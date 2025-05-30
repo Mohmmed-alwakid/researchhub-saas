@@ -1,0 +1,53 @@
+import { Router } from 'express';
+import authRoutes from './auth.routes';
+import studyRoutes from './study.routes';
+import taskRoutes from './task.routes';
+import sessionRoutes from './session.routes';
+// import recordingRoutes from './recording.routes';
+// import feedbackRoutes from './feedback.routes';
+// import paymentRoutes from './payment.routes';
+// import subscriptionRoutes from './subscription.routes';
+
+const router = Router();
+
+// API Routes
+router.use('/auth', authRoutes);
+router.use('/studies', studyRoutes);
+router.use('/tasks', taskRoutes);
+router.use('/sessions', sessionRoutes);
+// router.use('/recordings', recordingRoutes);
+// router.use('/feedback', feedbackRoutes);
+// router.use('/payments', paymentRoutes);
+// router.use('/subscriptions', subscriptionRoutes);
+
+// Health check endpoint
+router.get('/health', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'ResearchHub API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// API documentation endpoint
+router.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to ResearchHub API',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      studies: '/api/studies',
+      tasks: '/api/tasks',
+      sessions: '/api/sessions',
+      recordings: '/api/recordings',
+      feedback: '/api/feedback',
+      payments: '/api/payments',
+      subscriptions: '/api/subscriptions'
+    },
+    documentation: 'https://docs.researchhub.com/api'
+  });
+});
+
+export default router;

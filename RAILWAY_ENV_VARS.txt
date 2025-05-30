@@ -1,0 +1,22 @@
+RAILWAY ENVIRONMENT VARIABLES
+Copy and paste these into Railway one by one:
+
+NODE_ENV=production
+
+PORT=5000
+
+MONGODB_URI=mongodb+srv://abwanwr77:CFm4JCkjeFpKpzO4@cluster0.ackancs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+JWT_SECRET=f985e9336178c587e7cd17dcbdc2ff6d863c16a45f941ad2daf6dda9b38a54ea5984515fba438420abade63aef243fe2090cd3a0aa19ce37a0f6c955ba11ef004
+
+JWT_REFRESH_SECRET=9c64a633ecac05bf7bf95fbb75d97f87252e7c086c7a7abdb9231fb30362adecf599d5307861c380749166beb221a0e71182a4fa93e0a429513370980d43c79e03
+
+JWT_EXPIRE=7d
+
+JWT_REFRESH_EXPIRE=30d
+
+===== OPTIONAL (for full functionality) =====
+STRIPE_SECRET_KEY=your-stripe-secret-key
+STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
+SENDGRID_API_KEY=your-sendgrid-api-key
+FROM_EMAIL=noreply@researchhub.com

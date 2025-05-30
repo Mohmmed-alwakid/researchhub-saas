@@ -1,0 +1,62 @@
+# Docker Compose for local development and testing
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: research-hub-db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: research-hub
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - research-hub-network
+
+  # Backend API
+  backend:
+    build: .
+    container_name: research-hub-api
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/research-hub?authSource=admin
+      JWT_SECRET: dev-jwt-secret
+      JWT_REFRESH_SECRET: dev-refresh-secret
+      CLIENT_URL: http://localhost:5174
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - research-hub-network
+    command: npm run dev:server
+
+  # Frontend (for production builds)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: research-hub-client
+    ports:
+      - "5174:80"
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    depends_on:
+      - backend
+    networks:
+      - research-hub-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  research-hub-network:
+    driver: bridge
