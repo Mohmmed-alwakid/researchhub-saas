@@ -5,13 +5,6 @@ import { Task } from '../../database/models/Task.model';
 import { Recording } from '../../database/models/Recording.model';
 import { APIError } from '../middleware/error.middleware';
 import type { AuthRequest } from '../../shared/types/index.js';
-import {
-  canAccessStudy,
-  isResourceOwner,
-  isAdmin,
-  hasSubscriptionFeature,
-  PERMISSION_ERRORS
-} from '../utils/permissions.util.js';
 
 /**
  * Start a new session (for participants)
@@ -271,8 +264,7 @@ export const getStudySessions = async (req: AuthRequest, res: Response, next: Ne
       return next(new APIError('Access denied', 403));
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
-    const filter: any = { study: studyId };
+    const skip = (Number(page) - 1) * Number(limit);    const filter: Record<string, unknown> = { study: studyId };
     
     if (status) filter.status = status;
 
@@ -312,11 +304,10 @@ export const getSessionDetails = async (req: AuthRequest, res: Response, next: N
       .populate('progress.completedTasks');
 
     if (!session) {
-      return next(new APIError('Session not found', 404));
-    }
+      return next(new APIError('Session not found', 404));    }
 
     // Check study access
-    const study = session.studyId as any;
+    const study = session.studyId as unknown as { createdBy: string; team?: string[] };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 
@@ -347,11 +338,10 @@ export const deleteSession = async (req: AuthRequest, res: Response, next: NextF
     const { id } = req.params;
     const userId = req.user?.id;    const session = await Session.findById(id).populate('studyId');
     if (!session) {
-      return next(new APIError('Session not found', 404));
-    }
+      return next(new APIError('Session not found', 404));    }
 
     // Check study access
-    const study = session.studyId as any;
+    const study = session.studyId as unknown as { createdBy: string; team?: string[] };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 

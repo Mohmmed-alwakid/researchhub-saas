@@ -4,9 +4,7 @@ import { validationResult } from 'express-validator';
 import type { AuthRequest } from '../../shared/types/index.js';
 import {
   canAccessStudy,
-  isResourceOwner,
   isAdmin,
-  hasSubscriptionFeature,
   PERMISSION_ERRORS
 } from '../utils/permissions.util.js';
 

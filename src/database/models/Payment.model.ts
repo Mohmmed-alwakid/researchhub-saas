@@ -57,7 +57,7 @@ export interface IPaymentDocument extends Omit<IPayment, '_id' | 'userId'>, Docu
   refundStatus?: string;
   refundReason?: string;
   // Add methods
-  markAsSucceeded(chargeId: string, amountReceived: number, fees?: any): Promise<IPaymentDocument>;
+  markAsSucceeded(chargeId: string, amountReceived: number, fees?: Record<string, unknown>): Promise<IPaymentDocument>;
   markAsFailed(failureCode: string, failureMessage: string, failureReason?: string): Promise<IPaymentDocument>;
   processRefund(refundAmount: number, reason?: string): Promise<IPaymentDocument>;
   flagForFraud(reason: string): Promise<IPaymentDocument>;
@@ -366,7 +366,7 @@ PaymentSchema.pre('save', function(this: IPaymentDocument, next) {
 
 // Static method to get payment analytics
 PaymentSchema.statics.getAnalytics = function(dateRange?: { start: Date; end: Date }, userId?: string) {
-  const matchStage: any = {};
+  const matchStage: Record<string, unknown> = {};
   
   if (dateRange) {
     matchStage.createdAt = {
@@ -441,9 +441,8 @@ PaymentSchema.statics.getFraudAlerts = function() {
 };
 
 // Instance method to mark as succeeded
-PaymentSchema.methods.markAsSucceeded = function(this: IPaymentDocument, chargeId: string, amountReceived: number, fees: any = {}) {
-  this.status = PaymentStatus.SUCCEEDED;
-  this.stripeChargeId = chargeId;
+PaymentSchema.methods.markAsSucceeded = function(this: IPaymentDocument, chargeId: string, amountReceived: number, fees: { stripeFee?: number; applicationFee?: number } = {}) {
+  this.status = PaymentStatus.SUCCEEDED;  this.stripeChargeId = chargeId;
   this.amountReceived = amountReceived;
   this.stripeFee = fees.stripeFee || 0;
   this.applicationFee = fees.applicationFee || 0;

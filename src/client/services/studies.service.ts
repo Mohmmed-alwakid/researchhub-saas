@@ -60,10 +60,9 @@ export interface StudyAnalytics {
     taskId: string;
     taskTitle: string;
     dropoffRate: number;
-  }>;
-  heatmapData: any[];
-  clickData: any[];
-  scrollData: any[];
+  }>;  heatmapData: Record<string, unknown>[];
+  clickData: Record<string, unknown>[];
+  scrollData: Record<string, unknown>[];
 }
 
 /**
@@ -167,7 +166,7 @@ export const studiesService = {
     success: boolean;
     participants: Array<{
       _id: string;
-      user: any;
+      user: Record<string, unknown>;
       status: string;
       invitedAt: string;
       joinedAt?: string;

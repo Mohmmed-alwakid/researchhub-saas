@@ -95,7 +95,7 @@ class DatabaseConnection {
   /**
    * Health check for the database connection
    */
-  public async healthCheck(): Promise<{ status: string; timestamp: Date; details: any }> {
+  public async healthCheck(): Promise<{ status: string; timestamp: Date; details: Record<string, unknown> }> {
     try {
       const adminDb = mongoose.connection.db?.admin();
       const result = await adminDb?.ping();

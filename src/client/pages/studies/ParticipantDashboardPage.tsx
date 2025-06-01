@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -62,11 +62,10 @@ const ParticipantDashboardPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   // Actions
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
 
-  const fetchApplications = async (page = 1, refresh = false) => {
+  const fetchApplications = useCallback(async (page = 1, refresh = false) => {
     try {
       if (refresh) {
         setRefreshing(true);
@@ -81,7 +80,7 @@ const ParticipantDashboardPage: React.FC = () => {
       };
 
       const response = await participantApplicationsService.getMyApplications(filters);
-        if (response.success) {
+      if (response.success) {
         const apps = response.data.applications as unknown as EnhancedApplication[];
         setApplications(apps);
         setCurrentPage(response.data.pagination.current);
@@ -96,14 +95,18 @@ const ParticipantDashboardPage: React.FC = () => {
 
         setStats(newStats);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch applications:', error);
-      toast.error(error.response?.data?.message || 'Failed to fetch applications');
+      const message = error && typeof error === 'object' && 'response' in error && 
+                     error.response && typeof error.response === 'object' && 'data' in error.response &&
+                     error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+                     ? String(error.response.data.message) : 'Failed to fetch applications';
+      toast.error(message);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [statusFilter]);
 
   const handleWithdrawApplication = async (applicationId: string) => {
     if (!confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) {
@@ -114,10 +117,13 @@ const ParticipantDashboardPage: React.FC = () => {
       setWithdrawingId(applicationId);
       await participantApplicationsService.withdrawApplication(applicationId);
       toast.success('Application withdrawn successfully');
-      await fetchApplications(currentPage, true);
-    } catch (error: any) {
+      await fetchApplications(currentPage, true);    } catch (error: unknown) {
       console.error('Failed to withdraw application:', error);
-      toast.error(error.response?.data?.message || 'Failed to withdraw application');
+      const message = error && typeof error === 'object' && 'response' in error && 
+                     error.response && typeof error.response === 'object' && 'data' in error.response &&
+                     error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+                     ? String(error.response.data.message) : 'Failed to withdraw application';
+      toast.error(message);
     } finally {
       setWithdrawingId(null);
     }
@@ -157,10 +163,9 @@ const ParticipantDashboardPage: React.FC = () => {
     app.studyId.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.studyId.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   useEffect(() => {
     fetchApplications();
-  }, [statusFilter]);
+  }, [statusFilter, fetchApplications]);
 
   if (loading) {
     return (

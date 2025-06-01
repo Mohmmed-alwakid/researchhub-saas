@@ -26,8 +26,6 @@ interface HeatmapAnalyticsProps {
 }
 
 export const HeatmapAnalytics: React.FC<HeatmapAnalyticsProps> = ({
-  sessionId: _sessionId,
-  studyId: _studyId,
   data,
   width = 1920,
   height = 1080,
@@ -234,10 +232,9 @@ export const HeatmapAnalytics: React.FC<HeatmapAnalyticsProps> = ({
                 Event Type
               </label>
               <div className="flex flex-wrap gap-2">
-                {['all', 'click', 'move', 'scroll'].map((eventType) => (
-                  <button
+                {['all', 'click', 'move', 'scroll'].map((eventType) => (                  <button
                     key={eventType}
-                    onClick={() => setHeatmapType(eventType as any)}
+                    onClick={() => setHeatmapType(eventType as 'click' | 'move' | 'scroll' | 'all')}
                     className={`flex items-center px-3 py-2 text-sm rounded-lg border transition-colors ${
                       heatmapType === eventType
                         ? 'bg-indigo-100 border-indigo-300 text-indigo-700'

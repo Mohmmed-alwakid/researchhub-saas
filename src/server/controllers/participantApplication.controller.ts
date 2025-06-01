@@ -1,12 +1,10 @@
 import type { Response, NextFunction } from 'express';
 import { ParticipantApplication } from '../../database/models/ParticipantApplication.model.js';
 import { Study } from '../../database/models/Study.model.js';
-import { User } from '../../database/models/User.model.js';
 import { APIError } from '../middleware/error.middleware.js';
 import type { AuthRequest } from '../../shared/types/index.js';
 import {
   isParticipant,
-  isResearcher,
   canAccessStudy,
   PERMISSION_ERRORS
 } from '../utils/permissions.util.js';
@@ -299,16 +297,12 @@ export const reviewApplication = async (req: AuthRequest, res: Response, next: N
     }
 
     const application = await ParticipantApplication.findById(applicationId)
-      .populate('studyId');
-
-    if (!application) {
+      .populate('studyId');    if (!application) {
       return next(new APIError('Application not found', 404));
-    }
-
-    const study = application.studyId as any;
+    }    const study = application.studyId as unknown as { createdBy: { toString(): string }; team?: { toString(): string }[]; _id: string };
 
     // Check if user can access this study
-    if (!canAccessStudy(req.user!, study.createdBy.toString(), study.team?.map((id: any) => id.toString()))) {
+    if (!canAccessStudy(req.user!, study.createdBy.toString(), study.team?.map((id) => id.toString()))) {
       return next(new APIError(PERMISSION_ERRORS.STUDY_ACCESS_DENIED, 403));
     }
 

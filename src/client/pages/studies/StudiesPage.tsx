@@ -26,7 +26,7 @@ interface Study {
   type: 'usability' | 'interview' | 'survey' | 'prototype';
   status: 'draft' | 'recruiting' | 'active' | 'completed' | 'paused';
   createdBy: string;
-  tasks: any[];
+  tasks: Record<string, unknown>[];
   participants: string[];
   settings: {
     maxParticipants: number;

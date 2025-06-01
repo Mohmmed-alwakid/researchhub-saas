@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,13 +6,6 @@ import { QrCode, Copy, Shield, CheckCircle, AlertCircle, ArrowLeft, Eye, EyeOff 
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
 import toast from 'react-hot-toast';
-
-// Mock QR code generation (in real app, this would come from backend)
-const generateQRCode = (secret: string, email: string) => {
-  const appName = 'ResearchHub';
-  const issuer = 'researchhub.com';
-  return `otpauth://totp/${encodeURIComponent(appName)}:${encodeURIComponent(email)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
-};
 
 // Generate random backup codes
 const generateBackupCodes = (): string[] => {
@@ -37,20 +30,16 @@ interface TwoFactorSetupProps {
   onCancel: () => void;
 }
 
-const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ userEmail, onComplete, onCancel }) => {
+const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ onComplete, onCancel }) => {
   const [currentStep, setCurrentStep] = useState<'setup' | 'verify' | 'backup'>('setup');
-  const [isLoading, setIsLoading] = useState(false);
-  const [secret] = useState('JBSWY3DPEHPK3PXP'); // In real app, this comes from backend
-  const [qrCode] = useState(generateQRCode('JBSWY3DPEHPK3PXP', userEmail));
+  const [isLoading, setIsLoading] = useState(false);  const [secret] = useState('JBSWY3DPEHPK3PXP'); // In real app, this comes from backend
   const [backupCodes] = useState(generateBackupCodes());
   const [showSecret, setShowSecret] = useState(false);
   const [backupCodesSaved, setBackupCodesSaved] = useState(false);
-
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<VerificationFormData>({
     resolver: zodResolver(verificationSchema),
   });
@@ -72,11 +61,10 @@ const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ userEmail, onComplete, 
       // Mock verification - in real app, verify with backend
       if (data.code === '123456') {
         toast.success('Two-factor authentication verified!');
-        setCurrentStep('backup');
-      } else {
+        setCurrentStep('backup');      } else {
         toast.error('Invalid verification code. Please try again.');
       }
-    } catch (error) {
+    } catch {
       toast.error('Verification failed. Please try again.');
     } finally {
       setIsLoading(false);

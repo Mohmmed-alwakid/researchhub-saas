@@ -375,9 +375,8 @@ export function hasSubscriptionFeature(user: IUserDocument, feature: string): bo
   if (!hasActiveSubscription(user)) {
     return false;
   }
-  
-  // Type assertion since we know subscription exists and is active
-  const subscription = user.subscription as any;
+    // Type assertion since we know subscription exists and is active
+  const subscription = user.subscription as { hasFeature?: (feature: string) => boolean };
   return subscription?.hasFeature?.(feature) === true;
 }
 

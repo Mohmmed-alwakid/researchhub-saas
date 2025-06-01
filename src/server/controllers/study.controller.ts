@@ -125,8 +125,9 @@ export const getStudy = async (req: AuthRequest, res: Response, next: NextFuncti
     if (!study) {
       return next(new APIError(PERMISSION_ERRORS.RESOURCE_NOT_FOUND, 404));
     }    // Check if user has access to this study using utility function
-    const teamMemberIds = study.team?.map((member: any) => {
-      return typeof member === 'string' ? member : member._id?.toString() || member.toString();
+    const teamMemberIds = study.team?.map((member: unknown) => {
+      if (typeof member === 'string') return member;
+      return (member as { _id?: string; toString(): string })._id?.toString() || (member as { toString(): string }).toString();
     }) || [];
     
     if (!canAccessStudy(req.user!, study.createdBy.toString(), teamMemberIds)) {

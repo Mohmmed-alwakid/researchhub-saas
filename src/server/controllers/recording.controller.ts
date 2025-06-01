@@ -164,13 +164,11 @@ export const getRecording = async (req: AuthRequest, res: Response, next: NextFu
 
     if (!recording) {
       return next(new APIError('Recording not found', 404));
-    }
-
-    // Check access permissions
-    const session = recording.sessionId as any;
+    }    // Check access permissions
+    const session = recording.sessionId as unknown as { studyId: { createdBy: string; team?: string[] } };
     const study = session.studyId;
     
-    const hasAccess = study.createdBy.toString() === userId || 
+    const hasAccess = study.createdBy.toString() === userId ||
                      study.team?.includes(userId);
 
     if (!hasAccess) {
@@ -189,16 +187,17 @@ export const getRecording = async (req: AuthRequest, res: Response, next: NextFu
 /**
  * Get all recordings for a session
  */
-export const getSessionRecordings = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
+export const getSessionRecordings = async (req: AuthRequest, res: Response, next: NextFunction) => {  try {
     const { sessionId } = req.params;
-    const userId = req.user?.id;    // Verify session access
+    const userId = req.user?.id;
+
+    // Verify session access
     const session = await Session.findById(sessionId).populate('studyId');
     if (!session) {
       return next(new APIError('Session not found', 404));
     }
 
-    const study = session.studyId as any;
+    const study = session.studyId as unknown as { createdBy: { toString(): string }; team?: string[] };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 
@@ -240,11 +239,9 @@ export const getStudyRecordings = async (req: AuthRequest, res: Response, next: 
 
     const skip = (Number(page) - 1) * Number(limit);    // Get sessions for this study first
     const sessions = await Session.find({ studyId: studyId }, '_id');
-    const sessionIds = sessions.map(s => s._id);
-
-    const filter: any = { sessionId: { $in: sessionIds } };
+    const sessionIds = sessions.map(s => s._id);    const filter: Record<string, unknown> = { sessionId: { $in: sessionIds } };
     if (type) filter.type = type;
-    if (status) filter.status = status;    const recordings = await Recording.find(filter)
+    if (status) filter.status = status;const recordings = await Recording.find(filter)
       .populate('sessionId', 'participant startedAt')
       .sort({ startTime: -1 })
       .skip(skip)
@@ -279,8 +276,7 @@ export const updateRecording = async (req: AuthRequest, res: Response, next: Nex
 
     const recording = await Recording.findById(id)
       .populate({
-        path: 'sessionId',
-        populate: {
+        path: 'sessionId',        populate: {
           path: 'studyId',
           select: 'createdBy team'
         }
@@ -288,10 +284,8 @@ export const updateRecording = async (req: AuthRequest, res: Response, next: Nex
 
     if (!recording) {
       return next(new APIError('Recording not found', 404));
-    }
-
-    // Check access permissions
-    const session = recording.sessionId as any;
+    }    // Check access permissions
+    const session = recording.sessionId as unknown as { studyId: { createdBy: { toString(): string }; team?: string[] } };
     const study = session.studyId;
     
     const hasAccess = study.createdBy.toString() === userId || 
@@ -337,12 +331,9 @@ export const deleteRecording = async (req: AuthRequest, res: Response, next: Nex
         }
       });
 
-    if (!recording) {
-      return next(new APIError('Recording not found', 404));
-    }
-
-    // Check access permissions
-    const session = recording.sessionId as any;
+    if (!recording) {    return next(new APIError('Recording not found', 404));
+    }    // Check access permissions
+    const session = recording.sessionId as unknown as { studyId: { createdBy: { toString(): string }; team?: string[] } };
     const study = session.studyId;
     
     const hasAccess = study.createdBy.toString() === userId || 
@@ -381,13 +372,11 @@ export const getRecordingUrl = async (req: AuthRequest, res: Response, next: Nex
           path: 'study',
           select: 'createdBy team'
         }
-      });
-
-    if (!recording) {
+      });    if (!recording) {
       return next(new APIError('Recording not found', 404));
     }    // Check access permissions
-    const session = recording.sessionId as any;
-    const study = session.study;
+    const session = recording.sessionId as unknown as { studyId: { createdBy: string; team?: string[] } };
+    const study = session.studyId;
       const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 

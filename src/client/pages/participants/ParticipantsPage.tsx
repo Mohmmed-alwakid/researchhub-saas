@@ -12,11 +12,19 @@ import {
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
 
+interface InviteData {
+  studyId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role?: string;
+}
+
 interface InviteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onInvite: (data: any) => void;
-  studies: any[];
+  onInvite: (data: InviteData) => void;
+  studies: Record<string, unknown>[];
 }
 
 const InviteModal: React.FC<InviteModalProps> = ({ isOpen, onClose, onInvite, studies }) => {
@@ -189,7 +197,7 @@ const ParticipantsPage: React.FC = () => {
     }
   };
 
-  const handleInvite = async (data: any) => {
+  const handleInvite = async (data: InviteData) => {
     try {
       await inviteParticipant(data.studyId, data);
     } catch (error) {

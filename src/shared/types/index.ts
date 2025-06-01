@@ -425,7 +425,7 @@ export interface ISubscription {
   _id: string;
   userId: string;
   plan: 'free' | 'basic' | 'pro' | 'enterprise';
-  status: 'active' | 'canceled' | 'expired' | 'past_due';
+  status: 'active' | 'canceled' | 'expired' | 'past_due' | 'cancel_at_period_end';
   stripeSubscriptionId?: string;
   currentPeriodStart: Date;
   currentPeriodEnd: Date;

@@ -272,12 +272,12 @@ SubscriptionSchema.virtual('trialDaysRemaining').get(function() {
 SubscriptionSchema.virtual('usagePercentage').get(function() {
   if (!this.usageLimits || !this.currentUsage) return {};
   
-  const percentages: any = {};
+  const percentages: Record<string, number> = {};
   
   for (const [key, limit] of Object.entries(this.usageLimits)) {
     if (typeof limit === 'number' && limit > 0) {
-      const usage = (this.currentUsage as any)[key] || 0;
-      percentages[key] = Math.round((usage / limit) * 100);
+      const usage = (this.currentUsage as Record<string, unknown>)[key] || 0;
+      percentages[key] = Math.round((Number(usage) / limit) * 100);
     }
   }
   
@@ -286,7 +286,15 @@ SubscriptionSchema.virtual('usagePercentage').get(function() {
 
 // Virtual for plan features
 SubscriptionSchema.virtual('planFeatures').get(function() {
-  const planFeatures: { [key: string]: any } = {
+  const planFeatures: Record<string, {
+    studies: number;
+    participants: number;
+    recordings: number;
+    storage: number;
+    collaborators: number;
+    apiCalls: number;
+    features: string[];
+  }> = {
     [SubscriptionPlan.FREE]: {
       studies: 1,
       participants: 50,
@@ -332,7 +340,7 @@ SubscriptionSchema.virtual('planFeatures').get(function() {
 SubscriptionSchema.pre('save', function(next) {
   // Set usage limits based on plan
   if (this.isNew || this.isModified('plan')) {
-    const planFeatures = (this as any).planFeatures;
+    const planFeatures = (this as unknown as { planFeatures: Record<string, unknown> }).planFeatures;
     this.usageLimits = {
       studies: planFeatures.studies,
       participants: planFeatures.participants,
@@ -363,7 +371,7 @@ SubscriptionSchema.pre('save', function(next) {
 
 // Static method to get subscription analytics
 SubscriptionSchema.statics.getAnalytics = function(dateRange?: { start: Date; end: Date }) {
-  const matchStage: any = {};
+  const matchStage: Record<string, unknown> = {};
   
   if (dateRange) {
     matchStage.createdAt = {
@@ -408,7 +416,7 @@ SubscriptionSchema.statics.getExpiring = function(days: number = 7) {
 
 // Instance method to check if feature is available
 SubscriptionSchema.methods.hasFeature = function(featureName: string): boolean {
-  const planFeatures = (this as any).planFeatures;
+  const planFeatures = (this as unknown as { planFeatures: { features: string[] } }).planFeatures;
   
   // Check plan features
   if (planFeatures.features.includes(featureName)) {
@@ -416,7 +424,7 @@ SubscriptionSchema.methods.hasFeature = function(featureName: string): boolean {
   }
     // Check custom features
   if (this.features && Array.isArray(this.features)) {
-    const customFeature = (this.features as any[]).find((f: any) => f.name === featureName);
+    const customFeature = (this.features as { name: string; enabled?: boolean }[]).find((f) => f.name === featureName);
     return customFeature?.enabled || false;
   }
   
@@ -424,9 +432,8 @@ SubscriptionSchema.methods.hasFeature = function(featureName: string): boolean {
 };
 
 // Instance method to check usage limits
-SubscriptionSchema.methods.checkUsageLimit = function(limitType: string): { allowed: boolean; remaining: number; percentage: number } {
-  const limit = (this.usageLimits as any)[limitType];
-  const current = (this.currentUsage as any)[limitType] || 0;
+SubscriptionSchema.methods.checkUsageLimit = function(limitType: string): { allowed: boolean; remaining: number; percentage: number } {  const limit = (this.usageLimits as Record<string, number>)[limitType];
+  const current = (this.currentUsage as Record<string, number>)[limitType] || 0;
   
   if (limit === -1) { // Unlimited
     return { allowed: true, remaining: -1, percentage: 0 };
@@ -445,11 +452,11 @@ SubscriptionSchema.methods.checkUsageLimit = function(limitType: string): { allo
 // Instance method to increment usage
 SubscriptionSchema.methods.incrementUsage = function(usageType: string, amount: number = 1) {
   if (!this.currentUsage) {
-    this.currentUsage = {} as any;
+    this.currentUsage = {} as Record<string, number>;
   }
   
-  const current = (this.currentUsage as any)[usageType] || 0;
-  (this.currentUsage as any)[usageType] = current + amount;
+  const current = (this.currentUsage as Record<string, number>)[usageType] || 0;
+  (this.currentUsage as Record<string, number>)[usageType] = current + amount;
   
   return this.save();
 };

@@ -19,7 +19,7 @@ interface SessionEvent {
   x?: number;
   y?: number;
   element?: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 interface SessionReplayProps {
@@ -37,8 +37,7 @@ export const SessionReplay: React.FC<SessionReplayProps> = ({
   sessionId,
   recordingUrl,
   events,
-  duration,  width: _width = 1920,
-  height: _height = 1080,
+  duration,
   autoPlay = false,
   showEvents = true
 }) => {
@@ -46,9 +45,7 @@ export const SessionReplay: React.FC<SessionReplayProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const [_isFullscreen, setIsFullscreen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [currentEvents, setCurrentEvents] = useState<SessionEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -129,14 +126,11 @@ export const SessionReplay: React.FC<SessionReplayProps> = ({
       setPlaybackSpeed(speed);
     }
   };
-
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       videoRef.current?.requestFullscreen();
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
 

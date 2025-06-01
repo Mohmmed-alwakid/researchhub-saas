@@ -131,9 +131,10 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    } catch (err: any) {      console.log(`Webhook signature verification failed.`, err.message);
-      res.status(400).send(`Webhook Error: ${err.message}`);
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.log(`Webhook signature verification failed.`, errorMessage);
+      res.status(400).send(`Webhook Error: ${errorMessage}`);
       return;
     }
 
@@ -224,13 +225,11 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     const customerId = subscription.customer as string;
     const user = await User.findOne({ stripeCustomerId: customerId });
 
-    if (user) {
-      await Subscription.findOneAndUpdate(
-        { user: user._id },
-        {
+    if (user) {      await Subscription.findOneAndUpdate(
+        { user: user._id },        {
           stripeSubscriptionId: subscription.id,
-          status: subscription.status,          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+          status: subscription.status,          currentPeriodStart: new Date((subscription as unknown as { current_period_start: number }).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as unknown as { current_period_end: number }).current_period_end * 1000),
           updatedAt: new Date()
         },
         { upsert: true }
@@ -264,7 +263,7 @@ async function handleSubscriptionCancellation(subscription: Stripe.Subscription)
  */
 async function handleInvoicePaymentSuccess(invoice: Stripe.Invoice) {
   try {
-    const subscriptionId = (invoice as any).subscription as string;
+    const subscriptionId = (invoice as unknown as { subscription: string }).subscription;
     if (subscriptionId) {
       await Subscription.findOneAndUpdate(
         { stripeSubscriptionId: subscriptionId },
@@ -284,7 +283,7 @@ async function handleInvoicePaymentSuccess(invoice: Stripe.Invoice) {
  */
 async function createOrUpdateSubscription(userId: string, planType: string) {
   try {
-    const planMapping: { [key: string]: { features: string[], limits: any } } = {
+    const planMapping: { [key: string]: { features: string[], limits: Record<string, string | number> } } = {
       basic: {
         features: ['basic_analytics', 'screen_recording', 'up_to_5_studies'],
         limits: { studies: 5, participants: 100, storage: '10GB' }
@@ -327,10 +326,8 @@ export const getUserPayments = async (req: AuthRequest, res: Response, next: Nex
     const userId = req.user?.id;
     const { page = 1, limit = 10, type, status } = req.query;    if (!userId) {
       return next(new APIError('User not authenticated', 401));
-    }
-
-    const skip = (Number(page) - 1) * Number(limit);
-    const filter: any = { user: userId };
+    }    const skip = (Number(page) - 1) * Number(limit);
+    const filter: Record<string, unknown> = { user: userId };
 
     if (type) filter.type = type;
     if (status) filter.status = status;

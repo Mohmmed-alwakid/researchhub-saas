@@ -85,14 +85,15 @@ class ApiService {
         return Promise.reject(error);
       }
     );
-  }
-
-  private handleApiError(error: any): void {
+  }  private handleApiError(error: unknown): void {
     // Show user-friendly error messages
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
-    } else if (error.message) {
-      toast.error(error.message);
+    if (error && typeof error === 'object' && 'response' in error) {
+      const response = error.response as { data?: { message?: string } };
+      if (response?.data?.message) {
+        toast.error(response.data.message);
+      }
+    } else if (error && typeof error === 'object' && 'message' in error) {
+      toast.error(String(error.message));
     } else {
       toast.error('An unexpected error occurred');
     }
@@ -103,18 +104,17 @@ class ApiService {
     const response = await this.api.get<T>(url, config);
     return response.data;
   }
-
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.api.post<T>(url, data, config);
     return response.data;
   }
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.api.put<T>(url, data, config);
     return response.data;
   }
 
-  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.api.patch<T>(url, data, config);
     return response.data;
   }
@@ -129,8 +129,7 @@ class ApiService {
     const response = await this.api.post<T>(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-      },
-      onUploadProgress: (progressEvent: any) => {
+      },      onUploadProgress: (progressEvent: { loaded: number; total?: number }) => {
         if (onProgress && progressEvent.total) {
           const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           onProgress(progress);

@@ -112,9 +112,7 @@ export const getStudyFeedback = async (req: AuthRequest, res: Response, next: Ne
 
     // Get sessions for this study
     const sessions = await Session.find({ study: studyId }, '_id');
-    const sessionIds = sessions.map(s => s._id);
-
-    const filter: any = { session: { $in: sessionIds } };
+    const sessionIds = sessions.map(s => s._id);    const filter: Record<string, unknown> = { session: { $in: sessionIds } };
     if (type) filter.type = type;
     if (taskId) filter.task = taskId;
     if (rating) filter.rating = Number(rating);
@@ -194,15 +192,13 @@ export const getFeedback = async (req: AuthRequest, res: Response, next: NextFun
           path: 'studyId',
           select: 'title createdBy team'
         }
-      })
-      .populate('taskId', 'title order');
+      })      .populate('taskId', 'title order');
 
     if (!feedback) {
       return next(new APIError('Feedback not found', 404));
-    }
-
-    // Check access permissions
-    const session = feedback.sessionId as any;    const study = session.study;
+    }    // Check access permissions
+    const session = feedback.sessionId as unknown as { studyId: { createdBy: { toString(): string }; team?: string[] } };
+    const study = session.studyId;
     
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
@@ -231,8 +227,7 @@ export const updateFeedback = async (req: AuthRequest, res: Response, next: Next
 
     const feedback = await Feedback.findById(id)
       .populate({
-        path: 'sessionId',
-        populate: {
+        path: 'sessionId',        populate: {
           path: 'studyId',
           select: 'createdBy team'
         }
@@ -241,8 +236,8 @@ export const updateFeedback = async (req: AuthRequest, res: Response, next: Next
     if (!feedback) {
       return next(new APIError('Feedback not found', 404));
     }    // Check access permissions
-    const session = feedback.sessionId as any;
-    const study = session.study;
+    const session = feedback.sessionId as unknown as { studyId: { createdBy: { toString(): string }; team?: string[] } };
+    const study = session.studyId;
     
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
@@ -283,14 +278,13 @@ export const deleteFeedback = async (req: AuthRequest, res: Response, next: Next
         populate: {
           path: 'studyId',
           select: 'createdBy team'
-        }
-      });
+        }      });
 
     if (!feedback) {
       return next(new APIError('Feedback not found', 404));
     }    // Check access permissions
-    const session = feedback.sessionId as any;
-    const study = session.study;
+    const session = feedback.sessionId as unknown as { studyId: { createdBy: { toString(): string }; team?: string[] } };
+    const study = session.studyId;
     
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);

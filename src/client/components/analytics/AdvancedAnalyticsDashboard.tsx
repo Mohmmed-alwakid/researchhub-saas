@@ -7,8 +7,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -23,15 +21,9 @@ import {
   Users,
   Clock,
   Target,
-  Eye,
-  MousePointer,
   Activity,
-  BarChart3,
-  Filter,
   Download,
   RefreshCw,
-  Calendar,
-  Zap,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -97,56 +89,55 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
   const [selectedMetric, setSelectedMetric] = useState<'sessions' | 'completions' | 'duration' | 'satisfaction'>('sessions');
   const [timeFilter, setTimeFilter] = useState(dateRange);
   const [isRealTime, setIsRealTime] = useState(false);
-
-  // Mock data - replace with actual API calls
-  const mockData: AnalyticsData = {
-    overview: {
-      totalSessions: 1247,
-      completedSessions: 1089,
-      averageDuration: 1847,
-      completionRate: 87.3,
-      bounceRate: 12.7,
-      conversionRate: 78.5,
-      userSatisfaction: 4.2,
-      totalParticipants: 892,
-    },
-    trends: [
-      { date: '2024-01-01', sessions: 45, completions: 38, avgDuration: 1650, satisfaction: 4.1 },
-      { date: '2024-01-02', sessions: 62, completions: 55, avgDuration: 1720, satisfaction: 4.3 },
-      { date: '2024-01-03', sessions: 58, completions: 48, avgDuration: 1890, satisfaction: 4.0 },
-      { date: '2024-01-04', sessions: 71, completions: 63, avgDuration: 1780, satisfaction: 4.4 },
-      { date: '2024-01-05', sessions: 68, completions: 59, avgDuration: 1945, satisfaction: 4.2 },
-      { date: '2024-01-06', sessions: 83, completions: 72, avgDuration: 1820, satisfaction: 4.5 },
-      { date: '2024-01-07', sessions: 76, completions: 68, avgDuration: 1760, satisfaction: 4.3 },
-    ],
-    deviceBreakdown: [
-      { device: 'Desktop', value: 68, color: '#3B82F6', sessions: 847 },
-      { device: 'Mobile', value: 25, color: '#10B981', sessions: 312 },
-      { device: 'Tablet', value: 7, color: '#F59E0B', sessions: 88 },
-    ],
-    taskPerformance: [
-      { task: 'Navigation Task', completion: 92, avgTime: 180, difficulty: 2.1, errorRate: 8 },
-      { task: 'Search Task', completion: 85, avgTime: 245, difficulty: 2.8, errorRate: 15 },
-      { task: 'Checkout Flow', completion: 67, avgTime: 420, difficulty: 3.5, errorRate: 33 },
-      { task: 'Contact Form', completion: 78, avgTime: 165, difficulty: 2.3, errorRate: 22 },
-      { task: 'Product Review', completion: 91, avgTime: 195, difficulty: 1.9, errorRate: 9 },
-    ],
-    userBehavior: [
-      { timeSpent: 120, pagesVisited: 5, clicksPerSession: 12, scrollDepth: 75 },
-      { timeSpent: 240, pagesVisited: 8, clicksPerSession: 18, scrollDepth: 85 },
-      { timeSpent: 180, pagesVisited: 6, clicksPerSession: 15, scrollDepth: 68 },
-      { timeSpent: 300, pagesVisited: 10, clicksPerSession: 22, scrollDepth: 92 },
-      { timeSpent: 160, pagesVisited: 4, clicksPerSession: 9, scrollDepth: 58 },
-    ],
-    realTimeMetrics: {
-      activeSessions: 23,
-      sessionsToday: 156,
-      completionsToday: 134,
-      averageSessionTime: 1920,
-    },
-  };
-
   useEffect(() => {
+    // Mock data - replace with actual API calls
+    const mockData: AnalyticsData = {
+      overview: {
+        totalSessions: 1247,
+        completedSessions: 1089,
+        averageDuration: 1847,
+        completionRate: 87.3,
+        bounceRate: 12.7,
+        conversionRate: 78.5,
+        userSatisfaction: 4.2,
+        totalParticipants: 892,
+      },
+      trends: [
+        { date: '2024-01-01', sessions: 45, completions: 38, avgDuration: 1650, satisfaction: 4.1 },
+        { date: '2024-01-02', sessions: 62, completions: 55, avgDuration: 1720, satisfaction: 4.3 },
+        { date: '2024-01-03', sessions: 58, completions: 48, avgDuration: 1890, satisfaction: 4.0 },
+        { date: '2024-01-04', sessions: 71, completions: 63, avgDuration: 1780, satisfaction: 4.4 },
+        { date: '2024-01-05', sessions: 68, completions: 59, avgDuration: 1945, satisfaction: 4.2 },
+        { date: '2024-01-06', sessions: 83, completions: 72, avgDuration: 1820, satisfaction: 4.5 },
+        { date: '2024-01-07', sessions: 76, completions: 68, avgDuration: 1760, satisfaction: 4.3 },
+      ],
+      deviceBreakdown: [
+        { device: 'Desktop', value: 68, color: '#3B82F6', sessions: 847 },
+        { device: 'Mobile', value: 25, color: '#10B981', sessions: 312 },
+        { device: 'Tablet', value: 7, color: '#F59E0B', sessions: 88 },
+      ],
+      taskPerformance: [
+        { task: 'Navigation Task', completion: 92, avgTime: 180, difficulty: 2.1, errorRate: 8 },
+        { task: 'Search Task', completion: 85, avgTime: 245, difficulty: 2.8, errorRate: 15 },
+        { task: 'Checkout Flow', completion: 67, avgTime: 420, difficulty: 3.5, errorRate: 33 },
+        { task: 'Contact Form', completion: 78, avgTime: 165, difficulty: 2.3, errorRate: 22 },
+        { task: 'Product Review', completion: 91, avgTime: 195, difficulty: 1.9, errorRate: 9 },
+      ],
+      userBehavior: [
+        { timeSpent: 120, pagesVisited: 5, clicksPerSession: 12, scrollDepth: 75 },
+        { timeSpent: 240, pagesVisited: 8, clicksPerSession: 18, scrollDepth: 85 },
+        { timeSpent: 180, pagesVisited: 6, clicksPerSession: 15, scrollDepth: 68 },
+        { timeSpent: 300, pagesVisited: 10, clicksPerSession: 22, scrollDepth: 92 },
+        { timeSpent: 160, pagesVisited: 4, clicksPerSession: 9, scrollDepth: 58 },
+      ],
+      realTimeMetrics: {
+        activeSessions: 23,
+        sessionsToday: 156,
+        completionsToday: 134,
+        averageSessionTime: 1920,
+      },
+    };
+
     // Simulate API call
     setLoading(true);
     setTimeout(() => {
@@ -366,7 +357,7 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
               <div className="flex items-center space-x-2">
                 <select
                   value={selectedMetric}
-                  onChange={(e) => setSelectedMetric(e.target.value as any)}
+                  onChange={(e) => setSelectedMetric(e.target.value as 'sessions' | 'completions' | 'duration' | 'satisfaction')}
                   className="border border-gray-300 rounded px-2 py-1 text-sm"
                 >
                   <option value="sessions">Sessions</option>
@@ -382,10 +373,9 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
               <AreaChart data={getMetricData()}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" tickFormatter={formatDate} />
-                <YAxis />
-                <Tooltip 
+                <YAxis />                <Tooltip 
                   labelFormatter={(label) => formatDate(label)}
-                  formatter={(value, name) => [value, selectedMetric]}
+                  formatter={(value) => [value, selectedMetric]}
                 />
                 <Area
                   type="monotone"

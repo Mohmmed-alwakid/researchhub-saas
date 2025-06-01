@@ -65,11 +65,10 @@ const BackupCodeLogin: React.FC<BackupCodeLoginProps> = ({
           toast.error('Too many failed attempts. Please contact support.');
           onCancel();
         } else {
-          toast.error(`Invalid backup code. ${newAttempts} attempts remaining.`);
-        }
+          toast.error(`Invalid backup code. ${newAttempts} attempts remaining.`);        }
         reset();
       }
-    } catch (error) {
+    } catch {
       toast.error('Verification failed. Please try again.');
     } finally {
       setIsLoading(false);

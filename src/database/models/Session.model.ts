@@ -298,7 +298,7 @@ SessionSchema.methods.completeSession = function() {
 };
 
 // Instance method to add mouse event
-SessionSchema.methods.addMouseEvent = function(event: any) {
+SessionSchema.methods.addMouseEvent = function(event: Record<string, unknown>) {
   if (!this.mouseEvents) this.mouseEvents = [];
   this.mouseEvents.push({
     ...event,
@@ -307,7 +307,7 @@ SessionSchema.methods.addMouseEvent = function(event: any) {
 };
 
 // Instance method to add keyboard event
-SessionSchema.methods.addKeyboardEvent = function(event: any) {
+SessionSchema.methods.addKeyboardEvent = function(event: Record<string, unknown>) {
   if (!this.keyboardEvents) this.keyboardEvents = [];
   this.keyboardEvents.push({
     ...event,

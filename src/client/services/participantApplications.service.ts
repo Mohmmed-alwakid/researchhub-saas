@@ -1,5 +1,5 @@
 import { apiService } from './api.service';
-import type { ParticipantApplication, Study } from '../../shared/types';
+import type { ParticipantApplication } from '../../shared/types';
 
 export interface PublicStudy {
   _id: string;
@@ -62,7 +62,7 @@ export interface StudyApplicationsResponse {
         name: string;
         email: string;
         profile?: {
-          demographics?: any;
+          demographics?: Record<string, unknown>;
         };
       };
     }>;

@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { uploadAvatar, uploadRecording, uploadFile } from '../middleware/upload.middleware';
 import { authenticateToken } from '../middleware/auth.middleware';
 import { uploadAvatarController, uploadRecordingController, uploadFileController } from '../controllers/upload.controller';
-import { validateRequest, fileValidation } from '../middleware/validation.middleware';
 
 const router = Router();
 

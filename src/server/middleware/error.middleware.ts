@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import { validationResult } from 'express-validator';
 
 /**
  * Custom error class for API errors
@@ -7,9 +8,9 @@ import mongoose from 'mongoose';
 export class APIError extends Error {
   public statusCode: number;
   public code?: string;
-  public details?: any;
+  public details?: Record<string, unknown>;
 
-  constructor(message: string, statusCode: number = 500, code?: string, details?: any) {
+  constructor(message: string, statusCode: number = 500, code?: string, details?: Record<string, unknown>) {
     super(message);
     this.name = 'APIError';
     this.statusCode = statusCode;
@@ -24,7 +25,7 @@ export class APIError extends Error {
 /**
  * Async error handler wrapper
  */
-export const asyncHandler = (fn: Function) => {
+export const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<void> | void) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
@@ -45,12 +46,13 @@ export const errorHandler = (
   error: Error | APIError,
   req: Request,
   res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): void => {
   let statusCode = 500;
   let message = 'Internal Server Error';
   let code = 'INTERNAL_ERROR';
-  let details: any = undefined;
+  let details: unknown = undefined;
 
   // Log error for debugging
   console.error('Error occurred:', {
@@ -79,21 +81,21 @@ export const errorHandler = (
     details = Object.keys(error.errors).reduce((acc, key) => {
       acc[key] = error.errors[key].message;
       return acc;
-    }, {} as any);
+    }, {} as Record<string, string>);
   } else if (error instanceof mongoose.Error.CastError) {
     // Mongoose cast errors (invalid ObjectId, etc.)
     statusCode = 400;
     message = `Invalid ${error.path}: ${error.value}`;
     code = 'CAST_ERROR';
-  } else if ((error as any).code === 11000) {
+  } else if ((error as { code?: number }).code === 11000) {
     // MongoDB duplicate key error
     statusCode = 400;
     message = 'Duplicate field value entered';
     code = 'DUPLICATE_ERROR';
-    
-    // Extract field name from error
-    const field = Object.keys((error as any).keyValue)[0];
-    details = { field, value: (error as any).keyValue[field] };
+      // Extract field name from error
+    const errorWithKey = error as { keyValue?: Record<string, unknown> };
+    const field = errorWithKey.keyValue ? Object.keys(errorWithKey.keyValue)[0] : 'unknown';
+    details = { field, value: errorWithKey.keyValue?.[field] };
   } else if (error.name === 'JsonWebTokenError') {
     // JWT errors
     statusCode = 401;
@@ -109,20 +111,29 @@ export const errorHandler = (
     statusCode = 400;
     message = `File upload error: ${error.message}`;
     code = 'UPLOAD_ERROR';
-  } else if ((error as any).type === 'StripeCardError') {
+  } else if ((error as { type?: string }).type === 'StripeCardError') {
     // Stripe card errors
     statusCode = 400;
     message = `Payment error: ${error.message}`;
     code = 'PAYMENT_ERROR';
-  } else if ((error as any).type === 'StripeInvalidRequestError') {
+  } else if ((error as { type?: string }).type === 'StripeInvalidRequestError') {
     // Stripe invalid request
     statusCode = 400;
     message = `Payment request error: ${error.message}`;
     code = 'PAYMENT_REQUEST_ERROR';
   }
-
   // Response object
-  const errorResponse: any = {
+  const errorResponse: {
+    success: boolean;
+    error: {
+      message: string;
+      code: string;
+      statusCode: number;
+      details?: unknown;
+      stack?: string;
+      requestId?: string;
+    };
+  } = {
     success: false,
     error: {
       message,
@@ -140,10 +151,10 @@ export const errorHandler = (
   if (process.env.NODE_ENV === 'development') {
     errorResponse.error.stack = error.stack;
   }
-
   // Add request ID if available
   if (req.headers['x-request-id']) {
-    errorResponse.error.requestId = req.headers['x-request-id'];
+    const requestId = req.headers['x-request-id'];
+    errorResponse.error.requestId = Array.isArray(requestId) ? requestId[0] : requestId;
   }
 
   res.status(statusCode).json(errorResponse);
@@ -156,13 +167,11 @@ export const handleValidationErrors = (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
-  const { validationResult } = require('express-validator');
-  const errors = validationResult(req);
+): void => {  const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    const errorDetails = errors.array().reduce((acc: any, error: any) => {
-      acc[error.path || error.param] = error.msg;
+  if (!errors.isEmpty()) {    const errorDetails = errors.array().reduce((acc: Record<string, string>, error: { path?: string; param?: string; msg: string }) => {
+      const field = error.path || error.param || 'unknown';
+      acc[field] = error.msg;
       return acc;
     }, {});
 
@@ -184,8 +193,7 @@ export const handleValidationErrors = (
 /**
  * Create standard API error responses
  */
-export const createError = {
-  badRequest: (message: string = 'Bad Request', details?: any) => 
+export const createError = {  badRequest: (message: string = 'Bad Request', details?: Record<string, unknown>) => 
     new APIError(message, 400, 'BAD_REQUEST', details),
     
   unauthorized: (message: string = 'Unauthorized') => 
@@ -214,8 +222,7 @@ export const createError = {
     
   quotaExceeded: (message: string = 'Usage quota exceeded') => 
     new APIError(message, 429, 'QUOTA_EXCEEDED'),
-    
-  invalidInput: (message: string, details?: any) => 
+      invalidInput: (message: string, details?: Record<string, unknown>) => 
     new APIError(message, 422, 'INVALID_INPUT', details),
     
   paymentRequired: (message: string = 'Payment required') => 

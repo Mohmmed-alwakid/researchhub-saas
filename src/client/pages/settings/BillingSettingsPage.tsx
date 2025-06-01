@@ -16,7 +16,7 @@ import { Button } from '../../components/ui/Button';
 
 const BillingSettingsPage = () => {
   const [searchParams] = useSearchParams();
-  const [usageStats, setUsageStats] = useState<any>(null);
+  const [usageStats, setUsageStats] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     // Handle payment success/cancel callbacks

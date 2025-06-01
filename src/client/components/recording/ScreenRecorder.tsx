@@ -121,14 +121,12 @@ export const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
         stream.getTracks().forEach(track => {
           combinedStream.addTrack(track);
         });
-      });
-
-      return combinedStream;
+      });      return combinedStream;
     } catch (error) {
       console.error('Error initializing media streams:', error);
       throw new Error(`Failed to initialize recording: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, [recordingOptions, getRecordingConstraints]);
+  }, [recordingOptions, getRecordingConstraints, handleStopRecording]);
 
   // Start recording
   const handleStartRecording = useCallback(async () => {
@@ -167,12 +165,20 @@ export const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
           streamRef.current.getTracks().forEach(track => track.stop());
           streamRef.current = null;
         }
-      };
-
-      mediaRecorder.onerror = (event) => {
-        console.error('MediaRecorder error:', event);
+      };      mediaRecorder.onerror = () => {
+        console.error('MediaRecorder error occurred');
         onError?.('Recording failed');
-        handleStopRecording();
+        // Stop recording directly without circular dependency
+        if (mediaRecorderRef.current && isRecording) {
+          mediaRecorderRef.current.stop();
+          setIsRecording(false);
+          setIsPaused(false);
+          
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+        }
       };
 
       // Generate recording ID and notify parent
@@ -200,7 +206,7 @@ export const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
     } finally {
       setIsInitializing(false);
     }
-  }, [sessionId, initializeStreams, onRecordingStart, onRecordingStop, onError]);
+  }, [sessionId, initializeStreams, onRecordingStart, onRecordingStop, onError, isRecording]);
 
   // Stop recording
   const handleStopRecording = useCallback(() => {

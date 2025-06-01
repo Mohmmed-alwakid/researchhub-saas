@@ -57,11 +57,10 @@ const TwoFactorLogin: React.FC<TwoFactorLoginProps> = ({
           toast.error('Too many failed attempts. Please try again later.');
           onCancel();
         } else {
-          toast.error(`Invalid code. ${newAttempts} attempts remaining.`);
-        }
+          toast.error(`Invalid code. ${newAttempts} attempts remaining.`);        }
         reset();
       }
-    } catch (error) {
+    } catch {
       toast.error('Verification failed. Please try again.');
     } finally {
       setIsLoading(false);

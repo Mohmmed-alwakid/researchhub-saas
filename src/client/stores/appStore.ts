@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+// Helper function to extract error message from axios errors
+const getErrorMessage = (error: unknown, defaultMessage: string): string => {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const response = (error as { response?: { data?: { message?: string } } }).response;
+    return response?.data?.message || defaultMessage;
+  }
+  return defaultMessage;
+};
+
 interface Study {
   _id: string;
   title: string;
@@ -29,7 +38,7 @@ interface Task {
   description: string;
   type: 'navigation' | 'interaction' | 'feedback' | 'questionnaire';
   order: number;
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
 }
 
 interface TaskInput {
@@ -37,7 +46,7 @@ interface TaskInput {
   description: string;
   type: 'navigation' | 'interaction' | 'feedback' | 'questionnaire' | 'prototype' | 'heatmap';
   order: number;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 interface StudyInput {
@@ -61,7 +70,7 @@ interface Participant {
   email: string;
   firstName: string;
   lastName: string;
-  demographics: Record<string, any>;
+  demographics: Record<string, unknown>;
   status: 'invited' | 'screened' | 'qualified' | 'completed' | 'disqualified';
   studyId: string;
   sessions: string[];
@@ -77,7 +86,7 @@ interface Session {
   startTime: string;
   endTime?: string;
   recordings: string[];
-  feedback: Record<string, any>;
+  feedback: Record<string, unknown>;
   analytics: {
     clicks: number;
     duration: number;
@@ -108,7 +117,7 @@ interface AppState {
   setCurrentStudy: (study: Study | null) => void;
   
   fetchParticipants: (studyId?: string) => Promise<void>;
-  inviteParticipant: (studyId: string, participantData: any) => Promise<void>;
+  inviteParticipant: (studyId: string, participantData: { email: string; name?: string }) => Promise<void>;
   updateParticipant: (participantId: string, updates: Partial<Participant>) => Promise<void>;
   
   fetchSessions: (studyId?: string) => Promise<void>;
@@ -116,7 +125,7 @@ interface AppState {
   updateSession: (sessionId: string, updates: Partial<Session>) => Promise<void>;
 }
 
-export const useAppStore = create<AppState>((set, _get) => ({
+export const useAppStore = create<AppState>((set) => ({
   // Initial state
   studies: [],
   currentStudy: null,
@@ -131,10 +140,9 @@ export const useAppStore = create<AppState>((set, _get) => ({
     set({ studiesLoading: true });
     try {
       const response = await axios.get('/studies');
-      set({ studies: response.data.studies, studiesLoading: false });
-    } catch (error: any) {
+      set({ studies: response.data.studies, studiesLoading: false });    } catch (error: unknown) {
       set({ studiesLoading: false });
-      const message = error.response?.data?.message || 'Failed to fetch studies';
+      const message = getErrorMessage(error, 'Failed to fetch studies');
       toast.error(message);
     }
   },
@@ -149,9 +157,8 @@ export const useAppStore = create<AppState>((set, _get) => ({
       }));
       
       toast.success('Study created successfully');
-      return newStudy;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to create study';
+      return newStudy;    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to create study');
       toast.error(message);
       throw error;
     }
@@ -169,9 +176,8 @@ export const useAppStore = create<AppState>((set, _get) => ({
         currentStudy: state.currentStudy?._id === studyId ? updatedStudy : state.currentStudy
       }));
       
-      toast.success('Study updated successfully');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to update study';
+      toast.success('Study updated successfully');    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to update study');
       toast.error(message);
       throw error;
     }
@@ -186,9 +192,8 @@ export const useAppStore = create<AppState>((set, _get) => ({
         currentStudy: state.currentStudy?._id === studyId ? null : state.currentStudy
       }));
       
-      toast.success('Study deleted successfully');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to delete study';
+      toast.success('Study deleted successfully');    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to delete study');
       toast.error(message);
       throw error;
     }
@@ -204,15 +209,13 @@ export const useAppStore = create<AppState>((set, _get) => ({
     try {
       const url = studyId ? `/participants?studyId=${studyId}` : '/participants';
       const response = await axios.get(url);
-      set({ participants: response.data.participants, participantsLoading: false });
-    } catch (error: any) {
+      set({ participants: response.data.participants, participantsLoading: false });    } catch (error: unknown) {
       set({ participantsLoading: false });
-      const message = error.response?.data?.message || 'Failed to fetch participants';
+      const message = getErrorMessage(error, 'Failed to fetch participants');
       toast.error(message);
     }
   },
-
-  inviteParticipant: async (studyId: string, participantData: any) => {
+  inviteParticipant: async (studyId: string, participantData: { email: string; name?: string }) => {
     try {
       const response = await axios.post('/participants/invite', {
         studyId,
@@ -224,9 +227,8 @@ export const useAppStore = create<AppState>((set, _get) => ({
         participants: [newParticipant, ...state.participants]
       }));
       
-      toast.success('Participant invited successfully');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to invite participant';
+      toast.success('Participant invited successfully');    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to invite participant');
       toast.error(message);
       throw error;
     }
@@ -243,9 +245,8 @@ export const useAppStore = create<AppState>((set, _get) => ({
         )
       }));
       
-      toast.success('Participant updated successfully');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to update participant';
+      toast.success('Participant updated successfully');    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to update participant');
       toast.error(message);
       throw error;
     }
@@ -257,10 +258,9 @@ export const useAppStore = create<AppState>((set, _get) => ({
     try {
       const url = studyId ? `/sessions?studyId=${studyId}` : '/sessions';
       const response = await axios.get(url);
-      set({ sessions: response.data.sessions, sessionsLoading: false });
-    } catch (error: any) {
+      set({ sessions: response.data.sessions, sessionsLoading: false });    } catch (error: unknown) {
       set({ sessionsLoading: false });
-      const message = error.response?.data?.message || 'Failed to fetch sessions';
+      const message = getErrorMessage(error, 'Failed to fetch sessions');
       toast.error(message);
     }
   },
@@ -275,9 +275,8 @@ export const useAppStore = create<AppState>((set, _get) => ({
       }));
       
       toast.success('Session created successfully');
-      return newSession;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to create session';
+      return newSession;    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to create session');
       toast.error(message);
       throw error;
     }
@@ -294,9 +293,8 @@ export const useAppStore = create<AppState>((set, _get) => ({
         )
       }));
       
-      toast.success('Session updated successfully');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to update session';
+      toast.success('Session updated successfully');    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to update session');
       toast.error(message);
       throw error;
     }

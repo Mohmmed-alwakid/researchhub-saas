@@ -16,11 +16,9 @@ import {
 type PermissionValue = typeof PERMISSIONS[keyof typeof PERMISSIONS];
 
 // Extend Express Request interface to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: IUserDocument;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: IUserDocument;
   }
 }
 
@@ -137,8 +135,7 @@ export const optionalAuth = async (
     }
 
     next();
-
-  } catch (error) {
+  } catch {
     // Silent fail for optional auth
     next();
   }
@@ -242,10 +239,8 @@ export const requireSubscription = (feature?: string) => {
           message: 'Active subscription required'
         });
         return;
-      }
-
-      // Check specific feature if provided
-      if (feature && !(subscription as any).hasFeature(feature)) {
+      }      // Check specific feature if provided
+      if (feature && !(subscription as { hasFeature: (feature: string) => boolean }).hasFeature(feature)) {
         res.status(403).json({
           success: false,
           message: `Feature '${feature}' not available in current plan`
@@ -401,9 +396,10 @@ export const authenticateSessionToken = async (
         success: false,
         message: 'Session is not active'
       });
-      return;
-    }    // Attach session to request
-    (req as Request & { session: any }).session = session;
+      return;    }
+
+    // Attach session to request
+    (req as Request & { session: unknown }).session = session;
     const user = await User.findById(session.participantId);
     req.user = user || undefined;
     next();
@@ -523,16 +519,14 @@ export const requireStudyAccess = async (
       return;
     }
 
-    if (!canAccessStudy(req.user, study.createdBy.toString(), study.team?.map((id: any) => id.toString()))) {
+    if (!canAccessStudy(req.user, study.createdBy.toString(), study.team?.map((id: unknown) => (id as { toString(): string }).toString()))) {
       res.status(403).json({
         success: false,
         message: PERMISSION_ERRORS.STUDY_ACCESS_DENIED
       });
       return;
-    }
-
-    // Attach study to request for use in controller
-    (req as Request & { study: any }).study = study;
+    }    // Attach study to request for use in controller
+    (req as Request & { study: unknown }).study = study;
     next();
 
   } catch (error) {
@@ -618,12 +612,10 @@ export const requireResourceOwnership = (
           message: `${resourceType} ID required`
         });
         return;
-      }
-
-      // Dynamic model import based on resource type
+      }      // Dynamic model import based on resource type
       const models = await import('../../database/models/index.js');
       const ModelName = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
-      const Model = (models as any)[ModelName];
+      const Model = (models as Record<string, unknown>)[ModelName] as { findById: (id: string) => Promise<Record<string, unknown> | null> };
 
       if (!Model) {
         res.status(500).json({
@@ -640,20 +632,16 @@ export const requireResourceOwnership = (
           success: false,
           message: PERMISSION_ERRORS.RESOURCE_NOT_FOUND
         });
-        return;
-      }      const resourceOwnerId = resource[userIdField]?.toString();
-      const currentUserId = req.user._id?.toString();
+        return;      }      const resourceOwnerId = resource[userIdField]?.toString();
 
-      if (!isOwnerOrAdmin(req.user, resourceOwnerId)) {
+      if (!resourceOwnerId || !isOwnerOrAdmin(req.user, resourceOwnerId)) {
         res.status(403).json({
           success: false,
           message: PERMISSION_ERRORS.OWNER_OR_ADMIN_REQUIRED
         });
         return;
-      }
-
-      // Attach resource to request
-      (req as any)[resourceType] = resource;
+      }      // Attach resource to request
+      (req as Request & Record<string, unknown>)[resourceType] = resource;
       next();
 
     } catch (error) {
@@ -704,11 +692,10 @@ export const validateParticipantSession = async (
         success: false,
         message: PERMISSION_ERRORS.ACCESS_DENIED
       });
-      return;
-    }
+      return;    }
 
     // Attach session to request
-    (req as Request & { session: any }).session = session;
+    (req as Request & { session: unknown }).session = session;
     next();
 
   } catch (error) {

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import crypto from 'crypto';
 import type { IRecording } from '../../shared/types/index.js';
 import { RecordingQuality, RecordingStatus } from '../../shared/types/index.js';
 
@@ -284,17 +285,16 @@ RecordingSchema.pre('save', function(next) {
 });
 
 // Static method to get recordings by study with analytics
-RecordingSchema.statics.getStudyRecordings = function(studyId: string, options: any = {}) {
-  const query: any = { studyId };
+RecordingSchema.statics.getStudyRecordings = function(studyId: string, options: Record<string, unknown> = {}) {
+  const query: Record<string, unknown> = { studyId };
   
   if (options.status) {
     query.status = options.status;
   }
-  
-  if (options.dateRange) {
+    if (options.dateRange) {
     query.createdAt = {
-      $gte: options.dateRange.start,
-      $lte: options.dateRange.end
+      $gte: (options.dateRange as { start: Date; end: Date }).start,
+      $lte: (options.dateRange as { start: Date; end: Date }).end
     };
   }
   
@@ -370,7 +370,6 @@ RecordingSchema.methods.incrementViewCount = function() {
 
 // Instance method to generate access token
 RecordingSchema.methods.generateAccessToken = function(expirationHours: number = 24) {
-  const crypto = require('crypto');
   this.accessToken = crypto.randomBytes(32).toString('hex');
   this.expiresAt = new Date(Date.now() + expirationHours * 60 * 60 * 1000);
   return this.save();

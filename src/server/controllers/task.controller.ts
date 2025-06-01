@@ -91,14 +91,10 @@ export const getTask = async (req: AuthRequest, res: Response, next: NextFunctio
     const userId = req.user?.id;
 
     const task = await Task.findById(id)      .populate('studyId')
-      .populate('createdBy', 'name email');
-
-    if (!task) {
+      .populate('createdBy', 'name email');    if (!task) {
       return next(new APIError('Task not found', 404));
-    }
-
-    // Check study access
-    const study = task.studyId as any;
+    }    // Check study access
+    const study = task.studyId as unknown as { createdBy: string; team?: string[] };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 
@@ -121,16 +117,12 @@ export const getTask = async (req: AuthRequest, res: Response, next: NextFunctio
 export const updateTask = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id;
-
-    const task = await Task.findById(id).populate('studyId');
-
-    if (!task) {
+    const userId = req.user?.id;    const task = await Task.findById(id).populate('studyId');    if (!task) {
       return next(new APIError('Task not found', 404));
     }
 
     // Check study access
-    const study = task.studyId as any;
+    const study = task.studyId as unknown as { createdBy: string; team?: string[]; status: string };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 
@@ -175,11 +167,8 @@ export const deleteTask = async (req: AuthRequest, res: Response, next: NextFunc
     const task = await Task.findById(id).populate('studyId');
 
     if (!task) {
-      return next(new APIError('Task not found', 404));
-    }
-
-    // Check study access
-    const study = task.studyId as any;
+      return next(new APIError('Task not found', 404));    }    // Check study access
+    const study = task.studyId as unknown as { createdBy: string; team?: string[]; status: string };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 
@@ -258,10 +247,8 @@ export const duplicateTask = async (req: AuthRequest, res: Response, next: NextF
 
     if (!originalTask) {
       return next(new APIError('Task not found', 404));
-    }
-
-    // Check study access
-    const study = originalTask.studyId as any;
+    }    // Check study access
+    const study = originalTask.studyId as unknown as { createdBy: string; team?: string[]; status: string; _id: string };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 
@@ -271,17 +258,20 @@ export const duplicateTask = async (req: AuthRequest, res: Response, next: NextF
 
     // Cannot duplicate tasks in active studies
     if (study.status === 'active') {
-      return next(new APIError('Cannot duplicate tasks in active studies', 400));
-    }    // Create duplicate
-    const taskData = originalTask.toObject();
-    delete (taskData as any)._id;
-    delete (taskData as any).createdAt;
-    delete (taskData as any).updatedAt;
+      return next(new APIError('Cannot duplicate tasks in active studies', 400));    }
+
+    // Create duplicate
+    const taskData = originalTask.toObject() as unknown as Record<string, unknown>;
+    delete (taskData as Record<string, unknown>)._id;
+    delete (taskData as Record<string, unknown>).createdAt;
+    delete (taskData as Record<string, unknown>).updatedAt;
     
-    taskData.title = `${taskData.title} (Copy)`;
-    taskData.createdBy = userId;    // Set order to be last
+    (taskData as Record<string, unknown>).title = `${(taskData as Record<string, unknown>).title} (Copy)`;
+    (taskData as Record<string, unknown>).createdBy = userId;
+
+    // Set order to be last
     const lastTask = await Task.findOne({ studyId: study._id }).sort({ order: -1 });
-    taskData.order = lastTask ? lastTask.order + 1 : 1;
+    (taskData as Record<string, unknown>).order = lastTask ? (lastTask.order as number) + 1 : 1;
 
     const duplicatedTask = new Task(taskData);
     await duplicatedTask.save();
@@ -306,18 +296,17 @@ export const getTaskAnalytics = async (req: AuthRequest, res: Response, next: Ne
 
     const task = await Task.findById(id).populate('studyId');
 
-    if (!task) {
-      return next(new APIError('Task not found', 404));
-    }
-
-    // Check study access
-    const study = task.studyId as any;
+    if (!task) {    return next(new APIError('Task not found', 404));
+    }    // Check study access
+    const study = task.studyId as unknown as { createdBy: string; team?: string[]; _id: string };
     const hasAccess = study.createdBy.toString() === userId || 
                      study.team?.includes(userId);
 
     if (!hasAccess) {
       return next(new APIError('Access denied', 403));
-    }    // Get sessions that include this task
+    }
+
+    // Get sessions that include this task
     const sessions = await Session.find({ 
       studyId: study._id,
       'progress.currentTask': id

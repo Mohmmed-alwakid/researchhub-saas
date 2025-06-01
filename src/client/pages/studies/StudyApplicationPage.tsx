@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, DollarSign, Users, CheckCircle, AlertCircle } from 'lucide-react';
 import { participantApplicationsService } from '../../services/participantApplications.service';
@@ -45,8 +45,7 @@ const StudyApplicationPage: React.FC = () => {
   const [study, setStudy] = useState<StudyDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [screeningResponses, setScreeningResponses] = useState<Record<string, string>>({});
-  const fetchStudyDetails = async () => {
+  const [screeningResponses, setScreeningResponses] = useState<Record<string, string>>({});  const fetchStudyDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await studiesService.getStudy(studyId!);
@@ -58,7 +57,7 @@ const StudyApplicationPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [studyId, navigate]);
 
   useEffect(() => {
     if (studyId) {

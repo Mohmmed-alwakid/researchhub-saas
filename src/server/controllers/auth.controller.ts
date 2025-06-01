@@ -303,9 +303,8 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
   if (!user.profile) {
     user.profile = {};
   }
-  
-  // Update profile fields with proper typing
-  const profileData = user.profile as Record<string, any>;
+    // Update profile fields with proper typing
+  const profileData = user.profile as Record<string, unknown>;
   if (bio !== undefined) profileData.bio = bio;
   if (avatar !== undefined) profileData.avatar = avatar;
 

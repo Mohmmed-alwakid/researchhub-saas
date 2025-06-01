@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, 
@@ -37,8 +37,7 @@ const StudyDiscoveryPage: React.FC = () => {
     { value: 'card-sorting', label: 'Card Sorting' },
     { value: 'a-b-testing', label: 'A/B Testing' }
   ];
-
-  const fetchStudies = async () => {
+  const fetchStudies = useCallback(async () => {
     try {
       setLoading(true);
       const response = await participantApplicationsService.getPublicStudies({
@@ -56,7 +55,7 @@ const StudyDiscoveryPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, typeFilter]);
   useEffect(() => {
     fetchStudies();
   }, [currentPage, searchTerm, typeFilter, fetchStudies]);

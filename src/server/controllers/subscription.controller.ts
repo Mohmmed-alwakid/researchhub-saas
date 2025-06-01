@@ -6,6 +6,7 @@ import { Study } from '../../database/models/Study.model';
 import { Session } from '../../database/models/Session.model';
 import { APIError } from '../middleware/error.middleware';
 import type { AuthRequest } from '../../shared/types/index.js';
+import { SubscriptionStatus } from '../../shared/types/index.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-05-28.basil'
@@ -193,9 +194,8 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response, nex
     let customerId = user.stripeCustomerId;
     if (!customerId) {
       const customer = await stripe.customers.create({        email: user.email,
-        name: user.name,
-        metadata: {
-          userId: (user._id as any).toString()
+        name: user.name,        metadata: {
+          userId: (user._id as { toString(): string }).toString()
         }
       });
       customerId = customer.id;
@@ -308,11 +308,10 @@ export const cancelSubscription = async (req: AuthRequest, res: Response, next: 
     }
 
     // Cancel subscription in Stripe
-    if (cancelAtPeriodEnd) {
-      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+    if (cancelAtPeriodEnd) {      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
         cancel_at_period_end: true
       });
-      subscription.status = 'cancel_at_period_end' as any;
+      subscription.status = SubscriptionStatus.CANCEL_AT_PERIOD_END;
     } else {
       await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
       subscription.status = 'canceled';
@@ -341,14 +340,12 @@ export const reactivateSubscription = async (req: AuthRequest, res: Response, ne
 
     if (!userId) {
       return next(new APIError('User not authenticated', 401));
-    }
-
-    const subscription = await Subscription.findOne({ user: userId });
+    }    const subscription = await Subscription.findOne({ user: userId });
     if (!subscription || !subscription.stripeSubscriptionId) {
       return next(new APIError('No subscription found', 404));
     }
 
-    if ((subscription.status as any) !== 'cancel_at_period_end') {
+    if (subscription.status !== SubscriptionStatus.CANCEL_AT_PERIOD_END) {
       return next(new APIError('Subscription is not set to cancel', 400));
     }
 
@@ -357,7 +354,7 @@ export const reactivateSubscription = async (req: AuthRequest, res: Response, ne
       cancel_at_period_end: false
     });
 
-    subscription.status = 'active';
+    subscription.status = SubscriptionStatus.ACTIVE;
     subscription.updatedAt = new Date();
     await subscription.save();
 
