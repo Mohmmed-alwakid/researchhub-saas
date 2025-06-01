@@ -7,12 +7,11 @@ services:
   startCommand: npm run start
   plan: starter
   numInstances: 1
-  healthCheckPath: /api/health
-  envVars:
+  healthCheckPath: /api/health  envVars:
   - key: NODE_ENV
     value: production
   - key: PORT
-    value: 3002
+    value: "3002"
   - key: CLIENT_URL
     sync: false
   - key: MONGODB_URI

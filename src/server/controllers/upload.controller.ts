@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/error.middleware';
 import createError from 'http-errors';
 import { User } from '../../database/models/index';

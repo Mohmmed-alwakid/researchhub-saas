@@ -1,13 +1,13 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 /**
  * Configure multer storage for file uploads
  */
 const storage = multer.diskStorage({
-  destination: (req: Request, file: Express.Multer.File, cb) => {
+  destination: (_req: Request, _file: Express.Multer.File, cb) => {
     const uploadDir = path.join(process.cwd(), 'uploads');
     
     // Create uploads directory if it doesn't exist
@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     
     cb(null, uploadDir);
   },
-  filename: (req: Request, file: Express.Multer.File, cb) => {
+  filename: (_req: Request, file: Express.Multer.File, cb) => {
     // Generate unique filename with timestamp and random string
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const extension = path.extname(file.originalname);
@@ -28,7 +28,7 @@ const storage = multer.diskStorage({
 /**
  * File filter for image uploads
  */
-const imageFileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const imageFileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Check if file is an image
   const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
   
@@ -42,7 +42,7 @@ const imageFileFilter = (req: Request, file: Express.Multer.File, cb: multer.Fil
 /**
  * File filter for video uploads (recordings)
  */
-const videoFileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const videoFileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Check if file is a video
   const allowedMimeTypes = ['video/webm', 'video/mp4', 'video/avi'];
   

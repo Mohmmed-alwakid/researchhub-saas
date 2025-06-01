@@ -641,10 +641,8 @@ export const requireResourceOwnership = (
           message: PERMISSION_ERRORS.RESOURCE_NOT_FOUND
         });
         return;
-      }
-
-      const resourceOwnerId = resource[userIdField]?.toString();
-      const userId = req.user._id?.toString();
+      }      const resourceOwnerId = resource[userIdField]?.toString();
+      const currentUserId = req.user._id?.toString();
 
       if (!isOwnerOrAdmin(req.user, resourceOwnerId)) {
         res.status(403).json({
