@@ -9,6 +9,16 @@ export default defineConfig({
   define: {
     'process.env.NODE_ENV': JSON.stringify('production')
   },
+  server: {
+    port: 5175,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

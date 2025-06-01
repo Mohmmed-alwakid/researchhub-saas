@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
@@ -9,15 +9,25 @@ import EnhancedLandingPage from './client/pages/EnhancedLandingPage';
 import LoginPage from './client/pages/auth/LoginPage';
 import EnhancedLoginPage from './client/pages/auth/EnhancedLoginPage';
 import RegisterPage from './client/pages/auth/RegisterPage';
+import ForgotPasswordPage from './client/pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './client/pages/auth/ResetPasswordPage';
 import DashboardPage from './client/pages/dashboard/DashboardPage';
 import StudiesPage from './client/pages/studies/StudiesPage';
 import StudyBuilderPage from './client/pages/studies/StudyBuilderPage';
+import EnhancedStudyBuilderPage from './client/pages/studies/EnhancedStudyBuilderPage';
+import StudyDiscoveryPage from './client/pages/studies/StudyDiscoveryPage';
+import StudyApplicationPage from './client/pages/studies/StudyApplicationPage';
+import StudyApplicationsManagementPage from './client/pages/studies/StudyApplicationsManagementPage';
+import ParticipantDashboardPage from './client/pages/studies/ParticipantDashboardPage';
 import ParticipantsPage from './client/pages/participants/ParticipantsPage';
 import AnalyticsPage from './client/pages/analytics/AnalyticsPage';
+import BillingSettingsPage from './client/pages/settings/BillingSettingsPage';
+import SettingsPage from './client/pages/settings/SettingsPage';
 
 // Import layouts
 import AppLayout from './client/components/common/AppLayout';
 import AuthGuard from './client/components/auth/AuthGuard';
+import ProtectedRoute from './client/components/auth/ProtectedRoute';
 import { useAuthStore } from './client/stores/authStore';
 
 // Create a client
@@ -38,6 +48,43 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
+  // Component for role-based redirect
+  const RoleBasedRedirect = () => {
+    const navigate = useNavigate();
+    const { user: currentUser, isLoading: currentIsLoading } = useAuthStore();
+    
+    useEffect(() => {
+      // Only attempt redirect if we have user data and are not loading
+      if (currentUser && !currentIsLoading) {
+        switch (currentUser.role as string) {
+          case 'participant':
+            navigate('/app/participant-dashboard', { replace: true });
+            break;
+          case 'researcher':
+          case 'admin':
+          case 'super_admin':
+          default:
+            navigate('/app/dashboard', { replace: true });
+            break;
+        }
+      } else if (!currentIsLoading && !currentUser) {
+        // If not loading and no user, redirect to login
+        navigate('/login', { replace: true });
+      }
+    }, [currentUser, currentIsLoading, navigate]);
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-600">
+            {currentIsLoading ? 'Loading user data...' : 'Redirecting...'}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
@@ -49,6 +96,8 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/enhanced-login" element={<EnhancedLoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             
             {/* Protected routes */}
             <Route
@@ -59,13 +108,77 @@ function App() {
                 </AuthGuard>
               }
             >
-              <Route index element={<DashboardPage />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="studies" element={<StudiesPage />} />
-              <Route path="studies/new" element={<StudyBuilderPage />} />
-              <Route path="studies/:id/edit" element={<StudyBuilderPage />} />
-              <Route path="participants" element={<ParticipantsPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route index element={<RoleBasedRedirect />} />
+              
+              {/* Researcher/Admin routes */}
+              <Route path="dashboard" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <DashboardPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <StudiesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/new" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <EnhancedStudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/new/basic" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <StudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/:id/edit" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <EnhancedStudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/:id/edit/basic" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <StudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/:id/applications" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <StudyApplicationsManagementPage />
+                </ProtectedRoute>
+              } />
+              <Route path="participants" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <ParticipantsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="analytics" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <AnalyticsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="settings/billing" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <BillingSettingsPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Participant-specific routes */}
+              <Route path="participant-dashboard" element={
+                <ProtectedRoute allowedRoles={['participant']}>
+                  <ParticipantDashboardPage />
+                </ProtectedRoute>
+              } />
+              <Route path="discover" element={
+                <ProtectedRoute allowedRoles={['participant']}>
+                  <StudyDiscoveryPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/:id/apply" element={
+                <ProtectedRoute allowedRoles={['participant']}>
+                  <StudyApplicationPage />
+                </ProtectedRoute>
+              } />
             </Route>
           </Routes>
           <Toaster position="top-right" />

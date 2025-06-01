@@ -4,6 +4,14 @@ import { Task } from '../../database/models/Task.model';
 import { Session } from '../../database/models/Session.model';
 import { APIError } from '../middleware/error.middleware';
 import type { AuthRequest } from '../../shared/types/index.js';
+import {
+  canAccessStudy,
+  isResourceOwner,
+  isAdmin,
+  hasActiveSubscription,
+  hasSubscriptionFeature,
+  PERMISSION_ERRORS
+} from '../utils/permissions.util.js';
 
 /**
  * Create a new study
@@ -12,13 +20,26 @@ export const createStudy = async (req: AuthRequest, res: Response, next: NextFun
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return next(new APIError('User not authenticated', 401));
+      return next(new APIError(PERMISSION_ERRORS.AUTHENTICATION_REQUIRED, 401));
+    }
+
+    // Check if user has active subscription for study creation
+    if (!hasActiveSubscription(req.user!)) {
+      return next(new APIError(PERMISSION_ERRORS.SUBSCRIPTION_REQUIRED, 403));
+    }
+
+    // Check study creation limits based on subscription
+    if (!hasSubscriptionFeature(req.user!, 'unlimited_studies')) {
+      const userStudyCount = await Study.countDocuments({ createdBy: userId });
+      if (userStudyCount >= 5) { // Free tier limit
+        return next(new APIError('Study limit reached. Upgrade subscription for unlimited studies', 403));
+      }
     }
 
     const studyData = {
       ...req.body,
       createdBy: userId,
-      team: userId // Initially, creator is the only team member
+      team: [userId] // Initially, creator is the only team member
     };
 
     const study = new Study(studyData);
@@ -45,18 +66,20 @@ export const getStudies = async (req: AuthRequest, res: Response, next: NextFunc
     }
 
     const { page = 1, limit = 10, status, category } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+    const skip = (Number(page) - 1) * Number(limit);    // Build filter
+    interface StudyFilter {
+      $or: Array<{ createdBy: string } | { team: string }>;
+      status?: string;
+      category?: string;
+    }
 
-    // Build filter
-    const filter: any = {
+    const filter: StudyFilter = {
       $or: [
         { createdBy: userId },
         { team: userId }
       ]
-    };
-
-    if (status) filter.status = status;
-    if (category) filter.category = category;
+    };    if (status) filter.status = status as string;
+    if (category) filter.category = category as string;
 
     const studies = await Study.find(filter)
       .populate('createdBy', 'name email')
@@ -91,18 +114,23 @@ export const getStudy = async (req: AuthRequest, res: Response, next: NextFuncti
     const { id } = req.params;
     const userId = req.user?.id;
 
+    if (!userId) {
+      return next(new APIError(PERMISSION_ERRORS.AUTHENTICATION_REQUIRED, 401));
+    }
+
     const study = await Study.findById(id)
       .populate('createdBy', 'name email')
       .populate('team', 'name email');
 
     if (!study) {
-      return next(new APIError('Study not found', 404));
-    }    // Check if user has access to this study
-    const hasAccess = (typeof study.createdBy === 'string' ? study.createdBy : study.createdBy._id.toString()) === userId || 
-                     study.team?.some((member: any) => member._id.toString() === userId);
-
-    if (!hasAccess) {
-      return next(new APIError('Access denied', 403));
+      return next(new APIError(PERMISSION_ERRORS.RESOURCE_NOT_FOUND, 404));
+    }    // Check if user has access to this study using utility function
+    const teamMemberIds = study.team?.map((member: any) => {
+      return typeof member === 'string' ? member : member._id?.toString() || member.toString();
+    }) || [];
+    
+    if (!canAccessStudy(req.user!, study.createdBy.toString(), teamMemberIds)) {
+      return next(new APIError(PERMISSION_ERRORS.STUDY_ACCESS_DENIED, 403));
     }
 
     res.json({
@@ -122,18 +150,22 @@ export const updateStudy = async (req: AuthRequest, res: Response, next: NextFun
     const { id } = req.params;
     const userId = req.user?.id;
 
+    if (!userId) {
+      return next(new APIError(PERMISSION_ERRORS.AUTHENTICATION_REQUIRED, 401));
+    }
+
     const study = await Study.findById(id);
 
     if (!study) {
-      return next(new APIError('Study not found', 404));
+      return next(new APIError(PERMISSION_ERRORS.RESOURCE_NOT_FOUND, 404));
     }
 
-    // Check if user has permission to update
-    const hasPermission = study.createdBy.toString() === userId || 
-                         study.team?.includes(userId);
-
-    if (!hasPermission) {
-      return next(new APIError('Permission denied', 403));
+    // Check if user has permission to update using utility functions
+    if (!isResourceOwner(req.user!, study.createdBy.toString()) && !isAdmin(req.user!)) {
+      // Check if user is team member
+      if (!study.team?.includes(userId)) {
+        return next(new APIError(PERMISSION_ERRORS.OWNER_OR_ADMIN_REQUIRED, 403));
+      }
     }
 
     // Update study

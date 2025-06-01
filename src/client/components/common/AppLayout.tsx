@@ -13,6 +13,8 @@ import {
   Menu,
   X,
   LogOut,
+  Compass,
+  BookOpen,
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -37,7 +39,6 @@ const AppLayout = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
   const navigation = [
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Studies', href: '/app/studies', icon: FileText },
@@ -45,6 +46,24 @@ const AppLayout = () => {
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/app/settings', icon: Settings },
   ];
+
+  // Get role-specific navigation
+  const getNavigationForRole = () => {
+    const userRole = user?.role;
+    
+    if (userRole === 'participant') {
+      return [
+        { name: 'My Applications', href: '/app/participant-dashboard', icon: BookOpen },
+        { name: 'Discover Studies', href: '/app/discover', icon: Compass },
+        { name: 'Settings', href: '/app/settings', icon: Settings },
+      ];
+    }
+    
+    // For researchers, admins, and super_admins - use the full navigation
+    return navigation;
+  };
+
+  const currentNavigation = getNavigationForRole();
 
   const isCurrentPath = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
@@ -70,9 +89,8 @@ const AppLayout = () => {
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
               <span className="ml-2 text-xl font-bold text-gray-900">ResearchHub</span>
-            </div>
-            <nav className="mt-5 px-2 space-y-1">
-              {navigation.map((item) => {
+            </div>            <nav className="mt-5 px-2 space-y-1">
+              {currentNavigation.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
@@ -105,9 +123,8 @@ const AppLayout = () => {
                   <BarChart3 className="h-5 w-5 text-white" />
                 </div>
                 <span className="ml-2 text-xl font-bold text-gray-900">ResearchHub</span>
-              </div>
-              <nav className="mt-5 flex-1 px-2 space-y-1">
-                {navigation.map((item) => {
+              </div>              <nav className="mt-5 flex-1 px-2 space-y-1">
+                {currentNavigation.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Link

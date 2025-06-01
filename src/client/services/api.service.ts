@@ -5,11 +5,9 @@ import toast from 'react-hot-toast';
  * API configuration and interceptors
  */
 class ApiService {
-  private api: AxiosInstance;
-
-  constructor() {
+  private api: AxiosInstance;  constructor() {
     this.api = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+      baseURL: import.meta.env.VITE_API_URL || '/api',
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',

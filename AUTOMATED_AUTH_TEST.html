@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Authentication Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #005a8a;
+        }
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .loading { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        #test-log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Automated Authentication Test</h1>
+        <div class="info">
+            <strong>Purpose:</strong> Automatically test the authentication API endpoints and verify the fix.
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧪 API Tests</h2>
+        <button id="test-researcher" class="test-button" onclick="testResearcherLogin()">Test Researcher Login</button>
+        <button id="test-participant" class="test-button" onclick="testParticipantLogin()">Test Participant Login</button>
+        <button id="test-flow" class="test-button" onclick="testCompleteFlow()">Test Complete Flow</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 Test Results</h2>
+        <div id="test-status"></div>
+        <div id="test-log"></div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Manual Login Test Links</h2>
+        <div class="info">
+            Use these links to manually test the login flow in separate tabs:
+        </div>
+        <a href="http://localhost:5175/login" target="_blank" class="test-button">Open Login Page</a>
+        <a href="http://localhost:5175/app" target="_blank" class="test-button">Test /app Route</a>
+        <a href="http://localhost:5175/app/dashboard" target="_blank" class="test-button">Test Researcher Dashboard</a>
+        <a href="http://localhost:5175/app/participant-dashboard" target="_blank" class="test-button">Test Participant Dashboard</a>
+    </div>
+
+    <script>
+        let testLog = '';
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            testLog += logEntry;
+            document.getElementById('test-log').textContent = testLog;
+            document.getElementById('test-log').scrollTop = document.getElementById('test-log').scrollHeight;
+        }
+
+        function setStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        function clearLog() {
+            testLog = '';
+            document.getElementById('test-log').textContent = '';
+            setStatus('Log cleared');
+        }
+
+        async function testResearcherLogin() {
+            const button = document.getElementById('test-researcher');
+            button.disabled = true;
+            
+            try {
+                log('Testing researcher login...', 'info');
+                setStatus('Testing researcher login...', 'loading');
+
+                const response = await fetch('http://localhost:3002/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'testresearcher@test.com',
+                        password: 'Password123!'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    log(`✅ Researcher login successful!`, 'success');
+                    log(`User ID: ${result.data.user._id}`, 'info');
+                    log(`Role: ${result.data.user.role}`, 'info');
+                    log(`Token received: ${result.data.accessToken ? 'Yes' : 'No'}`, 'info');
+                    setStatus('✅ Researcher login test passed!', 'success');
+                } else {
+                    log(`❌ Researcher login failed: ${result.message || 'Unknown error'}`, 'error');
+                    setStatus('❌ Researcher login test failed!', 'error');
+                }
+            } catch (error) {
+                log(`❌ Researcher login error: ${error.message}`, 'error');
+                setStatus('❌ Researcher login test failed!', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function testParticipantLogin() {
+            const button = document.getElementById('test-participant');
+            button.disabled = true;
+            
+            try {
+                log('Testing participant login...', 'info');
+                setStatus('Testing participant login...', 'loading');
+
+                const response = await fetch('http://localhost:3002/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'testparticipant@test.com',
+                        password: 'Password123!'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    log(`✅ Participant login successful!`, 'success');
+                    log(`User ID: ${result.data.user._id}`, 'info');
+                    log(`Role: ${result.data.user.role}`, 'info');
+                    log(`Token received: ${result.data.accessToken ? 'Yes' : 'No'}`, 'info');
+                    setStatus('✅ Participant login test passed!', 'success');
+                } else {
+                    log(`❌ Participant login failed: ${result.message || 'Unknown error'}`, 'error');
+                    setStatus('❌ Participant login test failed!', 'error');
+                }
+            } catch (error) {
+                log(`❌ Participant login error: ${error.message}`, 'error');
+                setStatus('❌ Participant login test failed!', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function testCompleteFlow() {
+            const button = document.getElementById('test-flow');
+            button.disabled = true;
+            
+            try {
+                log('=== STARTING COMPLETE FLOW TEST ===', 'info');
+                setStatus('Running complete authentication flow test...', 'loading');
+
+                // Test 1: Check if servers are running
+                log('1. Checking server status...', 'info');
+                
+                try {
+                    const frontendCheck = await fetch('http://localhost:5175/');
+                    log(`Frontend (5175): ${frontendCheck.ok ? '✅ Online' : '❌ Offline'}`, frontendCheck.ok ? 'success' : 'error');
+                } catch (e) {
+                    log('Frontend (5175): ❌ Offline or unreachable', 'error');
+                }
+
+                try {
+                    const backendCheck = await fetch('http://localhost:3002/api/health');
+                    log(`Backend (3002): ${backendCheck.ok ? '✅ Online' : '❌ Offline'}`, backendCheck.ok ? 'success' : 'error');
+                } catch (e) {
+                    log('Backend (3002): ❌ Offline or unreachable', 'error');
+                }
+
+                // Test 2: Login API tests
+                log('2. Testing login APIs...', 'info');
+                
+                // Researcher login
+                const researcherResponse = await fetch('http://localhost:3002/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'testresearcher@test.com', password: 'Password123!' })
+                });
+                const researcherResult = await researcherResponse.json();
+                
+                if (researcherResponse.ok && researcherResult.success) {
+                    log(`✅ Researcher API login: SUCCESS (Role: ${researcherResult.data.user.role})`, 'success');
+                } else {
+                    log(`❌ Researcher API login: FAILED`, 'error');
+                }
+
+                // Participant login
+                const participantResponse = await fetch('http://localhost:3002/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'testparticipant@test.com', password: 'Password123!' })
+                });
+                const participantResult = await participantResponse.json();
+                
+                if (participantResponse.ok && participantResult.success) {
+                    log(`✅ Participant API login: SUCCESS (Role: ${participantResult.data.user.role})`, 'success');
+                } else {
+                    log(`❌ Participant API login: FAILED`, 'error');
+                }
+
+                // Test 3: Check route accessibility
+                log('3. Testing route accessibility...', 'info');
+                
+                const routes = [
+                    'http://localhost:5175/',
+                    'http://localhost:5175/login',
+                    'http://localhost:5175/app'
+                ];
+
+                for (const route of routes) {
+                    try {
+                        const routeResponse = await fetch(route);
+                        log(`${route}: ${routeResponse.ok ? '✅ Accessible' : '❌ Not accessible'}`, routeResponse.ok ? 'success' : 'error');
+                    } catch (e) {
+                        log(`${route}: ❌ Error accessing route`, 'error');
+                    }
+                }
+
+                log('=== FLOW TEST COMPLETE ===', 'info');
+                log('🎯 NEXT STEP: Manually test login flow in browser using the buttons above', 'info');
+                setStatus('✅ Complete flow test finished! Check log for details.', 'success');
+
+            } catch (error) {
+                log(`❌ Complete flow test error: ${error.message}`, 'error');
+                setStatus('❌ Complete flow test failed!', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        // Run initial test on page load
+        window.onload = function() {
+            log('🚀 Authentication test page loaded', 'info');
+            log('Ready to test authentication flow...', 'info');
+        };
+    </script>
+</body>
+</html>

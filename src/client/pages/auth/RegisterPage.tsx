@@ -14,6 +14,9 @@ const registerSchema = z
     email: z.string().email('Please enter a valid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
+    role: z.enum(['participant', 'researcher'], {
+      required_error: 'Please select your role',
+    }),
     company: z.string().optional(),
     acceptTerms: z.boolean().refine(val => val === true, {
       message: 'You must accept the terms and conditions',
@@ -60,7 +63,6 @@ const RegisterPage = () => {
   };
 
   const passwordStrength = getPasswordStrength(password || '');
-
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await registerUser({
@@ -68,7 +70,7 @@ const RegisterPage = () => {
         password: data.password,
         firstName: data.firstName,
         lastName: data.lastName,
-        role: 'researcher' // Default role for new registrations
+        role: data.role || 'participant' // Use selected role or default to participant
       });
       navigate('/app/dashboard');
     } catch (error) {
@@ -132,9 +134,9 @@ const RegisterPage = () => {
                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
                     First name
                   </label>
-                  <div className="mt-1">
-                    <input
+                  <div className="mt-1">                    <input
                       {...register('firstName')}
+                      id="firstName"
                       type="text"
                       autoComplete="given-name"
                       className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
@@ -155,9 +157,9 @@ const RegisterPage = () => {
                   <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
                     Last name
                   </label>
-                  <div className="mt-1">
-                    <input
+                  <div className="mt-1">                    <input
                       {...register('lastName')}
+                      id="lastName"
                       type="text"
                       autoComplete="family-name"
                       className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
@@ -179,9 +181,9 @@ const RegisterPage = () => {
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
                 </label>
-                <div className="mt-1">
-                  <input
+                <div className="mt-1">                  <input
                     {...register('email')}
+                    id="email"
                     type="email"
                     autoComplete="email"
                     className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
@@ -196,15 +198,13 @@ const RegisterPage = () => {
                     </div>
                   )}
                 </div>
-              </div>
-
-              <div>
+              </div>              <div>
                 <label htmlFor="company" className="block text-sm font-medium text-gray-700">
                   Company <span className="text-gray-400">(optional)</span>
                 </label>
-                <div className="mt-1">
-                  <input
+                <div className="mt-1">                  <input
                     {...register('company')}
+                    id="company"
                     type="text"
                     autoComplete="organization"
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -214,12 +214,52 @@ const RegisterPage = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  I am signing up as a:
+                </label>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <input
+                      {...register('role')}
+                      type="radio"
+                      value="participant"
+                      id="role-participant"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                    />
+                    <label htmlFor="role-participant" className="ml-3 block text-sm">
+                      <span className="font-medium text-gray-900">Participant</span>
+                      <p className="text-gray-500">I want to participate in research studies and earn rewards</p>
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      {...register('role')}
+                      type="radio"
+                      value="researcher"
+                      id="role-researcher"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                    />
+                    <label htmlFor="role-researcher" className="ml-3 block text-sm">
+                      <span className="font-medium text-gray-900">Researcher</span>
+                      <p className="text-gray-500">I want to create studies and gather user insights</p>
+                    </label>
+                  </div>
+                </div>
+                {errors.role && (
+                  <div className="mt-2 flex items-center text-sm text-red-600">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    {errors.role.message}
+                  </div>
+                )}
+              </div>
+
+              <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <div className="mt-1 relative">
-                  <input
+                <div className="mt-1 relative">                  <input
                     {...register('password')}
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="new-password"
                     className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-10 ${
@@ -273,12 +313,12 @@ const RegisterPage = () => {
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                   Confirm password
                 </label>
-                <div className="mt-1 relative">
-                  <input
+                <div className="mt-1 relative">                  <input
                     {...register('confirmPassword')}
+                    id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
                     autoComplete="new-password"
-                    className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-10 ${
+                    className={`appearance-one block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-10 ${
                       errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="Confirm your password"
@@ -303,9 +343,9 @@ const RegisterPage = () => {
                 )}
               </div>
 
-              <div className="flex items-center">
-                <input
+              <div className="flex items-center">                <input
                   {...register('acceptTerms')}
+                  id="acceptTerms"
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />

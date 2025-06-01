@@ -294,13 +294,20 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
   if (!user) {
     throw createError.notFound('User not found');
   }
-
   // Update allowed fields
   if (firstName) user.firstName = firstName;
   if (lastName) user.lastName = lastName;
   if (organization !== undefined) user.organization = organization;
-  if (bio !== undefined) user.profile!.bio = bio;
-  if (avatar !== undefined) user.profile!.avatar = avatar;
+  
+  // Initialize profile if it doesn't exist
+  if (!user.profile) {
+    user.profile = {};
+  }
+  
+  // Update profile fields with proper typing
+  const profileData = user.profile as Record<string, any>;
+  if (bio !== undefined) profileData.bio = bio;
+  if (avatar !== undefined) profileData.avatar = avatar;
 
   await user.save();
 

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Flow Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .response {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        input {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>ResearchHub Authentication Flow Debug</h1>
+    
+    <div class="test-section">
+        <h2>1. Local Storage Check</h2>
+        <button onclick="checkLocalStorage()">Check Auth Storage</button>
+        <div id="storage-response" class="response"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Full Authentication Flow</h2>
+        <div>
+            <h3>Researcher Login Test</h3>
+            <button onclick="testResearcherFlow()">Test Researcher Login → Redirect</button>
+            <div id="researcher-flow-response" class="response"></div>
+        </div>
+        <div>
+            <h3>Participant Login Test</h3>
+            <button onclick="testParticipantFlow()">Test Participant Login → Redirect</button>
+            <div id="participant-flow-response" class="response"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Authentication State Simulation</h2>
+        <button onclick="simulateAuth()">Simulate Auth Check</button>
+        <button onclick="clearAuth()">Clear Auth</button>
+        <div id="auth-sim-response" class="response"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Direct App Test</h2>
+        <button onclick="testAppRedirect()">Test /app Redirect</button>
+        <div id="app-test-response" class="response"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+
+        function checkLocalStorage() {
+            const responseDiv = document.getElementById('storage-response');
+            const authStorage = localStorage.getItem('auth-storage');
+            
+            if (authStorage) {
+                try {
+                    const parsed = JSON.parse(authStorage);
+                    responseDiv.innerHTML = `<span class="success">Auth Storage Found:</span>\n${JSON.stringify(parsed, null, 2)}`;
+                } catch (e) {
+                    responseDiv.innerHTML = `<span class="error">Auth Storage Corrupt:</span>\n${authStorage}`;
+                }
+            } else {
+                responseDiv.innerHTML = `<span class="error">No Auth Storage Found</span>`;
+            }
+        }
+
+        async function testResearcherFlow() {
+            const responseDiv = document.getElementById('researcher-flow-response');
+            responseDiv.innerHTML = "Starting researcher login flow...\n";
+            
+            try {
+                // Step 1: Login
+                responseDiv.innerHTML += "Step 1: Logging in...\n";
+                const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'testresearcher@test.com',
+                        password: 'Password123!'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (loginData.success) {
+                    responseDiv.innerHTML += `<span class="success">Login successful!</span>\n`;
+                    responseDiv.innerHTML += `User: ${loginData.data.user.email} (${loginData.data.user.role})\n`;
+                    
+                    // Step 2: Simulate auth storage
+                    const authState = {
+                        state: {
+                            user: loginData.data.user,
+                            token: loginData.data.token,
+                            refreshToken: loginData.data.refreshToken,
+                            isAuthenticated: true,
+                            isLoading: false
+                        }
+                    };
+                    
+                    localStorage.setItem('auth-storage', JSON.stringify(authState));
+                    responseDiv.innerHTML += `<span class="success">Auth state stored</span>\n`;
+                    
+                    // Step 3: Test redirect logic
+                    const role = loginData.data.user.role;
+                    let expectedRedirect;
+                    
+                    switch (role) {
+                        case 'participant':
+                            expectedRedirect = '/app/participant-dashboard';
+                            break;
+                        case 'researcher':
+                        case 'admin':
+                        case 'super_admin':
+                        default:
+                            expectedRedirect = '/app/dashboard';
+                            break;
+                    }
+                    
+                    responseDiv.innerHTML += `<span class="success">Expected redirect: ${expectedRedirect}</span>\n`;
+                    responseDiv.innerHTML += `\n<span class="success">✅ Researcher flow should work!</span>\n`;
+                    responseDiv.innerHTML += `\nYou can now visit: http://localhost:5175/app\n`;
+                    
+                } else {
+                    responseDiv.innerHTML += `<span class="error">Login failed: ${loginData.message}</span>\n`;
+                }
+                
+            } catch (error) {
+                responseDiv.innerHTML += `<span class="error">Error: ${error.message}</span>\n`;
+            }
+        }
+
+        async function testParticipantFlow() {
+            const responseDiv = document.getElementById('participant-flow-response');
+            responseDiv.innerHTML = "Starting participant login flow...\n";
+            
+            try {
+                // Step 1: Login
+                responseDiv.innerHTML += "Step 1: Logging in...\n";
+                const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'testparticipant@test.com',
+                        password: 'Password123!'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (loginData.success) {
+                    responseDiv.innerHTML += `<span class="success">Login successful!</span>\n`;
+                    responseDiv.innerHTML += `User: ${loginData.data.user.email} (${loginData.data.user.role})\n`;
+                    
+                    // Step 2: Simulate auth storage
+                    const authState = {
+                        state: {
+                            user: loginData.data.user,
+                            token: loginData.data.token,
+                            refreshToken: loginData.data.refreshToken,
+                            isAuthenticated: true,
+                            isLoading: false
+                        }
+                    };
+                    
+                    localStorage.setItem('auth-storage', JSON.stringify(authState));
+                    responseDiv.innerHTML += `<span class="success">Auth state stored</span>\n`;
+                    
+                    // Step 3: Test redirect logic
+                    const role = loginData.data.user.role;
+                    let expectedRedirect;
+                    
+                    switch (role) {
+                        case 'participant':
+                            expectedRedirect = '/app/participant-dashboard';
+                            break;
+                        case 'researcher':
+                        case 'admin':
+                        case 'super_admin':
+                        default:
+                            expectedRedirect = '/app/dashboard';
+                            break;
+                    }
+                    
+                    responseDiv.innerHTML += `<span class="success">Expected redirect: ${expectedRedirect}</span>\n`;
+                    responseDiv.innerHTML += `\n<span class="success">✅ Participant flow should work!</span>\n`;
+                    responseDiv.innerHTML += `\nYou can now visit: http://localhost:5175/app\n`;
+                    
+                } else {
+                    responseDiv.innerHTML += `<span class="error">Login failed: ${loginData.message}</span>\n`;
+                }
+                
+            } catch (error) {
+                responseDiv.innerHTML += `<span class="error">Error: ${error.message}</span>\n`;
+            }
+        }
+
+        function simulateAuth() {
+            const responseDiv = document.getElementById('auth-sim-response');
+            
+            // Simulate the checkAuth process
+            const authStorage = localStorage.getItem('auth-storage');
+            
+            if (authStorage) {
+                try {
+                    const parsed = JSON.parse(authStorage);
+                    const user = parsed.state?.user;
+                    const token = parsed.state?.token;
+                    
+                    if (user && token) {
+                        responseDiv.innerHTML = `<span class="success">Auth Check Simulation:</span>\n`;
+                        responseDiv.innerHTML += `User: ${user.email} (${user.role})\n`;
+                        responseDiv.innerHTML += `Token: ${token.substring(0, 20)}...\n`;
+                        responseDiv.innerHTML += `\nRoleBasedRedirect would navigate to:\n`;
+                        
+                        switch (user.role) {
+                            case 'participant':
+                                responseDiv.innerHTML += `<span class="success">/app/participant-dashboard</span>\n`;
+                                break;
+                            case 'researcher':
+                            case 'admin':
+                            case 'super_admin':
+                            default:
+                                responseDiv.innerHTML += `<span class="success">/app/dashboard</span>\n`;
+                                break;
+                        }
+                    } else {
+                        responseDiv.innerHTML = `<span class="error">Invalid auth state - missing user or token</span>\n`;
+                    }
+                } catch (e) {
+                    responseDiv.innerHTML = `<span class="error">Corrupt auth storage</span>\n`;
+                }
+            } else {
+                responseDiv.innerHTML = `<span class="error">No auth storage - would redirect to /login</span>\n`;
+            }
+        }
+
+        function clearAuth() {
+            localStorage.removeItem('auth-storage');
+            document.getElementById('auth-sim-response').innerHTML = `<span class="success">Auth storage cleared</span>\n`;
+        }
+
+        function testAppRedirect() {
+            const responseDiv = document.getElementById('app-test-response');
+            responseDiv.innerHTML = "Opening /app in new tab...\n";
+            window.open('http://localhost:5175/app', '_blank');
+            responseDiv.innerHTML += "Check the new tab for redirect behavior.\n";
+            responseDiv.innerHTML += "It should either:\n";
+            responseDiv.innerHTML += "1. Show 'Redirecting...' briefly then redirect to dashboard/participant-dashboard\n";
+            responseDiv.innerHTML += "2. Redirect to /login if no auth\n";
+        }
+
+        // Auto-check storage on load
+        window.onload = function() {
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

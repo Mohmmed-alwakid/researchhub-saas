@@ -5,6 +5,13 @@ import { Task } from '../../database/models/Task.model';
 import { Recording } from '../../database/models/Recording.model';
 import { APIError } from '../middleware/error.middleware';
 import type { AuthRequest } from '../../shared/types/index.js';
+import {
+  canAccessStudy,
+  isResourceOwner,
+  isAdmin,
+  hasSubscriptionFeature,
+  PERMISSION_ERRORS
+} from '../utils/permissions.util.js';
 
 /**
  * Start a new session (for participants)

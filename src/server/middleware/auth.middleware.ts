@@ -2,6 +2,18 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import type { IUserDocument } from '../../database/models/index.js';
 import { User } from '../../database/models/index.js';
+import {
+  isAdmin,
+  isOwnerOrAdmin,
+  canAccessStudy,
+  hasActiveSubscription,
+  hasSubscriptionFeature,
+  PERMISSION_ERRORS,
+  PERMISSIONS
+} from '../utils/permissions.util.js';
+
+// Type for permission values
+type PermissionValue = typeof PERMISSIONS[keyof typeof PERMISSIONS];
 
 // Extend Express Request interface to include user
 declare global {
@@ -179,13 +191,14 @@ export const requireOwnershipOrAdmin = (userIdField: string = 'userId') => {
       });
       return;
     }    const resourceUserId = req.params[userIdField] || req.body[userIdField];
-    const isOwner = (req.user._id as any).toString() === resourceUserId;
-    const isAdmin = ['admin', 'super_admin'].includes(req.user.role);
+    const userId = req.user._id ? req.user._id.toString() : '';
+    const isOwner = userId === resourceUserId;
+    const userIsAdmin = isAdmin(req.user);
 
-    if (!isOwner && !isAdmin) {
+    if (!isOwner && !userIsAdmin) {
       res.status(403).json({
         success: false,
-        message: 'Access denied - not resource owner or admin'
+        message: PERMISSION_ERRORS.OWNER_OR_ADMIN_REQUIRED
       });
       return;
     }
@@ -221,10 +234,9 @@ export const requireSubscription = (feature?: string) => {
           message: 'Active subscription required'
         });
         return;
-      }
-
-      // Check if subscription is active
-      if (subscription.status !== 'active') {
+      }      // Check if subscription is active
+      const subscriptionData = subscription as { status?: string };
+      if (subscriptionData.status !== 'active') {
         res.status(403).json({
           success: false,
           message: 'Active subscription required'
@@ -263,7 +275,7 @@ export const rateLimitPerUser = (maxRequests: number, windowMs: number) => {
     if (!req.user) {
       next();
       return;
-    }    const userId = (req.user._id as any).toString();
+    }    const userId = req.user._id ? req.user._id.toString() : '';
     const now = Date.now();
     const userLimit = userRequests.get(userId);
 
@@ -390,10 +402,10 @@ export const authenticateSessionToken = async (
         message: 'Session is not active'
       });
       return;
-    }
-
-    // Attach session to request    (req as any).session = session;
-    req.user = session.participantId as any;
+    }    // Attach session to request
+    (req as Request & { session: any }).session = session;
+    const user = await User.findById(session.participantId);
+    req.user = user || undefined;
     next();
 
   } catch (error) {
@@ -401,6 +413,311 @@ export const authenticateSessionToken = async (
     res.status(500).json({
       success: false,
       message: 'Session authentication failed'
+    });
+  }
+};
+
+// =============================================================================
+// ENHANCED PERMISSION MIDDLEWARE
+// =============================================================================
+
+/**
+ * Check if user has specific permission
+ */
+export const requirePermission = (permission: PermissionValue) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        message: PERMISSION_ERRORS.AUTHENTICATION_REQUIRED
+      });
+      return;
+    }
+
+    // Import permission utilities
+    import('../utils/permissions.util.js').then(({ hasPermission }) => {
+      if (!hasPermission(req.user!, permission)) {
+        res.status(403).json({
+          success: false,
+          message: PERMISSION_ERRORS.PERMISSION_REQUIRED(permission)
+        });
+        return;
+      }
+      next();
+    }).catch(() => {
+      res.status(500).json({
+        success: false,
+        message: 'Permission check failed'
+      });
+    });
+  };
+};
+
+/**
+ * Check if user has any of the specified permissions
+ */
+export const requireAnyPermission = (permissions: PermissionValue[]) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        message: PERMISSION_ERRORS.AUTHENTICATION_REQUIRED
+      });
+      return;
+    }
+
+    import('../utils/permissions.util.js').then(({ hasAnyPermission }) => {
+      if (!hasAnyPermission(req.user!, permissions)) {
+        res.status(403).json({
+          success: false,
+          message: PERMISSION_ERRORS.INSUFFICIENT_PERMISSIONS
+        });
+        return;
+      }
+      next();
+    }).catch(() => {
+      res.status(500).json({
+        success: false,
+        message: 'Permission check failed'
+      });
+    });
+  };
+};
+
+/**
+ * Enhanced study access middleware - checks ownership, team membership, or admin
+ */
+export const requireStudyAccess = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({
+      success: false,
+      message: PERMISSION_ERRORS.AUTHENTICATION_REQUIRED
+    });
+    return;
+  }
+
+  try {
+    const studyId = req.params.studyId || req.params.id || req.body.studyId;
+
+    if (!studyId) {
+      res.status(400).json({
+        success: false,
+        message: 'Study ID required'
+      });
+      return;
+    }
+
+    // Import Study model
+    const { Study } = await import('../../database/models/index.js');
+    const study = await Study.findById(studyId);
+
+    if (!study) {
+      res.status(404).json({
+        success: false,
+        message: PERMISSION_ERRORS.RESOURCE_NOT_FOUND
+      });
+      return;
+    }
+
+    if (!canAccessStudy(req.user, study.createdBy.toString(), study.team?.map((id: any) => id.toString()))) {
+      res.status(403).json({
+        success: false,
+        message: PERMISSION_ERRORS.STUDY_ACCESS_DENIED
+      });
+      return;
+    }
+
+    // Attach study to request for use in controller
+    (req as Request & { study: any }).study = study;
+    next();
+
+  } catch (error) {
+    console.error('Study access check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify study access'
+    });
+  }
+};
+
+/**
+ * Enhanced subscription middleware with better error messages
+ */
+export const requireActiveSubscription = (feature?: string) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        message: PERMISSION_ERRORS.AUTHENTICATION_REQUIRED
+      });
+      return;
+    }
+
+    try {
+      // Load subscription if not already populated
+      if (!req.user.subscription) {
+        await req.user.populate('subscription');
+      }
+
+      if (!hasActiveSubscription(req.user)) {
+        res.status(403).json({
+          success: false,
+          message: PERMISSION_ERRORS.SUBSCRIPTION_REQUIRED
+        });
+        return;
+      }
+
+      // Check specific feature if provided
+      if (feature && !hasSubscriptionFeature(req.user, feature)) {
+        res.status(403).json({
+          success: false,
+          message: PERMISSION_ERRORS.FEATURE_NOT_AVAILABLE(feature)
+        });
+        return;
+      }
+
+      next();
+
+    } catch (error) {
+      console.error('Subscription check error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to verify subscription'
+      });
+    }
+  };
+};
+
+/**
+ * Resource ownership validation with better type safety
+ */
+export const requireResourceOwnership = (
+  resourceType: string,
+  resourceIdField: string = 'id',
+  userIdField: string = 'createdBy'
+) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        message: PERMISSION_ERRORS.AUTHENTICATION_REQUIRED
+      });
+      return;
+    }
+
+    try {
+      const resourceId = req.params[resourceIdField] || req.body[resourceIdField];
+
+      if (!resourceId) {
+        res.status(400).json({
+          success: false,
+          message: `${resourceType} ID required`
+        });
+        return;
+      }
+
+      // Dynamic model import based on resource type
+      const models = await import('../../database/models/index.js');
+      const ModelName = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+      const Model = (models as any)[ModelName];
+
+      if (!Model) {
+        res.status(500).json({
+          success: false,
+          message: `Invalid resource type: ${resourceType}`
+        });
+        return;
+      }
+
+      const resource = await Model.findById(resourceId);
+
+      if (!resource) {
+        res.status(404).json({
+          success: false,
+          message: PERMISSION_ERRORS.RESOURCE_NOT_FOUND
+        });
+        return;
+      }
+
+      const resourceOwnerId = resource[userIdField]?.toString();
+      const userId = req.user._id?.toString();
+
+      if (!isOwnerOrAdmin(req.user, resourceOwnerId)) {
+        res.status(403).json({
+          success: false,
+          message: PERMISSION_ERRORS.OWNER_OR_ADMIN_REQUIRED
+        });
+        return;
+      }
+
+      // Attach resource to request
+      (req as any)[resourceType] = resource;
+      next();
+
+    } catch (error) {
+      console.error(`${resourceType} ownership check error:`, error);
+      res.status(500).json({
+        success: false,
+        message: `Failed to verify ${resourceType} ownership`
+      });
+    }
+  };
+};
+
+/**
+ * Participant session validation
+ */
+export const validateParticipantSession = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const sessionId = req.params.sessionId || req.body.sessionId;
+
+    if (!sessionId) {
+      res.status(400).json({
+        success: false,
+        message: 'Session ID required'
+      });
+      return;
+    }
+
+    const { Session } = await import('../../database/models/index.js');
+    const session = await Session.findById(sessionId)
+      .populate('studyId')
+      .populate('participantId');
+
+    if (!session) {
+      res.status(404).json({
+        success: false,
+        message: PERMISSION_ERRORS.RESOURCE_NOT_FOUND
+      });
+      return;
+    }
+
+    // Check if user is the participant for this session
+    if (req.user && session.participantId._id.toString() !== req.user._id?.toString()) {
+      res.status(403).json({
+        success: false,
+        message: PERMISSION_ERRORS.ACCESS_DENIED
+      });
+      return;
+    }
+
+    // Attach session to request
+    (req as Request & { session: any }).session = session;
+    next();
+
+  } catch (error) {
+    console.error('Participant session validation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to validate participant session'
     });
   }
 };

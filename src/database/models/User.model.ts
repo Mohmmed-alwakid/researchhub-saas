@@ -7,7 +7,7 @@ export interface IUserDocument extends Document {
   password: string;
   firstName: string;
   lastName: string;
-  role: 'researcher' | 'participant' | 'admin';
+  role: 'researcher' | 'participant' | 'admin' | 'super_admin';
   avatar?: string;
   isVerified: boolean;
   verificationToken?: string;
@@ -22,10 +22,9 @@ export interface IUserDocument extends Document {
     ipAddress: string;
   }>;
   lastLoginAt?: Date;
-  loginCount?: number;
-  organization?: string;
-  profile?: any;
-  subscription?: any;
+  loginCount?: number;  organization?: string;
+  profile?: object;
+  subscription?: object;
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
   isEmailVerified?: boolean;
@@ -76,10 +75,9 @@ const UserSchema: Schema = new Schema({
     required: [true, 'Last name is required'],
     trim: true,
     maxlength: [50, 'Last name cannot exceed 50 characters']
-  },
-  role: {
+  },  role: {
     type: String,
-    enum: ['researcher', 'participant', 'admin'],
+    enum: ['researcher', 'participant', 'admin', 'super_admin'],
     default: 'participant'
   },
   avatar: {

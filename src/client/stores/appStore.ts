@@ -35,7 +35,7 @@ interface Task {
 interface TaskInput {
   title: string;
   description: string;
-  type: 'navigation' | 'interaction' | 'feedback' | 'questionnaire';
+  type: 'navigation' | 'interaction' | 'feedback' | 'questionnaire' | 'prototype' | 'heatmap';
   order: number;
   settings?: Record<string, any>;
 }

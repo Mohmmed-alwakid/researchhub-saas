@@ -4,6 +4,8 @@ import type { User, UserRole } from '../../shared/types';
 export interface LoginRequest {
   email: string;
   password: string;
+  twoFactorCode?: string;
+  backupCode?: string;
 }
 
 export interface RegisterRequest {
@@ -17,9 +19,25 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   success: boolean;
-  user: User;
-  token: string;
-  refreshToken: string;
+  user?: User;
+  token?: string;
+  refreshToken?: string;
+  message: string;
+  requiresTwoFactor?: boolean;
+  tempToken?: string;
+}
+
+export interface TwoFactorSetupResponse {
+  success: boolean;
+  qrCode: string;
+  secret: string;
+  backupCodes: string[];
+  message: string;
+}
+
+export interface TwoFactorVerifyResponse {
+  success: boolean;
+  backupCodes: string[];
   message: string;
 }
 
@@ -113,12 +131,53 @@ export const authService = {
   async verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
     return apiService.post('/auth/verify-email', { token });
   },
-
   /**
    * Resend email verification
    */
   async resendVerification(): Promise<{ success: boolean; message: string }> {
     return apiService.post('/auth/resend-verification');
+  },
+
+  /**
+   * Setup two-factor authentication
+   */
+  async setup2FA(): Promise<TwoFactorSetupResponse> {
+    return apiService.post<TwoFactorSetupResponse>('/auth/2fa/setup');
+  },
+
+  /**
+   * Verify two-factor authentication setup
+   */
+  async verify2FASetup(code: string): Promise<TwoFactorVerifyResponse> {
+    return apiService.post<TwoFactorVerifyResponse>('/auth/2fa/verify-setup', { code });
+  },
+
+  /**
+   * Disable two-factor authentication
+   */
+  async disable2FA(password: string): Promise<{ success: boolean; message: string }> {
+    return apiService.post('/auth/2fa/disable', { password });
+  },
+
+  /**
+   * Generate new backup codes
+   */
+  async generateBackupCodes(): Promise<{ success: boolean; backupCodes: string[]; message: string }> {
+    return apiService.post('/auth/2fa/backup-codes');
+  },
+
+  /**
+   * Verify 2FA login
+   */
+  async verify2FALogin(tempToken: string, code: string): Promise<AuthResponse> {
+    return apiService.post<AuthResponse>('/auth/2fa/verify-login', { tempToken, code });
+  },
+
+  /**
+   * Verify backup code login
+   */
+  async verifyBackupCodeLogin(tempToken: string, backupCode: string): Promise<AuthResponse> {
+    return apiService.post<AuthResponse>('/auth/2fa/verify-backup', { tempToken, backupCode });
   },
 };
 

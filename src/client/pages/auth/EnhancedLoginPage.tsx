@@ -7,6 +7,8 @@ import { Eye, EyeOff, BarChart3, AlertCircle, Sparkles, CheckCircle } from 'luci
 import { useAuthStore } from '../../stores/authStore';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
+import TwoFactorLogin from '../../components/auth/TwoFactorLogin';
+import BackupCodeLogin from '../../components/auth/BackupCodeLogin';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -19,8 +21,9 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const EnhancedLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [authStep, setAuthStep] = useState<'login' | '2fa' | 'backup'>('login');
   const navigate = useNavigate();
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, tempToken, tempEmail, requiresTwoFactor, clearTempAuth } = useAuthStore();
 
   const {
     register,
@@ -28,16 +31,58 @@ const EnhancedLoginPage = () => {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-  });
-
-  const onSubmit = async (data: LoginFormData) => {
+  });  const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data.email, data.password);
-      navigate('/app/dashboard');
+      const result = await login(data.email, data.password);
+      if (result.requiresTwoFactor) {
+        setAuthStep('2fa');
+      } else {
+        navigate('/app'); // Let RoleBasedRedirect handle the proper routing
+      }
     } catch (error) {
       console.error('Login error:', error);
     }
   };
+
+  const handle2FASuccess = () => {
+    navigate('/app'); // Let RoleBasedRedirect handle the proper routing
+  };
+
+  const handleBackupCodeLogin = () => {
+    setAuthStep('backup');
+  };
+
+  const handleBackToLogin = () => {
+    setAuthStep('login');
+    clearTempAuth();
+  };
+
+  const handleBack2FA = () => {
+    setAuthStep('2fa');
+  };
+  // Show 2FA component if required
+  if (requiresTwoFactor && tempToken && tempEmail && authStep === '2fa') {
+    return (
+      <TwoFactorLogin
+        email={tempEmail}
+        onSuccess={handle2FASuccess}
+        onUseBackupCode={handleBackupCodeLogin}
+        onCancel={handleBackToLogin}
+      />
+    );
+  }
+
+  // Show backup code component
+  if (requiresTwoFactor && tempToken && tempEmail && authStep === 'backup') {
+    return (
+      <BackupCodeLogin
+        email={tempEmail}
+        onSuccess={handle2FASuccess}
+        onCancel={handleBack2FA}
+        onUseAuthenticator={handleBackToLogin}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex">

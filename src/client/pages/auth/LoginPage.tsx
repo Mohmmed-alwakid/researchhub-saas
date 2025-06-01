@@ -64,9 +64,9 @@ const LoginPage = () => {
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
                 </label>
-                <div className="mt-1">
-                  <input
+                <div className="mt-1">                  <input
                     {...register('email')}
+                    id="email"
                     type="email"
                     autoComplete="email"
                     className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
@@ -87,9 +87,9 @@ const LoginPage = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <div className="mt-1 relative">
-                  <input
+                <div className="mt-1 relative">                  <input
                     {...register('password')}
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-10 ${
@@ -118,9 +118,9 @@ const LoginPage = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
+                <div className="flex items-center">                  <input
                     {...register('rememberMe')}
+                    id="rememberMe"
                     type="checkbox"
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />

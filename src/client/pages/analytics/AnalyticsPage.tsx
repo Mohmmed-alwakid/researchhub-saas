@@ -9,7 +9,8 @@ import {
   Download,
   Eye,
   MousePointer,
-  Play
+  Play,
+  Zap
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -27,6 +28,7 @@ import {
 } from 'recharts';
 import HeatmapAnalytics from '../../components/analytics/HeatmapAnalytics';
 import SessionReplay from '../../components/analytics/SessionReplay';
+import AdvancedAnalyticsDashboard from '../../components/analytics/AdvancedAnalyticsDashboard';
 import { useAppStore } from '../../stores/appStore';
 
 const AnalyticsPage: React.FC = () => {
@@ -111,9 +113,9 @@ const AnalyticsPage: React.FC = () => {
     // Implementation for data export
     console.log(`Exporting analytics data as ${format.toUpperCase()}`);
   };
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'advanced', label: 'Advanced', icon: Zap },
     { id: 'heatmaps', label: 'Heatmaps', icon: MousePointer },
     { id: 'sessions', label: 'Session Replays', icon: Play },
     { id: 'tasks', label: 'Task Analysis', icon: Target }
@@ -303,6 +305,16 @@ const AnalyticsPage: React.FC = () => {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+          </div>        )}
+
+        {/* Advanced Analytics Tab */}
+        {activeTab === 'advanced' && (
+          <div>
+            <AdvancedAnalyticsDashboard
+              studyId={studyId}
+              dateRange={dateRange}
+              refreshInterval={30000}
+            />
           </div>
         )}
 

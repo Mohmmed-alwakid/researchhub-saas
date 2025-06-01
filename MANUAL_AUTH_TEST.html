@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Authentication Flow Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .test-button:hover {
+            background: #005a8a;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .checklist {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .checklist ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .test-credentials {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #007cba;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Manual Authentication Flow Test</h1>
+        <div class="info">
+            <strong>Purpose:</strong> Verify that the authentication redirect issues have been resolved and login flow works correctly.
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📋 Test Environment Status</h2>
+        <div id="status-check">
+            <div class="info">
+                <strong>Current Status:</strong> Checking servers...
+            </div>
+        </div>
+        <button class="test-button" onclick="checkServers()">Check Server Status</button>
+    </div>
+
+    <div class="container">
+        <h2>🧪 Test Credentials</h2>
+        <div class="test-credentials">
+            <strong>Researcher Account:</strong><br>
+            Email: testresearcher@test.com<br>
+            Password: Password123!<br>
+            Expected Dashboard: /app/dashboard (Researcher Dashboard)
+        </div>
+        <div class="test-credentials">
+            <strong>Participant Account:</strong><br>
+            Email: testparticipant@test.com<br>
+            Password: Password123!<br>
+            Expected Dashboard: /app/participant-dashboard (Participant Dashboard)
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Manual Test Steps</h2>
+        
+        <div class="test-section">
+            <h3>Step 1: Login Page Access</h3>
+            <div class="step">
+                1. Click the button below to open the login page
+            </div>
+            <a href="http://localhost:5175/login" target="_blank" class="test-button">Open Login Page</a>
+            <div class="checklist">
+                <strong>✅ Verify:</strong>
+                <ul>
+                    <li>Login page loads without errors</li>
+                    <li>Login form is visible and functional</li>
+                    <li>Both email and password fields are present</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 2: Researcher Login Test</h3>
+            <div class="step">
+                1. Use the researcher credentials above<br>
+                2. Enter email: testresearcher@test.com<br>
+                3. Enter password: Password123!<br>
+                4. Click "Sign In" button
+            </div>
+            <div class="checklist">
+                <strong>✅ Expected Behavior:</strong>
+                <ul>
+                    <li>NO "Redirecting..." message that gets stuck</li>
+                    <li>Should redirect to /app first</li>
+                    <li>Then automatically redirect to /app/dashboard (Researcher Dashboard)</li>
+                    <li>Should see researcher dashboard with studies, analytics, etc.</li>
+                    <li>URL should be: http://localhost:5175/app/dashboard</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 3: Logout Test</h3>
+            <div class="step">
+                1. Find and click the logout button/link<br>
+                2. Should redirect to home page or login page
+            </div>
+            <div class="checklist">
+                <strong>✅ Expected Behavior:</strong>
+                <ul>
+                    <li>Successfully logs out without errors</li>
+                    <li>Redirects to appropriate page (login or home)</li>
+                    <li>Cannot access protected routes after logout</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 4: Participant Login Test</h3>
+            <div class="step">
+                1. Go back to login page<br>
+                2. Use participant credentials above<br>
+                3. Enter email: testparticipant@test.com<br>
+                4. Enter password: Password123!<br>
+                5. Click "Sign In" button
+            </div>
+            <div class="checklist">
+                <strong>✅ Expected Behavior:</strong>
+                <ul>
+                    <li>NO "Redirecting..." message that gets stuck</li>
+                    <li>Should redirect to /app first</li>
+                    <li>Then automatically redirect to /app/participant-dashboard</li>
+                    <li>Should see participant dashboard with available studies</li>
+                    <li>URL should be: http://localhost:5175/app/participant-dashboard</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 5: Direct Route Access Test</h3>
+            <div class="step">
+                1. While logged in as participant, try to access researcher routes<br>
+                2. While logged in as researcher, try to access participant routes
+            </div>
+            <a href="http://localhost:5175/app/dashboard" target="_blank" class="test-button">Test Researcher Dashboard Access</a>
+            <a href="http://localhost:5175/app/participant-dashboard" target="_blank" class="test-button">Test Participant Dashboard Access</a>
+            <div class="checklist">
+                <strong>✅ Expected Behavior:</strong>
+                <ul>
+                    <li>Should redirect to appropriate dashboard based on user role</li>
+                    <li>No access to unauthorized routes</li>
+                    <li>Proper role-based routing enforcement</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🚨 Known Issues to Verify Are Fixed</h2>
+        <div class="warning">
+            <strong>Previous Issues:</strong>
+            <ul>
+                <li>❌ "Redirecting..." message that gets stuck</li>
+                <li>❌ Login appears successful but refreshes the same page</li>
+                <li>❌ Not redirecting to role-appropriate dashboards</li>
+            </ul>
+        </div>
+        <div class="success">
+            <strong>Expected After Fix:</strong>
+            <ul>
+                <li>✅ Smooth redirect flow without getting stuck</li>
+                <li>✅ Proper role-based dashboard redirection</li>
+                <li>✅ No page refresh loops</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Test Results</h2>
+        <div id="test-results">
+            <div class="info">
+                Complete the manual tests above and record your results here:
+            </div>
+            <textarea id="results-text" style="width: 100%; height: 200px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" placeholder="Record your test results here...
+
+Example:
+✅ Login Page: Loads correctly
+✅ Researcher Login: Redirects to /app/dashboard successfully
+❌ Participant Login: Still showing redirect issue
+etc."></textarea>
+            <br><br>
+            <button class="test-button" onclick="saveResults()">Save Test Results</button>
+        </div>
+    </div>
+
+    <script>
+        async function checkServers() {
+            const statusDiv = document.getElementById('status-check');
+            statusDiv.innerHTML = '<div class="info">Checking servers...</div>';
+            
+            try {
+                // Check frontend
+                const frontendResponse = await fetch('http://localhost:5175/');
+                const frontendStatus = frontendResponse.ok ? '✅ Online' : '❌ Error';
+                
+                // Check backend
+                const backendResponse = await fetch('http://localhost:3002/api/health');
+                const backendStatus = backendResponse.ok ? '✅ Online' : '❌ Error';
+                
+                statusDiv.innerHTML = `
+                    <div class="success">
+                        <strong>Server Status:</strong><br>
+                        Frontend (localhost:5175): ${frontendStatus}<br>
+                        Backend (localhost:3002): ${backendStatus}
+                    </div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <strong>Server Check Failed:</strong><br>
+                        ${error.message}<br>
+                        Make sure both servers are running with: npm run dev
+                    </div>
+                `;
+            }
+        }
+        
+        function saveResults() {
+            const results = document.getElementById('results-text').value;
+            localStorage.setItem('authTestResults', results);
+            alert('Test results saved to localStorage!');
+        }
+        
+        // Auto-check servers on load
+        window.onload = function() {
+            checkServers();
+            
+            // Load previous results if any
+            const savedResults = localStorage.getItem('authTestResults');
+            if (savedResults) {
+                document.getElementById('results-text').value = savedResults;
+            }
+        };
+    </script>
+</body>
+</html>

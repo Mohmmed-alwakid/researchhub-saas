@@ -8,22 +8,29 @@ interface AuthState {
   user: User | null;
   token: string | null;
   refreshToken: string | null;
+  tempToken: string | null;
+  tempEmail: string | null;
+  requiresTwoFactor: boolean;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ requiresTwoFactor?: boolean; tempToken?: string }>;
+  verify2FALogin: (tempToken: string, code: string) => Promise<void>;
+  verifyBackupCodeLogin: (tempToken: string, backupCode: string) => Promise<void>;
   register: (userData: RegisterRequest) => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
   checkAuth: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
+  clearTempAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
-      user: null,
+  persist(    (set, get) => ({      user: null,
       token: null,
       refreshToken: null,
+      tempToken: null,
+      tempEmail: null,
+      requiresTwoFactor: false,
       isLoading: false,
       isAuthenticated: false,
 
@@ -31,6 +38,41 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const response = await authService.login({ email, password });
+            if (response.requiresTwoFactor) {
+            set({ 
+              tempToken: response.tempToken,
+              tempEmail: email,
+              requiresTwoFactor: true,
+              isLoading: false 
+            });
+            return { requiresTwoFactor: true, tempToken: response.tempToken };
+          }
+          
+          const { user, token, refreshToken } = response;
+          set({ 
+            user, 
+            token, 
+            refreshToken,
+            isAuthenticated: true, 
+            isLoading: false,
+            requiresTwoFactor: false,
+            tempToken: null
+          });
+          
+          toast.success('Login successful!');
+          return {};
+        } catch (error: unknown) {
+          set({ isLoading: false });
+          const message = error instanceof Error ? error.message : 'Login failed';
+          toast.error(message);
+          throw error;
+        }
+      },
+
+      verify2FALogin: async (tempToken: string, code: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await authService.verify2FALogin(tempToken, code);
           const { user, token, refreshToken } = response;
           
           set({ 
@@ -38,16 +80,49 @@ export const useAuthStore = create<AuthState>()(
             token, 
             refreshToken,
             isAuthenticated: true, 
-            isLoading: false 
+            isLoading: false,
+            requiresTwoFactor: false,
+            tempToken: null
           });
           
-          toast.success('Login successful!');
+          toast.success('2FA verification successful!');
         } catch (error: unknown) {
           set({ isLoading: false });
-          const message = error instanceof Error ? error.message : 'Login failed';
+          const message = error instanceof Error ? error.message : '2FA verification failed';
           toast.error(message);
           throw error;
         }
+      },      verifyBackupCodeLogin: async (tempToken: string, backupCode: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await authService.verifyBackupCodeLogin(tempToken, backupCode);
+          const { user, token, refreshToken } = response;
+          
+          set({ 
+            user, 
+            token, 
+            refreshToken,
+            isAuthenticated: true, 
+            isLoading: false,
+            requiresTwoFactor: false,
+            tempToken: null
+          });
+          
+          toast.success('Backup code verification successful!');
+        } catch (error: unknown) {
+          set({ isLoading: false });
+          const message = error instanceof Error ? error.message : 'Backup code verification failed';
+          toast.error(message);
+          throw error;
+        }
+      },
+
+      clearTempAuth: () => {
+        set({ 
+          tempToken: null, 
+          tempEmail: null,
+          requiresTwoFactor: false 
+        });
       },
 
       register: async (userData: RegisterRequest) => {
@@ -71,14 +146,15 @@ export const useAuthStore = create<AuthState>()(
           toast.error(message);
           throw error;
         }
-      },
-
-      logout: () => {
+      },      logout: () => {
         set({ 
           user: null, 
           token: null, 
           refreshToken: null,
-          isAuthenticated: false 
+          tempToken: null,
+          requiresTwoFactor: false,
+          isAuthenticated: false,
+          isLoading: false
         });
         
         toast.success('Logged out successfully');
@@ -98,19 +174,21 @@ export const useAuthStore = create<AuthState>()(
           const message = error instanceof Error ? error.message : 'Profile update failed';
           toast.error(message);
           throw error;
-        }
-      },
-
-      checkAuth: async () => {
+        }      },      checkAuth: async () => {
         const token = get().token;
-        if (!token) return;
+        
+        if (!token) {
+          set({ isLoading: false, isAuthenticated: false, user: null });
+          return;
+        }
 
+        set({ isLoading: true });
         try {
           const response = await authService.getProfile();
           const user = response.user;
           
-          set({ user, isAuthenticated: true });
-        } catch (error: unknown) {
+          set({ user, isAuthenticated: true, isLoading: false });
+        } catch {
           // Token is invalid, try to refresh
           const refreshToken = get().refreshToken;
           if (refreshToken) {
@@ -122,18 +200,17 @@ export const useAuthStore = create<AuthState>()(
               
               // Retry getting profile with new token
               const profileResponse = await authService.getProfile();
-              set({ user: profileResponse.user, isAuthenticated: true });
-            } catch (refreshError: unknown) {
+              set({ user: profileResponse.user, isAuthenticated: true, isLoading: false });
+            } catch (refreshError) {
               // Refresh failed, logout user
+              console.error('Token refresh failed:', refreshError);
               get().logout();
             }
           } else {
             get().logout();
           }
         }
-      },
-
-      refreshAccessToken: async () => {
+      },      refreshAccessToken: async () => {
         const refreshToken = get().refreshToken;
         if (!refreshToken) {
           get().logout();
@@ -157,7 +234,10 @@ export const useAuthStore = create<AuthState>()(
         user: state.user, 
         token: state.token,
         refreshToken: state.refreshToken,
-        isAuthenticated: state.isAuthenticated
+        isAuthenticated: state.isAuthenticated,
+        // Don't persist 2FA temporary state for security
+        tempToken: null,
+        requiresTwoFactor: false
       }),
     }
   )

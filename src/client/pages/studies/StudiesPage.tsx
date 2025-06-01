@@ -12,10 +12,33 @@ import {
   Pause, 
   Calendar,
   Clock,
-  DollarSign
+  DollarSign,
+  UserCheck
 } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
+
+// Type for study object
+interface Study {
+  _id: string;
+  title: string;
+  description: string;
+  type: 'usability' | 'interview' | 'survey' | 'prototype';
+  status: 'draft' | 'recruiting' | 'active' | 'completed' | 'paused';
+  createdBy: string;
+  tasks: any[];
+  participants: string[];
+  settings: {
+    maxParticipants: number;
+    duration: number;
+    compensation: number;
+    recordScreen: boolean;
+    recordAudio: boolean;
+    collectHeatmaps: boolean;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
 const StudiesPage: React.FC = () => {
   const { 
@@ -69,9 +92,7 @@ const StudiesPage: React.FC = () => {
     };
     
     return icons[type as keyof typeof icons] || '📊';
-  };
-
-  const handleStatusToggle = async (study: any) => {
+  };  const handleStatusToggle = async (study: Study) => {
     const newStatus = study.status === 'active' ? 'paused' : 'active';
     if (study.status === 'draft') return;
     
@@ -234,9 +255,7 @@ const StudiesPage: React.FC = () => {
                   <Calendar className="w-4 h-4 mr-2" />
                   {formatDistanceToNow(new Date(study.createdAt), { addSuffix: true })}
                 </div>
-              </div>
-
-              {/* Actions */}
+              </div>              {/* Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                 <div className="flex items-center space-x-2">
                   <Link
@@ -254,6 +273,13 @@ const StudiesPage: React.FC = () => {
                     title="Edit study"
                   >
                     <Edit className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    to={`/app/studies/${study._id}/applications`}
+                    className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                    title="View applications"
+                  >
+                    <UserCheck className="w-4 h-4" />
                   </Link>
                   <button
                     onClick={() => handleDelete(study._id)}

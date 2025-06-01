@@ -108,11 +108,20 @@ const StudySchema: Schema = new Schema({
     type: String,
     enum: ['usability', 'survey', 'interview', 'card-sorting', 'a-b-testing'],
     required: [true, 'Study type is required']
-  },
-  status: {
+  },  status: {
     type: String,
     enum: ['draft', 'active', 'paused', 'completed', 'archived'],
     default: 'draft'
+  },
+  visibility: {
+    type: String,
+    enum: ['private', 'public'],
+    default: 'private'
+  },
+  recruitmentStatus: {
+    type: String,
+    enum: ['not_recruiting', 'recruiting', 'recruitment_closed'],
+    default: 'not_recruiting'
   },
   configuration: {
     type: StudyConfigurationSchema,

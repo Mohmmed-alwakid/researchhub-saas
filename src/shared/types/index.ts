@@ -7,7 +7,7 @@ export interface IUser {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'researcher' | 'participant' | 'admin';
+  role: 'researcher' | 'participant' | 'admin' | 'super_admin';
   avatar?: string;
   isVerified: boolean;
   subscription?: ISubscription;
@@ -66,6 +66,8 @@ export interface IStudy {
   team?: (string | IUser)[]; // team members who can access the study
   type: 'usability' | 'survey' | 'interview' | 'card-sorting' | 'a-b-testing';
   status: 'draft' | 'active' | 'paused' | 'completed' | 'archived';
+  visibility: 'private' | 'public';
+  recruitmentStatus: 'not_recruiting' | 'recruiting' | 'recruitment_closed';
   configuration: IStudyConfiguration;
   settings?: {
     maxParticipants?: number;
@@ -129,6 +131,23 @@ export interface IStudyAnalytics {
   satisfactionScore: number;
   completionsByDevice: Record<string, number>;
   demographicBreakdown: Record<string, number>;
+}
+
+export interface IParticipantApplication {
+  _id: string;
+  studyId: string;
+  participantId: string;
+  status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
+  screeningResponses: Array<{
+    questionId: string;
+    question: string;
+    answer: string;
+  }>;
+  appliedAt: Date;
+  reviewedAt?: Date;
+  reviewedBy?: string;
+  rejectionReason?: string;
+  notes?: string;
 }
 
 // Task types
@@ -594,9 +613,10 @@ export type Task = ITask;
 export type Recording = IRecording;
 export type Feedback = IFeedback;
 export type Subscription = ISubscription;
+export type ParticipantApplication = IParticipantApplication;
 
 // Enum types
-export type UserRole = 'researcher' | 'participant' | 'admin';
+export type UserRole = 'researcher' | 'participant' | 'admin' | 'super_admin';
 export type StudyType = 'usability' | 'survey' | 'interview' | 'card-sorting' | 'a-b-testing' | 'prototype';
 export type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
 export type SessionStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
@@ -616,7 +636,8 @@ export type SubscriptionStatus = 'active' | 'canceled' | 'expired' | 'past_due' 
 export const UserRole = {
   RESEARCHER: 'researcher' as const,
   PARTICIPANT: 'participant' as const,
-  ADMIN: 'admin' as const
+  ADMIN: 'admin' as const,
+  SUPER_ADMIN: 'super_admin' as const
 } as const;
 
 export const StudyType = {
