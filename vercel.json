@@ -1,0 +1,42 @@
+{
+  "name": "researchhub",
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/server/server/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "src/**",
+          "dist/**",
+          "uploads/**"
+        ]
+      }
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/client"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/dist/server/server/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/client/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3002"
+  },  "functions": {
+    "dist/server/server/index.js": {
+      "maxDuration": 30
+    }
+  }
+}

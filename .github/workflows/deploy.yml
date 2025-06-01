@@ -1,0 +1,108 @@
+name: 🚀 Deploy ResearchHub
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  test:
+    name: 🧪 Test & Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📦 Install dependencies
+      run: npm ci
+      
+    - name: 🔍 TypeScript check
+      run: npx tsc --noEmit
+      
+    - name: 🔍 Server TypeScript check
+      run: npx tsc -p tsconfig.server.json --noEmit
+      
+    - name: 🏗️ Build client
+      run: npm run build:client
+      
+    - name: 🏗️ Build server
+      run: npm run build:server
+      
+    - name: ✅ Health check test
+      run: |
+        npm run start &
+        sleep 10
+        curl -f http://localhost:3002/api/health || exit 1
+        pkill -f "node.*server"
+
+  deploy-railway:
+    name: 🚂 Deploy to Railway
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🚂 Deploy to Railway
+      uses: bervProject/railway-deploy@v1.0.0
+      with:
+        railway_token: ${{ secrets.RAILWAY_TOKEN }}
+        service: researchhub
+        
+  deploy-vercel:
+    name: ▲ Deploy to Vercel
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: ▲ Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-args: '--prod'
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        
+  deploy-render:
+    name: 🎨 Deploy to Render
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 🎨 Deploy to Render
+      uses: johnbeynon/render-deploy-action@v0.0.8
+      with:
+        service-id: ${{ secrets.RENDER_SERVICE_ID }}
+        api-key: ${{ secrets.RENDER_API_KEY }}
+
+  notify:
+    name: 📢 Notify Deployment Status
+    needs: [deploy-railway, deploy-vercel, deploy-render]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📢 Deployment Status
+      run: |
+        echo "🚀 ResearchHub Deployment Summary:"
+        echo "Railway: ${{ needs.deploy-railway.result }}"
+        echo "Vercel: ${{ needs.deploy-vercel.result }}"
+        echo "Render: ${{ needs.deploy-render.result }}"
