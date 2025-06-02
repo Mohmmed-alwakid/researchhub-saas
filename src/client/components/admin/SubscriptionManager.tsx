@@ -12,6 +12,8 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { ComingSoon } from '../common/ComingSoon';
 
 interface SubscriptionPlan {
   id: string;
@@ -46,17 +48,36 @@ interface Subscription {
 }
 
 const SubscriptionManager: React.FC = () => {
+  const { ENABLE_SUBSCRIPTION_MANAGEMENT } = useFeatureFlags();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [activeTab, setActiveTab] = useState<'plans' | 'subscriptions' | 'analytics'>('plans');
-  const [loading, setLoading] = useState(true);
-  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [loading, setLoading] = useState(true);  const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
 
   useEffect(() => {
     fetchPlans();
     fetchSubscriptions();
   }, []);
+
+  // Show Coming Soon if subscription management is disabled
+  if (!ENABLE_SUBSCRIPTION_MANAGEMENT) {
+    return (
+      <ComingSoon
+        variant="card"
+        title="Subscription Management"
+        description="Manage subscription plans, billing, and revenue analytics with our comprehensive subscription system."
+        features={[
+          "Create and manage subscription plans",
+          "Real-time billing and payment processing",
+          "Revenue analytics and reporting",
+          "Subscriber management and support",
+          "Stripe integration for secure payments",
+          "Automated billing and invoicing"
+        ]}        expectedRelease="Q4 2024"
+      />
+    );
+  }
 
   const fetchPlans = async () => {
     try {
@@ -249,9 +270,27 @@ const SubscriptionManager: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600">      </div>
+
+      {/* Plan Modal - TODO: Implement full modal functionality */}
+      {showPlanModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold mb-4">
+              {editingPlan ? 'Edit Plan' : 'Create New Plan'}
+            </h3>
+            <p className="text-gray-600 mb-4">Plan management feature coming soon.</p>
+            <button
+              onClick={() => setShowPlanModal(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
   }
 
   return (
@@ -347,7 +386,7 @@ const SubscriptionManager: React.FC = () => {
           ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
+              onClick={() => setActiveTab(tab.key as 'plans' | 'subscriptions' | 'analytics')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.key
                   ? 'border-blue-500 text-blue-600'

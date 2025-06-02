@@ -2,13 +2,31 @@
 
 ResearchHub is a comprehensive SaaS platform for user testing research, enabling researchers to conduct studies, gather feedback, and analyze user behavior through screen recording, heatmaps, and analytics.
 
-## ✅ PROJECT STATUS: 🚀 DEPLOYMENT READY
+## ✅ PROJECT STATUS: 🚧 PRODUCTION READY (Core Features)
 
 **Build Status**: ✅ **0 TypeScript errors** (100% SUCCESS)  
-**Deployment Status**: ✅ **PRODUCTION READY** (June 2, 2025)  
+**Core Features**: ✅ **PRODUCTION READY** (Authentication, Studies, Basic Analytics)  
+**Advanced Features**: 🚧 **Coming Soon** (Advanced Analytics, Payments, Recording)  
+**Completion**: **65%** Deployment Ready (June 2, 2025)  
 **UI Status**: ✅ **Fully Restored** (Complete Tailwind CSS styling operational)  
-**Study Creation**: ✅ **Issue Resolved** (Create Study flow working)  
-**Admin System**: ✅ **COMPLETE** (Automatic admin account creation)
+
+### 🎯 Core Features (Ready for Production)
+- ✅ **User Authentication** - JWT-based auth with refresh tokens
+- ✅ **Study Management** - Create, edit, and manage research studies
+- ✅ **User Management** - Role-based access (Admin/Researcher/Participant)
+- ✅ **Basic Analytics** - Essential metrics and basic reporting
+- ✅ **Admin Dashboard** - User management and system overview
+- ✅ **Responsive UI** - Modern, accessible interface
+
+### 🚧 Advanced Features (Coming Soon)
+- 🔄 **Advanced Analytics** - Comprehensive charts and real-time metrics
+- 🔄 **Heatmap Analytics** - User interaction heatmaps
+- 🔄 **Session Replay** - Video recording and playback
+- 🔄 **Payment Integration** - Stripe-based subscription management
+- 🔄 **Real-time Features** - Live monitoring and notifications
+- 🔄 **Advanced Admin Tools** - System analytics and role permissions
+
+> **Note**: Advanced features display "Coming Soon" banners in production mode. Enable via feature flags for development testing.
 
 ### 🌐 Ready for Cloud Deployment
 - **Railway**: Configuration ready in `railway.toml`
@@ -49,6 +67,38 @@ ResearchHub includes an automatic admin account initialization system for secure
 - **Participant**: `testparticipant@test.com` / `Password123!`
 
 📋 **See [ADMIN_SETUP_GUIDE.md](./ADMIN_SETUP_GUIDE.md) for complete admin setup instructions**
+
+## 🎚️ Feature Flags
+
+ResearchHub uses feature flags to control access to incomplete features, ensuring production deployments only show fully functional features.
+
+### Production Mode (Default)
+All advanced features are disabled by default and show "Coming Soon" messages:
+- Advanced Analytics Dashboard
+- Heatmap Analytics  
+- Session Replay
+- Payment/Subscription Management
+- System Analytics
+- Role & Permission Manager
+
+### Development Mode
+Enable incomplete features for testing by setting environment variables:
+
+```bash
+# Enable specific features for development testing
+VITE_ENABLE_ADVANCED_ANALYTICS=true
+VITE_ENABLE_HEATMAP_ANALYTICS=true
+VITE_ENABLE_SESSION_REPLAY=true
+VITE_ENABLE_SUBSCRIPTION_MANAGEMENT=true
+VITE_ENABLE_SYSTEM_ANALYTICS=true
+VITE_ENABLE_ROLE_PERMISSION_MANAGER=true
+```
+
+### Feature Status
+- ✅ **Ready**: Authentication, Studies, Basic Analytics, Admin Dashboard
+- 🚧 **Development**: Advanced Analytics (65% complete, mock data)
+- 🚧 **Planning**: Payment Integration, Real-time Features
+- 📋 **See [PRODUCTION_READINESS_AUDIT_REPORT.md](./PRODUCTION_READINESS_AUDIT_REPORT.md) for detailed status**
 
 ## 🏗️ Development Setup
 

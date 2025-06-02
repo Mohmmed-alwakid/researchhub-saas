@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search, 
-  Filter, 
   Plus, 
-  Edit, 
-  Trash2, 
   MoreVertical,
   UserCheck,
   UserX,
@@ -14,16 +11,18 @@ import {
   Activity,
   Users
 } from 'lucide-react';
+import { getAllUsers, type AdminUser } from '../../services/admin.service';
 
 interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
-  role: 'Participant' | 'Researcher' | 'Admin' | 'Super Admin';
-  status: 'active' | 'inactive' | 'suspended';
+  role: string; // Using string to match API response
+  isActive: boolean;
+  createdAt: string;
+  lastLoginAt?: string;
+  // Additional computed fields
   subscription?: string;
-  lastLogin: Date;
-  createdAt: Date;
   studiesCreated?: number;
   studiesParticipated?: number;
 }
@@ -39,74 +38,51 @@ const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [showUserModal, setShowUserModal] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);  const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [filters, setFilters] = useState<UserFilters>({
     role: 'all',
     status: 'all',
     subscription: 'all',
-    searchQuery: ''
-  });
+    searchQuery: ''  });
 
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [users, filters]);
-
   const fetchUsers = async () => {
     try {
-      // Simulate API call - replace with actual API
-      const mockUsers: User[] = [
-        {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          role: 'Researcher',
-          status: 'active',
-          subscription: 'Pro',
-          lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          createdAt: new Date('2024-01-15'),
-          studiesCreated: 5,
-          studiesParticipated: 12
-        },
-        {
-          id: '2',
-          name: 'Sarah Wilson',
-          email: 'sarah@example.com',
-          role: 'Admin',
-          status: 'active',
-          subscription: 'Enterprise',
-          lastLogin: new Date(Date.now() - 30 * 60 * 1000),
-          createdAt: new Date('2023-11-20'),
-          studiesCreated: 15,
-          studiesParticipated: 3
-        },
-        {
-          id: '3',
-          name: 'Mike Johnson',
-          email: 'mike@example.com',
-          role: 'Participant',
-          status: 'active',
-          subscription: 'Free',
-          lastLogin: new Date(Date.now() - 24 * 60 * 60 * 1000),
-          createdAt: new Date('2024-03-10'),
-          studiesCreated: 0,
-          studiesParticipated: 8
-        }
-      ];
-      setUsers(mockUsers);
+      setLoading(true);
+      const response = await getAllUsers({
+        page: 1,
+        limit: 100, // Get more users for admin view
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      });
+        // Map the API response to match our component interface
+      const mappedUsers: User[] = response.data.map((user: AdminUser) => ({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        lastLoginAt: user.lastLoginAt,
+        subscription: 'Free', // TODO: Get actual subscription data
+        studiesCreated: 0, // TODO: Get actual study count
+        studiesParticipated: 0 // TODO: Get actual participation count
+      }));
+      
+      setUsers(mappedUsers);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+      // Fallback to empty array if API fails
+      setUsers([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = users;
 
     // Search filter
@@ -120,55 +96,58 @@ const UserManagement: React.FC = () => {
     // Role filter
     if (filters.role !== 'all') {
       filtered = filtered.filter(user => user.role === filters.role);
-    }
-
-    // Status filter
+    }    // Status filter
     if (filters.status !== 'all') {
-      filtered = filtered.filter(user => user.status === filters.status);
+      if (filters.status === 'active') {
+        filtered = filtered.filter(user => user.isActive);
+      } else if (filters.status === 'inactive' || filters.status === 'suspended') {
+        filtered = filtered.filter(user => !user.isActive);
+      }
     }
 
     // Subscription filter
     if (filters.subscription !== 'all') {
       filtered = filtered.filter(user => user.subscription === filters.subscription);
-    }
+    }    setFilteredUsers(filtered);
+  }, [users, filters]);
 
-    setFilteredUsers(filtered);
-  };
-
+  useEffect(() => {
+    applyFilters();
+  }, [users, filters, applyFilters]);
   const handleUserAction = async (action: string, userId: string) => {
     try {
       switch (action) {
         case 'activate':
           // API call to activate user
           setUsers(users.map(user => 
-            user.id === userId ? { ...user, status: 'active' as const } : user
+            user._id === userId ? { ...user, isActive: true } : user
           ));
           break;
         case 'suspend':
           // API call to suspend user
           setUsers(users.map(user => 
-            user.id === userId ? { ...user, status: 'suspended' as const } : user
+            user._id === userId ? { ...user, isActive: false } : user
           ));
           break;
         case 'delete':
           if (confirm('Are you sure you want to delete this user?')) {
             // API call to delete user
-            setUsers(users.filter(user => user.id !== userId));
+            setUsers(users.filter(user => user._id !== userId));
           }
           break;
-        case 'edit':
-          const userToEdit = users.find(user => user.id === userId);
+        case 'edit': {
+          const userToEdit = users.find(user => user._id === userId);
           if (userToEdit) {
             setEditingUser(userToEdit);
             setShowUserModal(true);
           }
           break;
+        }
       }
     } catch (error) {
       console.error('Failed to perform user action:', error);
     }
   };
-
   const handleBulkAction = async (action: string) => {
     if (selectedUsers.length === 0) return;
 
@@ -176,17 +155,17 @@ const UserManagement: React.FC = () => {
       switch (action) {
         case 'activate':
           setUsers(users.map(user => 
-            selectedUsers.includes(user.id) ? { ...user, status: 'active' as const } : user
+            selectedUsers.includes(user._id) ? { ...user, isActive: true } : user
           ));
           break;
         case 'suspend':
           setUsers(users.map(user => 
-            selectedUsers.includes(user.id) ? { ...user, status: 'suspended' as const } : user
+            selectedUsers.includes(user._id) ? { ...user, isActive: false } : user
           ));
           break;
         case 'delete':
           if (confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) {
-            setUsers(users.filter(user => !selectedUsers.includes(user.id)));
+            setUsers(users.filter(user => !selectedUsers.includes(user._id)));
           }
           break;
       }
@@ -195,28 +174,22 @@ const UserManagement: React.FC = () => {
       console.error('Failed to perform bulk action:', error);
     }
   };
-
   const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'Super Admin':
-      case 'Admin':
+    const roleNormalized = role.toLowerCase();
+    switch (roleNormalized) {
+      case 'super_admin':
+      case 'admin':
         return <Crown className="w-4 h-4 text-yellow-600" />;
-      case 'Researcher':
+      case 'researcher':
         return <UserCheck className="w-4 h-4 text-blue-600" />;
       default:
         return <UserX className="w-4 h-4 text-gray-600" />;
     }
   };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'suspended':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  const getStatusBadge = (isActive: boolean) => {
+    return isActive 
+      ? 'bg-green-100 text-green-800'
+      : 'bg-red-100 text-red-800';
   };
 
   if (loading) {
@@ -262,17 +235,16 @@ const UserManagement: React.FC = () => {
             />
           </div>
 
-          {/* Role Filter */}
-          <select
+          {/* Role Filter */}          <select
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Roles</option>
-            <option value="Participant">Participant</option>
-            <option value="Researcher">Researcher</option>
-            <option value="Admin">Admin</option>
-            <option value="Super Admin">Super Admin</option>
+            <option value="participant">Participant</option>
+            <option value="researcher">Researcher</option>
+            <option value="admin">Admin</option>
+            <option value="super_admin">Super Admin</option>
           </select>
 
           {/* Status Filter */}
@@ -329,10 +301,9 @@ const UserManagement: React.FC = () => {
                 <th className="w-12 px-6 py-3">
                   <input
                     type="checkbox"
-                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                    onChange={(e) => {
+                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}                    onChange={(e) => {
                       if (e.target.checked) {
-                        setSelectedUsers(filteredUsers.map(user => user.id));
+                        setSelectedUsers(filteredUsers.map(user => user._id));
                       } else {
                         setSelectedUsers([]);
                       }
@@ -361,18 +332,17 @@ const UserManagement: React.FC = () => {
                 <th className="w-12 px-6 py-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
+            <tbody className="divide-y divide-gray-200">              {filteredUsers.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
-                      checked={selectedUsers.includes(user.id)}
+                      checked={selectedUsers.includes(user._id)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setSelectedUsers([...selectedUsers, user.id]);
+                          setSelectedUsers([...selectedUsers, user._id]);
                         } else {
-                          setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                          setSelectedUsers(selectedUsers.filter(id => id !== user._id));
                         }
                       }}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -393,25 +363,24 @@ const UserManagement: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
+                  </td>                  <td className="px-6 py-4">
                     <div className="flex items-center">
                       {getRoleIcon(user.role)}
-                      <span className="ml-2 text-sm font-medium">{user.role}</span>
+                      <span className="ml-2 text-sm font-medium">
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
+                      </span>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(user.status)}`}>
-                      {user.status}
+                  </td><td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(user.isActive)}`}>
+                      {user.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {user.subscription || 'None'}
-                  </td>
-                  <td className="px-6 py-4">
+                  </td>                  <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 flex items-center">
                       <Calendar className="w-3 h-3 mr-1" />
-                      {user.lastLogin.toLocaleDateString()}
+                      {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -422,13 +391,60 @@ const UserManagement: React.FC = () => {
                       </div>
                       <div>{user.studiesParticipated || 0} participated</div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
+                  </td>                  <td className="px-6 py-4">
                     <div className="relative">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg">
+                      <button 
+                        onClick={() => setDropdownOpen(dropdownOpen === user._id ? null : user._id)}
+                        className="p-2 hover:bg-gray-100 rounded-lg"
+                      >
                         <MoreVertical className="w-4 h-4" />
                       </button>
-                      {/* Dropdown menu would go here */}
+                      {dropdownOpen === user._id && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                          <div className="py-1">
+                            <button
+                              onClick={() => {
+                                handleUserAction('edit', user._id);
+                                setDropdownOpen(null);
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              Edit User
+                            </button>
+                            {!user.isActive && (
+                              <button
+                                onClick={() => {
+                                  handleUserAction('activate', user._id);
+                                  setDropdownOpen(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-gray-100"
+                              >
+                                Activate
+                              </button>
+                            )}
+                            {user.isActive && (
+                              <button
+                                onClick={() => {
+                                  handleUserAction('suspend', user._id);
+                                  setDropdownOpen(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-yellow-700 hover:bg-gray-100"
+                              >
+                                Suspend
+                              </button>
+                            )}
+                            <button
+                              onClick={() => {
+                                handleUserAction('delete', user._id);
+                                setDropdownOpen(null);
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
+                            >
+                              Delete User
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -451,16 +467,15 @@ const UserManagement: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="text-2xl font-bold text-gray-900">{users.length}</div>
           <div className="text-sm text-gray-600">Total Users</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        </div>        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="text-2xl font-bold text-green-600">
-            {users.filter(u => u.status === 'active').length}
+            {users.filter(u => u.isActive).length}
           </div>
           <div className="text-sm text-gray-600">Active Users</div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="text-2xl font-bold text-blue-600">
-            {users.filter(u => u.role === 'Researcher').length}
+            {users.filter(u => u.role.toLowerCase() === 'researcher').length}
           </div>
           <div className="text-sm text-gray-600">Researchers</div>
         </div>
@@ -469,8 +484,25 @@ const UserManagement: React.FC = () => {
             {users.filter(u => u.subscription && u.subscription !== 'Free').length}
           </div>
           <div className="text-sm text-gray-600">Paid Subscribers</div>
+        </div>      </div>
+
+      {/* User Modal - TODO: Implement full modal functionality */}
+      {showUserModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold mb-4">
+              {editingUser ? 'Edit User' : 'Create New User'}
+            </h3>
+            <p className="text-gray-600 mb-4">User management feature coming soon.</p>
+            <button
+              onClick={() => setShowUserModal(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Close
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

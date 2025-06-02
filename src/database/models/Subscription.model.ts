@@ -53,12 +53,10 @@ const UsageStatsSchema: Schema = new Schema({
   lastResetAt: { type: Date, default: Date.now }
 }, { _id: false });
 
-const SubscriptionSchema: Schema = new Schema({
-  userId: {
+const SubscriptionSchema: Schema = new Schema({  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
   },
   
   // Plan details
@@ -76,14 +74,12 @@ const SubscriptionSchema: Schema = new Schema({
   // Stripe information
   stripeCustomerId: {
     type: String,
-    required: true,
-    index: true
+    required: true
   },
   stripeSubscriptionId: {
     type: String,
     required: true,
-    unique: true,
-    index: true
+    unique: true
   },
   stripePriceId: {
     type: String,
@@ -228,7 +224,6 @@ const SubscriptionSchema: Schema = new Schema({
 // Indexes for performance
 SubscriptionSchema.index({ userId: 1 });
 SubscriptionSchema.index({ stripeCustomerId: 1 });
-SubscriptionSchema.index({ stripeSubscriptionId: 1 }, { unique: true });
 SubscriptionSchema.index({ status: 1, plan: 1 });
 SubscriptionSchema.index({ currentPeriodEnd: 1 });
 SubscriptionSchema.index({ renewalDate: 1 });

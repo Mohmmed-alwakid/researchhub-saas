@@ -35,7 +35,7 @@ const hasPermission = (user: { role: string } | null): boolean => {
 
 const adminRoutes: AdminRoute[] = [
   {
-    path: '/admin',
+    path: '/app/admin',
     label: 'Overview',
     icon: Activity,
     component: AdminOverview,
@@ -43,7 +43,7 @@ const adminRoutes: AdminRoute[] = [
     description: 'System overview and key metrics'
   },
   {
-    path: '/admin/users',
+    path: '/app/admin/users',
     label: 'User Management',
     icon: Users,
     component: UserManagement,
@@ -51,7 +51,7 @@ const adminRoutes: AdminRoute[] = [
     description: 'Manage users, roles, and access'
   },
   {
-    path: '/admin/subscriptions',
+    path: '/app/admin/subscriptions',
     label: 'Subscriptions',
     icon: CreditCard,
     component: SubscriptionManager,
@@ -59,7 +59,7 @@ const adminRoutes: AdminRoute[] = [
     description: 'Manage plans and billing'
   },
   {
-    path: '/admin/analytics',
+    path: '/app/admin/analytics',
     label: 'Analytics',
     icon: BarChart3,
     component: SystemAnalytics,
@@ -67,7 +67,7 @@ const adminRoutes: AdminRoute[] = [
     description: 'Platform usage and performance'
   },
   {
-    path: '/admin/studies',
+    path: '/app/admin/studies',
     label: 'Study Oversight',
     icon: Database,
     component: StudyOversight,
@@ -75,7 +75,7 @@ const adminRoutes: AdminRoute[] = [
     description: 'Monitor all platform studies'
   },
   {
-    path: '/admin/permissions',
+    path: '/app/admin/permissions',
     label: 'Permissions',
     icon: Shield,
     component: RolePermissionManager,
@@ -83,7 +83,7 @@ const adminRoutes: AdminRoute[] = [
     description: 'Configure roles and permissions'
   },
   {
-    path: '/admin/settings',
+    path: '/app/admin/settings',
     label: 'System Settings',
     icon: Settings,
     component: SystemSettings,
@@ -91,7 +91,7 @@ const adminRoutes: AdminRoute[] = [
     description: 'Platform configuration'
   },
   {
-    path: '/admin/support',
+    path: '/app/admin/support',
     label: 'Support Center',
     icon: HelpCircle,
     component: SupportCenter,
@@ -158,7 +158,8 @@ const AdminDashboard: React.FC = () => {
         <main className="p-6">
           <Routes>
             {availableRoutes.map((route) => {
-              const relativePath = route.path.replace('/admin', '');
+              // Remove /app/admin prefix to get relative path for nested routing
+              const relativePath = route.path.replace('/app/admin', '');
               
               // Use index route for the main admin path
               if (relativePath === '') {

@@ -55,26 +55,22 @@ export interface IRecordingDocument extends Omit<IRecording, '_id' | 'sessionId'
 const RecordingSchema: Schema<IRecordingDocument> = new Schema({  sessionId: {
     type: Schema.Types.ObjectId,
     ref: 'Session',
-    required: true,
-    index: true
+    required: true
   },
   studyId: {
     type: Schema.Types.ObjectId,
     ref: 'Study',
-    required: true,
-    index: true
+    required: true
   },
   participantId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
   },
   recordingId: {
     type: String,
     required: true,
-    unique: true,
-    index: true
+    unique: true
   },
   
   // Recording metadata
@@ -233,7 +229,6 @@ const RecordingSchema: Schema<IRecordingDocument> = new Schema({  sessionId: {
 RecordingSchema.index({ sessionId: 1 });
 RecordingSchema.index({ studyId: 1, createdAt: -1 });
 RecordingSchema.index({ participantId: 1, createdAt: -1 });
-RecordingSchema.index({ recordingId: 1 }, { unique: true });
 RecordingSchema.index({ status: 1, processingStatus: 1 });
 RecordingSchema.index({ cloudProvider: 1, cloudPath: 1 });
 RecordingSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { ComingSoon } from '../common/ComingSoon';
 
 interface AnalyticsData {
   overview: {
@@ -84,6 +86,7 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
   dateRange = '7d',
   refreshInterval = 30000,
 }) => {
+  const { advancedAnalytics, realTimeAnalytics, dataExport } = useFeatureFlags();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedMetric, setSelectedMetric] = useState<'sessions' | 'completions' | 'duration' | 'satisfaction'>('sessions');
@@ -145,10 +148,9 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
       setLoading(false);
     }, 1000);
   }, [studyId, timeFilter]);
-
   // Real-time updates
   useEffect(() => {
-    if (!isRealTime) return;
+    if (!isRealTime || !realTimeAnalytics) return;
 
     const interval = setInterval(() => {
       setData(prevData => {
@@ -167,7 +169,27 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
     }, refreshInterval);
 
     return () => clearInterval(interval);
-  }, [isRealTime, refreshInterval]);
+  }, [isRealTime, refreshInterval, realTimeAnalytics]);
+
+  // Show Coming Soon if advanced analytics is disabled
+  if (!advancedAnalytics) {
+    return (
+      <ComingSoon
+        variant="card"
+        title="Advanced Analytics Dashboard"
+        description="Get comprehensive insights with advanced charts, real-time metrics, and detailed performance analysis."
+        features={[
+          "Real-time session monitoring",
+          "Advanced behavioral analysis",
+          "Task performance metrics",
+          "Device and browser breakdowns",
+          "Data export capabilities",
+          "Custom date range filtering"
+        ]}
+        expectedRelease="Q3 2024"
+      />
+    );
+  }
 
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -198,8 +220,11 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
         return data.trends.map(item => ({ ...item, value: item.sessions }));
     }
   };
-
   const exportData = (format: 'csv' | 'pdf' | 'excel') => {
+    if (!dataExport) {
+      console.log('Data export feature is not available yet');
+      return;
+    }
     console.log(`Exporting analytics data as ${format.toUpperCase()}`);
     // Implementation for data export
   };
@@ -232,15 +257,16 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
             <option value="90d">Last 90 days</option>
-          </select>
-          <Button
+          </select>          <Button
             variant={isRealTime ? "primary" : "outline"}
             size="sm"
             onClick={() => setIsRealTime(!isRealTime)}
             className="flex items-center space-x-2"
+            disabled={!realTimeAnalytics}
           >
             <Activity className="w-4 h-4" />
             <span>Real-time</span>
+            {!realTimeAnalytics && <span className="text-xs">(Coming Soon)</span>}
           </Button>
           <Button
             variant="outline"
@@ -252,10 +278,8 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
             <span>Refresh</span>
           </Button>
         </div>
-      </div>
-
-      {/* Real-time Metrics Bar */}
-      {isRealTime && (
+      </div>      {/* Real-time Metrics Bar */}
+      {isRealTime && realTimeAnalytics && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -445,10 +469,10 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
           title="Task Performance Analysis"
           subtitle="Detailed breakdown of task completion and efficiency"
           action={
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={() => exportData('csv')}>
+            <div className="flex items-center space-x-2">              <Button variant="outline" size="sm" onClick={() => exportData('csv')} disabled={!dataExport}>
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
+                {!dataExport && <span className="text-xs ml-1">(Coming Soon)</span>}
               </Button>
             </div>
           }

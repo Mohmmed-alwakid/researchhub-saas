@@ -9,10 +9,10 @@ import {
   Save, 
   RefreshCw,
   AlertTriangle,
-  CheckCircle,
-  Clock,
-  Server
+  CheckCircle
 } from 'lucide-react';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { ComingSoon } from '../common/ComingSoon';
 
 interface SystemConfiguration {
   platform: {
@@ -103,6 +103,7 @@ const defaultConfig: SystemConfiguration = {
 };
 
 const SystemSettings: React.FC = () => {
+  const { ENABLE_ADVANCED_ADMIN_SETTINGS } = useFeatureFlags();
   const [config, setConfig] = useState<SystemConfiguration>(defaultConfig);
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
@@ -120,6 +121,26 @@ const SystemSettings: React.FC = () => {
   useEffect(() => {
     loadConfiguration();
   }, []);
+
+  // Show Coming Soon if advanced admin settings are disabled
+  if (!ENABLE_ADVANCED_ADMIN_SETTINGS) {
+    return (
+      <ComingSoon
+        variant="card"
+        title="System Settings"
+        description="Configure platform settings, email, storage, security, and advanced features for your research platform."
+        features={[
+          "Platform configuration and maintenance mode",
+          "Email provider settings and notifications",
+          "Storage configuration and file management",
+          "Security settings and access controls",
+          "Feature toggles and permissions",
+          "Billing and subscription settings"
+        ]}
+        expectedRelease="Q4 2024"
+      />
+    );
+  }
 
   const loadConfiguration = async () => {
     setIsLoading(true);
@@ -150,7 +171,7 @@ const SystemSettings: React.FC = () => {
     }
   };
 
-  const updateConfig = (section: keyof SystemConfiguration, field: string, value: any) => {
+  const updateConfig = (section: keyof SystemConfiguration, field: string, value: string | number | boolean) => {
     setConfig(prev => ({
       ...prev,
       [section]: {

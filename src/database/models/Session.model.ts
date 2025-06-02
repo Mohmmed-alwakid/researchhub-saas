@@ -107,13 +107,11 @@ const SessionSchema: Schema<ISessionDocument> = new Schema({  studyId: {
     ref: 'User',
     required: true,
     index: true
-  },
-  sessionToken: {
+  },  sessionToken: {
     type: String,
     required: true,
-    unique: true,
-    index: true
-  },  status: {
+    unique: true
+  },status: {
     type: String,
     enum: ['scheduled', 'in_progress', 'completed', 'cancelled', 'no_show'],
     default: 'scheduled'
@@ -129,11 +127,9 @@ const SessionSchema: Schema<ISessionDocument> = new Schema({  studyId: {
     type: Number,
     default: 0
   },
-  
-  // Recording information
+    // Recording information
   recordingId: {
-    type: String,
-    index: true
+    type: String
   },
   recordingUrl: String,
   recordingStartedAt: Date,
@@ -218,7 +214,6 @@ const SessionSchema: Schema<ISessionDocument> = new Schema({  studyId: {
 // Indexes for performance
 SessionSchema.index({ studyId: 1, status: 1 });
 SessionSchema.index({ participantId: 1, createdAt: -1 });
-SessionSchema.index({ sessionToken: 1 }, { unique: true });
 SessionSchema.index({ recordingId: 1 });
 SessionSchema.index({ 'metadata.compensation.status': 1 });
 

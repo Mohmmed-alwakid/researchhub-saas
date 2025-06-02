@@ -68,34 +68,29 @@ export interface IPaymentDocument extends Omit<IPayment, '_id' | 'userId'>, Docu
 const PaymentSchema: Schema<IPaymentDocument> = new Schema({  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
   },
   subscriptionId: {
     type: Schema.Types.ObjectId,
-    ref: 'Subscription',
-    index: true
+    ref: 'Subscription'
   },
   
   // Payment identifiers
   stripePaymentIntentId: {
     type: String,
     unique: true,
-    sparse: true,
-    index: true
+    sparse: true
   },
   stripeChargeId: {
-    type: String,
-    index: true
+    type: String
   },
   stripeInvoiceId: {
-    type: String,
-    index: true
+    type: String
   },
   stripeCustomerId: {
     type: String,
-    required: true,
-    index: true  },
+    required: true
+  },
   
   // Payment details
   type: {
@@ -302,7 +297,6 @@ const PaymentSchema: Schema<IPaymentDocument> = new Schema({  userId: {
 // Indexes for performance
 PaymentSchema.index({ userId: 1, createdAt: -1 });
 PaymentSchema.index({ subscriptionId: 1, createdAt: -1 });
-PaymentSchema.index({ stripePaymentIntentId: 1 }, { unique: true, sparse: true });
 PaymentSchema.index({ stripeChargeId: 1 });
 PaymentSchema.index({ stripeCustomerId: 1, createdAt: -1 });
 PaymentSchema.index({ status: 1, type: 1 });

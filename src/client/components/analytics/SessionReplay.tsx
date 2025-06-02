@@ -11,6 +11,8 @@ import {
   Clock,
   Eye
 } from 'lucide-react';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { ComingSoon } from '../common/ComingSoon';
 
 interface SessionEvent {
   id: string;
@@ -41,6 +43,7 @@ export const SessionReplay: React.FC<SessionReplayProps> = ({
   autoPlay = false,
   showEvents = true
 }) => {
+  const featureFlags = useFeatureFlags();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -172,9 +175,27 @@ export const SessionReplay: React.FC<SessionReplayProps> = ({
       navigation: 'bg-purple-100 text-purple-800 border-purple-200',
       focus: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       hover: 'bg-gray-100 text-gray-800 border-gray-200'
-    };
-    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200';
+    };    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
+  // Check if session replay is enabled
+  if (!featureFlags.ENABLE_SESSION_REPLAY) {
+    return (
+      <div className="relative min-h-[500px] bg-gray-50 rounded-lg">
+        <ComingSoon 
+          title="Session Replay"
+          description="Session replay functionality is currently under development. This feature will allow you to watch recordings of user sessions and analyze user behavior patterns."
+          features={[
+            "Video playback of user sessions",
+            "Event timeline with user interactions",
+            "Playback controls and speed adjustment",
+            "Event filtering and analysis tools"
+          ]}
+          variant="overlay"
+          size="large"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">

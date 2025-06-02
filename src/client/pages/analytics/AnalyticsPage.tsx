@@ -30,8 +30,10 @@ import HeatmapAnalytics from '../../components/analytics/HeatmapAnalytics';
 import SessionReplay from '../../components/analytics/SessionReplay';
 import AdvancedAnalyticsDashboard from '../../components/analytics/AdvancedAnalyticsDashboard';
 import { useAppStore } from '../../stores/appStore';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
 
 const AnalyticsPage: React.FC = () => {
+  const { ENABLE_ADVANCED_ANALYTICS } = useFeatureFlags();
   const { studyId } = useParams();
   const { currentStudy, fetchStudies } = useAppStore();
   const [activeTab, setActiveTab] = useState('overview');
@@ -112,10 +114,9 @@ const AnalyticsPage: React.FC = () => {
   const exportData = (format: 'csv' | 'pdf') => {
     // Implementation for data export
     console.log(`Exporting analytics data as ${format.toUpperCase()}`);
-  };
-  const tabs = [
+  };  const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'advanced', label: 'Advanced', icon: Zap },
+    ...(ENABLE_ADVANCED_ANALYTICS ? [{ id: 'advanced', label: 'Advanced', icon: Zap }] : []),
     { id: 'heatmaps', label: 'Heatmaps', icon: MousePointer },
     { id: 'sessions', label: 'Session Replays', icon: Play },
     { id: 'tasks', label: 'Task Analysis', icon: Target }

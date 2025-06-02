@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Feature Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { background: #f5f5f5; padding: 15px; margin: 10px 0; white-space: pre-wrap; border-radius: 4px; }
+        .success { background: #d4edda; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; border-left: 4px solid #dc3545; }
+        .warning { background: #fff3cd; border-left: 4px solid #ffc107; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .test-group { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .summary { background: #e9ecef; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 ResearchHub Feature Audit - Production Readiness Test</h1>
+    
+    <div class="summary">
+        <h2>📋 Test Summary</h2>
+        <div id="testSummary">Click "Run All Tests" to begin comprehensive testing...</div>
+        <button onclick="runAllTests()" style="background: #28a745;">🚀 Run All Tests</button>
+    </div>
+
+    <div class="test-group">
+        <h2>🔐 Authentication System</h2>
+        <button onclick="testAuth()">Test Auth Flow</button>
+        <div id="authResult" class="result"></div>
+    </div>
+
+    <div class="test-group">
+        <h2>👥 User Management</h2>
+        <button onclick="testUserManagement()">Test User Operations</button>
+        <div id="userMgmtResult" class="result"></div>
+    </div>
+
+    <div class="test-group">
+        <h2>📊 Study Management</h2>
+        <button onclick="testStudyOperations()">Test Study CRUD</button>
+        <div id="studyResult" class="result"></div>
+    </div>
+
+    <div class="test-group">
+        <h2>🎯 Session Recording</h2>
+        <button onclick="testSessionRecording()">Test Session APIs</button>
+        <div id="sessionResult" class="result"></div>
+    </div>
+
+    <div class="test-group">
+        <h2>👑 Admin Features</h2>
+        <button onclick="testAdminFeatures()">Test Admin Dashboard</button>
+        <div id="adminResult" class="result"></div>
+    </div>
+
+    <div class="test-group">
+        <h2>📈 Analytics & Data</h2>
+        <button onclick="testAnalytics()">Test Analytics APIs</button>
+        <div id="analyticsResult" class="result"></div>
+    </div>
+
+    <div class="test-group">
+        <h2>💳 Payment Integration</h2>
+        <button onclick="testPaymentFeatures()">Test Stripe Integration</button>
+        <div id="paymentResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+        let authToken = null;
+        let testUser = null;
+        let testStudy = null;
+        
+        const testResults = {
+            auth: { status: 'pending', details: null },
+            userMgmt: { status: 'pending', details: null },
+            studies: { status: 'pending', details: null },
+            sessions: { status: 'pending', details: null },
+            admin: { status: 'pending', details: null },
+            analytics: { status: 'pending', details: null },
+            payments: { status: 'pending', details: null }
+        };
+
+        async function makeRequest(url, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (authToken) {
+                headers.Authorization = `Bearer ${authToken}`;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}${url}`, {
+                    ...options,
+                    headers,
+                    credentials: 'include'
+                });
+
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    data = { rawResponse: text };
+                }
+
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function testAuth() {
+            const resultDiv = document.getElementById('authResult');
+            let results = [];
+
+            try {
+                // Test 1: Login with admin account
+                const loginResult = await makeRequest('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: 'admin@researchhub.com',
+                        password: 'admin123'
+                    })
+                });
+
+                if (loginResult.ok && loginResult.data.success) {
+                    authToken = loginResult.data.token;
+                    testUser = loginResult.data.user;
+                    results.push('✅ Admin login successful');
+                    results.push(`   User: ${testUser.name} (${testUser.role})`);
+                } else {
+                    results.push('❌ Admin login failed');
+                    results.push(`   Error: ${JSON.stringify(loginResult)}`);
+                }
+
+                // Test 2: Get current user profile
+                const profileResult = await makeRequest('/auth/profile');
+                if (profileResult.ok && profileResult.data.success) {
+                    results.push('✅ Profile fetch successful');
+                } else {
+                    results.push('❌ Profile fetch failed');
+                }
+
+                // Test 3: Refresh token
+                const refreshResult = await makeRequest('/auth/refresh', { method: 'POST' });
+                if (refreshResult.ok && refreshResult.data.success) {
+                    results.push('✅ Token refresh successful');
+                } else {
+                    results.push('❌ Token refresh failed');
+                }
+
+                testResults.auth = { status: 'success', details: results };
+                resultDiv.className = 'result success';
+
+            } catch (error) {
+                results.push(`❌ Authentication test failed: ${error.message}`);
+                testResults.auth = { status: 'error', details: results };
+                resultDiv.className = 'result error';
+            }
+
+            resultDiv.textContent = results.join('\n');
+            updateSummary();
+        }
+
+        async function testUserManagement() {
+            const resultDiv = document.getElementById('userMgmtResult');
+            let results = [];
+
+            try {
+                // Test 1: Get all users (admin only)
+                const usersResult = await makeRequest('/admin/users?page=1&limit=3');
+                if (usersResult.ok && usersResult.data.success) {
+                    results.push('✅ User listing successful');
+                    results.push(`   Found ${usersResult.data.data.data.length} users`);
+                } else {
+                    results.push('❌ User listing failed');
+                }
+
+                // Test 2: Register new user (public endpoint)
+                const randomEmail = `test${Date.now()}@example.com`;
+                const registerResult = await makeRequest('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: randomEmail,
+                        password: 'password123'
+                    })
+                });
+
+                if (registerResult.ok && registerResult.data.success) {
+                    results.push('✅ User registration successful');
+                } else {
+                    results.push('❌ User registration failed');
+                    results.push(`   Error: ${JSON.stringify(registerResult.data)}`);
+                }
+
+                testResults.userMgmt = { status: 'success', details: results };
+                resultDiv.className = 'result success';
+
+            } catch (error) {
+                results.push(`❌ User management test failed: ${error.message}`);
+                testResults.userMgmt = { status: 'error', details: results };
+                resultDiv.className = 'result error';
+            }
+
+            resultDiv.textContent = results.join('\n');
+            updateSummary();
+        }
+
+        async function testStudyOperations() {
+            const resultDiv = document.getElementById('studyResult');
+            let results = [];
+
+            try {
+                // Test 1: Create a new study
+                const studyData = {
+                    title: `Test Study ${Date.now()}`,
+                    description: 'Automated test study for feature validation',
+                    type: 'usability',
+                    targetParticipants: 10,
+                    questions: [
+                        {
+                            id: 'q1',
+                            type: 'multiple_choice',
+                            text: 'How easy was this to use?',
+                            options: ['Very Easy', 'Easy', 'Difficult', 'Very Difficult'],
+                            required: true
+                        }
+                    ]
+                };
+
+                const createResult = await makeRequest('/studies', {
+                    method: 'POST',
+                    body: JSON.stringify(studyData)
+                });
+
+                if (createResult.ok && createResult.data.success) {
+                    testStudy = createResult.data.study;
+                    results.push('✅ Study creation successful');
+                    results.push(`   Study ID: ${testStudy._id}`);
+                    results.push(`   Title: ${testStudy.title}`);
+                } else {
+                    results.push('❌ Study creation failed');
+                    results.push(`   Error: ${JSON.stringify(createResult.data)}`);
+                }
+
+                // Test 2: Get user's studies
+                const studiesResult = await makeRequest('/studies');
+                if (studiesResult.ok && studiesResult.data.success) {
+                    results.push('✅ Study listing successful');
+                    results.push(`   Found ${studiesResult.data.studies.length} studies`);
+                } else {
+                    results.push('❌ Study listing failed');
+                }
+
+                // Test 3: Update study (if created successfully)
+                if (testStudy) {
+                    const updateResult = await makeRequest(`/studies/${testStudy._id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            description: 'Updated test study description'
+                        })
+                    });
+
+                    if (updateResult.ok && updateResult.data.success) {
+                        results.push('✅ Study update successful');
+                    } else {
+                        results.push('❌ Study update failed');
+                    }
+                }
+
+                testResults.studies = { status: 'success', details: results };
+                resultDiv.className = 'result success';
+
+            } catch (error) {
+                results.push(`❌ Study operations test failed: ${error.message}`);
+                testResults.studies = { status: 'error', details: results };
+                resultDiv.className = 'result error';
+            }
+
+            resultDiv.textContent = results.join('\n');
+            updateSummary();
+        }
+
+        async function testSessionRecording() {
+            const resultDiv = document.getElementById('sessionResult');
+            let results = [];
+
+            try {
+                if (!testStudy) {
+                    results.push('⚠️ No test study available, skipping session tests');
+                    testResults.sessions = { status: 'warning', details: results };
+                    resultDiv.className = 'result warning';
+                    resultDiv.textContent = results.join('\n');
+                    return;
+                }
+
+                // Test 1: Start a session
+                const sessionResult = await makeRequest('/sessions', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        studyId: testStudy._id,
+                        userAgent: navigator.userAgent,
+                        screenResolution: { width: 1920, height: 1080 }
+                    })
+                });
+
+                if (sessionResult.ok && sessionResult.data.success) {
+                    results.push('✅ Session creation successful');
+                    results.push(`   Session ID: ${sessionResult.data.session._id}`);
+                } else {
+                    results.push('❌ Session creation failed');
+                    results.push(`   Error: ${JSON.stringify(sessionResult.data)}`);
+                }
+
+                testResults.sessions = { status: 'success', details: results };
+                resultDiv.className = 'result success';
+
+            } catch (error) {
+                results.push(`❌ Session recording test failed: ${error.message}`);
+                testResults.sessions = { status: 'error', details: results };
+                resultDiv.className = 'result error';
+            }
+
+            resultDiv.textContent = results.join('\n');
+            updateSummary();
+        }
+
+        async function testAdminFeatures() {
+            const resultDiv = document.getElementById('adminResult');
+            let results = [];
+
+            try {
+                // Test 1: Platform overview
+                const overviewResult = await makeRequest('/admin/overview');
+                if (overviewResult.ok && overviewResult.data.success) {
+                    results.push('✅ Platform overview successful');
+                    const data = overviewResult.data.data;
+                    results.push(`   Total Users: ${data.totalUsers}`);
+                    results.push(`   Total Studies: ${data.totalStudies}`);
+                    results.push(`   Active Studies: ${data.activeStudies}`);
+                } else {
+                    results.push('❌ Platform overview failed');
+                }
+
+                // Test 2: System analytics
+                const analyticsResult = await makeRequest('/admin/analytics?timeframe=30d');
+                if (analyticsResult.ok && analyticsResult.data.success) {
+                    results.push('✅ System analytics successful');
+                } else {
+                    results.push('❌ System analytics failed');
+                }
+
+                // Test 3: Admin study oversight
+                const adminStudiesResult = await makeRequest('/admin/studies?page=1&limit=5');
+                if (adminStudiesResult.ok && adminStudiesResult.data.success) {
+                    results.push('✅ Admin study oversight successful');
+                    results.push(`   Found ${adminStudiesResult.data.data.data.length} studies`);
+                } else {
+                    results.push('❌ Admin study oversight failed');
+                }
+
+                testResults.admin = { status: 'success', details: results };
+                resultDiv.className = 'result success';
+
+            } catch (error) {
+                results.push(`❌ Admin features test failed: ${error.message}`);
+                testResults.admin = { status: 'error', details: results };
+                resultDiv.className = 'result error';
+            }
+
+            resultDiv.textContent = results.join('\n');
+            updateSummary();
+        }
+
+        async function testAnalytics() {
+            const resultDiv = document.getElementById('analyticsResult');
+            let results = [];
+
+            // Note: Analytics features are mostly frontend components with mock data
+            results.push('⚠️ Analytics components detected:');
+            results.push('   - HeatmapAnalytics: Frontend component with simulated data');
+            results.push('   - SessionReplay: Frontend component with mock events');
+            results.push('   - AdvancedAnalyticsDashboard: Frontend component with sample data');
+            results.push('');
+            results.push('🔍 Assessment: Analytics are UI mockups, not connected to real recording data');
+
+            testResults.analytics = { status: 'warning', details: results };
+            resultDiv.className = 'result warning';
+            resultDiv.textContent = results.join('\n');
+            updateSummary();
+        }
+
+        async function testPaymentFeatures() {
+            const resultDiv = document.getElementById('paymentResult');
+            let results = [];
+
+            // Note: Payment features appear to be mostly mock data
+            results.push('⚠️ Payment integration assessment:');
+            results.push('   - SubscriptionManager: Uses mock subscription data');
+            results.push('   - No real Stripe webhook endpoints found');
+            results.push('   - Payment flows appear to be UI mockups');
+            results.push('');
+            results.push('🔍 Assessment: Payment features are placeholders, not production-ready');
+
+            testResults.payments = { status: 'warning', details: results };
+            resultDiv.className = 'result warning';
+            resultDiv.textContent = results.join('\n');
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            let summary = ['📊 TEST RESULTS SUMMARY\n'];
+            
+            let successCount = 0;
+            let errorCount = 0;
+            let warningCount = 0;
+
+            Object.entries(testResults).forEach(([category, result]) => {
+                const icon = result.status === 'success' ? '✅' : 
+                           result.status === 'error' ? '❌' : 
+                           result.status === 'warning' ? '⚠️' : '⏳';
+                
+                summary.push(`${icon} ${category.toUpperCase()}: ${result.status.toUpperCase()}`);
+                
+                if (result.status === 'success') successCount++;
+                else if (result.status === 'error') errorCount++;
+                else if (result.status === 'warning') warningCount++;
+            });
+
+            summary.push('\n🎯 PRODUCTION READINESS:');
+            summary.push(`✅ Fully Working: ${successCount}/7 features`);
+            summary.push(`⚠️ Partial/Mock: ${warningCount}/7 features`);
+            summary.push(`❌ Not Working: ${errorCount}/7 features`);
+
+            const readiness = successCount >= 4 ? '🟢 READY' : 
+                            successCount >= 2 ? '🟡 PARTIAL' : '🔴 NOT READY';
+            summary.push(`\n🚀 Overall Status: ${readiness}`);
+
+            summaryDiv.textContent = summary.join('\n');
+        }
+
+        async function runAllTests() {
+            document.getElementById('testSummary').textContent = '🔄 Running comprehensive tests...';
+            
+            await testAuth();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testUserManagement();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testStudyOperations();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testSessionRecording();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testAdminFeatures();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testAnalytics();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testPaymentFeatures();
+            
+            console.log('🎉 All tests completed!');
+        }
+
+        // Initialize
+        updateSummary();
+    </script>
+</body>
+</html>

@@ -189,7 +189,7 @@ export const useAuthStore = create<AuthState>()(
           const user = response.user;
           
           set({ user, isAuthenticated: true, isLoading: false });
-        } catch {
+        } catch (error) {
           // Token is invalid, try to refresh
           const refreshToken = get().refreshToken;
           if (refreshToken) {
@@ -197,6 +197,7 @@ export const useAuthStore = create<AuthState>()(
               const response = await authService.refreshToken(refreshToken);
               const newToken = response.token;
               
+              // Update the token in the store BEFORE retrying
               set({ token: newToken });
               
               // Retry getting profile with new token
@@ -205,13 +206,15 @@ export const useAuthStore = create<AuthState>()(
             } catch (refreshError) {
               // Refresh failed, logout user
               console.error('Token refresh failed:', refreshError);
+              set({ isLoading: false });
               get().logout();
             }
           } else {
+            set({ isLoading: false });
             get().logout();
           }
         }
-      },      refreshAccessToken: async () => {
+      },refreshAccessToken: async () => {
         const refreshToken = get().refreshToken;
         if (!refreshToken) {
           get().logout();

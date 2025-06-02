@@ -39,9 +39,7 @@ class ApiService {
       (error) => {
         return Promise.reject(error);
       }
-    );
-
-    // Response interceptor for error handling
+    );    // Response interceptor for error handling
     this.api.interceptors.response.use(
       (response: AxiosResponse) => response,
       async (error) => {
@@ -63,9 +61,12 @@ class ApiService {
 
                 const { token } = response.data;
                 
-                // Update the auth store with new token
+                // Update both localStorage and trigger Zustand store update
                 const updatedState = { ...state, token };
-                localStorage.setItem('auth-storage', JSON.stringify({ state: updatedState }));
+                localStorage.setItem('auth-storage', JSON.stringify({ 
+                  state: updatedState, 
+                  version: 0 
+                }));
                 
                 // Retry the original request with new token
                 originalRequest.headers.Authorization = `Bearer ${token}`;

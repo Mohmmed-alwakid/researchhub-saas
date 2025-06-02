@@ -49,8 +49,7 @@ export interface IUserDocument extends Document {
   generateRefreshToken(): string;
 }
 
-const UserSchema: Schema = new Schema({
-  email: {
+const UserSchema: Schema = new Schema({  email: {
     type: String,
     required: [true, 'Email is required'],
     unique: true,
@@ -140,7 +139,6 @@ const UserSchema: Schema = new Schema({
 });
 
 // Indexes
-UserSchema.index({ email: 1 });
 UserSchema.index({ role: 1 });
 
 // Virtual for full name

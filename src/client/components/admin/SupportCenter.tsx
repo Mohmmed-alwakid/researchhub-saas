@@ -1,20 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
-  HelpCircle, 
   MessageCircle, 
   Clock, 
   CheckCircle, 
   AlertTriangle, 
-  User, 
   Search, 
-  Filter, 
   Send,
-  Phone,
-  Mail,
-  FileText,
   Star,
-  ArrowRight,
-  MoreVertical,
   RefreshCw
 } from 'lucide-react';
 
@@ -208,26 +200,40 @@ const SupportCenter: React.FC = () => {
       default: return 'bg-gray-500';
     }
   };
-
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedTicket) return;
 
-    const message: SupportMessage = {
-      id: `msg-${Date.now()}`,
-      content: newMessage,
-      author: { name: 'Admin User', role: 'admin' },
-      timestamp: new Date().toISOString()
-    };
+    setIsLoading(true);
+    
+    try {
+      const message: SupportMessage = {
+        id: `msg-${Date.now()}`,
+        content: newMessage,
+        author: { name: 'Admin User', role: 'admin' },
+        timestamp: new Date().toISOString()
+      };
 
-    const updatedTicket = {
-      ...selectedTicket,
-      messages: [...selectedTicket.messages, message],
-      updatedAt: new Date().toISOString()
-    };
+      const updatedTicket = {
+        ...selectedTicket,
+        messages: [...selectedTicket.messages, message],
+        updatedAt: new Date().toISOString()
+      };
 
-    setSelectedTicket(updatedTicket);
-    setTickets(prev => prev.map(t => t.id === selectedTicket.id ? updatedTicket : t));
-    setNewMessage('');
+      setSelectedTicket(updatedTicket);
+      setTickets(prev => prev.map(t => t.id === selectedTicket.id ? updatedTicket : t));
+      setNewMessage('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refreshStats = () => {
+    setIsLoading(true);
+    // TODO: Fetch fresh stats from API
+    setTimeout(() => {
+      setStats({ ...stats }); // Trigger re-render
+      setIsLoading(false);
+    }, 1000);
   };
 
   const updateTicketStatus = async (ticketId: string, newStatus: SupportTicket['status']) => {
@@ -250,7 +256,11 @@ const SupportCenter: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900">Support Center</h2>
           <p className="text-gray-600 mt-1">Manage user support tickets and help requests</p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <button 
+          onClick={refreshStats}
+          disabled={isLoading}
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
         </button>

@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Shield, 
   Users, 
   Plus, 
   Edit, 
-  Save,
   X,
   Check,
   AlertTriangle,
-  Lock,
-  Unlock
+  Lock
 } from 'lucide-react';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { ComingSoon } from '../common/ComingSoon';
 
 interface Permission {
   id: string;
@@ -38,13 +38,31 @@ interface PermissionCategory {
 }
 
 const RolePermissionManager: React.FC = () => {
+  const { ENABLE_ROLE_PERMISSION_MANAGER } = useFeatureFlags();
   const [roles, setRoles] = useState<Role[]>([]);
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [permissionCategories, setPermissionCategories] = useState<PermissionCategory[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);const [permissionCategories, setPermissionCategories] = useState<PermissionCategory[]>([]);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [showCreateRole, setShowCreateRole] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const organizePermissionsByCategory = useCallback(() => {
+    const categories: { [key: string]: Permission[] } = {};
+    
+    permissions.forEach(permission => {
+      if (!categories[permission.category]) {
+        categories[permission.category] = [];
+      }
+      categories[permission.category].push(permission);
+    });
+
+    const organized = Object.entries(categories).map(([name, perms]) => ({
+      name,
+      permissions: perms.sort((a, b) => a.level - b.level)
+    }));
+
+    setPermissionCategories(organized);
+  }, [permissions]);
 
   useEffect(() => {
     fetchRoles();
@@ -55,7 +73,7 @@ const RolePermissionManager: React.FC = () => {
     if (permissions.length > 0) {
       organizePermissionsByCategory();
     }
-  }, [permissions]);
+  }, [permissions, organizePermissionsByCategory]);
 
   const fetchRoles = async () => {
     try {
@@ -211,24 +229,6 @@ const RolePermissionManager: React.FC = () => {
     }
   };
 
-  const organizePermissionsByCategory = () => {
-    const categories: { [key: string]: Permission[] } = {};
-    
-    permissions.forEach(permission => {
-      if (!categories[permission.category]) {
-        categories[permission.category] = [];
-      }
-      categories[permission.category].push(permission);
-    });
-
-    const organized = Object.entries(categories).map(([name, perms]) => ({
-      name,
-      permissions: perms.sort((a, b) => a.level - b.level)
-    }));
-
-    setPermissionCategories(organized);
-  };
-
   const handlePermissionToggle = (permissionId: string) => {
     if (!selectedRole || selectedRole.isSystemRole) return;
 
@@ -270,17 +270,39 @@ const RolePermissionManager: React.FC = () => {
       </div>
     );
   }
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Coming Soon Overlay */}
+      {!ENABLE_ROLE_PERMISSION_MANAGER && (
+        <div className="absolute inset-0 z-10 bg-white/90 backdrop-blur-sm">
+          <ComingSoon
+            variant="overlay"
+            title="Role & Permission Manager"
+            description="Configure user roles and manage granular access permissions with our comprehensive role-based access control system."
+            features={[
+              "Create and manage custom user roles",
+              "Granular permission management",
+              "Role-based access control (RBAC)",
+              "Permission inheritance and hierarchies",
+              "Audit logs for permission changes",
+              "Bulk permission assignments"
+            ]}
+            expectedRelease="Q4 2024"
+          />
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Role & Permission Manager</h1>
           <p className="text-gray-600">Configure roles and manage access permissions</p>
-        </div>
-        <button
-          onClick={() => setShowCreateRole(true)}
+        </div>        <button
+          onClick={() => {
+            // TODO: Implement create role functionality
+            console.log('Create role feature coming soon');
+            setShowCreateRole(true);
+          }}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -355,9 +377,12 @@ const RolePermissionManager: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                  {!selectedRole.isSystemRole && (
-                    <button
-                      onClick={() => setEditingRole(selectedRole)}
+                  {!selectedRole.isSystemRole && (                    <button
+                      onClick={() => {
+                        // TODO: Implement edit role functionality
+                        console.log('Edit role feature coming soon');
+                        setEditingRole(selectedRole);
+                      }}
                       className="flex items-center px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     >
                       <Edit className="w-4 h-4 mr-1" />
@@ -493,9 +518,40 @@ const RolePermissionManager: React.FC = () => {
               {roles.filter(role => role.isSystemRole).length}
             </div>
             <div className="text-sm text-gray-600">System Roles</div>
+          </div>        </div>
+      </div>
+
+      {/* Create Role Modal */}
+      {showCreateRole && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold mb-4">Create New Role</h3>
+            <p className="text-gray-600 mb-4">Role creation feature coming soon.</p>
+            <button
+              onClick={() => setShowCreateRole(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Close
+            </button>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Edit Role Modal */}
+      {editingRole && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold mb-4">Edit Role: {editingRole.name}</h3>
+            <p className="text-gray-600 mb-4">Role editing feature coming soon.</p>
+            <button
+              onClick={() => setEditingRole(null)}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

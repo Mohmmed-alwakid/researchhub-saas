@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Activity, 
   Users, 
-  BarChart3, 
   Database, 
   Clock, 
   TrendingUp,
@@ -11,6 +10,8 @@ import {
   CheckCircle,
   Server
 } from 'lucide-react';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { ComingSoon } from '../common/ComingSoon';
 
 // Reuse existing analytics dashboard
 import AdvancedAnalyticsDashboard from '../analytics/AdvancedAnalyticsDashboard';
@@ -43,12 +44,12 @@ interface UsageStatistic {
 }
 
 const SystemAnalytics: React.FC = () => {
+  const { ENABLE_SYSTEM_ANALYTICS } = useFeatureFlags();
   const [systemMetrics, setSystemMetrics] = useState<SystemMetric[]>([]);
   const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
   const [usageStats, setUsageStats] = useState<UsageStatistic[]>([]);
   const [selectedTimeRange, setSelectedTimeRange] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetchSystemMetrics();
     fetchPerformanceData();
@@ -220,9 +221,28 @@ const SystemAnalytics: React.FC = () => {
       </div>
     );
   }
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Coming Soon Overlay */}
+      {!ENABLE_SYSTEM_ANALYTICS && (
+        <div className="absolute inset-0 z-10 bg-white/90 backdrop-blur-sm">
+          <ComingSoon
+            variant="overlay"
+            title="System Analytics"
+            description="Monitor system performance, resource usage, and platform health with comprehensive analytics and real-time metrics."
+            features={[
+              "Real-time system performance monitoring",
+              "Resource usage analytics and trends",
+              "User activity and engagement metrics",
+              "Platform health and uptime tracking",
+              "Performance optimization insights",
+              "Automated alerts and notifications"
+            ]}
+            expectedRelease="Q4 2024"
+          />
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -240,7 +260,7 @@ const SystemAnalytics: React.FC = () => {
           ].map((range) => (
             <button
               key={range.key}
-              onClick={() => setSelectedTimeRange(range.key as any)}
+              onClick={() => setSelectedTimeRange(range.key as '1h' | '24h' | '7d' | '30d')}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 selectedTimeRange === range.key
                   ? 'bg-blue-600 text-white'
@@ -409,8 +429,17 @@ const SystemAnalytics: React.FC = () => {
                 Daily backup finished without errors - 2 hours ago
               </p>
             </div>
+          </div>        </div>
+
+        {/* Performance Data Summary */}
+        {performanceData.length > 0 && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Latest Performance Metrics</h3>
+            <div className="text-sm text-gray-600">
+              Last recorded: {performanceData[performanceData.length - 1]?.timestamp.toLocaleString()}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

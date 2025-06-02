@@ -4,6 +4,8 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react';
+import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { ComingSoonOverlay } from '../common/ComingSoon';
 
 interface HeatmapData {
   x: number;
@@ -32,6 +34,7 @@ export const HeatmapAnalytics: React.FC<HeatmapAnalyticsProps> = ({
   showControls = true,
   type = 'all'
 }) => {
+  const featureFlags = useFeatureFlags();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [heatmapType, setHeatmapType] = useState<'click' | 'move' | 'scroll' | 'all'>(type);
   const [intensity, setIntensity] = useState(50);
@@ -162,7 +165,18 @@ export const HeatmapAnalytics: React.FC<HeatmapAnalyticsProps> = ({
         avgIntensity: value.totalIntensity / value.count
       }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+      .slice(0, 5);  }
+
+  // Check if heatmap analytics are enabled
+  if (!featureFlags.ENABLE_HEATMAP_ANALYTICS) {
+    return (
+      <div className="relative min-h-[400px] bg-gray-50 rounded-lg">
+        <ComingSoonOverlay 
+          title="Heatmap Analytics"
+          description="Advanced heatmap visualization is currently under development. This feature will provide detailed click tracking, user interaction patterns, and behavioral insights."
+        />
+      </div>
+    );
   }
 
   return (

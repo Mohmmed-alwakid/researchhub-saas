@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Auth Flow Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .log-container {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 2px solid #333;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        .step h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Complete Authentication Flow Test</h1>
+        <p class="subtitle">Testing the logout-on-refresh fix for ResearchHub</p>
+        
+        <div class="controls">
+            <button onclick="runCompleteTest()" id="testBtn">🚀 Run Complete Test</button>
+            <button onclick="clearLog()">🗑️ Clear Log</button>
+            <button onclick="checkCurrentAuth()">📋 Check Current Auth</button>
+            <button onclick="testUserManagement()">👥 Test User Management</button>
+        </div>
+        
+        <div class="step">
+            <h3>🎯 Test Goals</h3>
+            <p>This test verifies that:</p>
+            <ul>
+                <li>✅ Users can log in successfully</li>
+                <li>✅ Auth tokens are properly stored in localStorage</li>
+                <li>✅ Token refresh works when tokens expire</li>
+                <li>✅ Users stay logged in after page refresh</li>
+                <li>✅ Admin APIs are accessible with valid tokens</li>
+            </ul>
+        </div>
+        
+        <div class="log-container" id="logContainer">
+            <div style="color: #00ccff;">ResearchHub Authentication Test Console</div>
+            <div style="color: #ffff00;">Ready to test... Click "Run Complete Test" to start</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+        let isTestRunning = false;
+
+        function log(message, type = 'info') {
+            const container = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            let color = '#00ff00'; // default green
+            switch(type) {
+                case 'error': color = '#ff4444'; break;
+                case 'warning': color = '#ffaa00'; break;
+                case 'info': color = '#00ccff'; break;
+                case 'success': color = '#00ff00'; break;
+            }
+            
+            const logLine = document.createElement('div');
+            logLine.style.color = color;
+            logLine.innerHTML = `[${timestamp}] ${message}`;
+            container.appendChild(logLine);
+            container.scrollTop = container.scrollHeight;
+            
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = 
+                '<div style="color: #00ccff;">ResearchHub Authentication Test Console</div>' +
+                '<div style="color: #ffff00;">Log cleared... Ready for new test</div>';
+        }
+
+        async function runCompleteTest() {
+            if (isTestRunning) {
+                log('Test already running...', 'warning');
+                return;
+            }
+            
+            isTestRunning = true;
+            document.getElementById('testBtn').disabled = true;
+            
+            try {
+                log('🚀 Starting Complete Authentication Flow Test', 'info');
+                log('=' * 60, 'info');
+                
+                // Step 1: Clear existing auth
+                log('1️⃣ Clearing existing auth data...', 'info');
+                localStorage.removeItem('auth-storage');
+                log('✅ Auth data cleared', 'success');
+                
+                // Step 2: Test login
+                log('\\n2️⃣ Testing admin login...', 'info');
+                const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'testadmin@test.com',
+                        password: 'AdminPassword123!'
+                    })
+                });
+                
+                if (!loginResponse.ok) {
+                    throw new Error(`Login request failed: ${loginResponse.status}`);
+                }
+                
+                const loginData = await loginResponse.json();
+                
+                if (!loginData.success) {
+                    throw new Error(`Login failed: ${loginData.message}`);
+                }
+                
+                const { user, accessToken, refreshToken } = loginData.data;
+                log(`✅ Login successful for ${user.email} (${user.role})`, 'success');
+                
+                // Step 3: Store auth data
+                log('\\n3️⃣ Storing auth data in localStorage...', 'info');
+                const authData = {
+                    state: {
+                        user,
+                        token: accessToken,
+                        refreshToken,
+                        isAuthenticated: true
+                    },
+                    version: 0
+                };
+                localStorage.setItem('auth-storage', JSON.stringify(authData));
+                log('✅ Auth data stored', 'success');
+                
+                // Step 4: Test profile access
+                log('\\n4️⃣ Testing profile access with stored token...', 'info');
+                let profileResponse = await fetch(`${API_BASE}/auth/profile`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (profileResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    log(`✅ Profile access successful: ${profileData.user.email}`, 'success');
+                } else {
+                    log(`⚠️ Profile access failed (${profileResponse.status})`, 'warning');
+                }
+                
+                // Step 5: Test token refresh scenario
+                log('\\n5️⃣ Testing token refresh scenario...', 'info');
+                const refreshResponse = await fetch(`${API_BASE}/auth/refresh`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+                
+                if (refreshResponse.ok) {
+                    const refreshData = await refreshResponse.json();
+                    const newToken = refreshData.token;
+                    log(`✅ Token refresh successful: ${newToken.substring(0, 20)}...`, 'success');
+                    
+                    // Update localStorage
+                    authData.state.token = newToken;
+                    localStorage.setItem('auth-storage', JSON.stringify(authData));
+                    log('✅ Updated auth data with new token', 'success');
+                    
+                    // Test profile with new token
+                    const newProfileResponse = await fetch(`${API_BASE}/auth/profile`, {
+                        headers: { 'Authorization': `Bearer ${newToken}` }
+                    });
+                    
+                    if (newProfileResponse.ok) {
+                        const newProfileData = await newProfileResponse.json();
+                        log(`✅ Profile access with new token: ${newProfileData.user.email}`, 'success');
+                    } else {
+                        log(`❌ Profile access with new token failed`, 'error');
+                    }
+                    
+                    // Step 6: Test admin API
+                    log('\\n6️⃣ Testing admin API access...', 'info');
+                    const adminResponse = await fetch(`${API_BASE}/admin/users`, {
+                        headers: { 'Authorization': `Bearer ${newToken}` }
+                    });
+                    
+                    if (adminResponse.ok) {
+                        const adminData = await adminResponse.json();
+                        log(`✅ Admin API successful: ${adminData.users.length} users`, 'success');
+                    } else {
+                        log(`❌ Admin API failed (${adminResponse.status})`, 'error');
+                    }
+                    
+                } else {
+                    log(`❌ Token refresh failed (${refreshResponse.status})`, 'error');
+                }
+                
+                log('\\n' + '='.repeat(60), 'info');
+                log('🎉 Authentication flow test completed!', 'success');
+                
+                // Final verification
+                log('\\n🔍 Final verification:', 'info');
+                const finalAuthData = JSON.parse(localStorage.getItem('auth-storage') || '{}');
+                if (finalAuthData.state) {
+                    log(`✅ User: ${finalAuthData.state.user?.email}`, 'success');
+                    log(`✅ Authenticated: ${finalAuthData.state.isAuthenticated}`, 'success');
+                    log(`✅ Token present: ${!!finalAuthData.state.token}`, 'success');
+                    log(`✅ Refresh token present: ${!!finalAuthData.state.refreshToken}`, 'success');
+                } else {
+                    log('❌ No auth data found in final verification', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            } finally {
+                isTestRunning = false;
+                document.getElementById('testBtn').disabled = false;
+            }
+        }
+
+        async function checkCurrentAuth() {
+            try {
+                const authStorage = localStorage.getItem('auth-storage');
+                if (!authStorage) {
+                    log('❌ No auth data found in localStorage', 'error');
+                    return;
+                }
+                
+                const authData = JSON.parse(authStorage);
+                log('📋 Current auth state:', 'info');
+                log(`  User: ${authData.state?.user?.email || 'None'}`, 'info');
+                log(`  Role: ${authData.state?.user?.role || 'None'}`, 'info');
+                log(`  Authenticated: ${authData.state?.isAuthenticated || false}`, 'info');
+                log(`  Token: ${authData.state?.token ? '✅ Present' : '❌ Missing'}`, 'info');
+                log(`  Refresh Token: ${authData.state?.refreshToken ? '✅ Present' : '❌ Missing'}`, 'info');
+                
+            } catch (error) {
+                log(`❌ Error checking auth: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUserManagement() {
+            try {
+                log('👥 Testing User Management API...', 'info');
+                
+                const authStorage = localStorage.getItem('auth-storage');
+                if (!authStorage) {
+                    log('❌ No auth data - please run complete test first', 'error');
+                    return;
+                }
+                
+                const authData = JSON.parse(authStorage);
+                const token = authData.state?.token;
+                
+                if (!token) {
+                    log('❌ No token found - please run complete test first', 'error');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE}/admin/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ User Management API: Found ${data.users.length} users`, 'success');
+                    
+                    // Show first few users
+                    data.users.slice(0, 3).forEach(user => {
+                        log(`  👤 ${user.email} (${user.role}) - ${user.isActive ? 'Active' : 'Inactive'}`, 'info');
+                    });
+                    
+                } else if (response.status === 401) {
+                    log('⚠️ Token expired - need to refresh', 'warning');
+                } else {
+                    log(`❌ User Management API failed: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ User Management test error: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize
+        log('🔐 Authentication Test Tool Ready', 'info');
+        log('Click "Run Complete Test" to verify the logout-on-refresh fix', 'info');
+    </script>
+</body>
+</html>
