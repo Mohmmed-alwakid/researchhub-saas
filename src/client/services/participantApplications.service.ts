@@ -99,10 +99,8 @@ export const participantApplicationsService = {
       if (value !== undefined && value !== '') {
         params.append(key, value.toString());
       }
-    });
-
-    const queryString = params.toString();
-    const url = queryString ? `/participant-applications/studies/public?${queryString}` : '/participant-applications/studies/public';
+    });    const queryString = params.toString();
+    const url = queryString ? `participant-applications/studies/public?${queryString}` : 'participant-applications/studies/public';
     
     return apiService.get<PublicStudiesResponse>(url);
   },
@@ -115,7 +113,7 @@ export const participantApplicationsService = {
     data: ParticipantApplication;
     message: string;
   }> {
-    return apiService.post(`/participant-applications/studies/${studyId}/apply`, application);
+    return apiService.post(`participant-applications/studies/${studyId}/apply`, application);
   },
 
   /**
@@ -132,10 +130,8 @@ export const participantApplicationsService = {
       if (value !== undefined && value !== '') {
         params.append(key, value.toString());
       }
-    });
-
-    const queryString = params.toString();
-    const url = queryString ? `/participant-applications/applications/my?${queryString}` : '/participant-applications/applications/my';
+    });    const queryString = params.toString();
+    const url = queryString ? `participant-applications/applications/my?${queryString}` : 'participant-applications/applications/my';
     
     return apiService.get<ApplicationsResponse>(url);
   },
@@ -147,7 +143,7 @@ export const participantApplicationsService = {
     success: boolean;
     message: string;
   }> {
-    return apiService.patch(`/participant-applications/applications/${applicationId}/withdraw`);
+    return apiService.patch(`participant-applications/applications/${applicationId}/withdraw`);
   },
 
   /**
@@ -164,10 +160,8 @@ export const participantApplicationsService = {
       if (value !== undefined && value !== '') {
         params.append(key, value.toString());
       }
-    });
-
-    const queryString = params.toString();
-    const url = queryString ? `/participant-applications/studies/${studyId}/applications?${queryString}` : `/participant-applications/studies/${studyId}/applications`;
+    });    const queryString = params.toString();
+    const url = queryString ? `participant-applications/studies/${studyId}/applications?${queryString}` : `participant-applications/studies/${studyId}/applications`;
     
     return apiService.get<StudyApplicationsResponse>(url);
   },
@@ -180,7 +174,7 @@ export const participantApplicationsService = {
     data: ParticipantApplication;
     message: string;
   }> {
-    return apiService.patch(`/participant-applications/applications/${applicationId}/review`, review);
+    return apiService.patch(`participant-applications/applications/${applicationId}/review`, review);
   }
 };
 

@@ -150,6 +150,26 @@ export interface IParticipantApplication {
   notes?: string;
 }
 
+// Participant types
+export interface IParticipant {
+  _id: string;
+  studyId: string;
+  researcherId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  demographics?: Record<string, unknown>;
+  status: 'invited' | 'accepted' | 'declined' | 'completed' | 'no_show';
+  invitedAt: Date;
+  acceptedAt?: Date;
+  completedAt?: Date;
+  notes?: string;
+  sessions?: string[];
+  compensation?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Task types
 export interface ITask {
   _id: string;
@@ -613,6 +633,7 @@ export type Task = ITask;
 export type Recording = IRecording;
 export type Feedback = IFeedback;
 export type Subscription = ISubscription;
+export type Participant = IParticipant;
 export type ParticipantApplication = IParticipantApplication;
 
 // Enum types

@@ -6,10 +6,11 @@ import sessionRoutes from './session.routes';
 import participantRoutes from './participant.routes';
 import participantApplicationRoutes from './participantApplication.routes';
 import uploadRoutes from './upload.routes';
+import subscriptionRoutes from './subscription.routes';
+import adminRoutes from './admin.routes';
 // import recordingRoutes from './recording.routes';
 // import feedbackRoutes from './feedback.routes';
 // import paymentRoutes from './payment.routes';
-// import subscriptionRoutes from './subscription.routes';
 
 const router = Router();
 
@@ -21,10 +22,11 @@ router.use('/sessions', sessionRoutes);
 router.use('/participants', participantRoutes);
 router.use('/participant-applications', participantApplicationRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/subscriptions', subscriptionRoutes);
+router.use('/admin', adminRoutes);
 // router.use('/recordings', recordingRoutes);
 // router.use('/feedback', feedbackRoutes);
 // router.use('/payments', paymentRoutes);
-// router.use('/subscriptions', subscriptionRoutes);
 
 // Health check endpoint
 router.get('/health', (_req, res) => {

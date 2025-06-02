@@ -36,10 +36,40 @@ export const createStudy = async (req: AuthRequest, res: Response, next: NextFun
       }
     }
 
+    // Transform the incoming data to match the database model
+    const { title, description, type, targetParticipants, duration, compensation, settings } = req.body;
+
     const studyData = {
-      ...req.body,
+      title,
+      description,
+      type,
       createdBy: userId,
-      team: [userId] // Initially, creator is the only team member
+      researcher: userId,
+      team: [userId], // Initially, creator is the only team member
+      configuration: {
+        duration: duration || 30,
+        compensation: compensation || 0,
+        maxParticipants: targetParticipants || 10,
+        participantCriteria: {
+          devices: ['desktop', 'mobile', 'tablet']
+        },
+        recordingOptions: {
+          screen: settings?.recordScreen ?? true,
+          audio: settings?.recordAudio ?? false,
+          webcam: settings?.recordWebcam ?? false,
+          clicks: settings?.trackClicks ?? true,
+          scrolls: settings?.trackScrolls ?? true,
+          keystrokes: false
+        }
+      },
+      participants: {
+        target: targetParticipants || 10,
+        enrolled: 0,
+        completed: 0,
+        active: [],
+        qualified: [],
+        disqualified: []
+      }
     };
 
     const study = new Study(studyData);
@@ -63,14 +93,14 @@ export const getStudies = async (req: AuthRequest, res: Response, next: NextFunc
     const userId = req.user?.id;
     if (!userId) {
       return next(new APIError('User not authenticated', 401));
-    }
+    }    const { page = 1, limit = 10, status, type } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
 
-    const { page = 1, limit = 10, status, category } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);    // Build filter
+    // Build filter
     interface StudyFilter {
       $or: Array<{ createdBy: string } | { team: string }>;
       status?: string;
-      category?: string;
+      type?: string;
     }
 
     const filter: StudyFilter = {
@@ -78,8 +108,10 @@ export const getStudies = async (req: AuthRequest, res: Response, next: NextFunc
         { createdBy: userId },
         { team: userId }
       ]
-    };    if (status) filter.status = status as string;
-    if (category) filter.category = category as string;
+    };
+
+    if (status) filter.status = status as string;
+    if (type) filter.type = type as string;
 
     const studies = await Study.find(filter)
       .populate('createdBy', 'name email')

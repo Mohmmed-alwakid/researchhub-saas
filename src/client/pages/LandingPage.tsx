@@ -7,394 +7,251 @@ import {
   Zap, 
   CheckCircle,
   ArrowRight,
-  Star
+  Star,
+  Sparkles,
+  TrendingUp,
+  Award
 } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent } from '../components/ui/Card';
 
-const LandingPage = () => {
+const EnhancedLandingPage = () => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      {/* Enhanced Header */}
+      <header className="bg-white/80 backdrop-blur-md shadow-soft border-b border-white/20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6 md:justify-start md:space-x-10">
+          <div className="flex justify-between items-center py-6">
             <div className="flex justify-start lg:w-0 lg:flex-1">
-              <Link to="/" className="flex items-center">
-                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-white" />
+              <Link to="/" className="flex items-center group">
+                <div className="h-10 w-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft group-hover:shadow-medium transition-all duration-200">
+                  <BarChart3 className="h-6 w-6 text-white" />
                 </div>
-                <span className="ml-2 text-xl font-bold text-gray-900">ResearchHub</span>
+                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  ResearchHub
+                </span>
               </Link>
             </div>
             
-            <nav className="hidden md:flex space-x-10">
-              <a href="#features" className="text-base font-medium text-gray-500 hover:text-gray-900">
+            <nav className="hidden md:flex space-x-8">
+              <a href="#features" className="text-base font-medium text-gray-600 hover:text-primary-600 transition-colors duration-200">
                 Features
               </a>
-              <a href="#pricing" className="text-base font-medium text-gray-500 hover:text-gray-900">
+              <a href="#pricing" className="text-base font-medium text-gray-600 hover:text-primary-600 transition-colors duration-200">
                 Pricing
               </a>
-              <a href="#about" className="text-base font-medium text-gray-500 hover:text-gray-900">
+              <a href="#about" className="text-base font-medium text-gray-600 hover:text-primary-600 transition-colors duration-200">
                 About
               </a>
             </nav>
             
-            <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
+            <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0 space-x-4">
               <Link
                 to="/login"
-                className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
+                className="text-base font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
               >
                 Sign in
               </Link>
-              <Link
-                to="/register"
-                className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
-              >
+              <Button>
                 Start Free Trial
-              </Link>
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block xl:inline">User research made</span>{' '}
-                  <span className="block text-blue-600 xl:inline">simple and powerful</span>
+      {/* Enhanced Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-accent-50 opacity-50"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+            <div className="lg:col-span-6">
+              <div className="animate-fade-in">
+                <div className="flex items-center mb-6">
+                  <div className="flex items-center bg-gradient-to-r from-primary-100 to-accent-100 rounded-full px-4 py-2">
+                    <Sparkles className="h-4 w-4 text-primary-600 mr-2" />
+                    <span className="text-sm font-medium text-primary-700">AI-Powered Research Platform</span>
+                  </div>
+                </div>
+                
+                <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                  <span className="text-gray-900">User research made</span>
+                  <br />
+                  <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+                    simple & powerful
+                  </span>
                 </h1>
-                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                   Conduct user testing, gather feedback, and analyze behavior with our comprehensive research platform. 
-                  Screen recording, heatmaps, and analytics in one place.
+                  Screen recording, heatmaps, and analytics powered by AI.
                 </p>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Link
-                      to="/register"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
-                    >
-                      Start Free Trial
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
+                
+                <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                  <Button size="lg" rightIcon={<ArrowRight className="h-5 w-5" />}>
+                    Start Free Trial
+                  </Button>
+                  <Button variant="secondary" size="lg" leftIcon={<PlayCircle className="h-5 w-5" />}>
+                    Watch Demo
+                  </Button>
+                </div>
+                
+                <div className="flex items-center space-x-8 text-sm text-gray-600">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    No credit card required
                   </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <button className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-10">
-                      <PlayCircle className="mr-2 h-5 w-5" />
-                      Watch Demo
-                    </button>
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    14-day free trial
                   </div>
                 </div>
               </div>
-            </main>
-          </div>
-        </div>
-        <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-          <div className="h-56 w-full bg-gradient-to-r from-blue-400 to-blue-600 sm:h-72 md:h-96 lg:w-full lg:h-full flex items-center justify-center">
-            <div className="text-white text-center">
-              <BarChart3 className="h-24 w-24 mx-auto mb-4 opacity-80" />
-              <p className="text-lg font-medium">Dashboard Preview</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Features</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Everything you need for user research
-            </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Comprehensive tools to conduct, manage, and analyze user research studies
-            </p>
-          </div>
-
-          <div className="mt-10">
-            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <PlayCircle className="h-6 w-6" />
-                </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Screen Recording</p>
-                <p className="mt-2 ml-16 text-base text-gray-500">
-                  Capture user interactions with high-quality screen recordings. No downloads required.
-                </p>
-              </div>
-
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <BarChart3 className="h-6 w-6" />
-                </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Advanced Analytics</p>
-                <p className="mt-2 ml-16 text-base text-gray-500">
-                  Get detailed insights with heatmaps, conversion funnels, and behavioral analysis.
-                </p>
-              </div>
-
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <Users className="h-6 w-6" />
-                </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Participant Management</p>
-                <p className="mt-2 ml-16 text-base text-gray-500">
-                  Recruit, screen, and manage participants with built-in tools and compensation.
-                </p>
-              </div>
-
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <Shield className="h-6 w-6" />
-                </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Privacy & Security</p>
-                <p className="mt-2 ml-16 text-base text-gray-500">
-                  GDPR compliant with end-to-end encryption and secure data storage.
-                </p>
-              </div>
-
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <Zap className="h-6 w-6" />
-                </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Real-time Insights</p>
-                <p className="mt-2 ml-16 text-base text-gray-500">
-                  Monitor studies in real-time with live analytics and instant notifications.
-                </p>
-              </div>
-
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                  <CheckCircle className="h-6 w-6" />
-                </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Study Templates</p>
-                <p className="mt-2 ml-16 text-base text-gray-500">
-                  Start quickly with pre-built templates for common research methodologies.
-                </p>
+            
+            <div className="mt-12 lg:mt-0 lg:col-span-6">
+              <div className="relative animate-slide-up">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-accent-400 rounded-3xl blur-3xl opacity-20 transform rotate-6"></div>
+                <Card variant="glass" className="relative p-8">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-gray-900">Live Dashboard</h3>
+                      <div className="flex items-center text-green-600">
+                        <div className="h-2 w-2 bg-green-500 rounded-full mr-2 animate-pulse-soft"></div>
+                        Live
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl">
+                        <div className="flex items-center">
+                          <TrendingUp className="h-5 w-5 text-green-600 mr-2" />
+                          <span className="text-sm text-green-700">Completion Rate</span>
+                        </div>
+                        <p className="text-2xl font-bold text-green-800 mt-1">94%</p>
+                      </div>
+                      <div className="bg-gradient-to-r from-blue-50 to-primary-50 p-4 rounded-xl">
+                        <div className="flex items-center">
+                          <Users className="h-5 w-5 text-primary-600 mr-2" />
+                          <span className="text-sm text-primary-700">Active Users</span>
+                        </div>
+                        <p className="text-2xl font-bold text-primary-800 mt-1">2,847</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-xl">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-gray-700">Study Progress</span>
+                        <span className="text-sm font-medium text-gray-900">87%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all duration-1000" style={{ width: '87%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-12 bg-white">
+      {/* Enhanced Features Section */}
+      <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Trusted by</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Research teams worldwide
-            </p>
-          </div>
-          
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="bg-gray-50 rounded-lg p-6 text-center">
-              <Star className="h-5 w-5 text-yellow-400 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-900">4.9/5</p>
-              <p className="text-gray-500">User Rating</p>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-primary-100 rounded-full px-4 py-2 mb-6">
+              <Star className="h-4 w-4 text-primary-600 mr-2" />
+              <span className="text-sm font-medium text-primary-700">Powerful Features</span>
             </div>
-            <div className="bg-gray-50 rounded-lg p-6 text-center">
-              <Users className="h-5 w-5 text-blue-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-900">10,000+</p>
-              <p className="text-gray-500">Active Researchers</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-6 text-center">
-              <BarChart3 className="h-5 w-5 text-green-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-900">1M+</p>
-              <p className="text-gray-500">Studies Completed</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Pricing</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Choose the right plan for you
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Everything you need for <span className="gradient-text">user research</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Comprehensive tools to conduct, manage, and analyze user research studies with AI-powered insights
             </p>
           </div>
 
-          <div className="mt-10 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6 lg:max-w-4xl lg:mx-auto">
-            {/* Starter Plan */}
-            <div className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white">
-              <div className="p-6">
-                <h2 className="text-lg leading-6 font-medium text-gray-900">Starter</h2>
-                <p className="mt-4 text-sm text-gray-500">Perfect for getting started</p>
-                <p className="mt-8">
-                  <span className="text-4xl font-extrabold text-gray-900">$29</span>
-                  <span className="text-base font-medium text-gray-500">/month</span>
-                </p>
-                <Link
-                  to="/register"
-                  className="mt-8 block w-full bg-blue-600 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-blue-700"
-                >
-                  Start Free Trial
-                </Link>
-              </div>
-              <div className="pt-6 pb-8 px-6">
-                <h3 className="text-xs font-medium text-gray-900 tracking-wide uppercase">What's included</h3>
-                <ul className="mt-6 space-y-4">
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Up to 5 studies</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">50 participants per study</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Basic analytics</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Email support</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Professional Plan */}
-            <div className="border border-blue-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white relative">
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <span className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-blue-600 text-white">
-                  Most popular
-                </span>
-              </div>
-              <div className="p-6">
-                <h2 className="text-lg leading-6 font-medium text-gray-900">Professional</h2>
-                <p className="mt-4 text-sm text-gray-500">For growing research teams</p>
-                <p className="mt-8">
-                  <span className="text-4xl font-extrabold text-gray-900">$79</span>
-                  <span className="text-base font-medium text-gray-500">/month</span>
-                </p>
-                <Link
-                  to="/register"
-                  className="mt-8 block w-full bg-blue-600 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-blue-700"
-                >
-                  Start Free Trial
-                </Link>
-              </div>
-              <div className="pt-6 pb-8 px-6">
-                <h3 className="text-xs font-medium text-gray-900 tracking-wide uppercase">What's included</h3>
-                <ul className="mt-6 space-y-4">
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Unlimited studies</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">200 participants per study</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Advanced analytics & heatmaps</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Priority support</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Team collaboration</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white">
-              <div className="p-6">
-                <h2 className="text-lg leading-6 font-medium text-gray-900">Enterprise</h2>
-                <p className="mt-4 text-sm text-gray-500">For large organizations</p>
-                <p className="mt-8">
-                  <span className="text-4xl font-extrabold text-gray-900">Custom</span>
-                </p>
-                <button className="mt-8 block w-full bg-gray-800 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-gray-900">
-                  Contact Sales
-                </button>
-              </div>
-              <div className="pt-6 pb-8 px-6">
-                <h3 className="text-xs font-medium text-gray-900 tracking-wide uppercase">What's included</h3>
-                <ul className="mt-6 space-y-4">
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Everything in Professional</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Unlimited participants</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Custom integrations</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">Dedicated support</span>
-                  </li>
-                  <li className="flex space-x-3">
-                    <CheckCircle className="flex-shrink-0 h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-500">SSO & advanced security</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: PlayCircle,
+                title: "HD Screen Recording",
+                description: "Capture crystal-clear user interactions with advanced screen recording technology. No downloads required.",
+                gradient: "from-red-500 to-pink-500"
+              },
+              {
+                icon: BarChart3,
+                title: "AI-Powered Analytics",
+                description: "Get actionable insights with heatmaps, conversion funnels, and behavioral analysis powered by machine learning.",
+                gradient: "from-blue-500 to-cyan-500"
+              },
+              {
+                icon: Users,
+                title: "Smart Participant Management",
+                description: "Recruit, screen, and manage participants with built-in tools, automated compensation, and CRM integration.",
+                gradient: "from-green-500 to-emerald-500"
+              },
+              {
+                icon: Shield,
+                title: "Enterprise Security",
+                description: "Bank-grade security with SOC 2 compliance, GDPR ready, and end-to-end encryption for all data.",
+                gradient: "from-purple-500 to-indigo-500"
+              },
+              {
+                icon: Zap,
+                title: "Real-time Collaboration",
+                description: "Work together with your team in real-time. Share insights, tag moments, and collaborate on analysis.",
+                gradient: "from-yellow-500 to-orange-500"
+              },
+              {
+                icon: Award,
+                title: "Advanced Integrations",
+                description: "Connect with 50+ tools including Slack, Figma, Notion, and your favorite design and project management tools.",
+                gradient: "from-teal-500 to-green-500"
+              }
+            ].map((feature, index) => (
+              <Card 
+                key={feature.title} 
+                variant="interactive"
+                className="group animate-slide-up"
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
+                <CardContent className="p-8">
+                  <div className={`w-12 h-12 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200`}>
+                    <feature.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-600">
-        <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            <span className="block">Ready to improve your user experience?</span>
+      <section className="py-20 bg-gradient-to-r from-primary-600 to-accent-600">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready to transform your user research?
           </h2>
-          <p className="mt-4 text-lg leading-6 text-blue-200">
-            Start your free trial today and see the difference research-driven insights can make.
+          <p className="text-xl text-primary-100 mb-8">
+            Join thousands of researchers who trust ResearchHub for their user testing needs.
           </p>
-          <Link
-            to="/register"
-            className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 sm:w-auto"
-          >
-            Start Free Trial
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="secondary" size="lg" className="bg-white text-primary-700 hover:bg-gray-50">
+              Start Free Trial
+            </Button>
+            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+              <PlayCircle className="h-5 w-5 mr-2" />
+              Watch Demo
+            </Button>
+          </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-white">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
-          <div className="flex justify-center space-x-6 md:order-2">
-            <a href="#" className="text-gray-400 hover:text-gray-500">
-              <span className="sr-only">Twitter</span>
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-              </svg>
-            </a>
-            <a href="#" className="text-gray-400 hover:text-gray-500">
-              <span className="sr-only">GitHub</span>
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-              </svg>
-            </a>
-          </div>
-          <div className="mt-8 md:mt-0 md:order-1">
-            <p className="text-center text-base text-gray-400">
-              &copy; 2025 ResearchHub. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
 
-export default LandingPage;
+export default EnhancedLandingPage;

@@ -4,17 +4,14 @@ import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 
 // Import pages
-import LandingPage from './client/pages/LandingPage';
-import EnhancedLandingPage from './client/pages/EnhancedLandingPage';
-import LoginPage from './client/pages/auth/LoginPage';
-import EnhancedLoginPage from './client/pages/auth/EnhancedLoginPage';
+import LandingPage from './client/pages/LandingPage'; // Primary landing page (formerly enhanced)
+import LoginPage from './client/pages/auth/LoginPage'; // Primary login page (formerly enhanced)
 import RegisterPage from './client/pages/auth/RegisterPage';
 import ForgotPasswordPage from './client/pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './client/pages/auth/ResetPasswordPage';
 import DashboardPage from './client/pages/dashboard/DashboardPage';
 import StudiesPage from './client/pages/studies/StudiesPage';
-import StudyBuilderPage from './client/pages/studies/StudyBuilderPage';
-import EnhancedStudyBuilderPage from './client/pages/studies/EnhancedStudyBuilderPage';
+import StudyBuilderPage from './client/pages/studies/StudyBuilderPage'; // Primary study builder (formerly enhanced)
 import StudyDiscoveryPage from './client/pages/studies/StudyDiscoveryPage';
 import StudyApplicationPage from './client/pages/studies/StudyApplicationPage';
 import StudyApplicationsManagementPage from './client/pages/studies/StudyApplicationsManagementPage';
@@ -23,6 +20,7 @@ import ParticipantsPage from './client/pages/participants/ParticipantsPage';
 import AnalyticsPage from './client/pages/analytics/AnalyticsPage';
 import BillingSettingsPage from './client/pages/settings/BillingSettingsPage';
 import SettingsPage from './client/pages/settings/SettingsPage';
+import AdminDashboard from './client/pages/admin/AdminDashboard';
 
 // Import layouts
 import AppLayout from './client/components/common/AppLayout';
@@ -60,9 +58,11 @@ function App() {
           case 'participant':
             navigate('/app/participant-dashboard', { replace: true });
             break;
-          case 'researcher':
           case 'admin':
           case 'super_admin':
+            navigate('/app/admin', { replace: true });
+            break;
+          case 'researcher':
           default:
             navigate('/app/dashboard', { replace: true });
             break;
@@ -92,9 +92,7 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/enhanced" element={<EnhancedLandingPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/enhanced-login" element={<EnhancedLoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -123,20 +121,10 @@ function App() {
               } />
               <Route path="studies/new" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
-                  <EnhancedStudyBuilderPage />
-                </ProtectedRoute>
-              } />
-              <Route path="studies/new/basic" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <StudyBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id/edit" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
-                  <EnhancedStudyBuilderPage />
-                </ProtectedRoute>
-              } />
-              <Route path="studies/:id/edit/basic" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <StudyBuilderPage />
                 </ProtectedRoute>
@@ -160,6 +148,13 @@ function App() {
               <Route path="settings/billing" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <BillingSettingsPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin Dashboard Routes */}
+              <Route path="admin/*" element={
+                <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
               

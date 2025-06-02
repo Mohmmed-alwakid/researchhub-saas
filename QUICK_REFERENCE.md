@@ -22,10 +22,16 @@ curl http://localhost:5000/api/health
 ```
 
 ## Key URLs
-- **Frontend**: http://localhost:5173
-- **Backend**: http://localhost:5000
-- **Health**: http://localhost:5000/api/health
+- **Frontend**: http://localhost:5175 (Updated June 1, 2025)
+- **Backend**: http://localhost:3002 (Updated May 31, 2025)
+- **Health**: http://localhost:3002/api/health
 - **Database**: MongoDB (configured in .env)
+
+## Recent Updates (June 1, 2025)
+- ✅ **Authentication Fix**: Login now properly redirects based on user roles
+- ✅ **Component Consolidation**: Removed duplicate pages, kept enhanced versions
+- ✅ **Architecture Guide**: Created COMPONENT_STRUCTURE_GUIDE.md to prevent future duplication
+- ✅ **Single Source of Truth**: One primary version of each page component
 
 ## Deploy to Cloud
 - **Railway**: `railway up`

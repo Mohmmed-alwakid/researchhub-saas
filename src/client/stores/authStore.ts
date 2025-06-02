@@ -36,9 +36,9 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (email: string, password: string) => {
         set({ isLoading: true });
-        try {
-          const response = await authService.login({ email, password });
-            if (response.requiresTwoFactor) {
+        try {          const response = await authService.login({ email, password });
+          
+          if (response.requiresTwoFactor) {
             set({ 
               tempToken: response.tempToken,
               tempEmail: email,
@@ -48,7 +48,10 @@ export const useAuthStore = create<AuthState>()(
             return { requiresTwoFactor: true, tempToken: response.tempToken };
           }
           
-          const { user, token, refreshToken } = response;
+          // Extract data from the response structure
+          const { user, accessToken, refreshToken } = response.data || {};
+          const token = accessToken;
+          
           set({ 
             user, 
             token, 
@@ -67,13 +70,12 @@ export const useAuthStore = create<AuthState>()(
           toast.error(message);
           throw error;
         }
-      },
-
-      verify2FALogin: async (tempToken: string, code: string) => {
+      },      verify2FALogin: async (tempToken: string, code: string) => {
         set({ isLoading: true });
         try {
           const response = await authService.verify2FALogin(tempToken, code);
-          const { user, token, refreshToken } = response;
+          const { user, accessToken, refreshToken } = response.data || {};
+          const token = accessToken;
           
           set({ 
             user, 
@@ -96,7 +98,8 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const response = await authService.verifyBackupCodeLogin(tempToken, backupCode);
-          const { user, token, refreshToken } = response;
+          const { user, accessToken, refreshToken } = response.data || {};
+          const token = accessToken;
           
           set({ 
             user, 
@@ -123,15 +126,13 @@ export const useAuthStore = create<AuthState>()(
           tempEmail: null,
           requiresTwoFactor: false 
         });
-      },
-
-      register: async (userData: RegisterRequest) => {
+      },      register: async (userData: RegisterRequest) => {
         set({ isLoading: true });
         try {
           const response = await authService.register(userData);
-          const { user, token, refreshToken } = response;
-          
-          set({ 
+          const { user, accessToken, refreshToken } = response.data || {};
+          const token = accessToken;
+            set({ 
             user, 
             token, 
             refreshToken,

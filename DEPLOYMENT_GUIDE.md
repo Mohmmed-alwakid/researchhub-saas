@@ -59,6 +59,24 @@ JWT_REFRESH_SECRET=generate-another-strong-secret-key-here
 CLIENT_URL=https://your-deployed-app-url.com
 ```
 
+### Admin Account Configuration (Required)
+```bash
+# 🔐 SUPER ADMIN ACCOUNT - Created automatically on first startup
+# ⚠️  IMPORTANT: Change these credentials immediately after first login!
+ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD=ChangeThisStrongPassword123!
+ADMIN_FIRST_NAME=System
+ADMIN_LAST_NAME=Administrator
+ADMIN_ORGANIZATION=Your Organization Name
+```
+
+**🛡️ Admin Account Security Notes:**
+- The system automatically creates a super admin account on first deployment
+- Use a **real email address** you can access for the admin account
+- Choose a **strong password** (minimum 8 characters, mix of letters, numbers, symbols)
+- **Immediately change** these credentials after first login for security
+- The super admin has full system access and can create additional admin accounts
+
 ### Optional Features
 ```bash
 # Stripe Payments (for subscription features)
@@ -89,6 +107,68 @@ mongodb+srv://username:password@cluster-name.xxxxx.mongodb.net/researchhub?retry
 
 ---
 
+## 👤 Admin Account Initialization
+
+### Automatic Admin Account Creation
+ResearchHub automatically creates the initial super admin account during deployment using the environment variables you configure.
+
+**How it works:**
+1. **First startup**: System checks if any super admin exists
+2. **If none found**: Creates super admin using `ADMIN_*` environment variables
+3. **If exists**: Skips creation, displays existing admin email
+4. **Logs**: Check deployment logs for admin account creation confirmation
+
+**Environment Variables Required:**
+```bash
+ADMIN_EMAIL=admin@yourdomain.com           # Use a real email you can access
+ADMIN_PASSWORD=YourSecurePassword123!      # Strong password (8+ chars)
+ADMIN_FIRST_NAME=System                    # Admin's first name
+ADMIN_LAST_NAME=Administrator             # Admin's last name
+ADMIN_ORGANIZATION=Your Organization       # Organization name
+```
+
+**Post-Deployment Security Steps:**
+1. 🔍 **Check deployment logs** for admin creation confirmation
+2. 🔑 **Login immediately** using the admin credentials
+3. 🛡️ **Change password** in admin settings (recommended)
+4. 📧 **Verify email** works for password resets
+5. 👥 **Create additional admins** if needed through the admin panel
+
+**Development vs Production:**
+- **Development**: Creates test admin (`testadmin@test.com` / `AdminPassword123!`)
+- **Production**: Creates admin from environment variables
+
+### Manual Admin Creation (Alternative)
+If automatic creation fails, you can create admin accounts manually via MongoDB:
+
+```javascript
+// Connect to your MongoDB and run:
+db.users.insertOne({
+  email: "admin@yourdomain.com",
+  password: "$2a$12$hashed_password_here", // Use bcrypt to hash
+  firstName: "System",
+  lastName: "Administrator",
+  role: "super_admin",
+  organization: "Your Organization",
+  status: "active",
+  isVerified: true,
+  isEmailVerified: true,
+  profile: {
+    isOnboardingComplete: true,
+    preferences: {
+      emailNotifications: true,
+      marketingEmails: false,
+      language: "en",
+      timezone: "UTC"
+    }
+  },
+  createdAt: new Date(),
+  updatedAt: new Date()
+});
+```
+
+---
+
 ## 🔐 Security Setup
 
 ### Generate JWT Secrets:
@@ -104,7 +184,7 @@ Use the output as your `JWT_SECRET` and `JWT_REFRESH_SECRET`
 
 ## ✅ Deployment Verification
 
-### After deployment, test these endpoints:
+### 1. Health Check Endpoints:
 
 **Health Check:**
 ```bash
@@ -118,7 +198,49 @@ curl https://your-app-url.com/api/status
 # Should return API information
 ```
 
-**Frontend:**
+### 2. Frontend Access:
+```bash
+# Visit in browser:
+https://your-app-url.com
+# Should show the ResearchHub login page
+```
+
+### 3. Admin Account Verification:
+
+**Check Deployment Logs:**
+Look for these messages in your deployment logs:
+```
+🌱 Checking for admin account...
+🔧 Creating initial super admin account...
+✅ Super admin account created successfully!
+📧 Email: your-admin-email@domain.com
+```
+
+**Test Admin Login:**
+1. Navigate to: `https://your-app-url.com/login`
+2. Use your configured admin credentials:
+   - Email: `ADMIN_EMAIL` from your environment variables
+   - Password: `ADMIN_PASSWORD` from your environment variables
+3. Should redirect to admin dashboard with full system access
+
+**Admin Login Test API:**
+```bash
+curl -X POST https://your-app-url.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "your-admin-email@domain.com",
+    "password": "YourAdminPassword123!"
+  }'
+# Should return: {"success": true, "token": "...", "user": {"role": "super_admin"}}
+```
+
+### 4. Post-Login Security Checklist:
+- [ ] Admin login successful
+- [ ] Can access admin panel/dashboard
+- [ ] Change admin password in settings
+- [ ] Verify email notifications work
+- [ ] Create additional admin accounts if needed
+- [ ] Test user registration flow
 ```bash
 # Visit in browser:
 https://your-app-url.com

@@ -61,82 +61,79 @@ export interface CreatePortalSessionResponse {
 /**
  * Payment and subscription management service
  */
-export const paymentService = {
-  /**
+export const paymentService = {  /**
    * Get available subscription plans
    */
   async getPlans(): Promise<{ success: boolean; plans: SubscriptionPlan[] }> {
-    return apiService.get<{ success: boolean; plans: SubscriptionPlan[] }>('/payments/plans');
+    return apiService.get<{ success: boolean; plans: SubscriptionPlan[] }>('payments/plans');
   },
 
   /**
    * Get current user subscription
    */
   async getSubscription(): Promise<{ success: boolean; subscription: Subscription | null }> {
-    return apiService.get<{ success: boolean; subscription: Subscription | null }>('/payments/subscription');
+    return apiService.get<{ success: boolean; subscription: Subscription | null }>('payments/subscription');
   },
 
   /**
    * Create Stripe checkout session
    */
   async createCheckoutSession(data: CreateCheckoutSessionRequest): Promise<CreateCheckoutSessionResponse> {
-    return apiService.post<CreateCheckoutSessionResponse>('/payments/create-checkout-session', data);
+    return apiService.post<CreateCheckoutSessionResponse>('payments/create-checkout-session', data);
   },
 
   /**
    * Create customer portal session
    */
   async createPortalSession(): Promise<CreatePortalSessionResponse> {
-    return apiService.post<CreatePortalSessionResponse>('/payments/create-portal-session');
+    return apiService.post<CreatePortalSessionResponse>('payments/create-portal-session');
   },
-
   /**
    * Cancel subscription
    */
   async cancelSubscription(): Promise<{ success: boolean; message: string }> {
-    return apiService.post('/payments/cancel-subscription');
+    return apiService.post('payments/cancel-subscription');
   },
 
   /**
    * Resume subscription
    */
   async resumeSubscription(): Promise<{ success: boolean; message: string }> {
-    return apiService.post('/payments/resume-subscription');
+    return apiService.post('payments/resume-subscription');
   },
 
   /**
    * Get payment methods
    */
   async getPaymentMethods(): Promise<{ success: boolean; paymentMethods: PaymentMethod[] }> {
-    return apiService.get<{ success: boolean; paymentMethods: PaymentMethod[] }>('/payments/payment-methods');
+    return apiService.get<{ success: boolean; paymentMethods: PaymentMethod[] }>('payments/payment-methods');
   },
 
   /**
    * Set default payment method
    */
   async setDefaultPaymentMethod(paymentMethodId: string): Promise<{ success: boolean; message: string }> {
-    return apiService.post('/payments/set-default-payment-method', { paymentMethodId });
+    return apiService.post('payments/set-default-payment-method', { paymentMethodId });
   },
 
   /**
    * Delete payment method
    */
   async deletePaymentMethod(paymentMethodId: string): Promise<{ success: boolean; message: string }> {
-    return apiService.delete(`/payments/payment-methods/${paymentMethodId}`);
+    return apiService.delete(`payments/payment-methods/${paymentMethodId}`);
   },
-
   /**
    * Get invoices
    */
   async getInvoices(): Promise<{ success: boolean; invoices: Invoice[] }> {
-    return apiService.get<{ success: boolean; invoices: Invoice[] }>('/payments/invoices');
+    return apiService.get<{ success: boolean; invoices: Invoice[] }>('payments/invoices');
   },
 
   /**
    * Download invoice
    */
   async downloadInvoice(invoiceId: string): Promise<{ success: boolean; url: string }> {
-    return apiService.get<{ success: boolean; url: string }>(`/payments/invoices/${invoiceId}/download`);
+    return apiService.get<{ success: boolean; url: string }>(`payments/invoices/${invoiceId}/download`);
   },
 
   /**
@@ -156,8 +153,7 @@ export const paymentService = {
       recordingMinutes: number;
       dataExports: number;
     };
-  }> {
-    return apiService.get('/payments/usage');
+  }> {    return apiService.get('payments/usage');
   },
 
   /**
@@ -173,7 +169,7 @@ export const paymentService = {
     };
     message: string;
   }> {
-    return apiService.post('/payments/apply-discount', { code });
+    return apiService.post('payments/apply-discount', { code });
   },
 };
 

@@ -8,16 +8,17 @@ import { useAuthStore } from '../../stores/authStore';
 const RoleBasedRedirect = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (user) {
       switch (user.role) {
         case 'participant':
           navigate('/app/participant-dashboard', { replace: true });
           break;
-        case 'researcher':
         case 'admin':
         case 'super_admin':
+          navigate('/app/admin', { replace: true });
+          break;
+        case 'researcher':
         default:
           navigate('/app/dashboard', { replace: true });
           break;

@@ -12,6 +12,7 @@ import { errorHandler } from './middleware/error.middleware';
 
 // Import database connection
 import { connectDB } from '../database/connection';
+import { initializeDatabaseWithRetries } from '../database/initializeDatabase';
 
 // Load environment variables
 dotenv.config();
@@ -59,6 +60,14 @@ const PORT = process.env.PORT || 3002;
 
 const startServer = async (): Promise<void> => {
   await connectDB();
+  
+  // Initialize database with admin accounts
+  try {
+    await initializeDatabaseWithRetries();
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    console.log('⚠️  Server will continue but admin account may not be available');
+  }
   
   server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

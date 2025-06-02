@@ -5,9 +5,10 @@ ResearchHub is a comprehensive SaaS platform for user testing research, enabling
 ## ✅ PROJECT STATUS: 🚀 DEPLOYMENT READY
 
 **Build Status**: ✅ **0 TypeScript errors** (100% SUCCESS)  
-**Deployment Status**: ✅ **PRODUCTION READY** (June 1, 2025)  
+**Deployment Status**: ✅ **PRODUCTION READY** (June 2, 2025)  
 **UI Status**: ✅ **Fully Restored** (Complete Tailwind CSS styling operational)  
-**Study Creation**: ✅ **Issue Resolved** (Create Study flow working)
+**Study Creation**: ✅ **Issue Resolved** (Create Study flow working)  
+**Admin System**: ✅ **COMPLETE** (Automatic admin account creation)
 
 ### 🌐 Ready for Cloud Deployment
 - **Railway**: Configuration ready in `railway.toml`
@@ -15,6 +16,7 @@ ResearchHub is a comprehensive SaaS platform for user testing research, enabling
 - **Render**: Configuration ready in `render.yaml`
 - **GitHub Actions**: CI/CD workflow configured
 - **Health Check**: `/api/health` endpoint operational
+- **Admin Setup**: Automatic super admin account creation
 
 ### 🚀 Quick Deploy Options
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template)
@@ -23,10 +25,89 @@ ResearchHub is a comprehensive SaaS platform for user testing research, enabling
 
 **📋 See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for complete deployment instructions**
 
-## Tech Stack
+## 🛡️ Admin Account System
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+ResearchHub includes an automatic admin account initialization system for secure deployment:
+
+### **Quick Admin Setup** (2 minutes)
+1. **Set Environment Variables**:
+   ```bash
+   ADMIN_EMAIL=admin@yourdomain.com
+   ADMIN_PASSWORD=YourSecurePassword123!
+   ADMIN_FIRST_NAME=Your
+   ADMIN_LAST_NAME=Name
+   ADMIN_ORGANIZATION=Your Organization
+   ```
+
+2. **Deploy Application** - Admin account created automatically on first startup
+
+3. **Login & Secure** - Change password immediately after first login
+
+### **Test Accounts** (Development)
+- **Admin**: `testadmin@test.com` / `AdminPassword123!`
+- **Researcher**: `testresearcher@test.com` / `Password123!`
+- **Participant**: `testparticipant@test.com` / `Password123!`
+
+📋 **See [ADMIN_SETUP_GUIDE.md](./ADMIN_SETUP_GUIDE.md) for complete admin setup instructions**
+
+## 🏗️ Development Setup
+
+### Prerequisites
+- Node.js 18+ 
+- MongoDB (local or Atlas)
+- Git
+
+### Quick Start
+```bash
+# Clone repository
+git clone https://github.com/yourusername/researchhub.git
+cd researchhub
+
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start development servers
+npm run dev  # Both frontend (5175) and backend (3002)
+
+# Or start individually
+npm run dev:client    # Frontend only
+npm run dev:server    # Backend only
+```
+
+### Development URLs
+- **Frontend**: http://localhost:5175
+- **Backend API**: http://localhost:3002/api
+- **Health Check**: http://localhost:3002/api/health
+- **Admin Test**: Open `ADMIN_LOGIN_TEST.html` in browser
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Express.js + TypeScript + MongoDB + Mongoose
+- **Authentication**: JWT tokens + refresh tokens
+- **Real-time**: Socket.io for live features
+- **Payments**: Stripe integration
+- **Storage**: AWS S3 for file uploads
+- **Email**: SendGrid for notifications
+- **Deployment**: Docker + GitHub Actions
+
+## 🔗 Documentation
+
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Complete deployment instructions
+- **[ADMIN_SETUP_GUIDE.md](./ADMIN_SETUP_GUIDE.md)** - Admin account configuration
+- **[PROJECT_MEMORY_BANK.md](./PROJECT_MEMORY_BANK.md)** - Complete project history
+- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Essential commands and URLs
+
+## 📞 Support
+
+- **Health Check**: `/api/health` endpoint for monitoring
+- **Test Files**: `ADMIN_LOGIN_TEST.html` for admin verification
+- **Logs**: Check deployment logs for admin account creation
+- **Issues**: GitHub Issues for bug reports and feature requests
 
 ## Expanding the ESLint configuration
 
