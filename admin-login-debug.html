@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ddd; margin: 10px 0; padding: 15px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        button { padding: 10px 20px; margin: 5px; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        .log { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Admin Login White Page Debug Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Server Status Check</h3>
+        <button onclick="checkServers()">Check Server Status</button>
+        <div id="server-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Admin Login Test</h3>
+        <input type="email" id="email" value="testadmin@test.com" placeholder="Email">
+        <input type="password" id="password" value="AdminPassword123!" placeholder="Password">
+        <button onclick="testAdminLogin()">Test Admin Login</button>
+        <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Admin API Access Test</h3>
+        <button onclick="testAdminAPI()">Test Admin Overview API</button>
+        <div id="api-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Browser Console Simulation</h3>
+        <button onclick="simulateAdminFlow()">Simulate Complete Admin Flow</button>
+        <div id="simulation-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Real-time Debug Log</h3>
+        <div id="debug-log" class="log"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div class="test-section">
+        <h3>6. Quick Actions</h3>
+        <button onclick="openApp()">Open App in New Tab</button>
+        <button onclick="openAdminDirect()">Open Admin Direct</button>
+        <button onclick="copyTokenTest()">Copy Token Test Code</button>
+    </div>
+
+    <script>
+        let authToken = null;
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.getElementById('debug-log');
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+            logDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('debug-log').innerHTML = '';
+        }
+
+        async function checkServers() {
+            const statusDiv = document.getElementById('server-status');
+            statusDiv.innerHTML = '<p>Checking servers...</p>';
+            
+            try {
+                // Check backend
+                const backendResponse = await fetch('http://localhost:3002/api/health');
+                const backendData = await backendResponse.json();
+                
+                // Check frontend
+                const frontendResponse = await fetch('http://localhost:5175');
+                const frontendOk = frontendResponse.ok;
+                
+                statusDiv.innerHTML = `
+                    <div class="success">✅ Backend: ${backendData.message}</div>
+                    <div class="success">✅ Frontend: ${frontendOk ? 'Running' : 'Not accessible'}</div>
+                `;
+                log('Server status check completed', 'success');
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                log(`Server check failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAdminLogin() {
+            const resultDiv = document.getElementById('login-result');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            resultDiv.innerHTML = '<p>Testing admin login...</p>';
+            log(`Attempting login for: ${email}`, 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3002/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    authToken = data.data.accessToken;
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Login successful!</div>
+                        <div><strong>Role:</strong> ${data.data.user.role}</div>
+                        <div><strong>Token:</strong> ${authToken.substring(0, 50)}...</div>
+                        <div><strong>User ID:</strong> ${data.data.user._id}</div>
+                    `;
+                    log(`Login successful for admin user: ${data.data.user.role}`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${data.message}</div>`;
+                    log(`Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+                log(`Login network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAdminAPI() {
+            const resultDiv = document.getElementById('api-result');
+            
+            if (!authToken) {
+                resultDiv.innerHTML = '<div class="warning">⚠️ Please login first to get auth token</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<p>Testing admin API access...</p>';
+            log('Testing admin overview API with token', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3002/api/admin/overview', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Admin API accessible!</div>
+                        <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                    `;
+                    log('Admin API test successful', 'success');
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ API Error: ${data.message}</div>`;
+                    log(`Admin API error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ API Network Error: ${error.message}</div>`;
+                log(`Admin API network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function simulateAdminFlow() {
+            const resultDiv = document.getElementById('simulation-result');
+            resultDiv.innerHTML = '<p>Simulating complete admin flow...</p>';
+            
+            log('Starting complete admin flow simulation', 'info');
+            
+            // Step 1: Login
+            log('Step 1: Admin login', 'info');
+            await testAdminLogin();
+            
+            if (!authToken) {
+                resultDiv.innerHTML += '<div class="error">❌ Login failed, cannot continue</div>';
+                return;
+            }
+            
+            // Step 2: Test API
+            log('Step 2: Testing admin API access', 'info');
+            await testAdminAPI();
+            
+            // Step 3: Simulate frontend navigation
+            log('Step 3: Simulating frontend admin navigation', 'info');
+            resultDiv.innerHTML += `
+                <div class="success">✅ Simulation complete!</div>
+                <div><strong>Next steps to debug:</strong></div>
+                <ul>
+                    <li>1. Open browser console on http://localhost:5175</li>
+                    <li>2. Login with admin credentials</li>
+                    <li>3. Watch console for JavaScript errors</li>
+                    <li>4. Monitor network tab for failed API calls</li>
+                    <li>5. Check if AdminOverview component renders</li>
+                </ul>
+            `;
+        }
+
+        function openApp() {
+            window.open('http://localhost:5175', '_blank');
+            log('Opened app in new tab', 'info');
+        }
+
+        function openAdminDirect() {
+            window.open('http://localhost:5175/app/admin', '_blank');
+            log('Attempted direct admin route access', 'info');
+        }
+
+        function copyTokenTest() {
+            if (!authToken) {
+                alert('Please login first to get a token');
+                return;
+            }
+            
+            const testCode = `
+// Console test code for admin debugging
+const token = "${authToken}";
+
+// Test admin API
+fetch('http://localhost:3002/api/admin/overview', {
+    headers: { 'Authorization': \`Bearer \${token}\` }
+})
+.then(r => r.json())
+.then(data => console.log('Admin API result:', data))
+.catch(err => console.error('Admin API error:', err));
+
+// Test auth store
+console.log('Auth store state:', useAuthStore.getState());
+
+// Monitor route changes
+console.log('Current location:', window.location.pathname);
+            `;
+            
+            navigator.clipboard.writeText(testCode);
+            alert('Token test code copied to clipboard! Paste in browser console.');
+            log('Token test code copied to clipboard', 'success');
+        }
+
+        // Initialize
+        window.onload = function() {
+            log('Admin login debug test initialized', 'info');
+            checkServers();
+        };
+    </script>
+</body>
+</html>

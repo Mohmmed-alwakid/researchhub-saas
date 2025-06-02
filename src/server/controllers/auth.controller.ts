@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import { User } from '../../database/models/index.js';
+import { Subscription } from '../../database/models/Subscription.model.js';
 import { asyncHandler, createError } from '../middleware/error.middleware.js';
 
 /**
@@ -31,6 +32,47 @@ const getCookieOptions = () => ({
   sameSite: 'strict' as const,
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 });
+
+/**
+ * Create a free subscription for new users
+ */
+const createFreeSubscription = async (userId: string) => {
+  const subscription = new Subscription({
+    userId: new mongoose.Types.ObjectId(userId),
+    plan: 'free',
+    status: 'active',
+    stripeCustomerId: 'free_user',
+    stripeSubscriptionId: `free_${userId}_${Date.now()}`,
+    stripePriceId: 'free_price',
+    stripeProductId: 'free_product',
+    billingCycle: 'monthly',
+    amount: 0,
+    currency: 'USD',
+    startDate: new Date(),
+    currentPeriodStart: new Date(),
+    currentPeriodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+    usageLimits: {
+      studies: 1,
+      participants: 50,
+      recordings: 10,
+      storage: 1,
+      collaborators: 1,
+      apiCalls: 1000
+    },
+    currentUsage: {
+      studies: 0,
+      participants: 0,
+      recordings: 0,
+      storage: 0,
+      collaborators: 0,
+      apiCalls: 0,
+      lastResetAt: new Date()
+    }
+  });
+  
+  await subscription.save();
+  return subscription;
+};
 
 /**
  * @desc    Register new user
@@ -64,9 +106,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
         timezone: 'UTC'
       }
     }  });
-
   // Generate tokens
   const { accessToken, refreshToken } = generateTokens((user._id as mongoose.Types.ObjectId).toString());
+  
   // Save refresh token to user
   user.refreshTokens = [{
     token: refreshToken,
@@ -75,6 +117,14 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     ipAddress: req.ip || req.connection.remoteAddress || 'unknown'
   }];
   await user.save();
+
+  // Create free subscription for new user
+  try {
+    await createFreeSubscription((user._id as mongoose.Types.ObjectId).toString());
+  } catch (error) {
+    console.error('Failed to create free subscription for user:', error);
+    // Don't fail registration if subscription creation fails
+  }
 
   // Set refresh token cookie
   res.cookie('refreshToken', refreshToken, getCookieOptions());

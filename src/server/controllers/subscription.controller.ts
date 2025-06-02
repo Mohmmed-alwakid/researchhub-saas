@@ -31,15 +31,6 @@ const handleStripeNotConfigured = (res: Response): void => {
  * Get user's current subscription
  */
 export const getCurrentSubscription = asyncHandler(async (req: Request, res: Response) => {
-  if (!isStripeConfigured()) {
-    res.json({
-      success: true,
-      data: null,
-      message: 'Subscription service not configured for development'
-    });
-    return;
-  }
-
   const userId = req.user?._id;
 
   if (!userId) {
@@ -56,15 +47,35 @@ export const getCurrentSubscription = asyncHandler(async (req: Request, res: Res
   if (!subscription) {
     subscription = new Subscription({
       user: userId,
-      planType: 'free',
+      plan: 'free',
       status: 'active',
-      features: ['basic_analytics', 'up_to_2_studies'],
-      limits: {
-        studies: 2,
+      stripeCustomerId: 'free_user',
+      stripeSubscriptionId: `free_${userId}_${Date.now()}`,
+      stripePriceId: 'free_price',
+      stripeProductId: 'free_product',
+      billingCycle: 'monthly',
+      amount: 0,
+      currency: 'USD',
+      startDate: new Date(),
+      currentPeriodStart: new Date(),
+      currentPeriodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+      usageLimits: {
+        studies: 1,
         participants: 50,
-        storage: '1GB'
+        recordings: 10,
+        storage: 1,
+        collaborators: 1,
+        apiCalls: 1000
       },
-      startDate: new Date()
+      currentUsage: {
+        studies: 0,
+        participants: 0,
+        recordings: 0,
+        storage: 0,
+        collaborators: 0,
+        apiCalls: 0,
+        lastResetAt: new Date()
+      }
     });
     await subscription.save();
   }

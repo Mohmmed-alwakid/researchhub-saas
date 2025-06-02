@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Admin Login White Page Issue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-step {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .url-link {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .url-link:hover {
+            color: #0056b3;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .debug-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Debug Admin Login White Page Issue</h1>
+        <p><strong>Issue:</strong> Admin login appears successful but shows a white page instead of the admin dashboard.</p>
+        <p><strong>Expected:</strong> After login, admin should be redirected to <code>/app/admin</code></p>
+        
+        <div class="test-step">
+            <h3>🧪 Comprehensive Debug Test</h3>
+            <button onclick="runFullDebugTest()">🔍 Start Complete Debug Process</button>
+            <button onclick="clearResults()">🧹 Clear Results</button>
+            <button onclick="openAdminDirectly()">🌐 Try Direct Admin Access</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div class="test-step">
+            <h3>📋 Manual Testing Links</h3>
+            <p>Try these URLs manually in browser:</p>
+            <ul>
+                <li><span class="url-link" onclick="openUrl('http://localhost:5175/login')">Login Page</span></li>
+                <li><span class="url-link" onclick="openUrl('http://localhost:5175/app')">Protected App Route</span></li>
+                <li><span class="url-link" onclick="openUrl('http://localhost:5175/app/admin')">Direct Admin Route</span></li>
+                <li><span class="url-link" onclick="openUrl('http://localhost:5175/app/dashboard')">Researcher Dashboard</span></li>
+            </ul>
+        </div>
+        
+        <div class="container">
+            <h3>🔧 Debug Log</h3>
+            <textarea id="debugLog" readonly placeholder="Debug information will appear here..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+        let debugLog = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            debugLog.push(logEntry);
+            document.getElementById('debugLog').value = debugLog.join('\n');
+            console.log(logEntry);
+            
+            // Also add to results
+            const resultsDiv = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('debugLog').value = '';
+            debugLog = [];
+        }
+        
+        function openUrl(url) {
+            window.open(url, '_blank');
+        }
+        
+        function openAdminDirectly() {
+            log('🌐 Opening admin dashboard directly...', 'info');
+            window.open('http://localhost:5175/app/admin', '_blank');
+        }
+        
+        async function runFullDebugTest() {
+            clearResults();
+            log('🚀 Starting comprehensive admin login debug test...', 'info');
+            
+            try {
+                // Step 1: Test API connectivity
+                log('📡 Step 1: Testing API connectivity...', 'info');
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                if (healthResponse.ok) {
+                    log('✅ API is responsive', 'success');
+                } else {
+                    log('❌ API health check failed', 'error');
+                    return;
+                }
+                
+                // Step 2: Clear any existing auth
+                log('🧹 Step 2: Clearing existing authentication...', 'info');
+                localStorage.removeItem('auth-storage');
+                sessionStorage.clear();
+                log('✅ Auth storage cleared', 'success');
+                
+                // Step 3: Test admin login
+                log('🔐 Step 3: Testing admin login...', 'info');
+                const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'testadmin@test.com',
+                        password: 'AdminPassword123!'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (loginResponse.ok && loginData.success) {
+                    log(`✅ Login successful! User: ${loginData.data.user.email} (${loginData.data.user.role})`, 'success');
+                    
+                    // Step 4: Store auth like the app does
+                    log('💾 Step 4: Storing authentication data...', 'info');
+                    const authState = {
+                        state: {
+                            user: loginData.data.user,
+                            token: loginData.data.accessToken,
+                            refreshToken: loginData.data.refreshToken,
+                            isAuthenticated: true,
+                            isLoading: false
+                        },
+                        version: 0
+                    };
+                    localStorage.setItem('auth-storage', JSON.stringify(authState));
+                    log('✅ Auth data stored in localStorage', 'success');
+                    
+                    // Step 5: Check what should happen according to routing
+                    log('🗺️ Step 5: Analyzing expected routing behavior...', 'info');
+                    const userRole = loginData.data.user.role;
+                    
+                    if (userRole === 'admin' || userRole === 'super_admin') {
+                        log(`✅ User role '${userRole}' should redirect to /app/admin`, 'success');
+                        log('📍 Login page should navigate to: /app', 'info');
+                        log('🔄 RoleBasedRedirect should then redirect to: /app/admin', 'info');
+                    } else {
+                        log(`⚠️ Unexpected role: ${userRole}`, 'error');
+                    }
+                    
+                    // Step 6: Test direct access to admin route
+                    log('🎯 Step 6: Testing direct admin route access...', 'info');
+                    
+                    log('🔍 Step 7: Check for potential issues...', 'info');
+                    log('- Check browser developer console for JavaScript errors', 'info');
+                    log('- Check Network tab for failed API requests', 'info');
+                    log('- Check if React components are loading properly', 'info');
+                    
+                    // Step 8: Simulate the actual login flow
+                    log('🎭 Step 8: Simulating actual application behavior...', 'info');
+                    log('Now try visiting the login page and using these credentials:', 'info');
+                    log(`Email: testadmin@test.com`, 'info');
+                    log(`Password: AdminPassword123!`, 'info');
+                    
+                    // Open the actual login page
+                    setTimeout(() => {
+                        log('🌐 Opening login page in new tab for manual testing...', 'info');
+                        window.open('http://localhost:5175/login', '_blank');
+                    }, 2000);
+                    
+                } else {
+                    log(`❌ Login failed: ${loginData.message || 'Unknown error'}`, 'error');
+                    log(`Full response: ${JSON.stringify(loginData, null, 2)}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Debug test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-run basic check on page load
+        window.onload = function() {
+            log('🔧 Debug page loaded', 'info');
+            log('Frontend: http://localhost:5175', 'info');
+            log('Backend: http://localhost:3002', 'info');
+            log('Click "Start Complete Debug Process" to begin debugging', 'info');
+        };
+    </script>
+</body>
+</html>

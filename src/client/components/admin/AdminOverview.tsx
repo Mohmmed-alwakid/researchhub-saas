@@ -37,12 +37,24 @@ const AdminOverview: React.FC = () => {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [systemHealth, setSystemHealth] = useState<'healthy' | 'warning' | 'critical'>('healthy');
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    fetchSystemMetrics();
-    fetchRecentActivity();
-    checkSystemHealth();
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchSystemMetrics(),
+          fetchRecentActivity(),
+          checkSystemHealth()
+        ]);
+      } catch (error) {
+        console.error('Error loading admin overview data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
   }, []);
+  
   const fetchSystemMetrics = async () => {
     try {
       // Get real platform overview data
@@ -171,8 +183,6 @@ const AdminOverview: React.FC = () => {
       }
     } catch {
       setSystemHealth('critical');
-    } finally {
-      setLoading(false);
     }
   };
 

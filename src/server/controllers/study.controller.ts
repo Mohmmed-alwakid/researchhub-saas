@@ -4,12 +4,12 @@ import { Task } from '../../database/models/Task.model';
 import { Session } from '../../database/models/Session.model';
 import { APIError } from '../middleware/error.middleware';
 import type { AuthRequest } from '../../shared/types/index.js';
+import type { ISubscriptionDocument } from '../../database/models/Subscription.model';
 import {
   canAccessStudy,
   isResourceOwner,
   isAdmin,
   hasActiveSubscription,
-  hasSubscriptionFeature,
   PERMISSION_ERRORS
 } from '../utils/permissions.util.js';
 
@@ -21,18 +21,19 @@ export const createStudy = async (req: AuthRequest, res: Response, next: NextFun
     const userId = req.user?.id;
     if (!userId) {
       return next(new APIError(PERMISSION_ERRORS.AUTHENTICATION_REQUIRED, 401));
-    }
-
-    // Check if user has active subscription for study creation
+    }    // Check if user has active subscription for study creation
     if (!hasActiveSubscription(req.user!)) {
       return next(new APIError(PERMISSION_ERRORS.SUBSCRIPTION_REQUIRED, 403));
-    }
-
-    // Check study creation limits based on subscription
-    if (!hasSubscriptionFeature(req.user!, 'unlimited_studies')) {
-      const userStudyCount = await Study.countDocuments({ createdBy: userId });
-      if (userStudyCount >= 5) { // Free tier limit
-        return next(new APIError('Study limit reached. Upgrade subscription for unlimited studies', 403));
+    }    // Check study creation limits based on subscription
+    const userStudyCount = await Study.countDocuments({ createdBy: userId });
+    
+    // Load user's subscription to check limits
+    await req.user!.populate('subscription');
+    const subscription = req.user!.subscription as ISubscriptionDocument;
+    
+    if (subscription?.usageLimits?.studies && subscription.usageLimits.studies !== -1) {
+      if (userStudyCount >= subscription.usageLimits.studies) {
+        return next(new APIError(`Study limit reached (${subscription.usageLimits.studies}). Upgrade subscription for more studies`, 403));
       }
     }
 

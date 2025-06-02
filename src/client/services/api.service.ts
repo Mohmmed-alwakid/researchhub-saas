@@ -54,12 +54,11 @@ class ApiService {
               const { state } = JSON.parse(authStorage);
               const refreshToken = state?.refreshToken;
               
-              if (refreshToken) {
-                const response = await axios.post(`${this.api.defaults.baseURL}/auth/refresh`, {
+              if (refreshToken) {                const response = await axios.post(`${this.api.defaults.baseURL}/auth/refresh`, {
                   refreshToken,
                 });
 
-                const { token } = response.data;
+                const token = response.data.data?.accessToken || response.data.token;
                 
                 // Update both localStorage and trigger Zustand store update
                 const updatedState = { ...state, token };

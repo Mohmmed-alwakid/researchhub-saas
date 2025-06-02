@@ -14,6 +14,23 @@ export interface ISubscriptionDocument extends Omit<ISubscription, '_id' | 'user
     participants?: number;
     storage?: number;
   };
+  usageLimits?: {
+    studies?: number;
+    participants?: number;
+    recordings?: number;
+    storage?: number;
+    collaborators?: number;
+    apiCalls?: number;
+  };
+  currentUsage?: {
+    studies?: number;
+    participants?: number;
+    recordings?: number;
+    storage?: number;
+    collaborators?: number;
+    apiCalls?: number;
+    lastResetAt?: Date;
+  };
   currentPeriodEnd?: Date;
   trialEnd?: Date | number;
   plan?: 'free' | 'basic' | 'pro' | 'enterprise';

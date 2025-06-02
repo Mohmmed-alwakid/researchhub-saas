@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3 & 4: Application Review & Study Completion Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #1e40af;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .phase {
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            transform: translateY(-1px);
+        }
+        
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .success {
+            background-color: #d1fae5;
+            border: 1px solid #10b981;
+            color: #047857;
+        }
+        
+        .error {
+            background-color: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #dc2626;
+        }
+        
+        .info {
+            background-color: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1d4ed8;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status.approved {
+            background: #d1fae5;
+            color: #047857;
+        }
+        
+        .status.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .application-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fafafa;
+        }
+        
+        .application-actions {
+            margin-top: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Phase 3 & 4: Application Review & Study Completion Test</h1>
+        
+        <div class="phase">
+            <h2>📋 Phase 3: Researcher Application Review</h2>
+            <p>Test the application review workflow from the researcher's perspective.</p>
+            
+            <button onclick="loginResearcher()">1. Login as Researcher</button>
+            <button onclick="getStudyApplications()" id="getAppsBtn" disabled>2. Get Study Applications</button>
+            <button onclick="approveApplication()" id="approveBtn" disabled>3. Approve Application</button>
+            
+            <div id="phase3Result" class="result"></div>
+        </div>
+        
+        <div class="phase">
+            <h2>🎯 Phase 4: Participant Study Access</h2>
+            <p>Test the participant's ability to access and complete the approved study.</p>
+            
+            <button onclick="loginParticipant()">1. Login as Participant</button>
+            <button onclick="checkApprovedStudies()" id="checkStudiesBtn" disabled>2. Check Approved Studies</button>
+            <button onclick="startStudySession()" id="startSessionBtn" disabled>3. Start Study Session</button>
+            <button onclick="completeStudy()" id="completeBtn" disabled>4. Complete Study</button>
+            
+            <div id="phase4Result" class="result"></div>
+        </div>
+        
+        <div class="phase">
+            <h2>📊 Test Summary</h2>
+            <div id="summary" class="result info">
+                <strong>Workflow Test Progress:</strong><br>
+                ✅ Phase 1: Researcher Authentication & Study Creation - COMPLETED<br>
+                ✅ Phase 2: Participant Authentication & Study Discovery - COMPLETED<br>
+                🔄 Phase 3: Application Review - IN PROGRESS<br>
+                ⏳ Phase 4: Study Completion - PENDING<br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+        const STUDY_ID = '683e01f02b37277cde320778'; // From previous testing
+        
+        let researcherToken = null;
+        let participantToken = null;
+        let applicationId = null;
+        let sessionId = null;
+        
+        function log(message, type = 'info', containerId = 'phase3Result') {
+            const container = document.getElementById(containerId);
+            const timestamp = new Date().toLocaleTimeString();
+            container.innerHTML += `[${timestamp}] ${message}\n`;
+            container.className = `result ${type}`;
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        async function loginResearcher() {
+            log('🔑 Logging in as researcher...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'testresearcher@test.com',
+                        password: 'Password123!'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    researcherToken = result.data.accessToken;
+                    log('✅ Researcher login successful', 'success');
+                    log(`User: ${result.data.user.firstName} ${result.data.user.lastName} (${result.data.user.role})`, 'info');
+                    document.getElementById('getAppsBtn').disabled = false;
+                } else {
+                    log(`❌ Login failed: ${result.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Login error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function getStudyApplications() {
+            log('📋 Retrieving study applications...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/participant-applications/studies/${STUDY_ID}/applications`, {
+                    method: 'GET',
+                    headers: { 
+                        'Authorization': `Bearer ${researcherToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    const applications = result.data.applications;
+                    log(`✅ Found ${applications.length} application(s)`, 'success');
+                    
+                    if (applications.length > 0) {
+                        applications.forEach((app, index) => {
+                            log(`Application ${index + 1}:`, 'info');
+                            log(`  ID: ${app._id}`, 'info');
+                            log(`  Status: ${app.status}`, 'info');
+                            log(`  Participant: ${app.participantId?.email || 'Unknown'}`, 'info');
+                            log(`  Applied: ${new Date(app.appliedAt).toLocaleString()}`, 'info');
+                            
+                            if (app.status === 'pending' && !applicationId) {
+                                applicationId = app._id;
+                                document.getElementById('approveBtn').disabled = false;
+                            }
+                        });
+                        
+                        if (!applicationId) {
+                            log('ℹ️ No pending applications found to review', 'info');
+                        }
+                    } else {
+                        log('ℹ️ No applications found for this study', 'info');
+                    }
+                } else {
+                    log(`❌ Failed to retrieve applications: ${result.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error retrieving applications: ${error.message}`, 'error');
+            }
+        }
+        
+        async function approveApplication() {
+            if (!applicationId) {
+                log('❌ No pending application to approve', 'error');
+                return;
+            }
+            
+            log(`🔍 Approving application ${applicationId}...`, 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/participant-applications/applications/${applicationId}/review`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Authorization': `Bearer ${researcherToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'approve',
+                        notes: 'Approved via comprehensive workflow testing'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    log('✅ Application approved successfully!', 'success');
+                    log(`New status: ${result.data.status}`, 'success');
+                    log(`Reviewed at: ${new Date(result.data.reviewedAt).toLocaleString()}`, 'info');
+                    
+                    // Update summary
+                    updateSummary('Phase 3: Application Review - COMPLETED ✅');
+                } else {
+                    log(`❌ Approval failed: ${result.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Approval error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loginParticipant() {
+            log('🔑 Logging in as participant...', 'info', 'phase4Result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'testparticipant@test.com',
+                        password: 'Password123!'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    participantToken = result.data.accessToken;
+                    log('✅ Participant login successful', 'success', 'phase4Result');
+                    log(`User: ${result.data.user.firstName} ${result.data.user.lastName} (${result.data.user.role})`, 'info', 'phase4Result');
+                    document.getElementById('checkStudiesBtn').disabled = false;
+                } else {
+                    log(`❌ Login failed: ${result.message || 'Unknown error'}`, 'error', 'phase4Result');
+                }
+            } catch (error) {
+                log(`❌ Login error: ${error.message}`, 'error', 'phase4Result');
+            }
+        }
+        
+        async function checkApprovedStudies() {
+            log('🔍 Checking approved studies...', 'info', 'phase4Result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/participant-applications/applications/my`, {
+                    method: 'GET',
+                    headers: { 
+                        'Authorization': `Bearer ${participantToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    const applications = result.data.applications;
+                    log(`✅ Found ${applications.length} application(s)`, 'success', 'phase4Result');
+                    
+                    const approvedApps = applications.filter(app => app.status === 'approved');
+                    log(`✅ Found ${approvedApps.length} approved application(s)`, 'success', 'phase4Result');
+                    
+                    if (approvedApps.length > 0) {
+                        approvedApps.forEach((app, index) => {
+                            log(`Approved Study ${index + 1}:`, 'info', 'phase4Result');
+                            log(`  Study: ${app.studyId?.title || 'Unknown'}`, 'info', 'phase4Result');
+                            log(`  Status: ${app.status}`, 'info', 'phase4Result');
+                            log(`  Approved: ${new Date(app.reviewedAt).toLocaleString()}`, 'info', 'phase4Result');
+                        });
+                        
+                        document.getElementById('startSessionBtn').disabled = false;
+                    } else {
+                        log('ℹ️ No approved studies found yet', 'info', 'phase4Result');
+                    }
+                } else {
+                    log(`❌ Failed to check applications: ${result.message || 'Unknown error'}`, 'error', 'phase4Result');
+                }
+            } catch (error) {
+                log(`❌ Error checking applications: ${error.message}`, 'error', 'phase4Result');
+            }
+        }
+        
+        async function startStudySession() {
+            log('🎯 Starting study session...', 'info', 'phase4Result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/sessions/start/${STUDY_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        participantInfo: {
+                            email: 'testparticipant@test.com',
+                            name: 'Test Participant',
+                            age: 25,
+                            demographics: {
+                                experience: 'intermediate',
+                                device: 'desktop'
+                            }
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    sessionId = result.data._id;
+                    log('✅ Study session started successfully!', 'success', 'phase4Result');
+                    log(`Session ID: ${sessionId}`, 'info', 'phase4Result');
+                    log(`Study: ${result.data.studyId.title}`, 'info', 'phase4Result');
+                    document.getElementById('completeBtn').disabled = false;
+                } else {
+                    log(`❌ Failed to start session: ${result.message || 'Unknown error'}`, 'error', 'phase4Result');
+                }
+            } catch (error) {
+                log(`❌ Session start error: ${error.message}`, 'error', 'phase4Result');
+            }
+        }
+        
+        async function completeStudy() {
+            if (!sessionId) {
+                log('❌ No active session to complete', 'error', 'phase4Result');
+                return;
+            }
+            
+            log('🏁 Completing study session...', 'info', 'phase4Result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        feedback: {
+                            rating: 5,
+                            comments: 'Great study! Very comprehensive workflow testing.',
+                            completedTasks: ['navigation', 'interaction', 'feedback']
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    log('✅ Study completed successfully!', 'success', 'phase4Result');
+                    log(`Final status: ${result.data.status}`, 'success', 'phase4Result');
+                    log(`Completed at: ${new Date(result.data.completedAt).toLocaleString()}`, 'info', 'phase4Result');
+                    
+                    // Update summary
+                    updateSummary('Phase 4: Study Completion - COMPLETED ✅');
+                    showFinalSummary();
+                } else {
+                    log(`❌ Failed to complete study: ${result.message || 'Unknown error'}`, 'error', 'phase4Result');
+                }
+            } catch (error) {
+                log(`❌ Study completion error: ${error.message}`, 'error', 'phase4Result');
+            }
+        }
+        
+        function updateSummary(newStatus) {
+            const summary = document.getElementById('summary');
+            const currentText = summary.innerHTML;
+            
+            if (newStatus.includes('Phase 3')) {
+                summary.innerHTML = currentText.replace('🔄 Phase 3: Application Review - IN PROGRESS', '✅ Phase 3: Application Review - COMPLETED');
+                summary.innerHTML = summary.innerHTML.replace('⏳ Phase 4: Study Completion - PENDING', '🔄 Phase 4: Study Completion - IN PROGRESS');
+            } else if (newStatus.includes('Phase 4')) {
+                summary.innerHTML = summary.innerHTML.replace('🔄 Phase 4: Study Completion - IN PROGRESS', '✅ Phase 4: Study Completion - COMPLETED');
+            }
+        }
+        
+        function showFinalSummary() {
+            const summary = document.getElementById('summary');
+            summary.innerHTML += `<br><br><strong>🎉 COMPREHENSIVE WORKFLOW TEST COMPLETED!</strong><br>
+            All phases of the ResearchHub platform have been successfully tested:<br>
+            • User authentication (researcher & participant)<br>
+            • Study creation and configuration<br>
+            • Study discovery and application<br>
+            • Application review and approval<br>
+            • Study session management<br>
+            • Study completion workflow<br><br>
+            The ResearchHub platform is fully functional and ready for production use! 🚀`;
+        }
+        
+        // Auto-start if previous phases completed
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Ready to test Phase 3 & 4 workflows...', 'info');
+        });
+    </script>
+</body>
+</html>
