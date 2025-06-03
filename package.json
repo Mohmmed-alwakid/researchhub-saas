@@ -14,7 +14,7 @@
     "dev:server": "nodemon src/server/index.ts",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --mode production",
-    "build:server": "tsc -p tsconfig.server.json",
+    "build:server": "tsc -p tsconfig.server.json && echo {\"type\":\"commonjs\"} > dist/server/package.json",
     "start": "node dist/server/index.js",
     "lint": "eslint .",
     "preview": "vite preview",
