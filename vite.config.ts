@@ -29,7 +29,7 @@ export default defineConfig({
       }
     }
   },
-  envPrefix: [],
+  envPrefix: ['VITE_'],
   css: {
     postcss: './postcss.config.js'
   }

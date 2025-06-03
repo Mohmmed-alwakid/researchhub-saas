@@ -1,13 +1,28 @@
-# 🚀 Railway Deployment Guide - Step by Step
+# 🚀 ResearchHub Hybrid Architecture: Railway Backend Deployment
 
 ## ✅ Current Status
-- [x] GitHub Repository: https://github.com/Mohmmed-alwakid/researchhub-saas
-- [x] Code pushed successfully (138 files)
-- [x] MongoDB Atlas configured
-- [x] Environment variables prepared
-- [x] Railway configuration ready
+- [x] **Frontend (Vercel)**: ✅ Deployed at `https://researchhub-saas.vercel.app`
+- [x] **GitHub Repository**: Ready for Railway integration
+- [x] **MongoDB Atlas**: Configured and tested
+- [x] **Environment Variables**: Prepared for Railway
+- [x] **Railway Configuration**: `railway.toml` optimized for backend-only
 
-## 🎯 Railway Deployment Steps
+## 🎯 Hybrid Architecture Overview
+
+### Frontend (Vercel) ➜ Backend (Railway)
+```
+Vercel Frontend (React)  →  Railway Backend (Express + MongoDB)
+┌─────────────────────┐     ┌────────────────────────────────┐
+│ https://researchhub │────▶│ https://YOUR-APP.railway.app   │
+│ -saas.vercel.app    │     │ /api endpoints                 │
+│                     │     │ MongoDB Atlas                  │
+│ - Static Assets     │     │ Socket.io Real-time           │
+│ - Global CDN        │     │ JWT Authentication             │
+│ - Auto SSL          │     │ File Upload Support            │
+└─────────────────────┘     └────────────────────────────────┘
+```
+
+## 🚀 Railway Backend Deployment Steps
 
 ### Step 1: Access Railway
 1. Go to: https://railway.app

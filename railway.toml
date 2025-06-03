@@ -1,9 +1,13 @@
 [build]
-command = "npm run build"
+command = "npm run build:server"
 
 [deploy]
 startCommand = "npm start"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
+
+[variables]
+NODE_ENV = "production"
+PORT = "5000"
     

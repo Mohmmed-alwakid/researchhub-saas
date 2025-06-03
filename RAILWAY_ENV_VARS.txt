@@ -1,4 +1,4 @@
-RAILWAY ENVIRONMENT VARIABLES
+RAILWAY ENVIRONMENT VARIABLES FOR HYBRID ARCHITECTURE
 Copy and paste these into Railway one by one:
 
 NODE_ENV=production
@@ -15,8 +15,16 @@ JWT_EXPIRE=7d
 
 JWT_REFRESH_EXPIRE=30d
 
+CLIENT_URL=https://researchhub-saas.vercel.app
+
 ===== OPTIONAL (for full functionality) =====
 STRIPE_SECRET_KEY=your-stripe-secret-key
 STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
 SENDGRID_API_KEY=your-sendgrid-api-key
 FROM_EMAIL=noreply@researchhub.com
+
+===== HYBRID ARCHITECTURE NOTES =====
+- Frontend: Vercel (https://researchhub-saas.vercel.app)
+- Backend: Railway (will be https://YOUR-APP.railway.app)
+- Database: MongoDB Atlas (already configured)
+- CORS: Configured to accept Vercel frontend requests

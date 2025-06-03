@@ -19,17 +19,39 @@ dotenv.config();
 
 const app: Application = express();
 const server = createServer(app);
+// Socket.io configuration for hybrid architecture
+const allowedOrigins = [
+  process.env.CLIENT_URL || 'http://localhost:5175',
+  'https://researchhub-saas.vercel.app', // Vercel frontend
+  'http://localhost:5175', // Local development
+  'http://localhost:3000', // Alternative local port
+];
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5175',
-    methods: ['GET', 'POST']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
-// Middleware
+// CORS middleware for hybrid architecture
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5175',
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Log unauthorized origin attempts
+    console.warn(`🚫 CORS blocked origin: ${origin}`);
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
