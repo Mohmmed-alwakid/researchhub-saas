@@ -1,41 +1,24 @@
 {
   "name": "researchhub",
   "version": 2,
-  "builds": [
-    {
-      "src": "dist/server/server/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "src/**",
-          "dist/**",
-          "uploads/**"
-        ]
-      }
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/client"
-      }
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/client",
+  "installCommand": "npm ci",
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/dist/server/server/index.js"
+      "dest": "/api"
     },
     {
       "src": "/(.*)",
       "dest": "/dist/client/$1"
     }
-  ],
-  "env": {
+  ],  "env": {
     "NODE_ENV": "production",
     "PORT": "3002"
-  },  "functions": {
-    "dist/server/server/index.js": {
+  },
+  "functions": {
+    "api/index.js": {
       "maxDuration": 30
     }
   }
