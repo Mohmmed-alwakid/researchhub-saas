@@ -3,8 +3,8 @@ Copy and paste these into Railway one by one:
 
 NODE_ENV=production
 
-# Railway Internal MongoDB (RECOMMENDED - faster, more reliable)
-MONGODB_URI=mongodb://mongodb.railway.internal:27017/researchhub
+# Railway Variable Reference (REQUIRED - auto-generates correct internal URL)
+MONGODB_URI=${{ MongoDB.MONGO_URL }}
 
 # Alternative: MongoDB Atlas (if you prefer external)
 # MONGODB_URI=mongodb+srv://abwanwr77:CFm4JCkjeFpKpzO4@cluster0.ackancs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
@@ -23,8 +23,9 @@ ADMIN_EMAIL=admin@researchhub.com
 ADMIN_PASSWORD=AdminPass123!
 
 ===== NOTES =====
-- Using Railway's internal MongoDB service (mongodb.railway.internal)
-- This provides faster connection and better integration
+- Using Railway's MongoDB variable reference system (${{ MongoDB.MONGO_URL }})
+- This auto-generates the correct internal connection URL
+- Railway handles service networking automatically
 - Database and collections will be created automatically
 - Admin user will be initialized on first startup
 
