@@ -12,9 +12,9 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
   },
   "include": ["src/server/**/*", "src/shared/**/*", "src/database/**/*"],
   "exclude": ["node_modules", "dist", "src/client"]
