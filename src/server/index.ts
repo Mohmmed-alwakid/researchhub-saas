@@ -62,24 +62,46 @@ app.use('/api', apiRoutes);
 
 // Root health check endpoint for Railway
 app.get('/health', (_req, res) => {
-  res.status(200).json({
-    status: 'ok',
-    message: 'ResearchHub Server is running',
-    timestamp: new Date().toISOString()
-  });
+  try {
+    res.status(200).json({
+      status: 'ok',
+      message: 'ResearchHub Server is running',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage()
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Health check failed',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Root endpoint
 app.get('/', (_req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'ResearchHub API Server',
-    version: '1.0.0',
-    health: '/api/health',
-    documentation: '/api',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+  try {
+    res.status(200).json({
+      success: true,
+      message: 'ResearchHub API Server',
+      version: '1.0.0',
+      health: '/health',
+      api_health: '/api/health',
+      documentation: '/api',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      uptime: process.uptime()
+    });
+  } catch (error) {
+    console.error('Root endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Socket.io for real-time features
@@ -96,11 +118,8 @@ io.on('connection', (socket) => {
   });
 });
 
-// Error handling middleware (must be last)
-app.use(errorHandler);
-
-// Catch-all route for debugging Railway deployment
-app.use('*', (req, res) => {
+// Catch-all route for debugging Railway deployment (before error handler)
+app.all('*', (req, res) => {
   console.log(`🔍 Unhandled route: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     success: false,
@@ -118,6 +137,9 @@ app.use('*', (req, res) => {
   });
 });
 
+// Error handling middleware (must be last)
+app.use(errorHandler);
+
 // Start server
 const PORT = parseInt(process.env.PORT || '3002', 10);
 const HOST = process.env.HOST || '0.0.0.0'; // Railway requires binding to 0.0.0.0
@@ -130,31 +152,37 @@ const startServer = async (): Promise<void> => {
   console.log(`📊 Host: ${HOST}`);
   
   // Start the HTTP server first
-  server.listen(PORT, HOST, () => {
+  const httpServer = server.listen(PORT, HOST, () => {
     console.log(`🚀 Server running on ${HOST}:${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5175'}`);
-    console.log(`🏥 Health check: http://${HOST}:${PORT}/api/health`);
-    console.log(`🏥 Alternative health: http://${HOST}:${PORT}/health`);
+    console.log(`🏥 Health check: http://${HOST}:${PORT}/health`);
+    console.log(`🏥 API Health check: http://${HOST}:${PORT}/api/health`);
     console.log(`🌍 Root endpoint: http://${HOST}:${PORT}/`);
+  });
+
+  // Handle server errors
+  httpServer.on('error', (error) => {
+    console.error('❌ Server startup error:', error);
+    process.exit(1);
   });
 
   // Connect to database after server is listening (for Railway healthcheck)
   try {
     await connectDB();
     console.log('✅ Database connection established');
+    
+    // Initialize database with admin accounts (only if DB connected)
+    try {
+      await initializeDatabaseWithRetries();
+      console.log('✅ Database initialization completed');
+    } catch (initError) {
+      console.error('❌ Database initialization failed:', initError);
+      console.log('⚠️  Server will continue but admin account may not be available');
+    }
   } catch (error) {
     console.error('❌ Database connection failed:', error);
     console.log('⚠️  Server will continue without database');
-  }
-  
-  // Initialize database with admin accounts (only if DB connected)
-  try {
-    await initializeDatabaseWithRetries();
-    console.log('✅ Database initialization completed');
-  } catch (error) {
-    console.error('❌ Database initialization failed:', error);
-    console.log('⚠️  Server will continue but admin account may not be available');
   }
 };
 
