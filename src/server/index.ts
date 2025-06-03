@@ -60,6 +60,26 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // API Routes
 app.use('/api', apiRoutes);
 
+// Root health check endpoint for Railway
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'ResearchHub Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Root endpoint
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'ResearchHub API Server',
+    version: '1.0.0',
+    health: '/api/health',
+    documentation: '/api'
+  });
+});
+
 // Socket.io for real-time features
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -78,7 +98,8 @@ io.on('connection', (socket) => {
 app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 3002;
+const PORT = parseInt(process.env.PORT || '3002', 10);
+const HOST = process.env.HOST || '0.0.0.0'; // Railway requires binding to 0.0.0.0
 
 const startServer = async (): Promise<void> => {
   await connectDB();
@@ -91,10 +112,11 @@ const startServer = async (): Promise<void> => {
     console.log('⚠️  Server will continue but admin account may not be available');
   }
   
-  server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+  server.listen(PORT, HOST, () => {
+    console.log(`🚀 Server running on ${HOST}:${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5175'}`);
+    console.log(`🏥 Health check: http://${HOST}:${PORT}/api/health`);
   });
 };
 

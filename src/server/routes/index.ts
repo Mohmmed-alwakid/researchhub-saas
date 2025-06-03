@@ -29,13 +29,29 @@ router.use('/admin', adminRoutes);
 // router.use('/payments', paymentRoutes);
 
 // Health check endpoint
-router.get('/health', (_req, res) => {
-  res.json({
-    success: true,
-    message: 'ResearchHub API is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+router.get('/health', async (_req, res) => {
+  try {
+    // Set proper status code and headers for Railway healthcheck
+    res.status(200).json({
+      status: 'ok',
+      success: true,
+      message: 'ResearchHub API is running',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      version: '1.0.0',
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      port: process.env.PORT || 3002
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(503).json({
+      status: 'error',
+      success: false,
+      message: 'Service unavailable',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // API documentation endpoint
