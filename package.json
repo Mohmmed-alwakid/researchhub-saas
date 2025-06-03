@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "SaaS platform for user testing research and feedback collection",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:client": "vite",

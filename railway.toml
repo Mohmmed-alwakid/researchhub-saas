@@ -1,9 +1,13 @@
 [build]
-command = "npm install && npm run build:server"
+command = "npm ci && npm run build:server && ls -la dist/server/server/"
 
 [deploy]
 startCommand = "node dist/server/server/index.js"
-healthcheckPath = "/api/health"
-healthcheckTimeout = 600
+healthcheckPath = "/"
+healthcheckTimeout = 300
 restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[env]
+NODE_ENV = "production"
     

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Cloud Database Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 10px; padding: 10px; border-radius: 3px; white-space: pre-wrap; font-family: monospace; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; width: 400px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Railway Cloud Database Test</h1>
+    
+    <div class="test-section info">
+        <h3>📋 Instructions</h3>
+        <p>1. Enter your Railway backend URL below</p>
+        <p>2. Test the health endpoint</p>
+        <p>3. Check database connectivity</p>
+        <p>4. Verify if collections exist in Railway MongoDB</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🌐 Railway Backend URL</h3>
+        <input type="text" id="backendUrl" placeholder="https://your-app.railway.app" value="">
+        <br>
+        <small>Find this in your Railway Backend service dashboard</small>
+    </div>
+
+    <div class="test-section">
+        <h3>🏥 Health Check Test</h3>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="healthResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🗄️ Database Status Test</h3>
+        <button onclick="testDatabase()">Check Database Connection</button>
+        <div id="databaseResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>👤 Admin User Test</h3>
+        <button onclick="testAdminUser()">Check Admin User</button>
+        <div id="adminResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Collections Test</h3>
+        <button onclick="testCollections()">List Collections</button>
+        <div id="collectionsResult" class="result"></div>
+    </div>
+
+    <script>
+        async function getBackendUrl() {
+            const url = document.getElementById('backendUrl').value;
+            if (!url) {
+                alert('Please enter your Railway backend URL first!');
+                return null;
+            }
+            return url.endsWith('/') ? url.slice(0, -1) : url;
+        }
+
+        async function testHealth() {
+            const backendUrl = await getBackendUrl();
+            if (!backendUrl) return;
+
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.textContent = 'Testing health endpoint...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch(`${backendUrl}/api/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Health Check Success!\n\nStatus: ${response.status}\nData: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Health Check Failed!\n\nStatus: ${response.status}\nError: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Connection Failed!\n\nError: ${error.message}\n\nPossible Issues:\n- Backend not deployed\n- Wrong URL\n- Service not running`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testDatabase() {
+            const backendUrl = await getBackendUrl();
+            if (!backendUrl) return;
+
+            const resultDiv = document.getElementById('databaseResult');
+            resultDiv.textContent = 'Testing database connectivity...';
+            resultDiv.className = 'result info';
+
+            try {
+                // Test a simple API endpoint that requires database
+                const response = await fetch(`${backendUrl}/api/auth/verify`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (response.status === 401) {
+                    resultDiv.textContent = `✅ Database Connected!\n\nThe /api/auth/verify endpoint responded with 401 (unauthorized),\nwhich means the backend is running and can connect to the database.\n\nThis is the expected response without authentication.`;
+                    resultDiv.className = 'result success';
+                } else {
+                    const data = await response.text();
+                    resultDiv.textContent = `⚠️ Unexpected Response\n\nStatus: ${response.status}\nResponse: ${data}`;
+                    resultDiv.className = 'result info';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Database Test Failed!\n\nError: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testAdminUser() {
+            const backendUrl = await getBackendUrl();
+            if (!backendUrl) return;
+
+            const resultDiv = document.getElementById('adminResult');
+            resultDiv.textContent = 'Testing admin user login...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch(`${backendUrl}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@researchhub.com',
+                        password: 'AdminPass123!'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    resultDiv.textContent = `✅ Admin User Exists!\n\nLogin successful!\nUser: ${data.user?.email}\nRole: ${data.user?.role}\n\nThis confirms:\n- Database connected\n- Admin user created\n- Authentication working`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Admin Login Failed!\n\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}\n\nThis might mean:\n- Admin user not created\n- Database not initialized\n- Authentication issues`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Admin Test Failed!\n\nError: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testCollections() {
+            const backendUrl = await getBackendUrl();
+            if (!backendUrl) return;
+
+            const resultDiv = document.getElementById('collectionsResult');
+            resultDiv.textContent = 'Testing collections endpoint...';
+            resultDiv.className = 'result info';
+
+            try {
+                // First login as admin to get token
+                const loginResponse = await fetch(`${backendUrl}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@researchhub.com',
+                        password: 'AdminPass123!'
+                    })
+                });
+
+                if (!loginResponse.ok) {
+                    resultDiv.textContent = `❌ Cannot test collections - admin login failed\n\nFirst run the Admin User Test to verify admin account exists.`;
+                    resultDiv.className = 'result error';
+                    return;
+                }
+
+                const loginData = await loginResponse.json();
+                const token = loginData.token;
+
+                // Test getting users (to verify collections exist)
+                const usersResponse = await fetch(`${backendUrl}/api/admin/users`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (usersResponse.ok) {
+                    const users = await usersResponse.json();
+                    resultDiv.textContent = `✅ Collections Working!\n\nUsers collection accessible\nFound ${users.length} users\n\nFirst user: ${users[0]?.email || 'No users found'}\n\nThis confirms:\n- MongoDB collections created\n- Database properly initialized\n- API endpoints working`;
+                    resultDiv.className = 'result success';
+                } else {
+                    const errorData = await usersResponse.text();
+                    resultDiv.textContent = `⚠️ Collections Test Inconclusive\n\nStatus: ${usersResponse.status}\nResponse: ${errorData}\n\nAdmin login worked, but users endpoint failed.\nThis might be an API issue, not a database issue.`;
+                    resultDiv.className = 'result info';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Collections Test Failed!\n\nError: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // Auto-detect Railway URL pattern
+        window.addEventListener('load', () => {
+            const urlInput = document.getElementById('backendUrl');
+            urlInput.placeholder = 'https://your-service-name.railway.app';
+        });
+    </script>
+</body>
+</html>

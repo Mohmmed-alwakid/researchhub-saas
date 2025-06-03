@@ -76,7 +76,9 @@ app.get('/', (_req, res) => {
     message: 'ResearchHub API Server',
     version: '1.0.0',
     health: '/api/health',
-    documentation: '/api'
+    documentation: '/api',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -97,17 +99,44 @@ io.on('connection', (socket) => {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
+// Catch-all route for debugging Railway deployment
+app.use('*', (req, res) => {
+  console.log(`🔍 Unhandled route: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    method: req.method,
+    path: req.originalUrl,
+    timestamp: new Date().toISOString(),
+    availableRoutes: [
+      'GET /',
+      'GET /health',
+      'GET /api/health',
+      'POST /api/auth/login',
+      'POST /api/auth/register'
+    ]
+  });
+});
+
 // Start server
 const PORT = parseInt(process.env.PORT || '3002', 10);
 const HOST = process.env.HOST || '0.0.0.0'; // Railway requires binding to 0.0.0.0
 
 const startServer = async (): Promise<void> => {
+  console.log('🚀 Starting ResearchHub server...');
+  console.log(`📊 Node.js version: ${process.version}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📊 Port: ${PORT}`);
+  console.log(`📊 Host: ${HOST}`);
+  
   // Start the HTTP server first
   server.listen(PORT, HOST, () => {
     console.log(`🚀 Server running on ${HOST}:${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5175'}`);
     console.log(`🏥 Health check: http://${HOST}:${PORT}/api/health`);
+    console.log(`🏥 Alternative health: http://${HOST}:${PORT}/health`);
+    console.log(`🌍 Root endpoint: http://${HOST}:${PORT}/`);
   });
 
   // Connect to database after server is listening (for Railway healthcheck)

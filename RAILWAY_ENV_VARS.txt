@@ -3,8 +3,8 @@ Copy and paste these into Railway one by one:
 
 NODE_ENV=production
 
-# Railway Variable Reference (REQUIRED - auto-generates correct internal URL)
-MONGODB_URI=${{ MongoDB.MONGO_URL }}
+# Railway MongoDB Connection (Use Railway's generated MONGO_URL + database name)
+MONGODB_URI=${{ MongoDB.MONGO_URL }}/researchhub
 
 # Alternative: MongoDB Atlas (if you prefer external)
 # MONGODB_URI=mongodb+srv://abwanwr77:CFm4JCkjeFpKpzO4@cluster0.ackancs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
