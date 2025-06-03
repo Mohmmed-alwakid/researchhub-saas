@@ -30,7 +30,7 @@ import HeatmapAnalytics from '../../components/analytics/HeatmapAnalytics';
 import SessionReplay from '../../components/analytics/SessionReplay';
 import AdvancedAnalyticsDashboard from '../../components/analytics/AdvancedAnalyticsDashboard';
 import { useAppStore } from '../../stores/appStore';
-import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 
 const AnalyticsPage: React.FC = () => {
   const { ENABLE_ADVANCED_ANALYTICS } = useFeatureFlags();

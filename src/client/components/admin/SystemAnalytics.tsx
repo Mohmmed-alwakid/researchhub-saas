@@ -10,7 +10,7 @@ import {
   CheckCircle,
   Server
 } from 'lucide-react';
-import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import { ComingSoon } from '../common/ComingSoon';
 
 // Reuse existing analytics dashboard

@@ -4,7 +4,7 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react';
-import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import { ComingSoonOverlay } from '../common/ComingSoon';
 
 interface HeatmapData {

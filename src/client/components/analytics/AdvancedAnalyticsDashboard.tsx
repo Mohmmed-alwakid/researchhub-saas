@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { useFeatureFlags } from '../../../shared/config/featureFlags';
+import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import { ComingSoon } from '../common/ComingSoon';
 
 interface AnalyticsData {
