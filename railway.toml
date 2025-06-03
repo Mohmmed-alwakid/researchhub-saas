@@ -1,13 +1,7 @@
-# Railway Test Configuration
 [build]
-command = "npm ci"
+command = "npm install && npm run build:server"
 
 [deploy]
-startCommand = "node railway-test-server.js"
-healthcheckPath = "/health"
-healthcheckTimeout = 300
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
-
-[env]
-NODE_ENV = "production"
+startCommand = "node dist/server/server/index.js"
+healthcheckPath = "/"
+    
