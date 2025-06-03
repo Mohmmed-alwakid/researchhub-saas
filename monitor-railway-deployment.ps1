@@ -1,17 +1,23 @@
-#!/usr/bin/env powershell
+# Railway Deployment Monitor & URL Discovery
+# Updated for ResearchHub Backend - Post-Fixes Deployment Check
 
 <#
 .SYNOPSIS
-    Real-time Railway Deployment Monitor
+    Railway Deployment Monitor with URL Discovery
 .DESCRIPTION
-    Monitors Railway deployment progress and tests endpoints when ready
-.PARAMETER RailwayUrl
-    The Railway URL to monitor (you'll get this after creating the project)
+    Monitors Railway deployment and discovers the live URL after all fixes applied
+.NOTES
+    All critical fixes applied: Express v4, start path, featureFlags imports
 #>
 
 param(
     [string]$RailwayUrl = ""
 )
+
+# Railway Project Details (Updated June 4, 2025)
+$ProjectId = "95c09b83-e303-4e20-9906-524cce66fc3b"
+$ServiceId = "db52a3b7-fc09-45b7-be15-a46ba8c97306"
+$DashboardUrl = "https://railway.app/project/$ProjectId"
 
 function Write-ColorOutput {
     param(
