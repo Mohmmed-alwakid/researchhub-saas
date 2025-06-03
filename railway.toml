@@ -1,12 +1,9 @@
 [build]
-command = "npm run build:server"
+command = "npm install && npm run build:server"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "node dist/server/server/index.js"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 600
 restartPolicyType = "on_failure"
-
-[variables]
-NODE_ENV = "production"
     
