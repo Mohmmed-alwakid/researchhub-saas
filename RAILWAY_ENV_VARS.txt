@@ -3,8 +3,6 @@ Copy and paste these into Railway one by one:
 
 NODE_ENV=production
 
-PORT=5000
-
 MONGODB_URI=mongodb+srv://abwanwr77:CFm4JCkjeFpKpzO4@cluster0.ackancs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
 JWT_SECRET=f985e9336178c587e7cd17dcbdc2ff6d863c16a45f941ad2daf6dda9b38a54ea5984515fba438420abade63aef243fe2090cd3a0aa19ce37a0f6c955ba11ef004

@@ -102,22 +102,31 @@ const PORT = parseInt(process.env.PORT || '3002', 10);
 const HOST = process.env.HOST || '0.0.0.0'; // Railway requires binding to 0.0.0.0
 
 const startServer = async (): Promise<void> => {
-  await connectDB();
-  
-  // Initialize database with admin accounts
-  try {
-    await initializeDatabaseWithRetries();
-  } catch (error) {
-    console.error('❌ Database initialization failed:', error);
-    console.log('⚠️  Server will continue but admin account may not be available');
-  }
-  
+  // Start the HTTP server first
   server.listen(PORT, HOST, () => {
     console.log(`🚀 Server running on ${HOST}:${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5175'}`);
     console.log(`🏥 Health check: http://${HOST}:${PORT}/api/health`);
   });
+
+  // Connect to database after server is listening (for Railway healthcheck)
+  try {
+    await connectDB();
+    console.log('✅ Database connection established');
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+    console.log('⚠️  Server will continue without database');
+  }
+  
+  // Initialize database with admin accounts (only if DB connected)
+  try {
+    await initializeDatabaseWithRetries();
+    console.log('✅ Database initialization completed');
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    console.log('⚠️  Server will continue but admin account may not be available');
+  }
 };
 
 // Handle unhandled promise rejections

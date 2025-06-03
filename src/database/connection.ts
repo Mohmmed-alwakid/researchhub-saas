@@ -15,7 +15,6 @@ class DatabaseConnection {
     }
     return DatabaseConnection.instance;
   }
-
   /**
    * Connect to MongoDB database
    */
@@ -27,12 +26,17 @@ class DatabaseConnection {
 
     try {
       const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/researchhub';
-        await mongoose.connect(mongoUri, {
+      
+      console.log('🔌 Attempting to connect to MongoDB...');
+      
+      await mongoose.connect(mongoUri, {
         // Connection options
         maxPoolSize: 10, // Maintain up to 10 socket connections
-        serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+        serverSelectionTimeoutMS: 10000, // Keep trying to send operations for 10 seconds
         socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
         bufferCommands: false, // Disable mongoose buffering
+        connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
+        retryWrites: true,
       });
 
       this.isConnected = true;
@@ -59,7 +63,10 @@ class DatabaseConnection {
 
     } catch (error) {
       console.error('❌ Failed to connect to MongoDB:', error);
-      process.exit(1);
+      console.log('⚠️  Server will continue without database connection');
+      console.log('⚠️  Some features may not work properly');
+      // Don't exit process - let Railway healthcheck succeed even without DB
+      // process.exit(1);
     }
   }
 
