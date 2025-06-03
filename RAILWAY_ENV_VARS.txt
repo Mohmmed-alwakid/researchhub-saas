@@ -3,7 +3,11 @@ Copy and paste these into Railway one by one:
 
 NODE_ENV=production
 
-MONGODB_URI=mongodb+srv://abwanwr77:CFm4JCkjeFpKpzO4@cluster0.ackancs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+# Railway Internal MongoDB (RECOMMENDED - faster, more reliable)
+MONGODB_URI=mongodb://mongodb.railway.internal:27017/researchhub
+
+# Alternative: MongoDB Atlas (if you prefer external)
+# MONGODB_URI=mongodb+srv://abwanwr77:CFm4JCkjeFpKpzO4@cluster0.ackancs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
 JWT_SECRET=f985e9336178c587e7cd17dcbdc2ff6d863c16a45f941ad2daf6dda9b38a54ea5984515fba438420abade63aef243fe2090cd3a0aa19ce37a0f6c955ba11ef004
 
@@ -14,6 +18,15 @@ JWT_EXPIRE=7d
 JWT_REFRESH_EXPIRE=30d
 
 CLIENT_URL=https://researchhub-saas.vercel.app
+
+ADMIN_EMAIL=admin@researchhub.com
+ADMIN_PASSWORD=AdminPass123!
+
+===== NOTES =====
+- Using Railway's internal MongoDB service (mongodb.railway.internal)
+- This provides faster connection and better integration
+- Database and collections will be created automatically
+- Admin user will be initialized on first startup
 
 ===== OPTIONAL (for full functionality) =====
 STRIPE_SECRET_KEY=your-stripe-secret-key
