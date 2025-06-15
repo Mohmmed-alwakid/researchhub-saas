@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign } from 'lucide-react';
 
 // Admin Modules - using relative imports
 import AdminSidebar from '../../components/admin/AdminSidebar';
@@ -12,6 +12,7 @@ import RolePermissionManager from '../../components/admin/RolePermissionManager'
 import SystemSettings from '../../components/admin/SystemSettings';
 import SupportCenter from '../../components/admin/SupportCenter';
 import AdminOverview from '../../components/admin/AdminOverview';
+import PaymentManagement from '../../components/admin/PaymentManagement';
 
 // Hooks and utilities
 import { useAuthStore } from '../../stores/authStore';
@@ -49,14 +50,21 @@ const adminRoutes: AdminRoute[] = [
     component: UserManagement,
     permission: 'USER_MANAGE_ROLES',
     description: 'Manage users, roles, and access'
-  },
-  {
+  },  {
     path: '/app/admin/subscriptions',
     label: 'Subscriptions',
     icon: CreditCard,
     component: SubscriptionManager,
     permission: 'PAYMENT_REFUND',
     description: 'Manage plans and billing'
+  },
+  {
+    path: '/app/admin/payments',
+    label: 'Payment Management',
+    icon: DollarSign,
+    component: PaymentManagement,
+    permission: 'PAYMENT_REFUND',
+    description: 'Manual payment verification'
   },
   {
     path: '/app/admin/analytics',

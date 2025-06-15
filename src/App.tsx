@@ -21,6 +21,7 @@ import AnalyticsPage from './client/pages/analytics/AnalyticsPage';
 import BillingSettingsPage from './client/pages/settings/BillingSettingsPage';
 import SettingsPage from './client/pages/settings/SettingsPage';
 import AdminDashboard from './client/pages/admin/AdminDashboard';
+import ManualPaymentPage from './client/pages/payments/ManualPaymentPage';
 
 // Import layouts
 import AppLayout from './client/components/common/AppLayout';
@@ -148,6 +149,11 @@ function App() {
               <Route path="settings/billing" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <BillingSettingsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="payments/manual" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <ManualPaymentPage />
                 </ProtectedRoute>
               } />
               

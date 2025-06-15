@@ -8,9 +8,10 @@ import participantApplicationRoutes from './participantApplication.routes';
 import uploadRoutes from './upload.routes';
 import subscriptionRoutes from './subscription.routes';
 import adminRoutes from './admin.routes';
+import paymentRoutes from './payments';
+import adminPaymentRoutes from './admin-payments';
 // import recordingRoutes from './recording.routes';
 // import feedbackRoutes from './feedback.routes';
-// import paymentRoutes from './payment.routes';
 
 const router = Router();
 
@@ -24,9 +25,10 @@ router.use('/participant-applications', participantApplicationRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/subscriptions', subscriptionRoutes);
 router.use('/admin', adminRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/admin/payments', adminPaymentRoutes);
 // router.use('/recordings', recordingRoutes);
 // router.use('/feedback', feedbackRoutes);
-// router.use('/payments', paymentRoutes);
 
 // Health check endpoint
 router.get('/health', async (_req, res) => {

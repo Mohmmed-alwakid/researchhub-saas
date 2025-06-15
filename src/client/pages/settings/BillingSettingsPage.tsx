@@ -6,7 +6,8 @@ import {
   Clock, 
   Download,
   AlertCircle,
-  TrendingUp
+  TrendingUp,
+  CreditCard
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { paymentService } from '../../services/payment.service';
@@ -14,9 +15,25 @@ import { SubscriptionManager } from '../../components/subscription/SubscriptionM
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 
+interface UsageStats {
+  success: boolean;
+  usage: {
+    studiesCreated: number;
+    participantsRecruited: number;
+    recordingMinutes: number;
+    dataExports: number;
+  };
+  limits: {
+    studiesCreated: number;
+    participantsRecruited: number;
+    recordingMinutes: number;
+    dataExports: number;
+  };
+}
+
 const BillingSettingsPage = () => {
   const [searchParams] = useSearchParams();
-  const [usageStats, setUsageStats] = useState<Record<string, unknown> | null>(null);
+  const [usageStats, setUsageStats] = useState<UsageStats | null>(null);
 
   useEffect(() => {
     // Handle payment success/cancel callbacks
@@ -69,11 +86,41 @@ const BillingSettingsPage = () => {
         <p className="mt-2 text-gray-600">
           Manage your subscription, view usage, and download invoices.
         </p>
-      </div>
-
-      {/* Subscription Manager */}
+      </div>      {/* Subscription Manager */}
       <div className="mb-8">
         <SubscriptionManager />
+      </div>
+
+      {/* Manual Payment Option */}
+      <div className="mb-8">
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold text-gray-900">Alternative Payment Methods</h3>
+            <p className="text-sm text-gray-600">For users in regions where online payments are not available</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
+                  <CreditCard className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Bank Transfer / Manual Payment</h4>
+                  <p className="text-sm text-gray-600">
+                    Pay via bank transfer, cash deposit, or other local payment methods
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                onClick={() => window.open('/app/payments/manual', '_blank')}
+              >
+                Get Started
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Usage Overview */}
