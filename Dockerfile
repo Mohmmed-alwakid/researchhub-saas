@@ -20,6 +20,7 @@ COPY tailwind.config.js ./
 COPY postcss.config.js ./
 COPY eslint.config.js ./
 COPY healthcheck.js ./
+COPY generate-server-package.cjs ./
 
 # Build the application
 RUN npm run build:client
@@ -29,7 +30,7 @@ RUN npm run build:server
 RUN npm ci --only=production && npm cache clean --force
 
 # Expose port
-EXPOSE 5000
+EXPOSE 3002
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
