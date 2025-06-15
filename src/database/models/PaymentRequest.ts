@@ -23,12 +23,11 @@ export interface IPaymentRequest extends Document {
   rejectionReason?: string;
 }
 
-const PaymentRequestSchema: Schema = new Schema({
-  userId: {
+const PaymentRequestSchema: Schema = new Schema({  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
+    // index: true - removed to avoid duplicate with compound index below
   },
   planType: {
     type: String,
@@ -55,18 +54,16 @@ const PaymentRequestSchema: Schema = new Schema({
   paymentProof: {
     type: String, // File path or URL to uploaded receipt
     required: false
-  },
-  status: {
+  },  status: {
     type: String,
     enum: ['pending', 'verified', 'rejected'],
-    default: 'pending',
-    index: true
-  },
-  referenceNumber: {
+    default: 'pending'
+    // index: true - removed to avoid duplicate with compound index below
+  },  referenceNumber: {
     type: String,
     required: true,
-    unique: true,
-    index: true
+    unique: true
+    // index: true - removed to avoid duplicate with single field index below
   },
   bankDetails: {
     accountName: String,

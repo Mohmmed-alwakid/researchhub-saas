@@ -27,13 +27,12 @@ export interface IUserCredits extends Document {
   updatedBy?: mongoose.Types.ObjectId;
 }
 
-const UserCreditsSchema: Schema = new Schema({
-  userId: {
+const UserCreditsSchema: Schema = new Schema({  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true,
-    index: true
+    unique: true
+    // index: true - removed to avoid duplicate with single field index below
   },
   totalCredits: {
     type: Number,
@@ -68,12 +67,11 @@ const UserCreditsSchema: Schema = new Schema({
     type: Date,
     required: true,
     default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-  },
-  isActive: {
+  },  isActive: {
     type: Boolean,
     required: true,
-    default: true,
-    index: true
+    default: true
+    // index: true - removed to avoid duplicate with compound index below
   },
   features: {
     maxStudies: {
