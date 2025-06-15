@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import mongoose from 'mongoose';
 import authRoutes from './auth.routes';
 import studyRoutes from './study.routes';
 import taskRoutes from './task.routes';
@@ -10,6 +11,7 @@ import subscriptionRoutes from './subscription.routes';
 import adminRoutes from './admin.routes';
 import paymentRoutes from './payments';
 import adminPaymentRoutes from './admin-payments';
+import { getDBStatus, dbHealthCheck } from '../../database/connection';
 // import recordingRoutes from './recording.routes';
 // import feedbackRoutes from './feedback.routes';
 
@@ -30,12 +32,18 @@ router.use('/admin/payments', adminPaymentRoutes);
 // router.use('/recordings', recordingRoutes);
 // router.use('/feedback', feedbackRoutes);
 
-// Health check endpoint
+// Health check endpoint with database status
 router.get('/health', async (_req, res) => {
   try {
-    // Set proper status code and headers for Railway healthcheck
+    // Get database connection status
+    const dbStatus = getDBStatus();
+    const dbHealth = await dbHealthCheck();
+    
+    // Determine overall health
+    const isHealthy = dbStatus.isConnected && dbHealth.status === 'healthy';
+    
     res.status(200).json({
-      status: 'ok',
+      status: isHealthy ? 'ok' : 'degraded',
       success: true,
       message: 'ResearchHub API is running',
       timestamp: new Date().toISOString(),
@@ -43,7 +51,15 @@ router.get('/health', async (_req, res) => {
       version: '1.0.0',
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      port: process.env.PORT || 3002
+      port: process.env.PORT || 3002,
+      database: {
+        status: dbHealth.status,
+        isConnected: dbStatus.isConnected,
+        readyState: dbStatus.readyState,
+        host: dbStatus.host,
+        name: dbStatus.name,
+        lastChecked: dbHealth.timestamp
+      }
     });
   } catch (error) {
     console.error('Health check failed:', error);
@@ -51,7 +67,8 @@ router.get('/health', async (_req, res) => {
       status: 'error',
       success: false,
       message: 'Service unavailable',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });

@@ -3,7 +3,7 @@ command = "npm ci && npm run build"
 
 [deploy]
 startCommand = "node dist/server/server/index.js"
-healthcheckPath = "/api/health"
+healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
     

@@ -1,6 +1,26 @@
 # ResearchHub - Final Deployment Status
 
-## ✅ 100% DEPLOYMENT READY
+## 🚀 CURRENT DEPLOYMENT STATUS (UPDATED June 15, 2025)
+
+**Date:** June 15, 2025  
+**Status:** 🟡 PARTIAL DEPLOYMENT  
+**Verification:** Automated testing completed
+
+### Live Production URLs
+- **Frontend (Vercel)**: https://researchhub-saas.vercel.app ✅ OPERATIONAL
+- **Backend (Railway)**: https://researchhub-saas-production.railway.app 🟡 PARTIAL
+
+### Current Issues
+- ✅ Frontend deployed and accessible
+- ❌ Backend API routes not accessible (404 errors)
+- ❌ Frontend-backend integration blocked
+- 🔍 Railway deployment needs investigation
+
+**See**: `docs/PRODUCTION_DEPLOYMENT_STATUS.md` for detailed analysis
+
+---
+
+## ✅ 100% DEPLOYMENT READY (Previous Status - May 30, 2025)
 
 **Date:** May 30, 2025  
 **Status:** PRODUCTION READY  

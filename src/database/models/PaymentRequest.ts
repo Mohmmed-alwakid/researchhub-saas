@@ -96,7 +96,7 @@ const PaymentRequestSchema: Schema = new Schema({  userId: {
 // Indexes for efficient queries
 PaymentRequestSchema.index({ userId: 1, status: 1 });
 PaymentRequestSchema.index({ status: 1, createdAt: -1 });
-PaymentRequestSchema.index({ referenceNumber: 1 });
+// Note: referenceNumber has unique: true in schema, so no need for separate index
 
 // Generate unique reference number before saving
 PaymentRequestSchema.pre('save', async function(next) {

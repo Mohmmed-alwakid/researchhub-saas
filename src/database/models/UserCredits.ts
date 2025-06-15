@@ -149,7 +149,7 @@ UserCreditsSchema.pre('save', function(this: IUserCredits, next) {
 });
 
 // Indexes for efficient queries
-UserCreditsSchema.index({ userId: 1 });
+// Note: userId has unique: true in schema, so no need for separate index
 UserCreditsSchema.index({ isActive: 1, planEndDate: 1 });
 UserCreditsSchema.index({ planType: 1 });
 
