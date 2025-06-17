@@ -1,7 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
-
-// Main handler
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -20,15 +17,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       message: 'ResearchHub API is running',
       timestamp: new Date().toISOString(),
-      version: '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
+      version: '2.0.0',
+      environment: process.env.NODE_ENV || 'production',
+      functions: {
+        total: 8,
+        limit: 12,
+        status: 'under_limit'
+      },
       endpoints: {
         auth: {
-          register: '/api/auth/register',
-          login: '/api/auth/login',
-          logout: '/api/auth/logout',
-          refresh: '/api/auth/refresh',
-          profile: '/api/auth/profile'
+          base: '/api/auth',
+          register: '/api/auth?action=register',
+          login: '/api/auth?action=login',
+          logout: '/api/auth?action=logout',
+          refresh: '/api/auth?action=refresh',
+          profile: '/api/auth?action=profile',
+          status: '/api/auth?action=status'
+        },
+        health: '/api/health',
+        studies: '/api/studies',
+        payments: '/api/payments/create-subscription',
+        admin: {
+          users: '/api/admin/users',
+          analytics: '/api/admin/analytics'
         }
       }
     });
