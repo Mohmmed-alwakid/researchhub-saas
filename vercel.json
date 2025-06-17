@@ -2,6 +2,9 @@
   "name": "researchhub",
   "version": 2,
   "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node"
+    },
     "api/**/*.ts": {
       "runtime": "@vercel/node"
     }
@@ -17,8 +20,16 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|ico|png|jpg|svg))",
       "dest": "/dist/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/index.html"
     }
   ],
   "env": {
