@@ -64,35 +64,35 @@ export const authService = {  /**
    * Login user
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('auth/login', credentials);
+    return apiService.post<AuthResponse>('auth?action=login', credentials);
   },
 
   /**
    * Register new user
    */
   async register(userData: RegisterRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('auth/register', userData);
+    return apiService.post<AuthResponse>('auth?action=register', userData);
   },
 
   /**
    * Refresh access token
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-    return apiService.post<RefreshTokenResponse>('auth/refresh', { refreshToken });
+    return apiService.post<RefreshTokenResponse>('auth?action=refresh', { refreshToken });
   },
 
   /**
    * Logout user
    */
   async logout(): Promise<{ success: boolean; message: string }> {
-    return apiService.post('auth/logout');
+    return apiService.post('auth?action=logout');
   },
 
   /**
    * Get current user profile
    */
   async getProfile(): Promise<{ success: boolean; user: User }> {
-    return apiService.get('auth/profile');
+    return apiService.get('auth?action=profile');
   },
   /**
    * Update user profile

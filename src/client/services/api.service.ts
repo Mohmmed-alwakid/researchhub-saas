@@ -53,8 +53,7 @@ class ApiService {
             if (authStorage) {
               const { state } = JSON.parse(authStorage);
               const refreshToken = state?.refreshToken;
-              
-              if (refreshToken) {                const response = await axios.post(`${this.api.defaults.baseURL}/auth/refresh`, {
+                if (refreshToken) {                const response = await axios.post(`${this.api.defaults.baseURL}/auth?action=refresh`, {
                   refreshToken,
                 });
 
