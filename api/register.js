@@ -11,15 +11,16 @@ module.exports = async function handler(req, res) {
   
   if (req.method === 'OPTIONS') {
     res.status(200).end();
-    return;
-  }
+    return;  }
 
   if (req.method !== 'POST') {
     return res.status(405).json({
       success: false,
       error: 'Method not allowed'
     });
-  }    const supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
     console.log('=== SUPABASE REGISTRATION ===');
