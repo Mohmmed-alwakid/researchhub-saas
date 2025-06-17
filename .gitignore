@@ -43,3 +43,5 @@ temp/
 coverage/
 .nyc_output
 .cache
+
+.vercel

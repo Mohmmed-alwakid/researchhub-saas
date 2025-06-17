@@ -183,12 +183,12 @@ const SystemSettings: React.FC = () => {
 
   const renderPlatformSettings = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">        <div>
+          <label htmlFor="platform-name" className="block text-sm font-medium text-gray-700 mb-2">
             Platform Name
           </label>
           <input
+            id="platform-name"
             type="text"
             value={config.platform.name}
             onChange={(e) => updateConfig('platform', 'name', e.target.value)}
@@ -196,10 +196,11 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="platform-version" className="block text-sm font-medium text-gray-700 mb-2">
             Version
           </label>
           <input
+            id="platform-version"
             type="text"
             value={config.platform.version}
             onChange={(e) => updateConfig('platform', 'version', e.target.value)}
@@ -207,10 +208,11 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="platform-environment" className="block text-sm font-medium text-gray-700 mb-2">
             Environment
           </label>
           <select
+            id="platform-environment"
             value={config.platform.environment}
             onChange={(e) => updateConfig('platform', 'environment', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -219,10 +221,10 @@ const SystemSettings: React.FC = () => {
             <option value="staging">Staging</option>
             <option value="production">Production</option>
           </select>
-        </div>
-        <div>
-          <label className="flex items-center space-x-2">
+        </div>        <div>
+          <label htmlFor="maintenance-mode" className="flex items-center space-x-2">
             <input
+              id="maintenance-mode"
               type="checkbox"
               checked={config.platform.maintenanceMode}
               onChange={(e) => updateConfig('platform', 'maintenanceMode', e.target.checked)}
@@ -232,10 +234,11 @@ const SystemSettings: React.FC = () => {
           </label>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="max-users" className="block text-sm font-medium text-gray-700 mb-2">
             Max Users
           </label>
           <input
+            id="max-users"
             type="number"
             value={config.platform.maxUsers}
             onChange={(e) => updateConfig('platform', 'maxUsers', parseInt(e.target.value))}
@@ -243,10 +246,11 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="max-studies" className="block text-sm font-medium text-gray-700 mb-2">
             Max Studies
           </label>
           <input
+            id="max-studies"
             type="number"
             value={config.platform.maxStudies}
             onChange={(e) => updateConfig('platform', 'maxStudies', parseInt(e.target.value))}
@@ -259,12 +263,12 @@ const SystemSettings: React.FC = () => {
 
   const renderEmailSettings = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">        <div>
+          <label htmlFor="email-provider" className="block text-sm font-medium text-gray-700 mb-2">
             Email Provider
           </label>
           <select
+            id="email-provider"
             value={config.email.provider}
             onChange={(e) => updateConfig('email', 'provider', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -275,8 +279,9 @@ const SystemSettings: React.FC = () => {
           </select>
         </div>
         <div>
-          <label className="flex items-center space-x-2">
+          <label htmlFor="email-enabled" className="flex items-center space-x-2">
             <input
+              id="email-enabled"
               type="checkbox"
               checked={config.email.enabled}
               onChange={(e) => updateConfig('email', 'enabled', e.target.checked)}
@@ -286,10 +291,11 @@ const SystemSettings: React.FC = () => {
           </label>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="email-from-address" className="block text-sm font-medium text-gray-700 mb-2">
             From Address
           </label>
           <input
+            id="email-from-address"
             type="email"
             value={config.email.fromAddress}
             onChange={(e) => updateConfig('email', 'fromAddress', e.target.value)}
@@ -297,10 +303,11 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="email-from-name" className="block text-sm font-medium text-gray-700 mb-2">
             From Name
           </label>
           <input
+            id="email-from-name"
             type="text"
             value={config.email.fromName}
             onChange={(e) => updateConfig('email', 'fromName', e.target.value)}
@@ -308,10 +315,11 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="email-daily-limit" className="block text-sm font-medium text-gray-700 mb-2">
             Daily Send Limit
           </label>
           <input
+            id="email-daily-limit"
             type="number"
             value={config.email.dailyLimit}
             onChange={(e) => updateConfig('email', 'dailyLimit', parseInt(e.target.value))}
@@ -324,12 +332,12 @@ const SystemSettings: React.FC = () => {
 
   const renderSecuritySettings = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">        <div>
+          <label htmlFor="session-timeout" className="block text-sm font-medium text-gray-700 mb-2">
             Session Timeout (minutes)
           </label>
           <input
+            id="session-timeout"
             type="number"
             value={config.security.sessionTimeout}
             onChange={(e) => updateConfig('security', 'sessionTimeout', parseInt(e.target.value))}
@@ -337,10 +345,11 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="password-min-length" className="block text-sm font-medium text-gray-700 mb-2">
             Password Min Length
           </label>
           <input
+            id="password-min-length"
             type="number"
             value={config.security.passwordMinLength}
             onChange={(e) => updateConfig('security', 'passwordMinLength', parseInt(e.target.value))}
@@ -348,8 +357,9 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="flex items-center space-x-2">
+          <label htmlFor="mfa-required" className="flex items-center space-x-2">
             <input
+              id="mfa-required"
               type="checkbox"
               checked={config.security.mfaRequired}
               onChange={(e) => updateConfig('security', 'mfaRequired', e.target.checked)}
@@ -359,10 +369,11 @@ const SystemSettings: React.FC = () => {
           </label>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="max-login-attempts" className="block text-sm font-medium text-gray-700 mb-2">
             Max Login Attempts
           </label>
           <input
+            id="max-login-attempts"
             type="number"
             value={config.security.loginAttempts}
             onChange={(e) => updateConfig('security', 'loginAttempts', parseInt(e.target.value))}
@@ -370,10 +381,11 @@ const SystemSettings: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="lockout-duration" className="block text-sm font-medium text-gray-700 mb-2">
             Lockout Duration (minutes)
           </label>
           <input
+            id="lockout-duration"
             type="number"
             value={config.security.lockoutDuration}
             onChange={(e) => updateConfig('security', 'lockoutDuration', parseInt(e.target.value))}

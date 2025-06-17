@@ -1,47 +1,99 @@
-# ResearchHub - Quick Reference
+# 🚀 ResearchHub - Quick Reference (Vercel Deployment)
 
-> **Status**: 🚀 **PRODUCTION READY** - 100% Deployment Confidence
+## 🌐 **DEPLOYMENT URLS**
+- **Application**: https://researchhub.vercel.app
+- **API Health**: https://researchhub.vercel.app/api/health
+- **Admin Panel**: https://researchhub.vercel.app/admin
 
-## Quick Commands
-
+## 📦 **DEVELOPMENT COMMANDS**
 ```bash
-# Development
-npm run dev          # Start both frontend and backend
-npm run dev:client   # Frontend only (port 5173)
-npm run dev:server   # Backend only (port 5000)
+# Install dependencies
+npm install
 
-# Production Build
-npm run build        # Build both frontend and backend
-npm run start        # Start production server
+# Start development
+npm run dev              # Frontend + API dev servers
+npm run dev:client       # Frontend only (Vite)
+npm run dev:api         # API only (Vercel dev)
 
-# Docker Deployment
-docker-compose up --build -d
+# Build for production
+npm run build           # Build frontend
+npm run type-check      # TypeScript validation
 
-# Health Check
-curl http://localhost:5000/api/health
+# Deploy to Vercel
+npm run deploy          # Deploy to production
+vercel --prod          # Alternative deploy command
 ```
 
-## Key URLs
-- **Frontend**: http://localhost:5175 (Updated June 1, 2025)
-- **Backend**: http://localhost:3002 (Updated May 31, 2025)
-- **Health**: http://localhost:3002/api/health
-- **Database**: MongoDB (configured in .env)
+## ⚙️ **VERCEL COMMANDS**
+```bash
+# Install Vercel CLI
+npm install -g vercel
 
-## Recent Updates (June 1, 2025)
-- ✅ **Authentication Fix**: Login now properly redirects based on user roles
-- ✅ **Component Consolidation**: Removed duplicate pages, kept enhanced versions
-- ✅ **Architecture Guide**: Created COMPONENT_STRUCTURE_GUIDE.md to prevent future duplication
-- ✅ **Single Source of Truth**: One primary version of each page component
+# Login to Vercel
+vercel login
 
-## Deploy to Cloud
-- **Railway**: `railway up`
-- **Heroku**: `git push heroku main`
-- **DigitalOcean**: Use App Platform
-- **Docker**: Use provided docker-compose.yml
+# Deploy to production
+vercel --prod
 
-## Documentation
-All detailed documentation moved to `/docs` folder and stored in memory.
-Use the assistant to recall any specific deployment or technical details.
+# View deployment logs
+vercel logs
+
+# Set environment variables
+vercel env add VARIABLE_NAME
+
+# List environment variables
+vercel env ls
+```
+
+## 🗄️ **DATABASE**
+- **Provider**: MongoDB Atlas
+- **Connection**: External, reliable connection
+- **Database**: researchhub
+- **Status**: ✅ Connected and working
+
+## 🔐 **ENVIRONMENT VARIABLES**
+```bash
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=your-jwt-secret
+JWT_REFRESH_SECRET=your-refresh-secret
+CLIENT_URL=https://researchhub.vercel.app
+ADMIN_EMAIL=admin@researchhub.app
+ADMIN_PASSWORD=SecureAdminPass123!
+```
+
+## 📁 **PROJECT STRUCTURE**
+```
+ResearchHub/
+├── src/                 # Frontend (React/TypeScript)
+├── api/                 # Backend (Vercel Functions)
+├── lib/                 # Shared utilities
+├── public/              # Static assets
+├── vercel.json          # Vercel configuration
+└── package.json         # Dependencies & scripts
+```
+
+## 🧪 **TESTING**
+```bash
+# Test API health
+curl https://researchhub.vercel.app/api/health
+
+# Test authentication
+curl -X POST https://researchhub.vercel.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@researchhub.app","password":"SecureAdminPass123!"}'
+```
+
+## 📊 **MONITORING**
+- **Vercel Dashboard**: https://vercel.com/dashboard
+- **Analytics**: Built-in Vercel analytics
+- **Logs**: `vercel logs` command
+- **Performance**: Vercel Speed Insights
+
+## 🆘 **TROUBLESHOOTING**
+- **Build Issues**: Check `vercel logs`
+- **API Issues**: Check function logs in Vercel dashboard
+- **Database Issues**: Test MongoDB Atlas connection
+- **Environment**: Verify `vercel env ls`
 
 ---
-**Generated**: May 30, 2025 | **Status**: Ready for Production 🎉
+**Last Updated**: June 16, 2025 - Vercel Migration Complete ✅
