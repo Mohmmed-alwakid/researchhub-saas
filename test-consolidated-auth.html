@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Consolidated Auth API</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        button { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { background: white; padding: 10px; margin: 10px 0; border-radius: 4px; white-space: pre-wrap; font-family: monospace; }
+        .success { border-left: 4px solid #28a745; }
+        .error { border-left: 4px solid #dc3545; }
+        input { width: 200px; padding: 5px; margin: 2px; }
+    </style>
+</head>
+<body>
+    <h1>Test Consolidated Auth API</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Auth Status</h3>
+        <button onclick="testAuthStatus()">Test Auth Status</button>
+        <div id="statusResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Registration</h3>
+        <input type="email" id="regEmail" placeholder="Email" value="test@example.com"><br>
+        <input type="password" id="regPassword" placeholder="Password" value="password123"><br>
+        <input type="text" id="regFirstName" placeholder="First Name" value="Test"><br>
+        <input type="text" id="regLastName" placeholder="Last Name" value="User"><br>
+        <button onclick="testRegister()">Test Register</button>
+        <div id="registerResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email" value="test@example.com"><br>
+        <input type="password" id="loginPassword" placeholder="Password" value="password123"><br>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://researchhub-saas.vercel.app/api';
+        let authTokens = null;
+
+        async function makeRequest(endpoint, method = 'GET', data = null, token = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(`${API_BASE}/${endpoint}`, options);
+                const result = await response.json();
+                
+                return {
+                    status: response.status,
+                    success: response.ok,
+                    data: result
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${result.success ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function testAuthStatus() {
+            const result = await makeRequest('auth?action=status', 'GET');
+            displayResult('statusResult', result);
+        }
+
+        async function testRegister() {
+            const data = {
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                firstName: document.getElementById('regFirstName').value,
+                lastName: document.getElementById('regLastName').value,
+                role: 'researcher'
+            };
+
+            const result = await makeRequest('auth?action=register', 'POST', data);
+            
+            if (result.success && result.data.tokens) {
+                authTokens = result.data.tokens;
+                console.log('Stored tokens:', authTokens);
+            }
+            
+            displayResult('registerResult', result);
+        }
+
+        async function testLogin() {
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            const result = await makeRequest('auth?action=login', 'POST', data);
+            
+            if (result.success && result.data.tokens) {
+                authTokens = result.data.tokens;
+                console.log('Stored tokens:', authTokens);
+            }
+            
+            displayResult('loginResult', result);
+        }
+
+        // Test status on page load
+        window.onload = () => {
+            testAuthStatus();
+        };
+    </script>
+</body>
+</html>
