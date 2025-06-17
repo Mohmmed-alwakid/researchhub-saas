@@ -1,6 +1,10 @@
-// User registration endpoint
-import connectDB from '../utils/db.js';
-import User from '../models/User.js';
+// Supabase registration endpoint
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,9 +24,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('=== SUPABASE REGISTRATION ===');
+    
     const { email, password, firstName, lastName, role = 'researcher' } = req.body;
-
-    // Validate required fields
+    
+    // Basic validation
     if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({
         success: false,
@@ -30,107 +36,61 @@ export default async function handler(req, res) {
       });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid email format'
-      });
-    }
-
-    // Validate password strength
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        error: 'Password must be at least 6 characters long'
-      });
-    }
-
-    // Check if MongoDB is configured
-    if (!process.env.MONGODB_URI) {
-      // Return mock success for testing
-      return res.status(201).json({
-        success: true,
-        message: 'User registered successfully (DEMO MODE - No MongoDB configured)',
-        user: {
-          id: 'demo_' + Date.now(),
-          email: email.toLowerCase(),
-          firstName,
-          lastName,
-          role,
-          status: 'active',
-          isEmailVerified: true,
-          createdAt: new Date().toISOString()
-        },
-        tokens: {
-          authToken: 'demo_token_' + Date.now(),
-          refreshToken: 'demo_refresh_' + Date.now()
-        },
-        demo: true
-      });
-    }
-
-    // MongoDB operations
-    await connectDB();
+    console.log('Step 1: Creating user with Supabase Auth...');
     
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        error: 'User with this email already exists'
-      });
-    }
-
-    const user = new User({
-      email: email.toLowerCase(),
+    // Create user with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
       password,
-      firstName,
-      lastName,
-      role,
-      status: 'active',
-      isEmailVerified: true
-    });
-
-    await user.save();
-
-    const authToken = user.generateAuthToken();
-    const refreshToken = user.generateRefreshToken();
-
-    user.refreshTokens.push({
-      token: refreshToken,
-      createdAt: new Date(),
-      userAgent: req.headers['user-agent'] || 'Unknown',
-      ipAddress: req.ip || req.connection.remoteAddress || 'Unknown'
-    });
-    await user.save();
-
-    const userResponse = {
-      id: user._id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      status: user.status,
-      isEmailVerified: user.isEmailVerified,
-      createdAt: user.createdAt
-    };
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      user: userResponse,
-      tokens: {
-        authToken,
-        refreshToken
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          role: role
+        }
       }
     });
 
+    if (authError) {
+      console.error('Supabase Auth Error:', authError);
+      return res.status(400).json({
+        success: false,
+        error: authError.message
+      });
+    }
+
+    console.log('Step 1 SUCCESS: User created with Supabase Auth');
+    console.log('User ID:', authData.user?.id);
+
+    // The profile will be automatically created via database trigger
+    console.log('Step 2: Profile automatically created via trigger');
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully with Supabase',
+      user: {
+        id: authData.user?.id,
+        email: authData.user?.email,
+        firstName,
+        lastName,
+        role,
+        emailConfirmed: authData.user?.email_confirmed_at ? true : false
+      },
+      session: authData.session,
+      supabase: true
+    });
+
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('=== SUPABASE REGISTRATION ERROR ===');
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
+    
     res.status(500).json({
       success: false,
-      error: 'Internal server error',
+      error: 'Registration failed',
       message: error.message
     });
   }

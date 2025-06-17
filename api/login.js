@@ -1,6 +1,10 @@
-// User login endpoint
-import connectDB from '../utils/db.js';
-import User from '../models/User.js';
+// Supabase login endpoint
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,8 +24,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('=== SUPABASE LOGIN ===');
+    
     const { email, password } = req.body;
-
+    
+    // Basic validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -29,109 +36,67 @@ export default async function handler(req, res) {
       });
     }
 
-    // Check if MongoDB is configured
-    if (!process.env.MONGODB_URI) {
-      // Demo mode login
-      if (password.length >= 6) {
-        return res.status(200).json({
-          success: true,
-          message: 'Login successful (DEMO MODE)',
-          user: {
-            id: 'demo_user_' + Date.now(),
-            email: email.toLowerCase(),
-            firstName: 'Demo',
-            lastName: 'User',
-            role: 'researcher',
-            status: 'active',
-            isEmailVerified: true
-          },
-          tokens: {
-            authToken: 'demo_token_' + Date.now(),
-            refreshToken: 'demo_refresh_' + Date.now()
-          },
-          demo: true
-        });
-      } else {
-        return res.status(401).json({
-          success: false,
-          error: 'Invalid credentials'
-        });
-      }
-    }
-
-    // MongoDB operations
-    await connectDB();
-
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials'
-      });
-    }
-
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials'
-      });
-    }
-
-    if (user.status !== 'active') {
-      return res.status(403).json({
-        success: false,
-        error: 'Account is not active'
-      });
-    }
-
-    user.lastLoginAt = new Date();
-    user.loginCount = (user.loginCount || 0) + 1;
-
-    const authToken = user.generateAuthToken();
-    const refreshToken = user.generateRefreshToken();
-
-    user.refreshTokens.push({
-      token: refreshToken,
-      createdAt: new Date(),
-      userAgent: req.headers['user-agent'] || 'Unknown',
-      ipAddress: req.ip || req.connection.remoteAddress || 'Unknown'
+    console.log('Step 1: Authenticating with Supabase...');
+    
+    // Authenticate with Supabase
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password
     });
 
-    if (user.refreshTokens.length > 5) {
-      user.refreshTokens = user.refreshTokens.slice(-5);
+    if (authError) {
+      console.error('Supabase Auth Error:', authError);
+      return res.status(401).json({
+        success: false,
+        error: authError.message
+      });
     }
 
-    await user.save();
+    console.log('Step 1 SUCCESS: User authenticated');
+    console.log('User ID:', authData.user?.id);
 
-    const userResponse = {
-      id: user._id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      status: user.status,
-      isEmailVerified: user.isEmailVerified,
-      lastLoginAt: user.lastLoginAt,
-      loginCount: user.loginCount,
-      createdAt: user.createdAt
-    };
+    console.log('Step 2: Fetching user profile...');
+    
+    // Get user profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (profileError) {
+      console.error('Profile fetch error:', profileError);
+      // Continue without profile data
+    }
+
+    console.log('Step 2 SUCCESS: Profile fetched');
 
     res.status(200).json({
       success: true,
       message: 'Login successful',
-      user: userResponse,
-      tokens: {
-        authToken,
-        refreshToken
-      }
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
+        firstName: profile?.first_name || '',
+        lastName: profile?.last_name || '',
+        role: profile?.role || 'researcher',
+        status: profile?.status || 'active'
+      },
+      session: authData.session,
+      supabase: true
     });
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('=== SUPABASE LOGIN ERROR ===');
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
+    
     res.status(500).json({
       success: false,
-      error: 'Internal server error',
+      error: 'Login failed',
       message: error.message
     });
   }
