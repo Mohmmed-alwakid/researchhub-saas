@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign } from 'lucide-react';
 
-// Admin Modules - using relative imports
+// Admin Sidebar - keep this loaded immediately
 import AdminSidebar from '../../components/admin/AdminSidebar';
-import UserManagement from '../../components/admin/UserManagement';
-import SubscriptionManager from '../../components/admin/SubscriptionManager';
-import SystemAnalytics from '../../components/admin/SystemAnalytics';
-import StudyOversight from '../../components/admin/StudyOversight';
-import RolePermissionManager from '../../components/admin/RolePermissionManager';
-import SystemSettings from '../../components/admin/SystemSettings';
-import SupportCenter from '../../components/admin/SupportCenter';
-import AdminOverview from '../../components/admin/AdminOverview';
-import PaymentManagement from '../../components/admin/PaymentManagement';
+
+// Lazy load admin components for better bundle splitting
+const UserManagement = lazy(() => import('../../components/admin/UserManagement'));
+const SubscriptionManager = lazy(() => import('../../components/admin/SubscriptionManager'));
+const SystemAnalytics = lazy(() => import('../../components/admin/SystemAnalytics'));
+const StudyOversight = lazy(() => import('../../components/admin/StudyOversight'));
+const RolePermissionManager = lazy(() => import('../../components/admin/RolePermissionManager'));
+const SystemSettings = lazy(() => import('../../components/admin/SystemSettings'));
+const SupportCenter = lazy(() => import('../../components/admin/SupportCenter'));
+const AdminOverview = lazy(() => import('../../components/admin/AdminOverview'));
+const PaymentManagement = lazy(() => import('../../components/admin/PaymentManagement'));
+
+// Loading component for lazy-loaded components
+const AdminLoadingSpinner = () => (
+  <div className="flex items-center justify-center h-64">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <span className="ml-2 text-gray-600">Loading...</span>
+  </div>
+);
 
 // Hooks and utilities
 import { useAuthStore } from '../../stores/authStore';
@@ -164,33 +174,35 @@ const AdminDashboard: React.FC = () => {
           </div>
         </header>        {/* Route Content */}
         <main className="p-6">
-          <Routes>
-            {availableRoutes.map((route) => {
-              // Remove /app/admin prefix to get relative path for nested routing
-              const relativePath = route.path.replace('/app/admin', '');
-              
-              // Use index route for the main admin path
-              if (relativePath === '') {
+          <Suspense fallback={<AdminLoadingSpinner />}>
+            <Routes>
+              {availableRoutes.map((route) => {
+                // Remove /app/admin prefix to get relative path for nested routing
+                const relativePath = route.path.replace('/app/admin', '');
+                
+                // Use index route for the main admin path
+                if (relativePath === '') {
+                  return (
+                    <Route
+                      key={route.path}
+                      index
+                      element={<route.component />}
+                    />
+                  );
+                }
+                
+                // Remove leading slash for nested routes
                 return (
                   <Route
                     key={route.path}
-                    index
+                    path={relativePath.startsWith('/') ? relativePath.substring(1) : relativePath}
                     element={<route.component />}
                   />
                 );
-              }
-              
-              // Remove leading slash for nested routes
-              return (
-                <Route
-                  key={route.path}
-                  path={relativePath.startsWith('/') ? relativePath.substring(1) : relativePath}
-                  element={<route.component />}
-                />
-              );
-            })}
-            <Route path="*" element={<Navigate to="/app/admin" replace />} />
-          </Routes>
+              })}
+              <Route path="*" element={<Navigate to="/app/admin" replace />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </div>

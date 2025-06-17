@@ -341,10 +341,17 @@ export const deleteRecording = async (req: AuthRequest, res: Response, next: Nex
 
     if (!hasAccess) {
       return next(new APIError('Access denied', 403));
+    }    // Delete file from cloud storage
+    if (recording.fileUrl) {
+      try {
+        const { cloudStorageService } = await import('../services/storage.service');
+        await cloudStorageService.deleteFile(recording.fileUrl);
+        console.log(`Recording file deleted from cloud storage: ${recording.fileUrl}`);
+      } catch (storageError) {
+        console.error('Failed to delete file from cloud storage:', storageError);
+        // Continue with database deletion even if cloud storage deletion fails
+      }
     }
-
-    // TODO: Delete file from cloud storage (AWS S3)
-    // This would involve calling AWS SDK to delete the file
 
     await Recording.findByIdAndDelete(id);
 
@@ -386,11 +393,17 @@ export const getRecordingUrl = async (req: AuthRequest, res: Response, next: Nex
 
     if (!recording.fileUrl) {
       return next(new APIError('Recording file not available', 404));
+    }    // Generate signed URL for secure access
+    let signedUrl = recording.fileUrl;
+    
+    try {
+      const { cloudStorageService } = await import('../services/storage.service');
+      signedUrl = cloudStorageService.generateSignedUrl(recording.fileUrl, 1); // 1 hour access
+      console.log(`Generated signed URL for recording: ${id}`);
+    } catch (storageError) {
+      console.error('Failed to generate signed URL:', storageError);
+      // Fallback to direct URL
     }
-
-    // TODO: Generate signed URL for secure access
-    // This would involve AWS S3 presigned URLs for temporary access
-    const signedUrl = recording.fileUrl; // Placeholder
 
     res.json({
       success: true,

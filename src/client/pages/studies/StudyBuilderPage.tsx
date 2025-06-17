@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,10 +13,28 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
-import { DragDropStudyBuilder, type StudyTask } from '../../components/studies/DragDropStudyBuilder';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import toast from 'react-hot-toast';
+
+// Lazy load the heavy study builder component
+const DragDropStudyBuilder = lazy(() => 
+  import('../../components/studies/DragDropStudyBuilder').then(module => ({
+    default: module.DragDropStudyBuilder
+  }))
+);
+
+// Loading spinner for the study builder
+const StudyBuilderLoading = () => (
+  <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-gray-200">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+      <p className="text-gray-600">Loading Study Builder...</p>
+    </div>
+  </div>
+);
+
+import type { StudyTask } from '../../components/studies/DragDropStudyBuilder';
 
 const studySchema = z.object({
   title: z.string().min(1, 'Study title is required'),
@@ -253,12 +271,12 @@ const EnhancedStudyBuilderPage: React.FC = () => {
               <p className="text-gray-600">
                 Add and arrange tasks that participants will complete during the study
               </p>
-            </div>
-
-            <DragDropStudyBuilder
-              onTasksChange={handleTasksChange}
-              initialTasks={studyTasks}
-            />
+            </div>            <Suspense fallback={<StudyBuilderLoading />}>
+              <DragDropStudyBuilder
+                onTasksChange={handleTasksChange}
+                initialTasks={studyTasks}
+              />
+            </Suspense>
           </div>
         );
 

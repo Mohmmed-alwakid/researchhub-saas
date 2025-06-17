@@ -438,6 +438,17 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
   await user.save();
 
   // TODO: Send email with reset link
+  const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+  const userName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+  
+  try {
+    const { emailService } = await import('../services/email.service');
+    await emailService.sendPasswordResetEmail(user.email, userName, resetLink);
+    console.log(`Password reset email sent successfully to ${user.email}`);
+  } catch (emailError) {
+    console.error('Failed to send password reset email:', emailError);
+    // Don't fail the operation if email fails
+  }
   // const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
   // await sendPasswordResetEmail(user.email, resetUrl);
 
@@ -533,6 +544,17 @@ export const resendEmailVerification = asyncHandler(async (req: Request, res: Re
   await user.save();
 
   // TODO: Send verification email
+  const verificationLink = `${process.env.CLIENT_URL}/verify-email?token=${user.verificationToken}`;
+  const userName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+  
+  try {
+    const { emailService } = await import('../services/email.service');
+    await emailService.sendVerificationEmail(user.email, userName, verificationLink);
+    console.log(`Verification email sent successfully to ${user.email}`);
+  } catch (emailError) {
+    console.error('Failed to send verification email:', emailError);
+    // Don't fail the registration if email fails
+  }
   // const verificationUrl = `${req.protocol}://${req.get('host')}/verify-email/${verificationToken}`;
   // await sendEmailVerification(user.email, verificationUrl);
 

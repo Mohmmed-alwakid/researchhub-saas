@@ -1,6 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../../src/database/models/User.model';
 
@@ -26,18 +25,32 @@ async function connectToDatabase() {
   }
 }
 
+// Extract user from Authorization header
+function extractUserFromToken(authHeader: string | string[] | undefined) {
+  if (!authHeader || Array.isArray(authHeader)) {
+    return null;
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as { id: string; email: string; role: string };
+  } catch {
+    return null;
+  }
+}
+
 // Main handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
@@ -45,59 +58,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Connect to database
     await connectToDatabase();
 
-    // Validate input
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
+    // Extract user from token
+    const userPayload = extractUserFromToken(req.headers.authorization);
+    if (!userPayload) {
+      return res.status(401).json({
         success: false,
-        message: 'Email and password are required'
+        message: 'Authentication required'
       });
     }
 
     // Find user
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findById(userPayload.id).select('-password');
     if (!user) {
-      return res.status(401).json({
+      return res.status(404).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'User not found'
       });
-    }
-
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
-    }
-
-    // Update last login
-    user.lastLoginAt = new Date();
-    await user.save();
-
-    // Generate JWT tokens
-    const accessToken = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email, 
-        role: user.role 
-      },
-      process.env.JWT_SECRET || 'default-secret',
-      { expiresIn: '1h' }
-    );
-
-    const refreshToken = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email 
-      },
-      process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
-      { expiresIn: '7d' }
-    );
-
-    // Return user data (excluding password)
+    }    // Return user data
     const userData = {
       id: user._id,
       email: user.email,
@@ -105,24 +82,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       lastName: user.lastName,
       role: user.role,
       isEmailVerified: user.isEmailVerified,
+      organization: user.organization,
+      avatar: user.avatar,
+      createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt
     };
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
-      user: userData,
-      tokens: {
-        accessToken,
-        refreshToken
-      }
+      user: userData
     });
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Profile error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error during login'
+      message: 'Internal server error while fetching profile'
     });
   }
 }

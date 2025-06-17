@@ -1,6 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../../src/database/models/User.model';
 
@@ -46,38 +45,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await connectToDatabase();
 
     // Validate input
-    const { email, password } = req.body;
+    const { refreshToken } = req.body;
 
-    if (!email || !password) {
+    if (!refreshToken) {
       return res.status(400).json({
         success: false,
-        message: 'Email and password are required'
+        message: 'Refresh token is required'
       });
     }
 
+    // Verify refresh token
+    const decoded = jwt.verify(
+      refreshToken, 
+      process.env.JWT_REFRESH_SECRET || 'default-refresh-secret'
+    ) as { id: string; email: string };
+
     // Find user
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findById(decoded.id);
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid refresh token'
       });
     }
 
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
-    }
-
-    // Update last login
-    user.lastLoginAt = new Date();
-    await user.save();
-
-    // Generate JWT tokens
+    // Generate new access token
     const accessToken = jwt.sign(
       { 
         id: user._id, 
@@ -88,41 +80,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       { expiresIn: '1h' }
     );
 
-    const refreshToken = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email 
-      },
-      process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
-      { expiresIn: '7d' }
-    );
-
-    // Return user data (excluding password)
-    const userData = {
-      id: user._id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      isEmailVerified: user.isEmailVerified,
-      lastLoginAt: user.lastLoginAt
-    };
-
     res.status(200).json({
       success: true,
-      message: 'Login successful',
-      user: userData,
-      tokens: {
-        accessToken,
-        refreshToken
-      }
+      token: accessToken,
+      message: 'Token refreshed successfully'
     });
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Token refresh error:', error);
+    
+    // Handle JWT errors specifically
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid refresh token'
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: 'Internal server error during login'
+      message: 'Internal server error during token refresh'
     });
   }
 }

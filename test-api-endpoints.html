@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Endpoints Test - ResearchHub</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px 0;
+        }
+        button:hover { background: #0056b3; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .result { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        input { 
+            width: 100%; 
+            padding: 8px; 
+            margin: 5px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ResearchHub API Endpoints Test</h1>
+    <p>Test the API endpoints to verify they're working correctly on production.</p>
+    
+    <div class="test-section">
+        <h2>1. Health Check</h2>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="healthResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. User Registration</h2>
+        <input type="email" id="regEmail" placeholder="Email" value="test@example.com">
+        <input type="password" id="regPassword" placeholder="Password" value="password123">
+        <input type="text" id="regFirstName" placeholder="First Name" value="Test">
+        <input type="text" id="regLastName" placeholder="Last Name" value="User">
+        <select id="regRole">
+            <option value="researcher">Researcher</option>
+            <option value="participant">Participant</option>
+            <option value="admin">Admin</option>
+        </select>
+        <button onclick="testRegister()">Test Registration</button>
+        <div id="registerResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. User Login</h2>
+        <input type="email" id="loginEmail" placeholder="Email" value="test@example.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="password123">
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Get Profile (requires login)</h2>
+        <button onclick="testProfile()">Test Get Profile</button>
+        <div id="profileResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Token Refresh (requires login)</h2>
+        <button onclick="testRefresh()">Test Token Refresh</button>
+        <div id="refreshResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Logout</h2>
+        <button onclick="testLogout()">Test Logout</button>
+        <div id="logoutResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://researchhub-saas.vercel.app/api';
+        let authTokens = null;
+
+        async function apiCall(endpoint, method = 'GET', data = null, useAuth = false) {
+            const url = `${API_BASE}${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(useAuth && authTokens ? { 'Authorization': `Bearer ${authTokens.accessToken}` } : {})
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                return {
+                    status: response.status,
+                    success: response.ok,
+                    data: result
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        function displayResult(elementId, result, isSuccess = null) {
+            const element = document.getElementById(elementId);
+            const success = isSuccess !== null ? isSuccess : result.success;
+            element.className = `result ${success ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function testHealth() {
+            const result = await apiCall('/health');
+            displayResult('healthResult', result);
+        }
+
+        async function testRegister() {
+            const data = {
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                firstName: document.getElementById('regFirstName').value,
+                lastName: document.getElementById('regLastName').value,
+                role: document.getElementById('regRole').value
+            };
+
+            const result = await apiCall('/auth/register', 'POST', data);
+            
+            if (result.success && result.data.tokens) {
+                authTokens = result.data.tokens;
+                console.log('Stored auth tokens:', authTokens);
+            }
+            
+            displayResult('registerResult', result);
+        }
+
+        async function testLogin() {
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            const result = await apiCall('/auth/login', 'POST', data);
+            
+            if (result.success && result.data.tokens) {
+                authTokens = result.data.tokens;
+                console.log('Stored auth tokens:', authTokens);
+            }
+            
+            displayResult('loginResult', result);
+        }
+
+        async function testProfile() {
+            if (!authTokens) {
+                displayResult('profileResult', { error: 'Please login first' }, false);
+                return;
+            }
+
+            const result = await apiCall('/auth/profile', 'GET', null, true);
+            displayResult('profileResult', result);
+        }
+
+        async function testRefresh() {
+            if (!authTokens) {
+                displayResult('refreshResult', { error: 'Please login first' }, false);
+                return;
+            }
+
+            const result = await apiCall('/auth/refresh', 'POST', { 
+                refreshToken: authTokens.refreshToken 
+            });
+            
+            if (result.success && result.data.token) {
+                authTokens.accessToken = result.data.token;
+                console.log('Updated access token');
+            }
+            
+            displayResult('refreshResult', result);
+        }
+
+        async function testLogout() {
+            const result = await apiCall('/auth/logout', 'POST');
+            
+            if (result.success) {
+                authTokens = null;
+                console.log('Cleared auth tokens');
+            }
+            
+            displayResult('logoutResult', result);
+        }
+
+        // Test health on page load
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+</body>
+</html>

@@ -142,13 +142,23 @@ export const inviteParticipant = async (req: AuthRequest, res: Response): Promis
       invitedAt: new Date()
     });
 
-    await participant.save();
-
-    // Populate study information
+    await participant.save();    // Populate study information
     await participant.populate('studyId', 'title');
 
-    // TODO: Send invitation email here
-    console.log(`Invitation email should be sent to ${email} for study ${studyId}`);
+    // Send invitation email
+    const studyDoc = participant.studyId as { title?: string };
+    const studyTitle = studyDoc?.title || 'Research Study';
+    const participantName = `${firstName} ${lastName}`.trim() || 'Participant';
+    const invitationLink = `${process.env.CLIENT_URL}/studies/${studyId}/participate?token=${participant._id}`;
+    
+    try {
+      const { emailService } = await import('../services/email.service');
+      await emailService.sendInvitationEmail(email, participantName, studyTitle, invitationLink);
+      console.log(`Invitation email sent successfully to ${email}`);
+    } catch (emailError) {
+      console.error('Failed to send invitation email:', emailError);
+      // Don't fail the entire operation if email fails
+    }
 
     res.status(201).json({
       success: true,
