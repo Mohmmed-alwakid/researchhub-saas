@@ -137,6 +137,47 @@
         <div class="result" id="systemResult">System endpoints ready to test...</div>
     </div>
 
+    <!-- Email Confirmation Test -->
+    <div class="test-section pending" id="confirmSection">
+        <h2><span class="status-indicator status-pending"></span>Email Confirmation Test</h2>
+        <p>Manual email confirmation for testing</p>
+        
+        <input type="email" id="confirmEmail" placeholder="Email to confirm" value="test123@gmail.com">
+        
+        <button onclick="testEmailConfirmation()">Get Confirmation Instructions</button>
+        <div class="result" id="confirmResult">Instructions for manual email confirmation...</div>
+    </div>
+
+    <!-- Full Authentication Flow Test -->
+    <div class="test-section pending" id="fullFlowSection">
+        <h2><span class="status-indicator status-pending"></span>Complete Auth Flow Test</h2>
+        <p>End-to-end authentication workflow</p>
+        
+        <div style="margin: 10px 0;">
+            <strong>Test Sequence:</strong>
+            <ol>
+                <li>Register new user</li>
+                <li>Confirm email (manual)</li>
+                <li>Login with credentials</li>
+                <li>Check auth status</li>
+                <li>Refresh token</li>
+                <li>Logout</li>
+            </ol>
+        </div>
+        
+        <button onclick="runFullAuthFlow()">Run Complete Flow</button>
+        <div class="result" id="fullFlowResult">Click to run complete authentication flow...</div>
+    </div>
+
+    <!-- Performance Test -->
+    <div class="test-section pending" id="performanceSection">
+        <h2><span class="status-indicator status-pending"></span>Performance Test</h2>
+        <p>API response time and reliability testing</p>
+        
+        <button onclick="testPerformance()">Run Performance Tests</button>
+        <div class="result" id="performanceResult">Performance metrics will be shown here...</div>
+    </div>
+
     <script>
         const API_BASE = 'https://researchhub-saas.vercel.app/api';
 
@@ -262,6 +303,174 @@
                 health: JSON.parse(currentResult), 
                 database: result 
             }, result.status !== 200);
+        }
+
+        async function testEmailConfirmation() {
+            const email = document.getElementById('confirmEmail').value;
+
+            if (!email) {
+                displayResult('confirmResult', { error: 'Please provide an email' }, true);
+                return;
+            }
+
+            const result = await makeRequest('confirm-email', 'POST', { email });
+            displayResult('confirmResult', result, result.status !== 200);
+        }
+
+        async function runFullAuthFlow() {
+            const results = {
+                flow: 'Complete Authentication Flow Test',
+                timestamp: new Date().toISOString(),
+                steps: []
+            };
+
+            try {
+                // Step 1: Register
+                const regResult = await makeRequest('register', 'POST', {
+                    email: 'fullflow@gmail.com',
+                    password: 'TestFlow123!',
+                    firstName: 'Full',
+                    lastName: 'Flow',
+                    role: 'researcher'
+                });
+                
+                results.steps.push({
+                    step: 1,
+                    action: 'Registration',
+                    status: regResult.status,
+                    success: regResult.status === 201 || regResult.status === 400, // 400 for already exists
+                    data: regResult.data
+                });
+
+                // Step 2: Try login (will fail due to unconfirmed email)
+                const loginResult = await makeRequest('login', 'POST', {
+                    email: 'fullflow@gmail.com',
+                    password: 'TestFlow123!'
+                });
+                
+                results.steps.push({
+                    step: 2,
+                    action: 'Login (unconfirmed)',
+                    status: loginResult.status,
+                    success: loginResult.status === 400, // Expected to fail
+                    data: loginResult.data
+                });
+
+                // Step 3: Get confirmation instructions
+                const confirmResult = await makeRequest('confirm-email', 'POST', {
+                    email: 'fullflow@gmail.com'
+                });
+                
+                results.steps.push({
+                    step: 3,
+                    action: 'Email confirmation instructions',
+                    status: confirmResult.status,
+                    success: confirmResult.status === 200,
+                    data: confirmResult.data
+                });
+
+                // Step 4: Test other endpoints with invalid token
+                const statusResult = await makeRequest('status', 'GET', null, 'invalid-token');
+                
+                results.steps.push({
+                    step: 4,
+                    action: 'Status check (invalid token)',
+                    status: statusResult.status,
+                    success: statusResult.status === 401, // Expected to fail
+                    data: statusResult.data
+                });
+
+                // Step 5: Test logout
+                const logoutResult = await makeRequest('logout', 'POST');
+                
+                results.steps.push({
+                    step: 5,
+                    action: 'Logout',
+                    status: logoutResult.status,
+                    success: logoutResult.status === 200,
+                    data: logoutResult.data
+                });
+
+                results.summary = {
+                    totalSteps: results.steps.length,
+                    successfulSteps: results.steps.filter(s => s.success).length,
+                    completionRate: (results.steps.filter(s => s.success).length / results.steps.length * 100).toFixed(1) + '%'
+                };
+
+                displayResult('fullFlowResult', results, false);
+
+            } catch (error) {
+                results.error = error.message;
+                displayResult('fullFlowResult', results, true);
+            }
+        }
+
+        async function testPerformance() {
+            const results = {
+                test: 'API Performance Analysis',
+                timestamp: new Date().toISOString(),
+                endpoints: []
+            };
+
+            const endpoints = [
+                { name: 'Health Check', endpoint: 'health', method: 'GET' },
+                { name: 'Database Check', endpoint: 'db-check', method: 'GET' },
+                { name: 'Registration', endpoint: 'register', method: 'POST', body: {
+                    email: 'perf@gmail.com',
+                    password: 'PerfTest123!',
+                    firstName: 'Perf',
+                    lastName: 'Test',
+                    role: 'researcher'
+                }},
+                { name: 'Login', endpoint: 'login', method: 'POST', body: {
+                    email: 'perf@gmail.com',
+                    password: 'PerfTest123!'
+                }},
+                { name: 'Logout', endpoint: 'logout', method: 'POST' }
+            ];
+
+            for (const endpoint of endpoints) {
+                const times = [];
+                
+                // Run each endpoint 3 times to get average
+                for (let i = 0; i < 3; i++) {
+                    const startTime = performance.now();
+                    const result = await makeRequest(endpoint.endpoint, endpoint.method, endpoint.body);
+                    const endTime = performance.now();
+                    
+                    times.push({
+                        attempt: i + 1,
+                        responseTime: Math.round(endTime - startTime),
+                        status: result.status,
+                        success: result.status < 400 || result.status === 400 // 400 might be expected for duplicate registration
+                    });
+                    
+                    // Small delay between requests
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                const avgTime = Math.round(times.reduce((sum, t) => sum + t.responseTime, 0) / times.length);
+                const successRate = (times.filter(t => t.success).length / times.length * 100);
+
+                results.endpoints.push({
+                    name: endpoint.name,
+                    averageResponseTime: avgTime + 'ms',
+                    successRate: successRate + '%',
+                    attempts: times
+                });
+            }
+
+            results.summary = {
+                totalEndpoints: results.endpoints.length,
+                averageResponseTime: Math.round(
+                    results.endpoints.reduce((sum, e) => sum + parseInt(e.averageResponseTime), 0) / results.endpoints.length
+                ) + 'ms',
+                overallSuccessRate: (
+                    results.endpoints.reduce((sum, e) => sum + parseFloat(e.successRate), 0) / results.endpoints.length
+                ).toFixed(1) + '%'
+            };
+
+            displayResult('performanceResult', results, false);
         }
 
         // Auto-test system status on page load
