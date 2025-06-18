@@ -27,7 +27,7 @@ interface AuthState {
   verify2FALogin: (tempToken: string, code: string) => Promise<void>;
   verifyBackupCodeLogin: (tempToken: string, backupCode: string) => Promise<void>;
   register: (userData: RegisterRequest) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (data: Partial<SupabaseUser>) => Promise<void>;
   checkAuth: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
@@ -203,7 +203,16 @@ export const useAuthStore = create<AuthState>()(
           toast.error(message);
           throw error;
         }
-      },logout: () => {
+      },      logout: async () => {
+        try {
+          // Call logout API to invalidate token on server
+          await authService.logout();
+        } catch (error) {
+          // Continue with local logout even if API fails
+          console.error('Logout API failed:', error);
+        }
+        
+        // Clear local storage and state
         set({ 
           user: null, 
           token: null, 
@@ -215,7 +224,7 @@ export const useAuthStore = create<AuthState>()(
         });
         
         toast.success('Logged out successfully');
-      },      updateProfile: async (data: Partial<SupabaseUser>) => {
+      },updateProfile: async (data: Partial<SupabaseUser>) => {
         try {
           const response = await authService.updateProfile(data);
           const updatedUser = response.user;
@@ -230,79 +239,103 @@ export const useAuthStore = create<AuthState>()(
           toast.error(message);
           throw error;
         }      },      checkAuth: async () => {
-        const token = get().token;
+        const { token, refreshToken } = get();
         
         if (!token) {
           set({ isLoading: false, isAuthenticated: false, user: null });
           return;
         }
 
-        set({ isLoading: true });        try {
-          const response = await authService.getProfile();
-          const user = response.user;
+        set({ isLoading: true });
+        
+        try {
+          const response = await authService.getCurrentUser();
           
-          // Ensure user has all required SupabaseUser fields
-          const supabaseUser: SupabaseUser = {
-            id: user?.id || '',
-            email: user?.email || '',
-            firstName: user?.firstName || '',
-            lastName: user?.lastName || '',
-            role: user?.role || '',
-            status: user?.status,
-            emailConfirmed: user?.emailConfirmed
-          };
-          
-          set({ user: supabaseUser, isAuthenticated: true, isLoading: false });} catch (error: unknown) {
+          if (response.success && response.user) {
+            const user = response.user;
+            
+            // Ensure user has all required SupabaseUser fields
+            const supabaseUser: SupabaseUser = {
+              id: user.id || '',
+              email: user.email || '',
+              firstName: user.firstName || '',
+              lastName: user.lastName || '',
+              role: user.role || '',
+              status: user.status,
+              emailConfirmed: user.emailConfirmed
+            };
+            
+            set({ user: supabaseUser, isAuthenticated: true, isLoading: false });
+          } else {
+            throw new Error('Invalid response format');
+          }        } catch {
           // Token is invalid, try to refresh
-          const refreshToken = get().refreshToken;
           if (refreshToken) {
             try {
-              const response = await authService.refreshToken(refreshToken);
-              const newToken = response.token;
+              const refreshResponse = await authService.refreshToken(refreshToken);
               
-              // Update the token in the store BEFORE retrying
-              set({ token: newToken });
-                // Retry getting profile with new token
-              const profileResponse = await authService.getProfile();
-              const retryUser = profileResponse.user;
-              
-              // Ensure user has all required SupabaseUser fields
-              const retrySupabaseUser: SupabaseUser = {
-                id: retryUser?.id || '',
-                email: retryUser?.email || '',
-                firstName: retryUser?.firstName || '',
-                lastName: retryUser?.lastName || '',
-                role: retryUser?.role || '',
-                status: retryUser?.status,
-                emailConfirmed: retryUser?.emailConfirmed
-              };
-              
-              set({ user: retrySupabaseUser, isAuthenticated: true, isLoading: false });
-            } catch (refreshError) {
+              if (refreshResponse.success) {
+                // Extract new tokens from refresh response
+                const newToken = refreshResponse.session?.access_token || refreshResponse.token;
+                const newRefreshToken = refreshResponse.session?.refresh_token || refreshToken;
+                
+                // Update tokens in store
+                set({ 
+                  token: newToken,
+                  refreshToken: newRefreshToken
+                });
+                
+                // Get user data with new token
+                const userResponse = await authService.getCurrentUser();
+                
+                if (userResponse.success && userResponse.user) {
+                  const user = userResponse.user;
+                  
+                  const supabaseUser: SupabaseUser = {
+                    id: user.id || '',
+                    email: user.email || '',
+                    firstName: user.firstName || '',
+                    lastName: user.lastName || '',
+                    role: user.role || '',
+                    status: user.status,
+                    emailConfirmed: user.emailConfirmed
+                  };
+                  
+                  set({ user: supabaseUser, isAuthenticated: true, isLoading: false });
+                } else {
+                  throw new Error('Could not get user after refresh');
+                }
+              } else {
+                throw new Error('Token refresh failed');
+              }            } catch (refreshError) {
               // Refresh failed, logout user
               console.error('Token refresh failed:', refreshError);
               set({ isLoading: false });
-              get().logout();
+              await get().logout();
             }
           } else {
             set({ isLoading: false });
-            get().logout();
+            await get().logout();
           }
         }
-      },refreshAccessToken: async () => {
+      },      refreshAccessToken: async () => {
         const refreshToken = get().refreshToken;
         if (!refreshToken) {
-          get().logout();
+          await get().logout();
           return;
         }
 
         try {
           const response = await authService.refreshToken(refreshToken);
-          const newToken = response.token;
+          const newToken = response.session?.access_token || response.token;
           
-          set({ token: newToken });
+          if (newToken) {
+            set({ token: newToken });
+          } else {
+            throw new Error('No token in refresh response');
+          }
         } catch (error: unknown) {
-          get().logout();
+          await get().logout();
           throw error;
         }
       },

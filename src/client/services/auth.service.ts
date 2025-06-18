@@ -71,8 +71,22 @@ export interface TwoFactorVerifyResponse {
 
 export interface RefreshTokenResponse {
   success: boolean;
-  token: string;
+  token?: string;
   message: string;
+  session?: {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+  };
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    status?: string;
+    emailVerified?: boolean;
+  };
 }
 
 export interface ProfileUpdateRequest {
@@ -106,30 +120,28 @@ export const authService = {  /**
   async getCurrentUser(): Promise<AuthResponse> {
     return apiService.get<AuthResponse>('status');
   },
-
   /**
    * Refresh access token
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-    return apiService.post<RefreshTokenResponse>('auth?action=refresh', { refreshToken });
+    return apiService.post<RefreshTokenResponse>('refresh', { refreshToken });
   },
 
   /**
    * Logout user
    */
   async logout(): Promise<{ success: boolean; message: string }> {
-    return apiService.post('auth?action=logout');
-  },  /**
+    return apiService.post('logout');
+  },/**
    * Get current user profile
    */
   async getProfile(): Promise<{ success: boolean; user: SupabaseUser }> {
     return apiService.get('status');
-  },
-  /**
+  },  /**
    * Update user profile
    */
   async updateProfile(data: ProfileUpdateRequest): Promise<{ success: boolean; user: SupabaseUser; message: string }> {
-    return apiService.put('auth/profile', data);
+    return apiService.put('profile', data);
   },
 
   /**
