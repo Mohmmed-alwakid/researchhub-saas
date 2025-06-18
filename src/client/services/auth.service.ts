@@ -1,5 +1,17 @@
 import { apiService } from './api.service';
-import type { User, UserRole } from '../../shared/types';
+
+// Supabase-compatible user type (matching the auth store)
+export interface SupabaseUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  status?: string;
+  emailConfirmed?: boolean;
+}
+
+export type UserRole = 'researcher' | 'participant' | 'admin';
 
 export interface LoginRequest {
   email: string;
@@ -20,11 +32,25 @@ export interface RegisterRequest {
 export interface AuthResponse {
   success: boolean;
   message: string;
-  data?: {
-    user?: User;
-    accessToken?: string;
-    refreshToken?: string;
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    status?: string;
+    emailConfirmed?: boolean;
   };
+  session?: {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+  };
+  tokens?: {
+    authToken: string;
+    refreshToken: string;
+  };
+  supabase?: boolean;
   requiresTwoFactor?: boolean;
   tempToken?: string;
 }
@@ -61,17 +87,24 @@ export interface ProfileUpdateRequest {
  * Authentication API service
  */
 export const authService = {  /**
-   * Login user
+   * Login user with Supabase
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('auth?action=login', credentials);
+    return apiService.post<AuthResponse>('login', credentials);
   },
 
   /**
-   * Register new user
+   * Register new user with Supabase
    */
   async register(userData: RegisterRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('auth?action=register', userData);
+    return apiService.post<AuthResponse>('register', userData);
+  },
+
+  /**
+   * Get current user status
+   */
+  async getCurrentUser(): Promise<AuthResponse> {
+    return apiService.get<AuthResponse>('status');
   },
 
   /**
@@ -87,17 +120,16 @@ export const authService = {  /**
   async logout(): Promise<{ success: boolean; message: string }> {
     return apiService.post('auth?action=logout');
   },
-
   /**
    * Get current user profile
    */
-  async getProfile(): Promise<{ success: boolean; user: User }> {
+  async getProfile(): Promise<{ success: boolean; user: SupabaseUser }> {
     return apiService.get('auth?action=profile');
   },
   /**
    * Update user profile
    */
-  async updateProfile(data: ProfileUpdateRequest): Promise<{ success: boolean; user: User; message: string }> {
+  async updateProfile(data: ProfileUpdateRequest): Promise<{ success: boolean; user: SupabaseUser; message: string }> {
     return apiService.put('auth/profile', data);
   },
 

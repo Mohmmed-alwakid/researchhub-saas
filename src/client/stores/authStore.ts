@@ -2,10 +2,20 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import toast from 'react-hot-toast';
 import { authService, type RegisterRequest } from '../services';
-import type { User } from '../../shared/types';
+
+// Supabase-compatible user type
+interface SupabaseUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  status?: string;
+  emailConfirmed?: boolean;
+}
 
 interface AuthState {
-  user: User | null;
+  user: SupabaseUser | null;
   token: string | null;
   refreshToken: string | null;
   tempToken: string | null;
@@ -18,7 +28,7 @@ interface AuthState {
   verifyBackupCodeLogin: (tempToken: string, backupCode: string) => Promise<void>;
   register: (userData: RegisterRequest) => Promise<void>;
   logout: () => void;
-  updateProfile: (data: Partial<User>) => Promise<void>;
+  updateProfile: (data: Partial<SupabaseUser>) => Promise<void>;
   checkAuth: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
   clearTempAuth: () => void;
@@ -37,8 +47,7 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true });
         try {          const response = await authService.login({ email, password });
-          
-          if (response.requiresTwoFactor) {
+            if (response.requiresTwoFactor) {
             set({ 
               tempToken: response.tempToken,
               tempEmail: email,
@@ -46,14 +55,24 @@ export const useAuthStore = create<AuthState>()(
               isLoading: false 
             });
             return { requiresTwoFactor: true, tempToken: response.tempToken };
-          }
+          }          // Extract data from Supabase response structure
+          const user = response.user;
+          const token = response.session?.access_token || response.tokens?.authToken;
+          const refreshToken = response.session?.refresh_token || response.tokens?.refreshToken;
           
-          // Extract data from the response structure
-          const { user, accessToken, refreshToken } = response.data || {};
-          const token = accessToken;
+          // Ensure user has all required SupabaseUser fields
+          const supabaseUser: SupabaseUser = {
+            id: user?.id || '', // Supabase uses id, not _id
+            email: user?.email || '',
+            firstName: user?.firstName || '',
+            lastName: user?.lastName || '',
+            role: user?.role || '',
+            status: user?.status,
+            emailConfirmed: user?.emailConfirmed
+          };
           
           set({ 
-            user, 
+            user: supabaseUser, 
             token, 
             refreshToken,
             isAuthenticated: true, 
@@ -74,11 +93,23 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const response = await authService.verify2FALogin(tempToken, code);
-          const { user, accessToken, refreshToken } = response.data || {};
-          const token = accessToken;
+          const user = response.user;
+          const token = response.session?.access_token || response.tokens?.authToken;
+          const refreshToken = response.session?.refresh_token || response.tokens?.refreshToken;
+          
+          // Ensure user has all required SupabaseUser fields
+          const supabaseUser: SupabaseUser = {
+            id: user?.id || '',
+            email: user?.email || '',
+            firstName: user?.firstName || '',
+            lastName: user?.lastName || '',
+            role: user?.role || '',
+            status: user?.status,
+            emailConfirmed: user?.emailConfirmed
+          };
           
           set({ 
-            user, 
+            user: supabaseUser, 
             token, 
             refreshToken,
             isAuthenticated: true, 
@@ -98,11 +129,23 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const response = await authService.verifyBackupCodeLogin(tempToken, backupCode);
-          const { user, accessToken, refreshToken } = response.data || {};
-          const token = accessToken;
+          const user = response.user;
+          const token = response.session?.access_token || response.tokens?.authToken;
+          const refreshToken = response.session?.refresh_token || response.tokens?.refreshToken;
+          
+          // Ensure user has all required SupabaseUser fields
+          const supabaseUser: SupabaseUser = {
+            id: user?.id || '',
+            email: user?.email || '',
+            firstName: user?.firstName || '',
+            lastName: user?.lastName || '',
+            role: user?.role || '',
+            status: user?.status,
+            emailConfirmed: user?.emailConfirmed
+          };
           
           set({ 
-            user, 
+            user: supabaseUser, 
             token, 
             refreshToken,
             isAuthenticated: true, 
@@ -130,10 +173,23 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const response = await authService.register(userData);
-          const { user, accessToken, refreshToken } = response.data || {};
-          const token = accessToken;
-            set({ 
-            user, 
+          const user = response.user;
+          const token = response.session?.access_token || response.tokens?.authToken;
+          const refreshToken = response.session?.refresh_token || response.tokens?.refreshToken;
+          
+          // Ensure user has all required SupabaseUser fields
+          const supabaseUser: SupabaseUser = {
+            id: user?.id || '',
+            email: user?.email || '',
+            firstName: user?.firstName || '',
+            lastName: user?.lastName || '',
+            role: user?.role || '',
+            status: user?.status,
+            emailConfirmed: user?.emailConfirmed
+          };
+          
+          set({ 
+            user: supabaseUser, 
             token, 
             refreshToken,
             isAuthenticated: true, 
@@ -147,7 +203,7 @@ export const useAuthStore = create<AuthState>()(
           toast.error(message);
           throw error;
         }
-      },      logout: () => {
+      },logout: () => {
         set({ 
           user: null, 
           token: null, 
@@ -159,9 +215,7 @@ export const useAuthStore = create<AuthState>()(
         });
         
         toast.success('Logged out successfully');
-      },
-
-      updateProfile: async (data: Partial<User>) => {
+      },      updateProfile: async (data: Partial<SupabaseUser>) => {
         try {
           const response = await authService.updateProfile(data);
           const updatedUser = response.user;
@@ -183,13 +237,22 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
 
-        set({ isLoading: true });
-        try {
+        set({ isLoading: true });        try {
           const response = await authService.getProfile();
           const user = response.user;
           
-          set({ user, isAuthenticated: true, isLoading: false });
-        } catch (error) {
+          // Ensure user has all required SupabaseUser fields
+          const supabaseUser: SupabaseUser = {
+            id: user?.id || '',
+            email: user?.email || '',
+            firstName: user?.firstName || '',
+            lastName: user?.lastName || '',
+            role: user?.role || '',
+            status: user?.status,
+            emailConfirmed: user?.emailConfirmed
+          };
+          
+          set({ user: supabaseUser, isAuthenticated: true, isLoading: false });} catch (error: unknown) {
           // Token is invalid, try to refresh
           const refreshToken = get().refreshToken;
           if (refreshToken) {
@@ -199,10 +262,22 @@ export const useAuthStore = create<AuthState>()(
               
               // Update the token in the store BEFORE retrying
               set({ token: newToken });
-              
-              // Retry getting profile with new token
+                // Retry getting profile with new token
               const profileResponse = await authService.getProfile();
-              set({ user: profileResponse.user, isAuthenticated: true, isLoading: false });
+              const retryUser = profileResponse.user;
+              
+              // Ensure user has all required SupabaseUser fields
+              const retrySupabaseUser: SupabaseUser = {
+                id: retryUser?.id || '',
+                email: retryUser?.email || '',
+                firstName: retryUser?.firstName || '',
+                lastName: retryUser?.lastName || '',
+                role: retryUser?.role || '',
+                status: retryUser?.status,
+                emailConfirmed: retryUser?.emailConfirmed
+              };
+              
+              set({ user: retrySupabaseUser, isAuthenticated: true, isLoading: false });
             } catch (refreshError) {
               // Refresh failed, logout user
               console.error('Token refresh failed:', refreshError);
