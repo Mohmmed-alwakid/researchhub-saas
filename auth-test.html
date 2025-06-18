@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchHub Auth Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .success { border-color: #4CAF50; background-color: #f8fff8; }
+        .error { border-color: #f44336; background-color: #fff8f8; }
+        .pending { border-color: #ff9800; background-color: #fff8f0; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0056b3; }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-success { background-color: #4CAF50; }
+        .status-error { background-color: #f44336; }
+        .status-pending { background-color: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>🔐 ResearchHub Authentication Test Suite</h1>
+    <p><strong>Supabase Migration Test</strong> - June 18, 2025</p>
+
+    <!-- Registration Test -->
+    <div class="test-section pending" id="registerSection">
+        <h2><span class="status-indicator status-pending"></span>Registration Test</h2>
+        <p>Test user registration with Supabase backend</p>
+        
+        <input type="email" id="regEmail" placeholder="Email (e.g., test@gmail.com)" value="test456@gmail.com">
+        <input type="password" id="regPassword" placeholder="Password" value="TestPassword123!">
+        <input type="text" id="regFirstName" placeholder="First Name" value="Test">
+        <input type="text" id="regLastName" placeholder="Last Name" value="User">
+        <select id="regRole">
+            <option value="researcher">Researcher</option>
+            <option value="participant">Participant</option>
+            <option value="admin">Admin</option>
+        </select>
+        
+        <button onclick="testRegistration()">Test Registration</button>
+        <div class="result" id="registerResult">Click "Test Registration" to begin...</div>
+    </div>
+
+    <!-- Login Test -->
+    <div class="test-section pending" id="loginSection">
+        <h2><span class="status-indicator status-pending"></span>Login Test</h2>
+        <p>Test user login with confirmed email</p>
+        
+        <input type="email" id="loginEmail" placeholder="Email" value="test123@gmail.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="TestPassword123!">
+        
+        <button onclick="testLogin()">Test Login</button>
+        <div class="result" id="loginResult">Register first, then confirm email, then test login...</div>
+    </div>
+
+    <!-- Token Status Test -->
+    <div class="test-section pending" id="statusSection">
+        <h2><span class="status-indicator status-pending"></span>Token Status Test</h2>
+        <p>Test authentication status with token</p>
+        
+        <textarea id="testToken" placeholder="Paste JWT token here..." rows="3"></textarea>
+        
+        <button onclick="testStatus()">Test Status</button>
+        <div class="result" id="statusResult">Login first to get a token...</div>
+    </div>
+
+    <!-- Token Refresh Test -->
+    <div class="test-section pending" id="refreshSection">
+        <h2><span class="status-indicator status-pending"></span>Token Refresh Test</h2>
+        <p>Test token refresh functionality</p>
+        
+        <textarea id="refreshToken" placeholder="Paste refresh token here..." rows="3"></textarea>
+        
+        <button onclick="testRefresh()">Test Refresh</button>
+        <div class="result" id="refreshResult">Login first to get a refresh token...</div>
+    </div>
+
+    <!-- Logout Test -->
+    <div class="test-section pending" id="logoutSection">
+        <h2><span class="status-indicator status-pending"></span>Logout Test</h2>
+        <p>Test session cleanup</p>
+        
+        <button onclick="testLogout()">Test Logout</button>
+        <div class="result" id="logoutResult">Click "Test Logout" to test session cleanup...</div>
+    </div>
+
+    <!-- System Status -->
+    <div class="test-section success" id="systemSection">
+        <h2><span class="status-indicator status-success"></span>System Status</h2>
+        <p>Check overall system health</p>
+        
+        <button onclick="testHealth()">Check Health</button>
+        <button onclick="testDbConnection()">Check Database</button>
+        <div class="result" id="systemResult">System endpoints ready to test...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://researchhub-saas.vercel.app/api';
+
+        function updateSectionStatus(sectionId, status) {
+            const section = document.getElementById(sectionId);
+            const indicator = section.querySelector('.status-indicator');
+            
+            section.className = `test-section ${status}`;
+            indicator.className = `status-indicator status-${status}`;
+        }
+
+        function displayResult(elementId, result, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(result, null, 2);
+            
+            const section = element.closest('.test-section');
+            updateSectionStatus(section.id, isError ? 'error' : 'success');
+        }
+
+        async function makeRequest(endpoint, method = 'GET', body = null, token = null) {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                const response = await fetch(`${API_BASE}/${endpoint}`, {
+                    method,
+                    headers,
+                    body: body ? JSON.stringify(body) : null
+                });
+
+                const data = await response.json();
+                return { status: response.status, data };
+            } catch (error) {
+                return { status: 0, data: { error: error.message } };
+            }
+        }
+
+        async function testRegistration() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const firstName = document.getElementById('regFirstName').value;
+            const lastName = document.getElementById('regLastName').value;
+            const role = document.getElementById('regRole').value;
+
+            const result = await makeRequest('register', 'POST', {
+                email, password, firstName, lastName, role
+            });
+
+            displayResult('registerResult', result, result.status !== 201);
+
+            // If successful, auto-fill login form
+            if (result.status === 201) {
+                document.getElementById('loginEmail').value = email;
+                document.getElementById('loginPassword').value = password;
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const result = await makeRequest('login', 'POST', { email, password });
+
+            displayResult('loginResult', result, result.status !== 200);
+
+            // If successful, auto-fill token fields
+            if (result.status === 200 && result.data.session) {
+                document.getElementById('testToken').value = result.data.session.access_token;
+                document.getElementById('refreshToken').value = result.data.session.refresh_token;
+            }
+        }
+
+        async function testStatus() {
+            const token = document.getElementById('testToken').value;
+
+            if (!token) {
+                displayResult('statusResult', { error: 'Please provide a token' }, true);
+                return;
+            }
+
+            const result = await makeRequest('status', 'GET', null, token);
+            displayResult('statusResult', result, result.status !== 200);
+        }
+
+        async function testRefresh() {
+            const refreshToken = document.getElementById('refreshToken').value;
+
+            if (!refreshToken) {
+                displayResult('refreshResult', { error: 'Please provide a refresh token' }, true);
+                return;
+            }
+
+            const result = await makeRequest('refresh', 'POST', { refreshToken });
+            displayResult('refreshResult', result, result.status !== 200);
+
+            // If successful, update access token
+            if (result.status === 200 && result.data.session) {
+                document.getElementById('testToken').value = result.data.session.access_token;
+            }
+        }
+
+        async function testLogout() {
+            const token = document.getElementById('testToken').value;
+
+            const result = await makeRequest('logout', 'POST', null, token);
+            displayResult('logoutResult', result, result.status !== 200);
+        }
+
+        async function testHealth() {
+            const result = await makeRequest('health');
+            displayResult('systemResult', result, result.status !== 200);
+        }
+
+        async function testDbConnection() {
+            const result = await makeRequest('db-check');
+            const currentResult = document.getElementById('systemResult').textContent;
+            displayResult('systemResult', { 
+                health: JSON.parse(currentResult), 
+                database: result 
+            }, result.status !== 200);
+        }
+
+        // Auto-test system status on page load
+        window.onload = () => {
+            testHealth();
+        };
+    </script>
+</body>
+</html>
