@@ -93,14 +93,34 @@ export default async function handler(req, res) {
           success: false,
           error: error.message
         });
-      }
-
-      // Get user profile
+      }      // Get user profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', data.user.id)
         .single();
+
+      // Get role from profile first, then from user metadata, with fallback
+      const userRole = profile?.role || data.user.user_metadata?.role || 'participant';
+      
+      // If no profile exists, create one with the correct role
+      if (!profile) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            first_name: data.user.user_metadata?.first_name || '',
+            last_name: data.user.user_metadata?.last_name || '',
+            role: data.user.user_metadata?.role || 'participant',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+      }
 
       console.log('User logged in successfully');
       return res.status(200).json({
@@ -109,9 +129,9 @@ export default async function handler(req, res) {
         user: {
           id: data.user.id,
           email: data.user.email,
-          role: profile?.role || 'participant',
-          firstName: profile?.first_name,
-          lastName: profile?.last_name
+          role: userRole,
+          firstName: profile?.first_name || data.user.user_metadata?.first_name,
+          lastName: profile?.last_name || data.user.user_metadata?.last_name
         },
         session: {
           accessToken: data.session.access_token,
@@ -217,14 +237,15 @@ export default async function handler(req, res) {
           success: false,
           error: 'Invalid token'
         });
-      }
-
-      // Get user profile
+      }      // Get user profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
+
+      // Get role from profile first, then from user metadata, with fallback
+      const userRole = profile?.role || user.user_metadata?.role || 'participant';
 
       console.log('Token validated successfully');
       return res.status(200).json({
@@ -233,9 +254,9 @@ export default async function handler(req, res) {
         user: {
           id: user.id,
           email: user.email,
-          role: profile?.role || 'participant',
-          firstName: profile?.first_name,
-          lastName: profile?.last_name,
+          role: userRole,
+          firstName: profile?.first_name || user.user_metadata?.first_name,
+          lastName: profile?.last_name || user.user_metadata?.last_name,
           emailConfirmed: user.email_confirmed_at !== null
         }
       });

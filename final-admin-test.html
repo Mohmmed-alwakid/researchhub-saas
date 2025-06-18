@@ -56,14 +56,20 @@
             <h4>3. Test Admin Account</h4>
             <button onclick="testAccount('admin')" class="admin">Test Admin Login</button>
             <div id="adminResult" class="result"></div>
-        </div>
-
-        <!-- Password Reset Test -->
+        </div>        <!-- Password Reset Test -->
         <div class="test-section">
             <h3>🔑 Password Reset Test (Participant & Researcher Only)</h3>
             <button onclick="testPasswordReset('participant')">Test Participant Password Reset</button>
             <button onclick="testPasswordReset('researcher')">Test Researcher Password Reset</button>
             <div id="passwordResult" class="result"></div>
+        </div>
+
+        <!-- Role Fix -->
+        <div class="test-section">
+            <h3>🔧 Fix Account Roles</h3>
+            <p><strong>IMPORTANT:</strong> Use this if accounts are showing wrong roles!</p>
+            <button onclick="fixAccountRoles()" class="admin">Fix All Account Roles</button>
+            <div id="roleResult" class="result"></div>
         </div>
 
         <!-- Summary -->
@@ -183,6 +189,43 @@
 
             } catch (error) {
                 showResult('passwordResult', `❌ ERROR: ${error.message}`, 'error');
+            }        }
+
+        async function fixAccountRoles() {
+            try {
+                showResult('roleResult', 'Fixing account roles...', 'info');
+
+                const response = await fetch(`${BASE_URL}/admin-setup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'fix_roles'
+                    }),
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    let resultText = '✅ Role fix completed!\n\n';
+                    result.results.forEach(r => {
+                        resultText += `${r.account}: ${r.status} (${r.email})\n`;
+                        if (r.role) resultText += `  → Role set to: ${r.role}\n`;
+                        if (r.error) resultText += `  → Error: ${r.error}\n`;
+                    });
+                    
+                    showResult('roleResult', resultText, 'success');
+                } else {
+                    showResult('roleResult', 
+                        `❌ Role fix failed\n` +
+                        `Error: ${result.error || result.message}`, 
+                        'error'
+                    );
+                }
+
+            } catch (error) {
+                showResult('roleResult', `❌ ERROR: ${error.message}`, 'error');
             }
         }
 

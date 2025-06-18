@@ -217,13 +217,124 @@ export default async function handler(req, res) {
           success: false,
           error: 'Admin account creation failed',
           details: e.message
-        });
+        });      }
+    }
+
+    if (action === 'fix_roles') {
+      // Fix roles for all test accounts
+      const results = [];
+      
+      for (const [accountType, account] of Object.entries(TEST_ACCOUNTS)) {
+        try {
+          // Get user by email from auth.users
+          const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
+          
+          if (usersError) {
+            results.push({ 
+              account: accountType, 
+              email: account.email, 
+              status: 'error', 
+              error: 'Failed to list users' 
+            });
+            continue;
+          }
+
+          const user = users.users.find(u => u.email === account.email);
+          
+          if (!user) {
+            results.push({ 
+              account: accountType, 
+              email: account.email, 
+              status: 'not_found', 
+              error: 'User not found in auth' 
+            });
+            continue;
+          }
+
+          // Update or insert profile with correct role
+          const { data: existingProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (existingProfile) {
+            // Update existing profile
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({ 
+                role: account.role,
+                email: account.email,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', user.id);
+
+            if (updateError) {
+              results.push({ 
+                account: accountType, 
+                email: account.email, 
+                status: 'update_error', 
+                error: updateError.message 
+              });
+            } else {
+              results.push({ 
+                account: accountType, 
+                email: account.email, 
+                status: 'updated', 
+                role: account.role 
+              });
+            }
+          } else {
+            // Create new profile
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                id: user.id,
+                email: account.email,
+                first_name: user.user_metadata?.first_name || accountType,
+                last_name: user.user_metadata?.last_name || 'User',
+                role: account.role,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+
+            if (insertError) {
+              results.push({ 
+                account: accountType, 
+                email: account.email, 
+                status: 'insert_error', 
+                error: insertError.message 
+              });
+            } else {
+              results.push({ 
+                account: accountType, 
+                email: account.email, 
+                status: 'created', 
+                role: account.role 
+              });
+            }
+          }
+
+        } catch (e) {
+          results.push({ 
+            account: accountType, 
+            email: account.email, 
+            status: 'error', 
+            error: e.message 
+          });
+        }
       }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Role fix attempted for all test accounts',
+        results: results
+      });
     }
 
     return res.status(400).json({
       success: false,
-      error: 'Invalid action. Use: setup_admin, create_test_accounts, or create_admin_account'
+      error: 'Invalid action. Use: setup_admin, create_test_accounts, create_admin_account, or fix_roles'
     });
 
   } catch (error) {
