@@ -119,12 +119,11 @@ export const authService = {  /**
    */
   async logout(): Promise<{ success: boolean; message: string }> {
     return apiService.post('auth?action=logout');
-  },
-  /**
+  },  /**
    * Get current user profile
    */
   async getProfile(): Promise<{ success: boolean; user: SupabaseUser }> {
-    return apiService.get('auth?action=profile');
+    return apiService.get('status');
   },
   /**
    * Update user profile

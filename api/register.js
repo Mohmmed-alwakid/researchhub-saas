@@ -56,13 +56,33 @@ export default async function handler(req, res) {
         success: false,
         error: authError.message
       });
-    }
-
-    console.log('Step 1 SUCCESS: User created with Supabase Auth');
+    }    console.log('Step 1 SUCCESS: User created with Supabase Auth');
     console.log('User ID:', authData.user?.id);
 
-    // The profile will be automatically created via database trigger
-    console.log('Step 2: Profile automatically created via trigger');
+    // Create user profile in profiles table
+    console.log('Step 2: Creating user profile...');
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .insert([
+        {
+          id: authData.user?.id,
+          email: authData.user?.email,
+          first_name: firstName,
+          last_name: lastName,
+          role: role,
+          status: 'active',
+          is_email_verified: authData.user?.email_confirmed_at ? true : false
+        }
+      ])
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error('Profile creation error:', profileError);
+      // Continue with registration but log the error
+    }
+
+    console.log('Step 2 SUCCESS: Profile created', profile);
 
     res.status(201).json({
       success: true,
