@@ -14,36 +14,51 @@ export default async function handler(req, res) {
     return;  }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
-
   try {
     if (req.method === 'GET') {
-      // Return sample studies data for now
-      const studies = [
-        {
-          id: '1',
-          title: 'Website Navigation Study',
-          status: 'active',
-          participants: 15,
-          completionRate: 87,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '2', 
-          title: 'Mobile App Usability Test',
-          status: 'draft',
-          participants: 0,
-          completionRate: 0,
-          createdAt: new Date().toISOString()
-        }
-      ];
+      // Fetch studies from Supabase
+      const { data: studies, error } = await supabase
+        .from('studies')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching studies:', error);
+        // Return sample data if no studies table exists yet
+        const sampleStudies = [
+          {
+            id: '1',
+            title: 'Website Navigation Study',
+            status: 'active',
+            participants: 15,
+            completionRate: 87,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: '2', 
+            title: 'Mobile App Usability Test',
+            status: 'draft',
+            participants: 0,
+            completionRate: 0,
+            createdAt: new Date().toISOString()
+          }
+        ];
+
+        res.status(200).json({
+          success: true,
+          studies: sampleStudies,
+          total: sampleStudies.length,
+          message: 'Sample studies retrieved (studies table not yet created)'
+        });
+        return;
+      }
 
       res.status(200).json({
         success: true,
-        studies,
-        total: studies.length,
+        studies: studies || [],
+        total: studies?.length || 0,
         message: 'Studies retrieved successfully'
-      });
-    } else if (req.method === 'POST') {
+      });    } else if (req.method === 'POST') {
       // Handle study creation
       const { title, description, type } = req.body;
 
@@ -52,18 +67,29 @@ export default async function handler(req, res) {
           success: false,
           error: 'Title is required'
         });
-      }
+      }      // Insert study into Supabase
+      const { data: newStudy, error } = await supabase
+        .from('studies')
+        .insert([
+          {
+            title,
+            description: description || '',
+            settings: { type: type || 'usability' },
+            status: 'draft',
+            target_participants: 10,
+            researcher_id: null // For now, we'll set this to null since auth isn't fully integrated
+          }
+        ])
+        .select()
+        .single();
 
-      const newStudy = {
-        id: Date.now().toString(),
-        title,
-        description: description || '',
-        type: type || 'usability',
-        status: 'draft',
-        participants: 0,
-        completionRate: 0,
-        createdAt: new Date().toISOString()
-      };
+      if (error) {
+        console.error('Error creating study:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to create study'
+        });
+      }
 
       res.status(201).json({
         success: true,
