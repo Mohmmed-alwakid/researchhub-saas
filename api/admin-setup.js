@@ -15,9 +15,9 @@ const TEST_ACCOUNTS = {
     email: 'abwanwr77+Researcher@gmail.com', 
     password: 'Testtest123',
     role: 'researcher'
-  },
-  admin: {
-    email: 'abwanwr+admin@gmail.com',
+  },  admin: {
+    email: 'abwanwr77+admin@gmail.com',
+    password: 'Testtest123',
     role: 'admin'
   }
 };
@@ -70,8 +70,7 @@ export default async function handler(req, res) {
     }
 
     const { action, email } = req.body;
-    
-    if (action === 'setup_admin') {
+      if (action === 'setup_admin') {
       const adminEmail = email || TEST_ACCOUNTS.admin.email;
       
       console.log('Setting up admin account for:', adminEmail);
@@ -172,9 +171,7 @@ export default async function handler(req, res) {
         }
       } catch (e) {
         results.push({ type: 'researcher', status: 'error', email: TEST_ACCOUNTS.researcher.email, error: 'Already exists or other error' });
-      }
-
-      return res.status(200).json({
+      }      return res.status(200).json({
         success: true,
         message: 'Test account creation attempted',
         results: results,
@@ -182,9 +179,51 @@ export default async function handler(req, res) {
       });
     }
 
+    if (action === 'create_admin_account') {
+      // Create the admin account with authentication
+      try {
+        const { data: adminAuth, error: adminError } = await supabase.auth.signUp({
+          email: TEST_ACCOUNTS.admin.email,
+          password: TEST_ACCOUNTS.admin.password,
+          options: {
+            data: {
+              first_name: 'Admin',
+              last_name: 'User',
+              role: 'admin'
+            }
+          }
+        });
+
+        if (adminError) {
+          return res.status(400).json({
+            success: false,
+            error: 'Failed to create admin account',
+            details: adminError.message
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Admin account created successfully',
+          admin: {
+            email: TEST_ACCOUNTS.admin.email,
+            role: 'admin',
+            status: 'created',
+            note: 'Password: Testtest123'
+          }
+        });
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          error: 'Admin account creation failed',
+          details: e.message
+        });
+      }
+    }
+
     return res.status(400).json({
       success: false,
-      error: 'Invalid action. Use: setup_admin or create_test_accounts'
+      error: 'Invalid action. Use: setup_admin, create_test_accounts, or create_admin_account'
     });
 
   } catch (error) {

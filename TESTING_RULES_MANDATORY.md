@@ -27,7 +27,8 @@ Status:   MUST be confirmed/active in Supabase
 
 #### **3. Admin Account** ⚡
 ```
-Email:    abwanwr+admin@gmail.com
+Email:    abwanwr77+admin@gmail.com
+Password: Testtest123
 Role:     admin
 Setup:    MUST be set as admin via admin-setup endpoint
 Status:   REQUIRED for admin testing

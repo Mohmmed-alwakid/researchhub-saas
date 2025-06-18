@@ -38,7 +38,7 @@
 
 1. **Participant**: `abwanwr77+participant@gmail.com` / `Testtest123` ✅
 2. **Researcher**: `abwanwr77+Researcher@gmail.com` / `Testtest123` ✅  
-3. **Admin**: `abwanwr+admin@gmail.com` (requires setup) ⏳
+3. **Admin**: `abwanwr77+admin@gmail.com` / `Testtest123` ⏳
 
 ### **❌ RULES ENFORCED**
 - No new test accounts allowed
