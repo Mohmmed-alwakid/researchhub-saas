@@ -1,19 +1,20 @@
 # 🧪 RESEARCHHUB TESTING RULES & TEST ACCOUNTS
 
 **Date**: June 18, 2025  
-**Status**: 📋 **MANDATORY TESTING GUIDELINES**
+**Status**: 📋 **MANDATORY TESTING GUIDELINES - FOLLOW EVERY TIME**
 
-## 🚨 **TESTING RULES - FOLLOW EVERY TIME**
+## 🚨 **CRITICAL TESTING RULES**
 
-### **✅ MANDATORY TEST ACCOUNTS**
+### **✅ MANDATORY TEST ACCOUNTS - ONLY USE THESE**
 
-**Use ONLY these accounts for testing - DO NOT create new accounts:**
+**⚠️ NEVER CREATE NEW ACCOUNTS - USE ONLY THESE THREE:**
 
 #### **1. Participant Account** 👤
 ```
 Email:    abwanwr77+participant@gmail.com
 Password: Testtest123
 Role:     participant
+Status:   Must be confirmed in Supabase
 ```
 
 #### **2. Researcher Account** 🔬
@@ -21,14 +22,24 @@ Role:     participant
 Email:    abwanwr77+Researcher@gmail.com  
 Password: Testtest123
 Role:     researcher
+Status:   Must be confirmed in Supabase
 ```
 
 #### **3. Admin Account** ⚡
 ```
 Email:    abwanwr+admin@gmail.com
 Role:     admin
-Setup:    Via admin-setup endpoint or Supabase dashboard
+Setup:    Must be set as admin via Supabase dashboard
+Status:   Special admin privileges required
 ```
+
+## 🔧 **ACCOUNT SETUP REQUIREMENTS**
+
+### **Before Testing - Verify:**
+1. **All accounts exist in Supabase Auth**
+2. **All accounts are email confirmed** 
+3. **Admin account has admin role in profiles table**
+4. **Passwords are exactly: Testtest123**
 
 ## 🔧 **TESTING PROCEDURES**
 

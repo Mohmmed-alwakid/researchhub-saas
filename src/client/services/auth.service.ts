@@ -104,50 +104,48 @@ export const authService = {  /**
    * Login user with Supabase
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('login', credentials);
+    return apiService.post<AuthResponse>('auth?action=login', credentials);
   },
 
   /**
    * Register new user with Supabase
    */
   async register(userData: RegisterRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('register', userData);
+    return apiService.post<AuthResponse>('auth?action=register', userData);
   },
 
   /**
    * Get current user status
    */
-  async getCurrentUser(): Promise<AuthResponse> {
-    return apiService.get<AuthResponse>('status');
+  async getCurrentUser(): Promise<AuthResponse> {    return apiService.get<AuthResponse>('auth?action=status');
   },
   /**
    * Refresh access token
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-    return apiService.post<RefreshTokenResponse>('refresh', { refreshToken });
+    return apiService.post<RefreshTokenResponse>('auth?action=refresh', { refreshToken });
   },
 
   /**
    * Logout user
    */
   async logout(): Promise<{ success: boolean; message: string }> {
-    return apiService.post('logout');
+    return apiService.post('auth?action=logout');
   },/**
    * Get current user profile
    */
   async getProfile(): Promise<{ success: boolean; user: SupabaseUser }> {
-    return apiService.get('status');
+    return apiService.get('auth?action=status');
   },  /**
    * Update user profile
    */
   async updateProfile(data: ProfileUpdateRequest): Promise<{ success: boolean; user: SupabaseUser; message: string }> {
     return apiService.put('profile', data);
-  },
-  /**
+  },  /**
    * Change password
    */
   async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    return apiService.post('change-password', {
+    return apiService.post('password?action=change', {
       currentPassword,
       newPassword,
     });
@@ -157,14 +155,14 @@ export const authService = {  /**
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
-    return apiService.post('forgot-password', { email });
+    return apiService.post('password?action=forgot', { email });
   },
 
   /**
    * Reset password with tokens
    */
   async resetPassword(accessToken: string, refreshToken: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    return apiService.post('reset-password', { 
+    return apiService.post('password?action=reset', { 
       accessToken, 
       refreshToken, 
       newPassword 
