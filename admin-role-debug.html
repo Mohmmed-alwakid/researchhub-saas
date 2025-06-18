@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Role Debug - ResearchHub</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #fafafa; }
+        .critical { background: #ffe8e8; border-color: #f44336; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; margin: 5px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        button.danger { background: #dc3545; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Admin Role Debug - ResearchHub</h1>
+        
+        <div class="test-section critical">
+            <h2>🚨 ADMIN ROLE ISSUE</h2>
+            <p><strong>Problem:</strong> abwanwr77+admin@gmail.com is showing as researcher instead of admin</p>
+            <p><strong>Solution:</strong> Force set admin role in database</p>
+        </div>
+
+        <div class="test-section">
+            <h3>1. Test Current Admin Login</h3>
+            <button onclick="testAdminLogin()">Test Admin Login (Check Current Role)</button>
+            <div id="loginResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Force Admin Role Fix</h3>
+            <button onclick="forceAdminRole()" class="danger">Force Set Admin Role</button>
+            <div id="forceResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Verify Admin Role After Fix</h3>
+            <button onclick="testAdminLoginAfterFix()">Test Admin Login (After Fix)</button>
+            <div id="verifyResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Debug Info</h3>
+            <button onclick="getDebugInfo()">Get Debug Information</button>
+            <div id="debugResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://researchhub-saas.vercel.app/api';
+        const ADMIN_EMAIL = 'abwanwr77+admin@gmail.com';
+        const ADMIN_PASSWORD = 'Testtest123';
+
+        async function testAdminLogin() {
+            try {
+                showResult('loginResult', 'Testing admin login...', 'info');
+
+                const response = await fetch(`${BASE_URL}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: ADMIN_EMAIL,
+                        password: ADMIN_PASSWORD
+                    }),
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('loginResult', 
+                        `✅ LOGIN SUCCESS\n` +
+                        `Email: ${result.user.email}\n` +
+                        `Current Role: ${result.user.role}\n` +
+                        `Expected Role: admin\n` +
+                        `Role Status: ${result.user.role === 'admin' ? '✅ CORRECT' : '❌ WRONG'}\n` +
+                        `Name: ${result.user.firstName} ${result.user.lastName}`, 
+                        result.user.role === 'admin' ? 'success' : 'error'
+                    );
+                } else {
+                    showResult('loginResult', 
+                        `❌ LOGIN FAILED\n` +
+                        `Error: ${result.error || result.message}`, 
+                        'error'
+                    );
+                }
+
+            } catch (error) {
+                showResult('loginResult', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function forceAdminRole() {
+            try {
+                showResult('forceResult', 'Forcing admin role...', 'info');
+
+                const response = await fetch(`${BASE_URL}/admin-setup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'force_admin_role',
+                        email: ADMIN_EMAIL
+                    }),
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('forceResult', 
+                        `✅ ADMIN ROLE FORCED\n` +
+                        `Email: ${result.admin.email}\n` +
+                        `Role: ${result.admin.role}\n` +
+                        `Method: ${result.admin.method}\n` +
+                        `Message: ${result.message}`, 
+                        'success'
+                    );
+                } else {
+                    showResult('forceResult', 
+                        `❌ FORCE FAILED\n` +
+                        `Error: ${result.error}\n` +
+                        `Details: ${result.details || 'N/A'}\n` +
+                        `Note: ${result.note || 'N/A'}`, 
+                        'error'
+                    );
+                }
+
+            } catch (error) {
+                showResult('forceResult', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAdminLoginAfterFix() {
+            try {
+                showResult('verifyResult', 'Verifying admin role after fix...', 'info');
+
+                const response = await fetch(`${BASE_URL}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: ADMIN_EMAIL,
+                        password: ADMIN_PASSWORD
+                    }),
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const isCorrect = result.user.role === 'admin';
+                    showResult('verifyResult', 
+                        `${isCorrect ? '✅' : '❌'} VERIFICATION RESULT\n` +
+                        `Email: ${result.user.email}\n` +
+                        `Role: ${result.user.role}\n` +
+                        `Expected: admin\n` +
+                        `Status: ${isCorrect ? 'FIXED! ✅' : 'STILL BROKEN ❌'}\n` +
+                        `Dashboard Access: ${isCorrect ? 'Admin Dashboard' : 'Wrong Dashboard'}`, 
+                        isCorrect ? 'success' : 'error'
+                    );
+                } else {
+                    showResult('verifyResult', 
+                        `❌ VERIFICATION FAILED\n` +
+                        `Error: ${result.error || result.message}`, 
+                        'error'
+                    );
+                }
+
+            } catch (error) {
+                showResult('verifyResult', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function getDebugInfo() {
+            try {
+                showResult('debugResult', 'Getting debug information...', 'info');
+
+                // Test health
+                const healthResponse = await fetch(`${BASE_URL}/health`);
+                const health = await healthResponse.json();
+
+                // Test admin setup info
+                const adminResponse = await fetch(`${BASE_URL}/admin-setup`, {
+                    method: 'GET'
+                });
+                const adminInfo = await adminResponse.json();
+
+                showResult('debugResult', 
+                    `🔍 DEBUG INFORMATION\n\n` +
+                    `API Health: ${health.success ? '✅ OK' : '❌ FAILED'}\n` +
+                    `Timestamp: ${health.timestamp}\n\n` +
+                    `Admin Setup Available: ${adminInfo.success ? '✅ YES' : '❌ NO'}\n` +
+                    `Expected Admin Email: ${ADMIN_EMAIL}\n` +
+                    `Expected Role: admin\n\n` +
+                    `Next Steps:\n` +
+                    `1. Run 'Force Set Admin Role'\n` +
+                    `2. Test login again\n` +
+                    `3. Should redirect to admin dashboard`, 
+                    'info'
+                );
+
+            } catch (error) {
+                showResult('debugResult', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+
+        // Auto-run initial test
+        window.onload = function() {
+            showResult('debugResult', 'Click "Test Admin Login" to check current role status', 'info');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Full-Stack Development Test - ResearchHub</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: rgba(255,255,255,0.1); 
+            backdrop-filter: blur(10px);
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .status-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .status-card.success { border-color: #4caf50; background: rgba(76,175,80,0.2); }
+        .status-card.error { border-color: #f44336; background: rgba(244,67,54,0.2); }
+        .status-card.info { border-color: #2196f3; background: rgba(33,150,243,0.2); }
+        
+        button { 
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            margin: 8px; 
+            border-radius: 25px; 
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        button.primary { background: linear-gradient(45deg, #4caf50, #45a049); }
+        button.danger { background: linear-gradient(45deg, #f44336, #d32f2f); }
+        button.warning { background: linear-gradient(45deg, #ff9800, #f57c00); }
+        
+        .result { 
+            margin: 15px 0; 
+            padding: 15px; 
+            border-radius: 10px; 
+            font-family: 'Consolas', monospace; 
+            font-size: 13px; 
+            white-space: pre-wrap;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .result.success { border-color: #4caf50; background: rgba(76,175,80,0.1); }
+        .result.error { border-color: #f44336; background: rgba(244,67,54,0.1); }
+        
+        .highlight { 
+            background: rgba(255,255,0,0.3); 
+            padding: 4px 8px; 
+            border-radius: 5px; 
+            font-weight: bold; 
+        }
+        .endpoint { 
+            font-family: 'Consolas', monospace; 
+            background: rgba(0,0,0,0.3); 
+            padding: 4px 8px; 
+            border-radius: 5px; 
+            color: #4fc3f7; 
+        }
+        .url-link {
+            color: #81c784;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .url-link:hover {
+            text-decoration: underline;
+        }
+        h1, h2, h3 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .success-icon { color: #4caf50; }
+        .error-icon { color: #f44336; }
+        .info-icon { color: #2196f3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Local Full-Stack Development Environment Test</h1>
+        
+        <div class="status-grid">
+            <div class="status-card info">
+                <h3>🎯 Environment Status</h3>
+                <p><strong>Frontend:</strong> <a href="http://localhost:5175" target="_blank" class="url-link">http://localhost:5175</a></p>
+                <p><strong>Backend API:</strong> <a href="http://localhost:3003" target="_blank" class="url-link">http://localhost:3003</a></p>
+                <p><strong>Database:</strong> <span class="highlight">Real Supabase Production DB</span></p>
+                <p><strong>Hot Reload:</strong> ✅ Enabled for both FE & BE</p>
+            </div>
+            
+            <div class="status-card success">
+                <h3>🔥 Development Benefits</h3>
+                <p>✅ <strong>Instant Testing</strong> - No deployment needed</p>
+                <p>✅ <strong>Real Data</strong> - Production Supabase database</p>
+                <p>✅ <strong>Fast Iteration</strong> - Hot reload on both ends</p>
+                <p>✅ <strong>Full Stack</strong> - Frontend + Backend + Database</p>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <h3>🧪 Quick Backend API Tests</h3>
+            <button onclick="testHealth()" class="primary">Test API Health</button>
+            <button onclick="testDBConnection()" class="primary">Test Database Connection</button>
+            <button onclick="testLogin()" class="warning">Test Login Flow</button>
+            <button onclick="testAllEndpoints()" class="info">Test All Endpoints</button>
+            <div id="apiResults" class="result"></div>
+        </div>
+
+        <div class="status-card">
+            <h3>📱 Frontend Application Tests</h3>
+            <button onclick="openFrontend()" class="primary">Open React App</button>
+            <button onclick="openLogin()" class="warning">Open Login Page</button>
+            <button onclick="openRegister()" class="warning">Open Register Page</button>
+            <button onclick="openDashboard()" class="info">Open Dashboard</button>
+            <div id="frontendResults" class="result"></div>
+        </div>
+
+        <div class="status-card">
+            <h3>🔐 Test Account Quick Login</h3>
+            <button onclick="loginAs('participant')" class="primary">Login as Participant</button>
+            <button onclick="loginAs('researcher')" class="warning">Login as Researcher</button>
+            <button onclick="loginAs('admin')" class="danger">Login as Admin</button>
+            <div id="loginResults" class="result"></div>
+        </div>
+
+        <div class="status-card">
+            <h3>⚡ Development Commands</h3>
+            <p><strong>Start Full-Stack:</strong> <span class="endpoint">npm run dev:fullstack</span></p>
+            <p><strong>Frontend Only:</strong> <span class="endpoint">npm run dev:client</span></p>
+            <p><strong>Backend Only:</strong> <span class="endpoint">npm run dev:local</span></p>
+            <p><strong>Stop All:</strong> <span class="endpoint">Ctrl+C</span> in terminal</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003';
+        const FRONTEND_BASE = 'http://localhost:5175';
+
+        const TEST_ACCOUNTS = {
+            participant: { email: 'abwanwr77+participant@gmail.com', password: 'Testtest123' },
+            researcher: { email: 'abwanwr77+Researcher@gmail.com', password: 'Testtest123' },
+            admin: { email: 'abwanwr77+admin@gmail.com', password: 'Testtest123' }
+        };
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            element.innerHTML = `${icon} [${timestamp}] ${message}`;
+            element.className = `result ${type}`;
+        }
+
+        async function testHealth() {
+            try {
+                log('apiResults', 'Testing API health...', 'info');
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('apiResults', `API Health: ✅ ${data.message}\\nVersion: ${data.version}\\nStatus: ${data.status}`, 'success');
+                } else {
+                    log('apiResults', `API Health Failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('apiResults', `API Health Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDBConnection() {
+            try {
+                log('apiResults', 'Testing database connection...', 'info');
+                const response = await fetch(`${API_BASE}/api/db-check`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('apiResults', `Database: ✅ Connected to Supabase\\nMessage: ${data.message}\\nTimestamp: ${data.timestamp}`, 'success');
+                } else {
+                    log('apiResults', `Database Failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('apiResults', `Database Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            try {
+                log('apiResults', 'Testing login endpoint...', 'info');
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(TEST_ACCOUNTS.participant)
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('apiResults', `Login Test: ✅ Success\\nUser: ${data.user.email}\\nRole: ${data.user.role}\\nToken: ${data.session.accessToken.substring(0, 20)}...`, 'success');
+                } else {
+                    log('apiResults', `Login Test Failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('apiResults', `Login Test Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAllEndpoints() {
+            log('apiResults', 'Testing all API endpoints...', 'info');
+            
+            const endpoints = [
+                { url: `${API_BASE}/api/health`, method: 'GET', name: 'Health Check' },
+                { url: `${API_BASE}/api/db-check`, method: 'GET', name: 'Database Check' },
+                { url: `${API_BASE}/api/studies`, method: 'GET', name: 'Studies (requires auth)', headers: { 'Authorization': 'Bearer fake-token' } }
+            ];
+
+            let results = '';
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: endpoint.method,
+                        headers: endpoint.headers || {}
+                    });
+                    const status = response.status;
+                    results += `\\n${endpoint.name}: ${status === 200 ? '✅' : status === 401 ? '🔒' : '❌'} ${status}`;
+                } catch (error) {
+                    results += `\\n${endpoint.name}: ❌ Error`;
+                }
+            }
+            
+            log('apiResults', `Endpoint Tests Completed:${results}`, 'success');
+        }
+
+        async function loginAs(accountType) {
+            try {
+                const account = TEST_ACCOUNTS[accountType];
+                log('loginResults', `Logging in as ${accountType}...`, 'info');
+                
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(account)
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Store token for future requests
+                    localStorage.setItem('accessToken', data.session.accessToken);
+                    log('loginResults', `✅ Logged in as ${accountType.toUpperCase()}\\nEmail: ${data.user.email}\\nRole: ${data.user.role}\\nName: ${data.user.firstName} ${data.user.lastName}\\n\\n🎯 Token saved to localStorage for frontend use!`, 'success');
+                } else {
+                    log('loginResults', `❌ Login failed for ${accountType}: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('loginResults', `❌ Login error for ${accountType}: ${error.message}`, 'error');
+            }
+        }
+
+        function openFrontend() {
+            window.open(FRONTEND_BASE, '_blank');
+            log('frontendResults', `🚀 Opening React app at ${FRONTEND_BASE}`, 'success');
+        }
+
+        function openLogin() {
+            window.open(`${FRONTEND_BASE}/login`, '_blank');
+            log('frontendResults', `🔐 Opening login page at ${FRONTEND_BASE}/login`, 'success');
+        }
+
+        function openRegister() {
+            window.open(`${FRONTEND_BASE}/register`, '_blank');
+            log('frontendResults', `📝 Opening register page at ${FRONTEND_BASE}/register`, 'success');
+        }
+
+        function openDashboard() {
+            window.open(`${FRONTEND_BASE}/dashboard`, '_blank');
+            log('frontendResults', `📊 Opening dashboard at ${FRONTEND_BASE}/dashboard`, 'success');
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            setTimeout(testHealth, 500);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Admin Role Fix - ResearchHub</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #fafafa; }
+        .critical { background: #ffe8e8; border-color: #f44336; }
+        .success { background: #e8f5e8; border-color: #4caf50; }
+        .info { background: #e3f2fd; border-color: #2196f3; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; margin: 5px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        button.danger { background: #dc3545; }
+        button.success { background: #28a745; }
+        button.admin { background: #6f42c1; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+        .result.success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .result.error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .result.info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .highlight { background: yellow; padding: 2px 4px; border-radius: 3px; font-weight: bold; }
+        .endpoint-url { font-family: monospace; background: #f8f9fa; padding: 2px 4px; border-radius: 3px; color: #e83e8c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Local Admin Role Fix - Real Supabase Testing</h1>
+        
+        <div class="test-section info">
+            <h2>🚀 Local Development Environment</h2>
+            <p><strong>✅ Connected to REAL Supabase database</strong></p>
+            <p><strong>✅ No deployment needed - instant testing!</strong></p>
+            <p>Local server: <span class="endpoint-url">http://localhost:3001</span></p>
+            <button onclick="checkHealth()" class="success">Check Local Server Health</button>
+            <div id="healthResult" class="result"></div>
+        </div>
+
+        <div class="test-section critical">
+            <h2>🚨 ADMIN ROLE ISSUE</h2>
+            <p><strong>Problem:</strong> Admin account shows as "researcher" instead of "admin"</p>
+            <p><strong>Account:</strong> <span class="highlight">abwanwr77+admin@gmail.com</span></p>
+            <p><strong>Expected Role:</strong> admin</p>
+            <p><strong>Current Role:</strong> researcher (WRONG!)</p>
+        </div>
+
+        <!-- Profile Check -->
+        <div class="test-section">
+            <h3>👁️ Check Current Profile Status</h3>
+            <button onclick="checkProfiles()" class="success">Check All Account Profiles</button>
+            <div id="profileResult" class="result"></div>
+        </div>
+
+        <!-- Admin Role Fix -->
+        <div class="test-section">
+            <h3>⚡ Force Admin Role Fix</h3>
+            <p><strong>This will directly update the admin profile in the database</strong></p>
+            <button onclick="forceAdminRole()" class="admin">FORCE ADMIN ROLE</button>
+            <div id="adminResult" class="result"></div>
+        </div>
+
+        <!-- Login Test -->
+        <div class="test-section">
+            <h3>🔐 Test Admin Login</h3>
+            <button onclick="testAdminLogin()" class="danger">Test Admin Login (Check Role)</button>
+            <div id="loginResult" class="result"></div>
+        </div>
+
+        <!-- All Account Tests -->
+        <div class="test-section">
+            <h3>📋 Test All Accounts</h3>
+            <button onclick="testAccount('participant')" class="success">Test Participant</button>
+            <button onclick="testAccount('researcher')" class="success">Test Researcher</button>
+            <button onclick="testAccount('admin')" class="admin">Test Admin</button>
+            <div id="allAccountsResult" class="result"></div>
+        </div>
+
+        <!-- Live Results -->
+        <div class="test-section">
+            <h3>📊 Live Testing Results</h3>
+            <div id="liveResults" class="result info">Ready for testing...</div>
+        </div>
+    </div>
+
+    <script>
+        const LOCAL_API = 'http://localhost:3001/api';
+        
+        const TEST_ACCOUNTS = {
+            participant: {
+                email: 'abwanwr77+participant@gmail.com',
+                password: 'Testtest123',
+                expectedRole: 'participant'
+            },
+            researcher: {
+                email: 'abwanwr77+Researcher@gmail.com',
+                password: 'Testtest123',
+                expectedRole: 'researcher'
+            },
+            admin: {
+                email: 'abwanwr77+admin@gmail.com',
+                password: 'Testtest123',
+                expectedRole: 'admin'
+            }
+        };
+
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${LOCAL_API}/health`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('healthResult', 
+                        `✅ Local server is running!\n` +
+                        `Status: ${result.status}\n` +
+                        `Message: ${result.message}\n` +
+                        `Time: ${result.timestamp}`, 
+                        'success'
+                    );
+                } else {
+                    showResult('healthResult', `❌ Health check failed`, 'error');
+                }
+            } catch (error) {
+                showResult('healthResult', 
+                    `❌ Cannot connect to local server!\n` +
+                    `Error: ${error.message}\n\n` +
+                    `Make sure to run: node local-dev-server.js`, 
+                    'error'
+                );
+            }
+        }
+
+        async function checkProfiles() {
+            try {
+                showResult('profileResult', 'Checking all account profiles...', 'info');
+
+                const response = await fetch(`${LOCAL_API}/admin-setup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'check_profiles' })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    let resultText = '📋 PROFILE CHECK RESULTS:\n\n';
+                    result.results.forEach(r => {
+                        resultText += `${r.account.toUpperCase()}:\n`;
+                        resultText += `  Email: ${r.email}\n`;
+                        resultText += `  Expected Role: ${r.expectedRole}\n`;
+                        resultText += `  Actual Role: ${r.actualRole}\n`;
+                        resultText += `  Profile Exists: ${r.profileExists}\n`;
+                        resultText += `  Status: ${r.actualRole === r.expectedRole ? '✅ CORRECT' : '❌ WRONG'}\n\n`;
+                    });
+                    
+                    showResult('profileResult', resultText, 'info');
+                } else {
+                    showResult('profileResult', `❌ Profile check failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('profileResult', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function forceAdminRole() {
+            try {
+                showResult('adminResult', 'Forcing admin role update...', 'info');
+
+                const response = await fetch(`${LOCAL_API}/admin-setup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'force_admin_role' })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('adminResult', 
+                        `✅ ADMIN ROLE FORCED SUCCESSFULLY!\n\n` +
+                        `Message: ${result.message}\n` +
+                        `Profile Updated: ${JSON.stringify(result.profile, null, 2)}`, 
+                        'success'
+                    );
+                } else {
+                    showResult('adminResult', 
+                        `❌ Admin role update failed\n` +
+                        `Error: ${result.error}\n` +
+                        `Details: ${result.details || 'N/A'}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('adminResult', `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAdminLogin() {
+            await testAccount('admin', 'loginResult');
+        }
+
+        async function testAccount(accountType, customResultId = null) {
+            const account = TEST_ACCOUNTS[accountType];
+            const resultId = customResultId || 'allAccountsResult';
+
+            try {
+                showResult(resultId, `Testing ${accountType} login...`, 'info');
+
+                const response = await fetch(`${LOCAL_API}/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: account.email,
+                        password: account.password
+                    }),
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const roleCorrect = result.user.role === account.expectedRole;
+                    const statusIcon = roleCorrect ? '✅' : '❌';
+                    
+                    showResult(resultId, 
+                        `${statusIcon} ${accountType.toUpperCase()} LOGIN RESULT:\n\n` +
+                        `Email: ${result.user.email}\n` +
+                        `Expected Role: ${account.expectedRole}\n` +
+                        `Actual Role: ${result.user.role}\n` +
+                        `Name: ${result.user.firstName} ${result.user.lastName}\n` +
+                        `Status: ${roleCorrect ? 'ROLE CORRECT ✅' : 'ROLE WRONG ❌'}\n` +
+                        `Token: ${result.session ? 'Received' : 'None'}`, 
+                        roleCorrect ? 'success' : 'error'
+                    );
+
+                    // Update live results
+                    updateLiveResults(accountType, roleCorrect, result.user.role, account.expectedRole);
+                } else {
+                    showResult(resultId, 
+                        `❌ ${accountType} login failed\n` +
+                        `Error: ${result.error}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult(resultId, `❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        function updateLiveResults(accountType, roleCorrect, actualRole, expectedRole) {
+            const timestamp = new Date().toLocaleTimeString();
+            const status = roleCorrect ? '✅ CORRECT' : '❌ WRONG';
+            
+            const currentText = document.getElementById('liveResults').textContent;
+            const newLine = `[${timestamp}] ${accountType}: ${actualRole} (expected: ${expectedRole}) - ${status}`;
+            
+            if (currentText === 'Ready for testing...') {
+                showResult('liveResults', newLine, 'info');
+            } else {
+                showResult('liveResults', currentText + '\n' + newLine, 'info');
+            }
+        }
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+
+        // Auto-check health on load
+        window.addEventListener('load', () => {
+            setTimeout(checkHealth, 500);
+        });
+    </script>
+</body>
+</html>

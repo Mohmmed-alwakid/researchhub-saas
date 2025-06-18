@@ -12,6 +12,8 @@
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:api\"",
     "dev:client": "vite",
     "dev:server": "nodemon src/server/index.ts",
+    "dev:local": "node local-dev-server.js",
+    "dev:fullstack": "node local-full-dev.js",
     "build": "npm run build:client",
     "build:client": "vite build",
     "build:server": "tsc -p tsconfig.server.json && node generate-server-package.cjs",

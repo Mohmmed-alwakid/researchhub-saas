@@ -273,11 +273,104 @@ export default async function handler(req, res) {
         results: results,
         note: 'Profiles will be created/updated on next login with correct roles'
       });
+    }    if (action === 'force_admin_role') {
+      // Force set admin role for specific email
+      const adminEmail = email || TEST_ACCOUNTS.admin.email;
+      
+      try {
+        console.log('Force setting admin role for:', adminEmail);
+        
+        // First try to update existing profile
+        const { data: updateResult, error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            role: 'admin',
+            updated_at: new Date().toISOString()
+          })
+          .eq('email', adminEmail)
+          .select();
+
+        if (updateError) {
+          console.error('Update error:', updateError);
+          
+          // If update failed, try to find by different method or create new
+          // Get all profiles and find by email manually
+          const { data: allProfiles, error: fetchError } = await supabase
+            .from('profiles')
+            .select('*');
+            
+          if (!fetchError && allProfiles) {
+            const existingProfile = allProfiles.find(p => p.email === adminEmail);
+            
+            if (existingProfile) {
+              // Update by ID
+              const { data: updateById, error: updateByIdError } = await supabase
+                .from('profiles')
+                .update({ 
+                  role: 'admin',
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', existingProfile.id)
+                .select();
+                
+              if (updateByIdError) {
+                return res.status(400).json({
+                  success: false,
+                  error: 'Failed to update admin role by ID',
+                  details: updateByIdError.message
+                });
+              }
+              
+              return res.status(200).json({
+                success: true,
+                message: 'Admin role set successfully (updated by ID)',
+                admin: {
+                  email: adminEmail,
+                  role: 'admin',
+                  method: 'updated_by_id'
+                }
+              });
+            }
+          }
+          
+          return res.status(400).json({
+            success: false,
+            error: 'Failed to update admin role and no profile found',
+            details: updateError.message
+          });
+        }
+
+        if (updateResult && updateResult.length > 0) {
+          return res.status(200).json({
+            success: true,
+            message: 'Admin role set successfully (direct update)',
+            admin: {
+              email: adminEmail,
+              role: 'admin',
+              method: 'direct_update'
+            }
+          });
+        } else {
+          return res.status(404).json({
+            success: false,
+            error: 'Admin profile not found for update',
+            note: 'Please login first to create profile, then try again'
+          });
+        }
+
+      } catch (e) {
+        console.error('Force admin role error:', e);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to force admin role',
+          details: e.message
+        });
+      }
     }
 
     return res.status(400).json({
       success: false,
-      error: 'Invalid action. Use: setup_admin, create_test_accounts, create_admin_account, or fix_roles'
+      error: 'Invalid action. Use: setup_admin, create_test_accounts, create_admin_account, fix_roles, or force_admin_role'
     });
 
   } catch (error) {
