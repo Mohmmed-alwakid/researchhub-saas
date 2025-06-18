@@ -143,12 +143,11 @@ export const authService = {  /**
   async updateProfile(data: ProfileUpdateRequest): Promise<{ success: boolean; user: SupabaseUser; message: string }> {
     return apiService.put('profile', data);
   },
-
   /**
    * Change password
    */
   async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    return apiService.put('auth/change-password', {
+    return apiService.post('change-password', {
       currentPassword,
       newPassword,
     });
@@ -158,14 +157,18 @@ export const authService = {  /**
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
-    return apiService.post('auth/forgot-password', { email });
+    return apiService.post('forgot-password', { email });
   },
 
   /**
-   * Reset password with token
+   * Reset password with tokens
    */
-  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    return apiService.post('auth/reset-password', { token, newPassword });
+  async resetPassword(accessToken: string, refreshToken: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    return apiService.post('reset-password', { 
+      accessToken, 
+      refreshToken, 
+      newPassword 
+    });
   },
 
   /**
