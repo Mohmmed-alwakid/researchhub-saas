@@ -18,6 +18,9 @@ export interface AdminUser {
   isActive: boolean;
   createdAt: string;
   lastLoginAt?: string;
+  subscription?: string;
+  studiesCreated?: number;
+  studiesParticipated?: number;
 }
 
 export interface AdminStudy {
@@ -41,6 +44,39 @@ export interface SystemAnalytics {
   timeframe: string;
 }
 
+export interface FinancialReport {
+  summary: {
+    totalRevenue: number;
+    activeSubscriptions: number;
+    cancelledSubscriptions: number;
+    churnRate: number;
+    mrr: number;
+    totalCustomers: number;
+  };
+  trends: {
+    revenue: Array<{ date: string; revenue: number }>;
+    timeframe: string;
+  };
+  breakdown: {
+    byPlan: Record<string, number>;
+    topCustomers: Array<{
+      name: string;
+      email: string;
+      totalRevenue: number;
+      subscriptionCount: number;
+    }>;
+  };
+  recentSubscriptions: Array<{
+    id: string;
+    customerName: string;
+    customerEmail: string;
+    planType: string;
+    amount: number;
+    status: string;
+    createdAt: string;
+  }>;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
@@ -49,6 +85,15 @@ export interface PaginatedResponse<T> {
     hasNext: boolean;
     hasPrev: boolean;
   };
+}
+
+export interface AdminActivity {
+  id: string;
+  type: 'user_signup' | 'study_created' | 'subscription' | 'session_started' | 'payment' | 'error';
+  description: string;
+  timestamp: string;
+  user: string;
+  metadata?: Record<string, string | number | boolean>;
 }
 
 // Platform Overview
@@ -65,7 +110,7 @@ export const getAllUsers = async (params: {
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
-}): Promise<PaginatedResponse<AdminUser>> => {
+}): Promise<any> => {
   const queryParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
@@ -73,7 +118,7 @@ export const getAllUsers = async (params: {
     }
   });
   
-  return apiService.get<{ data: PaginatedResponse<AdminUser> }>(`/admin/users?${queryParams.toString()}`).then(response => response.data);
+  return apiService.get<any>(`/admin/users?${queryParams.toString()}`);
 };
 
 export const updateUser = async (userId: string, data: {
@@ -82,7 +127,21 @@ export const updateUser = async (userId: string, data: {
   name?: string;
   email?: string;
 }): Promise<AdminUser> => {
-  return apiService.put<{ data: { user: AdminUser } }>(`/admin/users/${userId}`, data).then(response => response.data.user);
+  return apiService.put<{ data: AdminUser }>(`/admin/user-actions?userId=${userId}`, data).then(response => response.data);
+};
+
+export const createUser = async (data: {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  isActive: boolean;
+}): Promise<AdminUser> => {
+  return apiService.post<{ data: AdminUser }>('/admin/user-actions', data).then(response => response.data);
+};
+
+export const deleteUser = async (userId: string): Promise<void> => {
+  return apiService.delete(`/admin/user-actions?userId=${userId}`);
 };
 
 export const bulkUpdateUsers = async (data: {
@@ -122,4 +181,26 @@ export const updateStudyStatus = async (studyId: string, data: {
   reason?: string;
 }): Promise<AdminStudy> => {
   return apiService.put<{ data: { study: AdminStudy } }>(`/admin/studies/${studyId}/status`, data).then(response => response.data.study);
+};
+
+// Recent Activity
+export const getRecentActivity = async (limit: number = 20): Promise<AdminActivity[]> => {
+  return apiService.get<{ data: AdminActivity[] }>(`/admin/activity?limit=${limit}`).then(response => response.data);
+};
+
+// Financial Reporting
+export const getFinancialReport = async (timeframe: '7d' | '30d' | '90d' | '1y' = '30d'): Promise<FinancialReport> => {
+  return apiService.get<{ data: FinancialReport }>(`/admin/financial?timeframe=${timeframe}`).then(response => response.data);
+};
+
+// User Behavior Analytics
+export interface UserBehaviorAnalytics {
+  userEngagement: Array<{ date: string; activeUsers: number; sessionsPerUser: number }>;
+  featureUsage: Record<string, number>;
+  deviceTypes: Record<string, number>;
+  timeframe: string;
+}
+
+export const getUserBehaviorAnalytics = async (timeframe: '7d' | '30d' | '90d' = '30d'): Promise<UserBehaviorAnalytics> => {
+  return apiService.get<{ data: UserBehaviorAnalytics }>(`/admin/user-behavior?timeframe=${timeframe}`).then(response => response.data);
 };

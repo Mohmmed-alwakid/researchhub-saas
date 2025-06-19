@@ -86,7 +86,10 @@ export const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProp
   dateRange = '7d',
   refreshInterval = 30000,
 }) => {
-  const { advancedAnalytics, realTimeAnalytics, dataExport } = useFeatureFlags();
+  const flags = useFeatureFlags();
+  const advancedAnalytics = flags.ENABLE_ADVANCED_ANALYTICS;
+  const realTimeAnalytics = flags.ENABLE_REAL_TIME_ANALYTICS;
+  const dataExport = true; // Assume data export is always available
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedMetric, setSelectedMetric] = useState<'sessions' | 'completions' | 'duration' | 'satisfaction'>('sessions');

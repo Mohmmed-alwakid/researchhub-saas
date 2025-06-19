@@ -1,0 +1,92 @@
+// Supabase token refresh endpoint (ES modules)
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({
+      success: false,
+      error: 'Method not allowed'
+    });
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  try {
+    console.log('=== SUPABASE TOKEN REFRESH ===');
+    
+    const { refreshToken } = req.body;
+    
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        error: 'Refresh token is required'
+      });
+    }
+
+    console.log('Refreshing session with Supabase...');
+    
+    // Refresh session with Supabase
+    const { data, error } = await supabase.auth.refreshSession({
+      refresh_token: refreshToken
+    });
+
+    if (error) {
+      console.error('Supabase refresh error:', error);
+      return res.status(401).json({
+        success: false,
+        error: error.message
+      });
+    }
+
+    console.log('Token refresh successful');
+
+    // Get user profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', data.user?.id)
+      .single();
+
+    res.status(200).json({
+      success: true,
+      message: 'Token refreshed successfully',
+      user: {
+        id: data.user?.id,
+        email: data.user?.email,
+        firstName: profile?.first_name || '',
+        lastName: profile?.last_name || '',
+        role: profile?.role || 'researcher',
+        status: profile?.status || 'active',
+        emailVerified: !!data.user?.email_confirmed_at
+      },
+      session: data.session,
+      supabase: true
+    });
+
+  } catch (error) {
+    console.error('=== SUPABASE REFRESH ERROR ===');
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
+    
+    res.status(500).json({
+      success: false,
+      error: 'Token refresh failed',
+      message: error.message
+    });
+  }
+}

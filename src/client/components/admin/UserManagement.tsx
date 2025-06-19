@@ -11,7 +11,7 @@ import {
   Activity,
   Users
 } from 'lucide-react';
-import { getAllUsers, type AdminUser } from '../../services/admin.service';
+import { getAllUsers, updateUser, createUser, deleteUser, bulkUpdateUsers } from '../../services/admin.service';
 
 interface User {
   _id: string;
@@ -23,6 +23,26 @@ interface User {
   lastLoginAt?: string;
   // Additional computed fields
   subscription?: string;
+  studiesCreated?: number;
+  studiesParticipated?: number;
+}
+
+interface ApiUser {
+  _id?: string;
+  id?: string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  role: string;
+  isActive?: boolean;
+  status?: string;
+  createdAt?: string;
+  created_at?: string;
+  lastLoginAt?: string;
+  last_login_at?: string;
+  subscription?: string;
+  subscription_tier?: string;
   studiesCreated?: number;
   studiesParticipated?: number;
 }
@@ -49,30 +69,40 @@ const UserManagement: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
-  const fetchUsers = async () => {
+  }, []);  const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await getAllUsers({
         page: 1,
         limit: 100, // Get more users for admin view
-        sortBy: 'createdAt',
+        sortBy: 'created_at',
         sortOrder: 'desc'
       });
-        // Map the API response to match our component interface
-      const mappedUsers: User[] = response.data.map((user: AdminUser) => ({
-        _id: user._id,
-        name: user.name,
+      
+      console.log('API Response:', response); // Debug log
+      
+      // Handle both nested and direct data structures
+      const userData = response.data?.data || response.data || response;
+      
+      if (!Array.isArray(userData)) {
+        console.error('Invalid user data structure:', userData);
+        setUsers([]);
+        return;
+      }      // Map the API response to match our component interface
+      const mappedUsers: User[] = userData.map((user: ApiUser) => ({
+        _id: user._id || user.id || '',
+        name: user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'No Name',
         email: user.email,
-        role: user.role,
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt,
-        subscription: 'Free', // TODO: Get actual subscription data
-        studiesCreated: 0, // TODO: Get actual study count
-        studiesParticipated: 0 // TODO: Get actual participation count
+        role: user.role || 'participant',
+        isActive: user.isActive !== undefined ? user.isActive : (user.status === 'active'),
+        createdAt: user.createdAt || user.created_at || '',
+        lastLoginAt: user.lastLoginAt || user.last_login_at,
+        subscription: user.subscription || user.subscription_tier || 'free',
+        studiesCreated: user.studiesCreated || 0,
+        studiesParticipated: user.studiesParticipated || 0
       }));
       
+      console.log('Mapped users:', mappedUsers); // Debug log
       setUsers(mappedUsers);
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -118,20 +148,20 @@ const UserManagement: React.FC = () => {
     try {
       switch (action) {
         case 'activate':
-          // API call to activate user
+          await updateUser(userId, { isActive: true });
           setUsers(users.map(user => 
             user._id === userId ? { ...user, isActive: true } : user
           ));
           break;
         case 'suspend':
-          // API call to suspend user
+          await updateUser(userId, { isActive: false });
           setUsers(users.map(user => 
             user._id === userId ? { ...user, isActive: false } : user
           ));
           break;
         case 'delete':
           if (confirm('Are you sure you want to delete this user?')) {
-            // API call to delete user
+            await deleteUser(userId);
             setUsers(users.filter(user => user._id !== userId));
           }
           break;
@@ -146,32 +176,122 @@ const UserManagement: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to perform user action:', error);
+      alert('Failed to perform action. Please try again.');
+    }  };
+  const handleSaveUser = async (userData: Partial<User>) => {
+    try {
+      console.log('handleSaveUser called with:', userData);
+      
+      if (editingUser) {
+        // Update existing user
+        console.log('Updating user:', editingUser._id, userData);
+        const updatedUser = await updateUser(editingUser._id, {
+          name: userData.name,
+          role: userData.role,
+          isActive: userData.isActive
+        });
+        
+        console.log('Update response:', updatedUser);
+        
+        // Update local state
+        const updatedUsers = users.map(user => 
+          user._id === editingUser._id 
+            ? {
+                ...user,
+                name: updatedUser.name,
+                role: updatedUser.role,
+                isActive: updatedUser.isActive
+              }
+            : user
+        );
+        setUsers(updatedUsers);
+      } else {
+        // Create new user
+        console.log('Creating new user:', userData);
+        const newUserData = {
+          name: userData.name!,
+          email: userData.email!,
+          password: (userData as User & { password: string }).password,
+          role: userData.role!,
+          isActive: userData.isActive ?? true
+        };
+        
+        console.log('Sending create user request:', newUserData);
+        const newUser = await createUser(newUserData);
+        
+        console.log('Create user response:', newUser);
+        
+        // Add to local state
+        const mappedUser: User = {
+          _id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+          isActive: newUser.isActive,
+          createdAt: newUser.createdAt,
+          lastLoginAt: newUser.lastLoginAt,
+          subscription: newUser.subscription || 'free',
+          studiesCreated: newUser.studiesCreated || 0,
+          studiesParticipated: newUser.studiesParticipated || 0
+        };
+          setUsers([mappedUser, ...users]);
+        console.log('User added to local state');
+      }
+      
+      setShowUserModal(false);
+      setEditingUser(null);
+      console.log('Modal closed, editing user cleared');
+    } catch (error) {
+      console.error('Error saving user:', error);
+      alert(`Failed to ${editingUser ? 'update' : 'create'} user: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
     }
   };
+  
   const handleBulkAction = async (action: string) => {
     if (selectedUsers.length === 0) return;
 
     try {
+      let apiAction: string;
       switch (action) {
         case 'activate':
-          setUsers(users.map(user => 
-            selectedUsers.includes(user._id) ? { ...user, isActive: true } : user
-          ));
+          apiAction = 'activate';
           break;
         case 'suspend':
-          setUsers(users.map(user => 
-            selectedUsers.includes(user._id) ? { ...user, isActive: false } : user
-          ));
+          apiAction = 'deactivate';
           break;
         case 'delete':
-          if (confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) {
-            setUsers(users.filter(user => !selectedUsers.includes(user._id)));
+          if (!confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) {
+            return;
           }
-          break;
+          // Delete users one by one since there's no bulk delete in the API
+          for (const userId of selectedUsers) {
+            await deleteUser(userId);
+          }
+          setUsers(users.filter(user => !selectedUsers.includes(user._id)));
+          setSelectedUsers([]);
+          return;
+        default:
+          throw new Error('Invalid action');
       }
+
+      // Use bulk API for activate/deactivate
+      await bulkUpdateUsers({
+        userIds: selectedUsers,
+        action: apiAction as 'activate' | 'deactivate'
+      });
+
+      // Update local state
+      setUsers(users.map(user => 
+        selectedUsers.includes(user._id) 
+          ? { ...user, isActive: action === 'activate' } 
+          : user
+      ));
+      
       setSelectedUsers([]);
     } catch (error) {
       console.error('Failed to perform bulk action:', error);
+      alert('Failed to perform bulk action. Please try again.');
     }
   };
   const getRoleIcon = (role: string) => {
@@ -233,59 +353,61 @@ const UserManagement: React.FC = () => {
               onChange={(e) => setFilters({ ...filters, searchQuery: e.target.value })}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          {/* Role Filter */}          <select
+          </div>          {/* Role Filter */}
+          <select
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by role"
           >
             <option value="all">All Roles</option>
             <option value="participant">Participant</option>
             <option value="researcher">Researcher</option>
             <option value="admin">Admin</option>
             <option value="super_admin">Super Admin</option>
-          </select>
-
-          {/* Status Filter */}
+          </select>          {/* Status Filter */}
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by status"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
             <option value="suspended">Suspended</option>
-          </select>
-
-          {/* Subscription Filter */}
+          </select>          {/* Subscription Filter */}
           <select
             value={filters.subscription}
             onChange={(e) => setFilters({ ...filters, subscription: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by subscription"
           >
             <option value="all">All Plans</option>
             <option value="Free">Free</option>
             <option value="Basic">Basic</option>
             <option value="Pro">Pro</option>
             <option value="Enterprise">Enterprise</option>
-          </select>
-
-          {/* Bulk Actions */}
+          </select>          {/* Bulk Actions */}
           {selectedUsers.length > 0 && (
             <div className="flex space-x-2">
               <button
                 onClick={() => handleBulkAction('activate')}
                 className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
               >
-                Activate
+                Activate ({selectedUsers.length})
               </button>
               <button
                 onClick={() => handleBulkAction('suspend')}
+                className="px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm"
+              >
+                Suspend ({selectedUsers.length})
+              </button>
+              <button
+                onClick={() => handleBulkAction('delete')}
                 className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
               >
-                Suspend
+                Delete ({selectedUsers.length})
               </button>
             </div>
           )}
@@ -298,10 +420,10 @@ const UserManagement: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="w-12 px-6 py-3">
-                  <input
+                <th className="w-12 px-6 py-3">                  <input
                     type="checkbox"
-                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}                    onChange={(e) => {
+                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                    onChange={(e) => {
                       if (e.target.checked) {
                         setSelectedUsers(filteredUsers.map(user => user._id));
                       } else {
@@ -309,6 +431,7 @@ const UserManagement: React.FC = () => {
                       }
                     }}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    aria-label="Select all users"
                   />
                 </th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -334,8 +457,7 @@ const UserManagement: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">              {filteredUsers.map((user) => (
                 <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <input
+                  <td className="px-6 py-4">                    <input
                       type="checkbox"
                       checked={selectedUsers.includes(user._id)}
                       onChange={(e) => {
@@ -346,6 +468,7 @@ const UserManagement: React.FC = () => {
                         }
                       }}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      aria-label={`Select user ${user.name}`}
                     />
                   </td>
                   <td className="px-6 py-4">
@@ -392,10 +515,10 @@ const UserManagement: React.FC = () => {
                       <div>{user.studiesParticipated || 0} participated</div>
                     </div>
                   </td>                  <td className="px-6 py-4">
-                    <div className="relative">
-                      <button 
+                    <div className="relative">                      <button 
                         onClick={() => setDropdownOpen(dropdownOpen === user._id ? null : user._id)}
                         className="p-2 hover:bg-gray-100 rounded-lg"
+                        aria-label="User actions menu"
                       >
                         <MoreVertical className="w-4 h-4" />
                       </button>
@@ -484,26 +607,250 @@ const UserManagement: React.FC = () => {
             {users.filter(u => u.subscription && u.subscription !== 'Free').length}
           </div>
           <div className="text-sm text-gray-600">Paid Subscribers</div>
-        </div>      </div>
-
-      {/* User Modal - TODO: Implement full modal functionality */}
+        </div>      </div>      {/* User Modal - Full Add/Edit User Functionality */}
       {showUserModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold mb-4">
-              {editingUser ? 'Edit User' : 'Create New User'}
-            </h3>
-            <p className="text-gray-600 mb-4">User management feature coming soon.</p>
-            <button
-              onClick={() => setShowUserModal(false)}
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              Close
-            </button>
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">
+                {editingUser ? 'Edit User' : 'Create New User'}
+              </h3>              <button
+                onClick={() => setShowUserModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+                aria-label="Close modal"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <UserForm 
+              user={editingUser}
+              onSave={handleSaveUser}
+              onCancel={() => setShowUserModal(false)}
+            />
           </div>
         </div>
       )}
     </div>
+  );
+};
+
+// User Form Component
+interface UserFormProps {
+  user: User | null;
+  onSave: (userData: Partial<User>) => void;
+  onCancel: () => void;
+}
+
+const UserForm: React.FC<UserFormProps> = ({ user, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    role: user?.role || 'participant',
+    isActive: user?.isActive ?? true,
+    password: '',
+    confirmPassword: ''
+  });
+  
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+    
+    if (!user && !formData.password) {
+      newErrors.password = 'Password is required for new users';
+    }
+    
+    if (!user && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    if (!user && formData.password && formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      const userData: Partial<User> = {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        isActive: formData.isActive
+      };
+        if (!user) {
+        // Add password for new users
+        (userData as User & { password: string }).password = formData.password;
+      }
+      
+      await onSave(userData);
+    } catch (error) {
+      console.error('Error saving user:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Full Name *
+        </label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            errors.name ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="Enter full name"
+        />
+        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+      </div>
+
+      {/* Email */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Email Address *
+        </label>
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            errors.email ? 'border-red-500' : 'border-gray-300'
+          }`}
+          placeholder="Enter email address"
+        />
+        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+      </div>
+
+      {/* Password (for new users only) */}
+      {!user && (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password *
+            </label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.password ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="Enter password"
+            />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Confirm Password *
+            </label>
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="Confirm password"
+            />
+            {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+          </div>
+        </>
+      )}
+
+      {/* Role */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Role *
+        </label>        <select
+          value={formData.role}
+          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Select user role"
+        >
+          <option value="participant">Participant</option>
+          <option value="researcher">Researcher</option>
+          <option value="admin">Admin</option>
+          <option value="super_admin">Super Admin</option>
+        </select>
+      </div>
+
+      {/* Status */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Status
+        </label>
+        <div className="flex items-center space-x-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="status"
+              checked={formData.isActive}
+              onChange={() => setFormData({ ...formData, isActive: true })}
+              className="mr-2"
+            />
+            Active
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="status"
+              checked={!formData.isActive}
+              onChange={() => setFormData({ ...formData, isActive: false })}
+              className="mr-2"
+            />
+            Inactive
+          </label>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={saving}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+        >
+          {saving ? 'Saving...' : user ? 'Update User' : 'Create User'}
+        </button>
+      </div>
+    </form>
   );
 };
 

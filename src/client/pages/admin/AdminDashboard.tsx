@@ -15,6 +15,8 @@ const SystemSettings = lazy(() => import('../../components/admin/SystemSettings'
 const SupportCenter = lazy(() => import('../../components/admin/SupportCenter'));
 const AdminOverview = lazy(() => import('../../components/admin/AdminOverview'));
 const PaymentManagement = lazy(() => import('../../components/admin/PaymentManagement'));
+const AnalyticsDashboard = lazy(() => import('../../components/admin/AnalyticsDashboard'));
+const FinancialDashboard = lazy(() => import('../../components/admin/FinancialDashboard'));
 
 // Loading component for lazy-loaded components
 const AdminLoadingSpinner = () => (
@@ -67,22 +69,28 @@ const adminRoutes: AdminRoute[] = [
     component: SubscriptionManager,
     permission: 'PAYMENT_REFUND',
     description: 'Manage plans and billing'
-  },
-  {
+  },  {
     path: '/app/admin/payments',
     label: 'Payment Management',
-    icon: DollarSign,
+    icon: CreditCard,
     component: PaymentManagement,
     permission: 'PAYMENT_REFUND',
-    description: 'Manual payment verification'
-  },
-  {
+    description: 'Manual payment verification and processing'
+  },{
     path: '/app/admin/analytics',
     label: 'Analytics',
     icon: BarChart3,
-    component: SystemAnalytics,
+    component: AnalyticsDashboard,
     permission: 'SYSTEM_MONITOR',
-    description: 'Platform usage and performance'
+    description: 'Advanced system analytics and reporting'
+  },
+  {
+    path: '/app/admin/financial',
+    label: 'Financial Reports',
+    icon: DollarSign,
+    component: FinancialDashboard,
+    permission: 'PAYMENT_REFUND',
+    description: 'Revenue and subscription analytics'
   },
   {
     path: '/app/admin/studies',
@@ -136,7 +144,6 @@ const AdminDashboard: React.FC = () => {
   if (!hasAdminAccess) {
     return <Navigate to="/unauthorized" replace />;
   }
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Admin Sidebar */}
@@ -147,32 +154,11 @@ const AdminDashboard: React.FC = () => {
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content Area - no header, use the AppLayout header */}
       <div className={`flex-1 transition-all duration-300 ${
         isSidebarCollapsed ? 'ml-16' : 'ml-64'
       }`}>
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Admin Dashboard
-              </h1>
-              <p className="text-sm text-gray-600 mt-1">
-                ResearchHub Platform Administration
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
-                Logged in as <span className="font-semibold">{user?.role}</span>
-              </div>              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">
-                  {user?.firstName?.charAt(0) || 'A'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>        {/* Route Content */}
+        {/* Route Content - no separate header */}
         <main className="p-6">
           <Suspense fallback={<AdminLoadingSpinner />}>
             <Routes>
