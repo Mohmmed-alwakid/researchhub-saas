@@ -45,9 +45,8 @@ const AdminOverview: React.FC = () => {
     fetchAdminStats();
   }, []);
 
-  const fetchAdminStats = async () => {
-    try {
-      const response = await fetch('/api/admin/overview', {
+  const fetchAdminStats = async () => {    try {
+      const response = await fetch('/api/admin?action=overview', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',

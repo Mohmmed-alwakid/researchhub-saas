@@ -98,7 +98,7 @@ export interface AdminActivity {
 
 // Platform Overview
 export const getPlatformOverview = async (): Promise<PlatformOverview> => {
-  return apiService.get<{ data: PlatformOverview }>('/admin/overview').then(response => response.data);
+  return apiService.get<{ data: PlatformOverview }>('/api/admin?action=overview').then(response => response.data);
 };
 
 // User Management
@@ -118,7 +118,7 @@ export const getAllUsers = async (params: {
     }
   });
   
-  return apiService.get<any>(`/admin/users?${queryParams.toString()}`);
+  return apiService.get<any>(`/api/admin?action=users&${queryParams.toString()}`);
 };
 
 export const updateUser = async (userId: string, data: {
@@ -127,7 +127,7 @@ export const updateUser = async (userId: string, data: {
   name?: string;
   email?: string;
 }): Promise<AdminUser> => {
-  return apiService.put<{ data: AdminUser }>(`/admin/user-actions?userId=${userId}`, data).then(response => response.data);
+  return apiService.put<{ data: AdminUser }>(`/api/admin?action=user-actions&userId=${userId}`, data).then(response => response.data);
 };
 
 export const createUser = async (data: {
@@ -137,11 +137,11 @@ export const createUser = async (data: {
   role: string;
   isActive: boolean;
 }): Promise<AdminUser> => {
-  return apiService.post<{ data: AdminUser }>('/admin/user-actions', data).then(response => response.data);
+  return apiService.post<{ data: AdminUser }>('/api/admin?action=user-actions', data).then(response => response.data);
 };
 
 export const deleteUser = async (userId: string): Promise<void> => {
-  return apiService.delete(`/admin/user-actions?userId=${userId}`);
+  return apiService.delete(`/api/admin?action=user-actions&userId=${userId}`);
 };
 
 export const bulkUpdateUsers = async (data: {
@@ -149,12 +149,12 @@ export const bulkUpdateUsers = async (data: {
   action: 'activate' | 'deactivate' | 'changeRole';
   value?: string;
 }): Promise<{ modifiedCount: number; matchedCount: number }> => {
-  return apiService.put<{ data: { modifiedCount: number; matchedCount: number } }>('/admin/users/bulk', data).then(response => response.data);
+  return apiService.put<{ data: { modifiedCount: number; matchedCount: number } }>('/api/admin?action=users-bulk', data).then(response => response.data);
 };
 
 // System Analytics
 export const getSystemAnalytics = async (timeframe: '7d' | '30d' | '90d' = '30d'): Promise<SystemAnalytics> => {
-  return apiService.get<{ data: SystemAnalytics }>(`/admin/analytics?timeframe=${timeframe}`).then(response => response.data);
+  return apiService.get<{ data: SystemAnalytics }>(`/api/admin?action=analytics&timeframe=${timeframe}`).then(response => response.data);
 };
 
 // Study Oversight
@@ -173,24 +173,24 @@ export const getAllStudies = async (params: {
     }
   });
   
-  return apiService.get<{ data: PaginatedResponse<AdminStudy> }>(`/admin/studies?${queryParams.toString()}`).then(response => response.data);
+  return apiService.get<{ data: PaginatedResponse<AdminStudy> }>(`/api/admin?action=studies&${queryParams.toString()}`).then(response => response.data);
 };
 
 export const updateStudyStatus = async (studyId: string, data: {
   status: string;
   reason?: string;
 }): Promise<AdminStudy> => {
-  return apiService.put<{ data: { study: AdminStudy } }>(`/admin/studies/${studyId}/status`, data).then(response => response.data.study);
+  return apiService.put<{ data: { study: AdminStudy } }>(`/api/admin?action=studies&studyId=${studyId}`, data).then(response => response.data.study);
 };
 
 // Recent Activity
 export const getRecentActivity = async (limit: number = 20): Promise<AdminActivity[]> => {
-  return apiService.get<{ data: AdminActivity[] }>(`/admin/activity?limit=${limit}`).then(response => response.data);
+  return apiService.get<{ data: AdminActivity[] }>(`/api/admin?action=activity&limit=${limit}`).then(response => response.data);
 };
 
 // Financial Reporting
 export const getFinancialReport = async (timeframe: '7d' | '30d' | '90d' | '1y' = '30d'): Promise<FinancialReport> => {
-  return apiService.get<{ data: FinancialReport }>(`/admin/financial?timeframe=${timeframe}`).then(response => response.data);
+  return apiService.get<{ data: FinancialReport }>(`/api/admin?action=financial&timeframe=${timeframe}`).then(response => response.data);
 };
 
 // User Behavior Analytics
@@ -202,5 +202,5 @@ export interface UserBehaviorAnalytics {
 }
 
 export const getUserBehaviorAnalytics = async (timeframe: '7d' | '30d' | '90d' = '30d'): Promise<UserBehaviorAnalytics> => {
-  return apiService.get<{ data: UserBehaviorAnalytics }>(`/admin/user-behavior?timeframe=${timeframe}`).then(response => response.data);
+  return apiService.get<{ data: UserBehaviorAnalytics }>(`/api/admin?action=user-behavior&timeframe=${timeframe}`).then(response => response.data);
 };
