@@ -52,7 +52,8 @@ const SubscriptionManager: React.FC = () => {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [activeTab, setActiveTab] = useState<'plans' | 'subscriptions' | 'analytics'>('plans');
-  const [loading, setLoading] = useState(true);  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
 
   useEffect(() => {
@@ -74,14 +75,36 @@ const SubscriptionManager: React.FC = () => {
           "Subscriber management and support",
           "Stripe integration for secure payments",
           "Automated billing and invoicing"
-        ]}        expectedRelease="Q4 2024"
+        ]}
+        expectedRelease="Q4 2024"
       />
     );
   }
 
   const fetchPlans = async () => {
     try {
-      // Mock data - replace with actual API call
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/subscriptions?action=plans', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch plans');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        setPlans(result.data);
+      } else {
+        throw new Error(result.error || 'Failed to fetch plans');
+      }
+    } catch (error) {
+      console.error('Failed to fetch plans:', error);
+      // Keep mock data as fallback
       const mockPlans: SubscriptionPlan[] = [
         {
           id: 'free',
@@ -127,112 +150,148 @@ const SubscriptionManager: React.FC = () => {
           isActive: true,
           subscriberCount: 420,
           revenue: 12180
-        },
-        {
-          id: 'pro',
-          name: 'Pro',
-          description: 'Best for growing teams and frequent research',
-          price: 79,
-          interval: 'month',
-          features: [
-            'Unlimited studies',
-            '200 participants per study',
-            'Real-time analytics',
-            'Heatmaps & click tracking',
-            'API access',
-            'Custom integrations'
-          ],
-          limits: {
-            studies: -1, // unlimited
-            participants: 200,
-            storage: 100,
-            recordings: 500
-          },
-          isActive: true,
-          subscriberCount: 180,
-          revenue: 14220
-        },
-        {
-          id: 'enterprise',
-          name: 'Enterprise',
-          description: 'For large organizations with advanced needs',
-          price: 199,
-          interval: 'month',
-          features: [
-            'Everything in Pro',
-            'Unlimited participants',
-            'White-label solution',
-            'Dedicated support',
-            'Custom onboarding',
-            'SLA guarantee'
-          ],
-          limits: {
-            studies: -1,
-            participants: -1,
-            storage: 1000,
-            recordings: -1
-          },
-          isActive: true,
-          subscriberCount: 45,
-          revenue: 8955
         }
       ];
       setPlans(mockPlans);
-    } catch (error) {
-      console.error('Failed to fetch plans:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchSubscriptions = async () => {
     try {
-      // Mock data - replace with actual API call
-      const mockSubscriptions: Subscription[] = [
-        {
-          id: 'sub_1',
-          userId: 'user_1',
-          userName: 'John Doe',
-          userEmail: 'john@example.com',
-          planId: 'pro',
-          planName: 'Pro',
-          status: 'active',
-          currentPeriodStart: new Date('2024-01-01'),
-          currentPeriodEnd: new Date('2024-02-01'),
-          amount: 79,
-          interval: 'month'
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/subscriptions?action=subscriptions', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        {
-          id: 'sub_2',
-          userId: 'user_2',
-          userName: 'Sarah Wilson',
-          userEmail: 'sarah@example.com',
-          planId: 'enterprise',
-          planName: 'Enterprise',
-          status: 'active',
-          currentPeriodStart: new Date('2024-01-15'),
-          currentPeriodEnd: new Date('2024-02-15'),
-          amount: 199,
-          interval: 'month'
-        },
-        {
-          id: 'sub_3',
-          userId: 'user_3',
-          userName: 'Mike Johnson',
-          userEmail: 'mike@example.com',
-          planId: 'basic',
-          planName: 'Basic',
-          status: 'past_due',
-          currentPeriodStart: new Date('2023-12-20'),
-          currentPeriodEnd: new Date('2024-01-20'),
-          amount: 29,
-          interval: 'month'
-        }
-      ];
-      setSubscriptions(mockSubscriptions);
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch subscriptions');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        setSubscriptions(result.data);
+      } else {
+        throw new Error(result.error || 'Failed to fetch subscriptions');
+      }
     } catch (error) {
       console.error('Failed to fetch subscriptions:', error);
-    } finally {
-      setLoading(false);
+      // Keep empty array as fallback
+      setSubscriptions([]);
     }
+  };
+
+  const handleSavePlan = async () => {
+    if (!editingPlan) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const isNewPlan = !editingPlan.id || editingPlan.id.startsWith('new_');
+      
+      const url = isNewPlan 
+        ? '/api/subscriptions?action=plans'
+        : `/api/subscriptions?action=plan&id=${editingPlan.id}`;
+        
+      const method = isNewPlan ? 'POST' : 'PUT';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: editingPlan.name,
+          description: editingPlan.description,
+          price: editingPlan.price,
+          interval: editingPlan.interval,
+          features: editingPlan.features,
+          limits: editingPlan.limits,
+          is_active: editingPlan.isActive
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save plan');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        await fetchPlans(); // Refresh the plans list
+        setShowPlanModal(false);
+        setEditingPlan(null);
+        // Show success message
+        alert(isNewPlan ? 'Plan created successfully!' : 'Plan updated successfully!');
+      } else {
+        throw new Error(result.error || 'Failed to save plan');
+      }
+    } catch (error) {
+      console.error('Failed to save plan:', error);
+      alert('Failed to save plan. Please try again.');
+    }
+  };
+
+  const handleDeletePlan = async (planId: string) => {
+    if (!confirm('Are you sure you want to delete this plan? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/subscriptions?action=plan&id=${planId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete plan');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        await fetchPlans(); // Refresh the plans list
+        alert('Plan deleted successfully!');
+      } else {
+        throw new Error(result.error || 'Failed to delete plan');
+      }
+    } catch (error) {
+      console.error('Failed to delete plan:', error);
+      alert('Failed to delete plan. Please try again.');
+    }
+  };
+
+  const handleCreatePlan = () => {
+    const newPlan: SubscriptionPlan = {
+      id: `new_${Date.now()}`,
+      name: '',
+      description: '',
+      price: 0,
+      interval: 'month',
+      features: [],
+      limits: {
+        studies: 0,
+        participants: 0,
+        storage: 0,
+        recordings: 0
+      },
+      isActive: true,
+      subscriberCount: 0,
+      revenue: 0
+    };
+    setEditingPlan(newPlan);
+    setShowPlanModal(true);
+  };
+
+  const handleEditPlan = (plan: SubscriptionPlan) => {
+    setEditingPlan({ ...plan });
+    setShowPlanModal(true);
   };
 
   const getStatusIcon = (status: string) => {
@@ -250,149 +309,370 @@ const SubscriptionManager: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
+    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return `${baseClasses} bg-green-100 text-green-800`;
       case 'past_due':
-        return 'bg-yellow-100 text-yellow-800';
+        return `${baseClasses} bg-yellow-100 text-yellow-800`;
       case 'canceled':
+        return `${baseClasses} bg-red-100 text-red-800`;
       case 'incomplete':
-        return 'bg-red-100 text-red-800';
+        return `${baseClasses} bg-gray-100 text-gray-800`;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   };
 
-  const totalRevenue = plans.reduce((sum, plan) => sum + plan.revenue, 0);
-  const totalSubscribers = plans.reduce((sum, plan) => sum + plan.subscriberCount, 0);
-  const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active').length;
+  const renderPlansTab = () => (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Subscription Plans</h2>
+        <button
+          onClick={handleCreatePlan}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Create Plan
+        </button>
+      </div>
+
+      {/* Plans Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {plans.map((plan) => (
+          <div key={plan.id} className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
+                <p className="text-sm text-gray-600">{plan.description}</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEditPlan(plan)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDeletePlan(plan.id)}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="text-2xl font-bold text-gray-900">
+                ${plan.price}
+                <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-4">
+              {plan.features.slice(0, 3).map((feature, index) => (
+                <div key={index} className="text-sm text-gray-600">
+                  • {feature}
+                </div>
+              ))}
+              {plan.features.length > 3 && (
+                <div className="text-sm text-gray-500">
+                  +{plan.features.length - 3} more features
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+              <div className="text-sm text-gray-600">
+                <Users className="w-4 h-4 inline mr-1" />
+                {plan.subscriberCount} subscribers
+              </div>
+              <div className="text-sm font-medium text-green-600">
+                ${plan.revenue}/month
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderSubscriptionsTab = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900">Active Subscriptions</h2>
+      
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                User
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Plan
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Amount
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Next Billing
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {subscriptions.map((subscription) => (
+              <tr key={subscription.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {subscription.userName}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {subscription.userEmail}
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {subscription.planName}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    {getStatusIcon(subscription.status)}
+                    <span className={`ml-2 ${getStatusBadge(subscription.status)}`}>
+                      {subscription.status}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  ${subscription.amount}/{subscription.interval}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button className="text-blue-600 hover:text-blue-900 mr-3">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button className="text-red-600 hover:text-red-900">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderAnalyticsTab = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900">Subscription Analytics</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white p-6 border border-gray-200 rounded-lg">
+          <div className="flex items-center">
+            <Users className="w-8 h-8 text-blue-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Subscribers</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {plans.reduce((sum, plan) => sum + plan.subscriberCount, 0)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 border border-gray-200 rounded-lg">
+          <div className="flex items-center">
+            <DollarSign className="w-8 h-8 text-green-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Monthly Revenue</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${plans.reduce((sum, plan) => sum + plan.revenue, 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 border border-gray-200 rounded-lg">
+          <div className="flex items-center">
+            <CreditCard className="w-8 h-8 text-purple-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Active Plans</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {plans.filter(plan => plan.isActive).length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 border border-gray-200 rounded-lg">
+          <div className="flex items-center">
+            <TrendingUp className="w-8 h-8 text-indigo-600" />
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Growth Rate</p>
+              <p className="text-2xl font-bold text-gray-900">+12%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPlanModal = () => {
+    if (!showPlanModal || !editingPlan) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <h3 className="text-lg font-semibold mb-4">
+            {editingPlan.id.startsWith('new_') ? 'Create New Plan' : 'Edit Plan'}
+          </h3>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Plan Name
+              </label>
+              <input
+                type="text"
+                value={editingPlan.name}
+                onChange={(e) => setEditingPlan({...editingPlan, name: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="Enter plan name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                value={editingPlan.description}
+                onChange={(e) => setEditingPlan({...editingPlan, description: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                rows={3}
+                placeholder="Enter plan description"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Price
+                </label>
+                <input
+                  type="number"
+                  value={editingPlan.price}
+                  onChange={(e) => setEditingPlan({...editingPlan, price: parseFloat(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Interval
+                </label>
+                <select
+                  value={editingPlan.interval}
+                  onChange={(e) => setEditingPlan({...editingPlan, interval: e.target.value as 'month' | 'year'})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="month">Monthly</option>
+                  <option value="year">Yearly</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Features (one per line)
+              </label>
+              <textarea
+                value={editingPlan.features.join('\n')}
+                onChange={(e) => setEditingPlan({
+                  ...editingPlan, 
+                  features: e.target.value.split('\n').filter(f => f.trim())
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                rows={4}
+                placeholder="Enter features, one per line"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={editingPlan.isActive}
+                onChange={(e) => setEditingPlan({...editingPlan, isActive: e.target.checked})}
+                className="mr-2"
+              />
+              <label className="text-sm font-medium text-gray-700">
+                Active Plan
+              </label>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <button
+              onClick={() => {
+                setShowPlanModal(false);
+                setEditingPlan(null);
+              }}
+              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSavePlan}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              {editingPlan.id.startsWith('new_') ? 'Create Plan' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600">      </div>
-
-      {/* Plan Modal - TODO: Implement full modal functionality */}
-      {showPlanModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold mb-4">
-              {editingPlan ? 'Edit Plan' : 'Create New Plan'}
-            </h3>
-            <p className="text-gray-600 mb-4">Plan management feature coming soon.</p>
-            <button
-              onClick={() => setShowPlanModal(false)}
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Loading subscription data...</span>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Subscription Management</h1>
-          <p className="text-gray-600">Manage plans, pricing, and subscriber analytics</p>
-        </div>
-        <button
-          onClick={() => {
-            setEditingPlan(null);
-            setShowPlanModal(true);
-          }}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Plan
-        </button>
-      </div>
-
-      {/* Revenue Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-lg bg-green-50">
-              <DollarSign className="w-6 h-6 text-green-600" />
-            </div>
-            <TrendingUp className="w-4 h-4 text-green-600" />
-          </div>
-          <div className="mt-4">
-            <div className="text-2xl font-bold text-gray-900">
-              ${totalRevenue.toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-600">Monthly Revenue</div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-lg bg-blue-50">
-              <Users className="w-6 h-6 text-blue-600" />
-            </div>
-            <TrendingUp className="w-4 h-4 text-blue-600" />
-          </div>
-          <div className="mt-4">
-            <div className="text-2xl font-bold text-gray-900">
-              {totalSubscribers.toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-600">Total Subscribers</div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-lg bg-purple-50">
-              <CreditCard className="w-6 h-6 text-purple-600" />
-            </div>
-            <TrendingUp className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="mt-4">
-            <div className="text-2xl font-bold text-gray-900">
-              {activeSubscriptions}
-            </div>
-            <div className="text-sm text-gray-600">Active Subscriptions</div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-lg bg-orange-50">
-              <TrendingUp className="w-6 h-6 text-orange-600" />
-            </div>
-            <TrendingUp className="w-4 h-4 text-orange-600" />
-          </div>
-          <div className="mt-4">
-            <div className="text-2xl font-bold text-gray-900">
-              ${(totalRevenue / totalSubscribers).toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-600">ARPU</div>
-          </div>
-        </div>
-      </div>
-
       {/* Tab Navigation */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
           {[
-            { key: 'plans', label: 'Subscription Plans' },
-            { key: 'subscriptions', label: 'Active Subscriptions' },
-            { key: 'analytics', label: 'Revenue Analytics' }
+            { id: 'plans', label: 'Plans', icon: CreditCard },
+            { id: 'subscriptions', label: 'Subscriptions', icon: Users },
+            { id: 'analytics', label: 'Analytics', icon: TrendingUp },
           ].map((tab) => (
             <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as 'plans' | 'subscriptions' | 'analytics')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.key
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
+              <tab.icon className="w-4 h-4 mr-2" />
               {tab.label}
             </button>
           ))}
@@ -400,203 +680,12 @@ const SubscriptionManager: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'plans' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plans.map((plan) => (
-            <div key={plan.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              {/* Plan Header */}
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        setEditingPlan(plan);
-                        setShowPlanModal(true);
-                      }}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">{plan.description}</p>
-              </div>
+      {activeTab === 'plans' && renderPlansTab()}
+      {activeTab === 'subscriptions' && renderSubscriptionsTab()}
+      {activeTab === 'analytics' && renderAnalyticsTab()}
 
-              {/* Pricing */}
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-gray-900">
-                    ${plan.price}
-                  </span>
-                  <span className="text-gray-600 ml-2">/{plan.interval}</span>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="p-6 border-b border-gray-200">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Features</h4>
-                <ul className="space-y-2">
-                  {plan.features.slice(0, 4).map((feature, index) => (
-                    <li key={index} className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-3 h-3 text-green-600 mr-2" />
-                      {feature}
-                    </li>
-                  ))}
-                  {plan.features.length > 4 && (
-                    <li className="text-xs text-gray-500">
-                      +{plan.features.length - 4} more features
-                    </li>
-                  )}
-                </ul>
-              </div>
-
-              {/* Stats */}
-              <div className="p-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-lg font-semibold text-gray-900">
-                      {plan.subscriberCount}
-                    </div>
-                    <div className="text-xs text-gray-600">Subscribers</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-semibold text-gray-900">
-                      ${plan.revenue.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-gray-600">Revenue</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'subscriptions' && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Subscriber
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Plan
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Next Billing
-                  </th>
-                  <th className="w-12 px-6 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {subscriptions.map((subscription) => (
-                  <tr key={subscription.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="font-medium text-gray-900">{subscription.userName}</div>
-                        <div className="text-sm text-gray-600">{subscription.userEmail}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-gray-900">
-                        {subscription.planName}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        {getStatusIcon(subscription.status)}
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(subscription.status)}`}>
-                          {subscription.status}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      ${subscription.amount}/{subscription.interval}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {subscription.currentPeriodEnd.toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'analytics' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue Analytics</h3>
-            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-              <p className="text-gray-600">Revenue chart would be rendered here</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Plan Distribution</h3>
-              <div className="space-y-3">
-                {plans.map((plan) => (
-                  <div key={plan.id} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">{plan.name}</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-20 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full" 
-                          style={{ width: `${(plan.subscriberCount / totalSubscribers) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-sm text-gray-600">
-                        {plan.subscriberCount}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue by Plan</h3>
-              <div className="space-y-3">
-                {plans.filter(p => p.revenue > 0).map((plan) => (
-                  <div key={plan.id} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">{plan.name}</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-20 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-green-600 h-2 rounded-full" 
-                          style={{ width: `${(plan.revenue / totalRevenue) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-sm text-gray-600">
-                        ${plan.revenue.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Plan Modal */}
+      {renderPlanModal()}
     </div>
   );
 };

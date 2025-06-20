@@ -112,11 +112,40 @@ async function handleUsers(req, res) {
 
   try {
     // Get all users from auth.users (admin only)
-    const { data: users, error } = await supabase.auth.admin.listUsers();
+    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
     
-    if (error) {
-      console.error('Error fetching users:', error);
-      return res.status(500).json({ success: false, error: 'Failed to fetch users' });
+    if (authError) {
+      console.error('Error fetching auth users:', authError);
+      // Fallback to profiles table if auth.admin fails
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (profileError) {
+        console.error('Error fetching profiles:', profileError);
+        return res.status(500).json({ success: false, error: 'Failed to fetch users' });
+      }
+
+      const enrichedUsers = profiles.map(profile => ({
+        id: profile.id,
+        email: profile.email,
+        created_at: profile.created_at,
+        last_sign_in_at: profile.last_login,
+        email_confirmed_at: profile.is_email_verified ? profile.created_at : null,
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        role: profile.role || 'participant',
+        status: profile.status || 'active',
+        subscription: profile.subscription_plan || 'free',
+        subscription_status: profile.subscription_status || 'active'
+      }));
+
+      return res.status(200).json({
+        success: true,
+        data: enrichedUsers,
+        total: enrichedUsers.length
+      });
     }
 
     // Get profiles for additional user data
@@ -125,7 +154,7 @@ async function handleUsers(req, res) {
       .select('*');
 
     // Combine user data with profiles
-    const enrichedUsers = users.users.map(user => {
+    const enrichedUsers = authUsers.users.map(user => {
       const profile = profiles?.find(p => p.id === user.id);
       return {
         id: user.id,
@@ -136,7 +165,9 @@ async function handleUsers(req, res) {
         first_name: user.user_metadata?.first_name || profile?.first_name || '',
         last_name: user.user_metadata?.last_name || profile?.last_name || '',
         role: user.user_metadata?.role || profile?.role || 'participant',
-        status: user.email_confirmed_at ? 'active' : 'pending'
+        status: profile?.status || (user.email_confirmed_at ? 'active' : 'pending'),
+        subscription: profile?.subscription_plan || 'free',
+        subscription_status: profile?.subscription_status || 'active'
       };
     });
 
@@ -178,16 +209,19 @@ async function handleUserActions(req, res, userId) {
 
       if (error) {
         return res.status(400).json({ success: false, error: error.message });
-      }
-
-      // Create profile record
+      }      // Create profile record
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([{
           id: data.user.id,
+          email: email,
           first_name: firstName,
           last_name: lastName,
           role: role,
+          status: 'active',
+          subscription_plan: 'free',
+          subscription_status: 'active',
+          is_email_verified: true,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }]);

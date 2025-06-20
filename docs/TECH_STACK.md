@@ -2,7 +2,9 @@
 
 **Version:** 2.0  
 **Date:** June 15, 2025  
-**Status:** Production Ready  
+**Status:** Under Development - Not Production Ready
+
+> ⚠️ **Note**: While the technical stack is set up, many features listed here are incomplete or use mock data. See [PROJECT_STATUS_REALITY_CHECK.md](../PROJECT_STATUS_REALITY_CHECK.md) for implementation details.  
 
 ---
 

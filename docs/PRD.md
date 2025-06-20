@@ -2,7 +2,9 @@
 
 **Version:** 2.0  
 **Date:** June 15, 2025  
-**Status:** Production Ready  
+**Status:** Under Development - Not Production Ready
+
+> ⚠️ **IMPORTANT**: This PRD reflects the original vision. Many features described here are not yet implemented or are only partially complete. See [PROJECT_STATUS_REALITY_CHECK.md](../PROJECT_STATUS_REALITY_CHECK.md) for actual implementation status.  
 **Product Manager:** ResearchHub Team  
 
 ---
@@ -31,7 +33,9 @@ To democratize user research by providing accessible, powerful tools that help o
 
 ---
 
-## 🔧 Core Features (Production Ready)
+## 🔧 Core Features (⚠️ IMPLEMENTATION STATUS VARIES - See Reality Check Doc)
+
+> **IMPORTANT**: The features below represent the project vision. Not all are implemented. Refer to [PROJECT_STATUS_REALITY_CHECK.md](../PROJECT_STATUS_REALITY_CHECK.md) for accurate implementation status.
 
 ### ✅ Authentication & User Management
 - **User Registration/Login** - Secure JWT-based authentication

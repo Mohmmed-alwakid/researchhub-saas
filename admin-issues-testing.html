@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Issues Testing - ResearchHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .user-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .user-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .subscription-item {
+            padding: 12px;
+            border: 1px solid #ddd;
+            margin: 8px 0;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .plan-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .plan-form input, .plan-form textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Admin Issues Testing - ResearchHub</h1>
+        <p><strong>Testing URL:</strong> <a href="http://localhost:5175" target="_blank">http://localhost:5175</a></p>
+        <p><strong>API URL:</strong> <a href="http://localhost:3003" target="_blank">http://localhost:3003</a></p>
+        
+        <!-- Login Section -->
+        <div class="section">
+            <h2>🔐 Step 1: Admin Login</h2>
+            <p>Please login as admin first:</p>
+            <div>
+                <label>Email: </label>
+                <input type="email" id="loginEmail" value="abwanwr77+admin@gmail.com" style="width: 300px; padding: 8px;">
+            </div>
+            <div style="margin: 10px 0;">
+                <label>Password: </label>
+                <input type="password" id="loginPassword" value="Testtest123" style="width: 300px; padding: 8px;">
+            </div>
+            <button onclick="performLogin()">Login as Admin</button>
+            <div id="loginResult" class="test-result" style="display: none;"></div>
+        </div>
+
+        <!-- Issue 1: User Management -->
+        <div class="section">
+            <h2>👥 Issue 1: User Management Testing</h2>
+            <div>
+                <button onclick="testUserRetrieval()">Test 1.1: Retrieve Users from DB</button>
+                <button onclick="testUserCreation()">Test 1.2: Create New User</button>
+                <button onclick="testUserUpdate()">Test 1.3: Update User</button>
+                <button onclick="testUserDeletion()">Test 1.4: Delete User (Last Created)</button>
+            </div>
+            <div id="userTestResults"></div>
+            
+            <!-- User Creation Form -->
+            <div style="margin-top: 20px;">
+                <h3>Create New User Form:</h3>
+                <div class="plan-form">
+                    <input type="email" id="newUserEmail" placeholder="Email" value="test@example.com">
+                    <input type="text" id="newUserFirstName" placeholder="First Name" value="Test">
+                    <input type="text" id="newUserLastName" placeholder="Last Name" value="User">
+                    <input type="password" id="newUserPassword" placeholder="Password" value="TempPass123">
+                    <select id="newUserRole">
+                        <option value="participant">Participant</option>
+                        <option value="researcher">Researcher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button onclick="createNewUser()">Create User</button>
+            </div>
+        </div>
+
+        <!-- Issue 2: Subscription Management -->
+        <div class="section">
+            <h2>💳 Issue 2: Subscription Management Testing</h2>
+            <div>
+                <button onclick="testSubscriptionPlans()">Test 2.1: Retrieve Subscription Plans</button>
+                <button onclick="testSubscriptions()">Test 2.2: Retrieve Subscriptions</button>
+                <button onclick="testPlanCreation()">Test 2.3: Create New Plan</button>
+                <button onclick="testPlanUpdate()">Test 2.4: Update Plan</button>
+                <button onclick="testPlanDeletion()">Test 2.5: Delete Plan</button>
+            </div>
+            <div id="subscriptionTestResults"></div>
+            
+            <!-- Plan Creation Form -->
+            <div style="margin-top: 20px;">
+                <h3>Create New Plan Form:</h3>
+                <div class="plan-form">
+                    <input type="text" id="planName" placeholder="Plan Name" value="Test Plan">
+                    <input type="number" id="planPrice" placeholder="Price" value="19.99">
+                    <textarea id="planDescription" placeholder="Description">Test plan description</textarea>
+                    <select id="planInterval">
+                        <option value="month">Monthly</option>
+                        <option value="year">Yearly</option>
+                    </select>
+                    <textarea id="planFeatures" placeholder="Features (one per line)">Feature 1
+Feature 2
+Feature 3</textarea>
+                    <label><input type="checkbox" id="planActive" checked> Active</label>
+                </div>
+                <button onclick="createNewPlan()">Create Plan</button>
+            </div>
+        </div>
+
+        <!-- Issue 3: Settings Routing -->
+        <div class="section">
+            <h2>⚙️ Issue 3: Settings Routing Testing</h2>
+            <p>Test if settings routing works correctly for admin users:</p>
+            <div>
+                <button onclick="testAdminSettings()">Test 3.1: Navigate to Admin Settings</button>
+                <button onclick="testGeneralSettings()">Test 3.2: Navigate to General Settings</button>
+            </div>
+            <div id="settingsTestResults"></div>
+            <div id="settingsInfo" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+                <strong>Expected Behavior:</strong>
+                <ul>
+                    <li>Admin users should see SystemSettings when clicking Settings in admin dashboard</li>
+                    <li>General /app/settings should redirect admin users to admin settings or show admin options</li>
+                    <li>Settings navigation should be context-aware based on user role</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- API Testing Results -->
+        <div class="section">
+            <h2>📊 API Testing Results</h2>
+            <div id="apiResults"></div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('token');
+        let lastCreatedUserId = null;
+        let lastCreatedPlanId = null;
+
+        // Utility functions
+        function logResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function makeAuthenticatedRequest(url, options = {}) {
+            const token = localStorage.getItem('token');
+            return fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...options.headers
+                }
+            });
+        }
+
+        // Authentication
+        async function performLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                logResult('loginResult', 'Attempting login...', 'warning');
+                document.getElementById('loginResult').style.display = 'block';
+                
+                const response = await fetch('http://localhost:3003/api/auth?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    localStorage.setItem('token', result.token);
+                    authToken = result.token;
+                    logResult('loginResult', `✅ Login successful! Role: ${result.user.role}`, 'success');
+                } else {
+                    logResult('loginResult', `❌ Login failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('loginResult', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        // User Management Tests
+        async function testUserRetrieval() {
+            try {
+                logResult('userTestResults', 'Testing user retrieval...', 'warning');
+                
+                const response = await makeAuthenticatedRequest('http://localhost:3003/api/admin?action=users');
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult('userTestResults', `✅ Retrieved ${result.data.length} users successfully`, 'success');
+                    
+                    // Display user list
+                    let userListHtml = '<div class="user-list">';
+                    result.data.forEach((user, index) => {
+                        userListHtml += `
+                            <div class="user-item">
+                                <span><strong>${user.first_name} ${user.last_name}</strong> (${user.email}) - ${user.role}</span>
+                                <span>Status: ${user.status || 'active'}</span>
+                            </div>
+                        `;
+                    });
+                    userListHtml += '</div>';
+                    
+                    logResult('userTestResults', userListHtml, 'success');
+                } else {
+                    logResult('userTestResults', `❌ Failed to retrieve users: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('userTestResults', `❌ User retrieval error: ${error.message}`, 'error');
+            }
+        }
+
+        async function createNewUser() {
+            const email = document.getElementById('newUserEmail').value;
+            const firstName = document.getElementById('newUserFirstName').value;
+            const lastName = document.getElementById('newUserLastName').value;
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
+
+            try {
+                logResult('userTestResults', 'Creating new user...', 'warning');
+                
+                const response = await makeAuthenticatedRequest('http://localhost:3003/api/admin?action=user-actions', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email,
+                        firstName,
+                        lastName,
+                        password,
+                        role
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    lastCreatedUserId = result.data.id;
+                    logResult('userTestResults', `✅ User created successfully! ID: ${lastCreatedUserId}`, 'success');
+                    
+                    // Update form with new email for next test
+                    const timestamp = Date.now();
+                    document.getElementById('newUserEmail').value = `test${timestamp}@example.com`;
+                } else {
+                    logResult('userTestResults', `❌ Failed to create user: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('userTestResults', `❌ User creation error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUserCreation() {
+            await createNewUser();
+        }
+
+        async function testUserUpdate() {
+            if (!lastCreatedUserId) {
+                logResult('userTestResults', '⚠️ No user to update. Create a user first.', 'warning');
+                return;
+            }
+
+            try {
+                logResult('userTestResults', 'Updating user...', 'warning');
+                
+                const response = await makeAuthenticatedRequest(`http://localhost:3003/api/admin?action=user-actions&userId=${lastCreatedUserId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        role: 'researcher'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult('userTestResults', `✅ User updated successfully!`, 'success');
+                } else {
+                    logResult('userTestResults', `❌ Failed to update user: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('userTestResults', `❌ User update error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUserDeletion() {
+            if (!lastCreatedUserId) {
+                logResult('userTestResults', '⚠️ No user to delete. Create a user first.', 'warning');
+                return;
+            }
+
+            try {
+                logResult('userTestResults', 'Deleting user...', 'warning');
+                
+                const response = await makeAuthenticatedRequest(`http://localhost:3003/api/admin?action=user-actions&userId=${lastCreatedUserId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult('userTestResults', `✅ User deleted successfully!`, 'success');
+                    lastCreatedUserId = null;
+                } else {
+                    logResult('userTestResults', `❌ Failed to delete user: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('userTestResults', `❌ User deletion error: ${error.message}`, 'error');
+            }
+        }
+
+        // Subscription Management Tests
+        async function testSubscriptionPlans() {
+            try {
+                logResult('subscriptionTestResults', 'Testing subscription plans retrieval...', 'warning');
+                
+                const response = await makeAuthenticatedRequest('http://localhost:3003/api/subscriptions?action=plans');
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult('subscriptionTestResults', `✅ Retrieved ${result.data.length} subscription plans successfully`, 'success');
+                    
+                    // Display plans
+                    let plansHtml = '<div>';
+                    result.data.forEach((plan, index) => {
+                        plansHtml += `
+                            <div class="subscription-item">
+                                <strong>${plan.name}</strong> - $${plan.price}/${plan.interval}<br>
+                                <small>${plan.description}</small><br>
+                                <small>Subscribers: ${plan.subscriberCount || 0} | Revenue: $${plan.revenue || 0}/month</small>
+                            </div>
+                        `;
+                    });
+                    plansHtml += '</div>';
+                    
+                    logResult('subscriptionTestResults', plansHtml, 'success');
+                } else {
+                    logResult('subscriptionTestResults', `❌ Failed to retrieve plans: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('subscriptionTestResults', `❌ Plans retrieval error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSubscriptions() {
+            try {
+                logResult('subscriptionTestResults', 'Testing subscriptions retrieval...', 'warning');
+                
+                const response = await makeAuthenticatedRequest('http://localhost:3003/api/subscriptions?action=subscriptions');
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult('subscriptionTestResults', `✅ Retrieved ${result.data.length} subscriptions successfully`, 'success');
+                } else {
+                    logResult('subscriptionTestResults', `❌ Failed to retrieve subscriptions: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('subscriptionTestResults', `❌ Subscriptions retrieval error: ${error.message}`, 'error');
+            }
+        }
+
+        async function createNewPlan() {
+            const name = document.getElementById('planName').value;
+            const price = parseFloat(document.getElementById('planPrice').value);
+            const description = document.getElementById('planDescription').value;
+            const interval = document.getElementById('planInterval').value;
+            const features = document.getElementById('planFeatures').value.split('\n').filter(f => f.trim());
+            const isActive = document.getElementById('planActive').checked;
+
+            try {
+                logResult('subscriptionTestResults', 'Creating new plan...', 'warning');
+                
+                const response = await makeAuthenticatedRequest('http://localhost:3003/api/subscriptions?action=plans', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name,
+                        price,
+                        description,
+                        interval,
+                        features,
+                        limits: {
+                            studies: 10,
+                            participants: 100,
+                            storage: 50,
+                            recordings: 50
+                        },
+                        is_active: isActive
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    lastCreatedPlanId = result.data.id;
+                    logResult('subscriptionTestResults', `✅ Plan created successfully! ID: ${lastCreatedPlanId}`, 'success');
+                    
+                    // Update form with new name for next test
+                    const timestamp = Date.now();
+                    document.getElementById('planName').value = `Test Plan ${timestamp}`;
+                } else {
+                    logResult('subscriptionTestResults', `❌ Failed to create plan: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('subscriptionTestResults', `❌ Plan creation error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPlanCreation() {
+            await createNewPlan();
+        }
+
+        async function testPlanUpdate() {
+            if (!lastCreatedPlanId) {
+                logResult('subscriptionTestResults', '⚠️ No plan to update. Create a plan first.', 'warning');
+                return;
+            }
+
+            try {
+                logResult('subscriptionTestResults', 'Updating plan...', 'warning');
+                
+                const response = await makeAuthenticatedRequest(`http://localhost:3003/api/subscriptions?action=plan&id=${lastCreatedPlanId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        price: 24.99,
+                        description: 'Updated test plan description'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult('subscriptionTestResults', `✅ Plan updated successfully!`, 'success');
+                } else {
+                    logResult('subscriptionTestResults', `❌ Failed to update plan: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('subscriptionTestResults', `❌ Plan update error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPlanDeletion() {
+            if (!lastCreatedPlanId) {
+                logResult('subscriptionTestResults', '⚠️ No plan to delete. Create a plan first.', 'warning');
+                return;
+            }
+
+            try {
+                logResult('subscriptionTestResults', 'Deleting plan...', 'warning');
+                
+                const response = await makeAuthenticatedRequest(`http://localhost:3003/api/subscriptions?action=plan&id=${lastCreatedPlanId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    logResult('subscriptionTestResults', `✅ Plan deleted successfully!`, 'success');
+                    lastCreatedPlanId = null;
+                } else {
+                    logResult('subscriptionTestResults', `❌ Failed to delete plan: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                logResult('subscriptionTestResults', `❌ Plan deletion error: ${error.message}`, 'error');
+            }
+        }
+
+        // Settings Routing Tests
+        async function testAdminSettings() {
+            logResult('settingsTestResults', '🔄 Testing admin settings navigation...', 'warning');
+            logResult('settingsTestResults', 'Open the frontend application and navigate to Admin Dashboard > Settings', 'warning');
+            logResult('settingsTestResults', 'Expected: Should show SystemSettings component with platform configuration options', 'info');
+            logResult('settingsTestResults', '📱 Click here to open admin dashboard: <a href="http://localhost:5175/app/admin" target="_blank">http://localhost:5175/app/admin</a>', 'success');
+        }
+
+        async function testGeneralSettings() {
+            logResult('settingsTestResults', '🔄 Testing general settings navigation...', 'warning');
+            logResult('settingsTestResults', 'Open the frontend application and navigate to general Settings', 'warning');
+            logResult('settingsTestResults', 'Expected: Should show appropriate settings page based on user role', 'info');
+            logResult('settingsTestResults', '📱 Click here to open general settings: <a href="http://localhost:5175/app/settings" target="_blank">http://localhost:5175/app/settings</a>', 'success');
+        }
+
+        // Initialize page
+        window.onload = function() {
+            logResult('apiResults', '🚀 Admin Issues Testing Page Loaded', 'success');
+            logResult('apiResults', 'Environment: Local Development (Full-stack)', 'info');
+            logResult('apiResults', 'Please start by logging in as admin using the credentials provided.', 'info');
+            
+            // Check if already logged in
+            const token = localStorage.getItem('token');
+            if (token) {
+                logResult('apiResults', '✅ Found existing auth token in localStorage', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

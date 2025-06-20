@@ -486,6 +486,94 @@ app.all('/api/studies*', async (req, res) => {
   }
 });
 
+// Recordings endpoints  
+app.all('/api/recordings*', async (req, res) => {
+  try {
+    if (req.method === 'POST') {
+      const { action } = req.query;
+
+      if (action === 'upload') {
+        return await handleRecordingUpload(req, res, supabase);
+      } else if (action === 'create') {
+        return await createRecordingSession(req, res, supabase);
+      } else if (action === 'complete') {
+        return await completeRecording(req, res, supabase);
+      }
+    }
+
+    if (req.method === 'GET') {
+      const { sessionId, studyId } = req.query;
+      
+      if (sessionId) {
+        return await getRecordingBySession(req, res, supabase, sessionId);
+      } else if (studyId) {
+        return await getRecordingsByStudy(req, res, supabase, studyId);
+      } else {
+        return await getAllRecordings(req, res, supabase);
+      }
+    }
+
+    if (req.method === 'PUT') {
+      return await updateRecording(req, res, supabase);
+    }
+
+    if (req.method === 'DELETE') {
+      return await deleteRecording(req, res, supabase);
+    }
+
+    res.status(405).json({ success: false, error: 'Method not allowed' });
+
+  } catch (error) {
+    console.error('Recordings error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Recordings operation failed',
+      message: error.message
+    });
+  }
+});
+
+// User Interactions endpoints  
+app.all('/api/interactions*', async (req, res) => {
+  try {
+    if (req.method === 'POST') {
+      const { action } = req.query;
+
+      if (action === 'upload' || !action) {
+        return await handleInteractionsUpload(req, res, supabase);
+      } else if (action === 'process') {
+        return await processInteractionsForAnalytics(req, res, supabase);
+      }
+    }
+
+    if (req.method === 'GET') {
+      const { sessionId, studyId, type } = req.query;
+      
+      if (sessionId) {
+        return await getInteractionsBySession(req, res, supabase, sessionId);
+      } else if (studyId) {
+        return await getInteractionsByStudy(req, res, supabase, studyId);
+      } else {
+        return await getAllInteractions(req, res, supabase);
+      }
+    }
+
+    if (req.method === 'DELETE') {
+      return await deleteInteractions(req, res, supabase);
+    }
+
+    res.status(405).json({ success: false, error: 'Method not allowed' });
+
+  } catch (error) {
+    console.error('Interactions error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Interactions operation failed',
+      message: error.message
+    });
+  }
+});
+
 // Admin setup endpoints
 app.all('/api/admin-setup', async (req, res) => {
   const { action } = req.body;
@@ -2057,46 +2145,6 @@ app.get('/api/admin/system-performance', async (req, res) => {
     }
 
     // Calculate system metrics based on database activity
-    const totalUsers = (recentUsers || []).length;
-    const activeUsers = (recentUsers || []).filter(u => u.last_sign_in_at && 
-      new Date(u.last_sign_in_at) > startDate).length;
-    const totalStudies = (recentStudies || []).length;
-    const activeStudies = (recentStudies || []).filter(s => s.status === 'active').length;
-
-    // Generate performance data based on real activity  
-    const performanceData = [];
-    const hours = timeframe === '1h' ? 1 : timeframe === '24h' ? 24 : timeframe === '7d' ? 168 : 720;
-    
-    for (let i = hours - 1; i >= 0; i--) {
-      const hourDate = new Date(now);
-      hourDate.setHours(hourDate.getHours() - i);
-      
-      // Calculate activity for this hour
-      const hourStart = new Date(hourDate);
-      hourStart.setMinutes(0, 0, 0);
-      const hourEnd = new Date(hourStart);
-      hourEnd.setHours(hourEnd.getHours() + 1);
-      
-      const hourActivity = (recentUsers || []).filter(u => {
-        const signInDate = u.last_sign_in_at ? new Date(u.last_sign_in_at) : null;
-        return signInDate && signInDate >= hourStart && signInDate < hourEnd;
-      }).length;
-      
-      // Simulate realistic performance metrics
-      const baseLoad = 30 + (hourActivity * 5); // Base load + activity impact
-      const cpuUsage = Math.min(95, baseLoad + Math.random() * 20);
-      const memoryUsage = Math.min(90, baseLoad + Math.random() * 15);
-      const responseTime = Math.max(50, 200 - (hourActivity * 2) + Math.random() * 100);
-      
-      performanceData.push({
-        timestamp: hourStart.toISOString(),
-        cpu: Math.round(cpuUsage),
-        memory: Math.round(memoryUsage),
-        responseTime: Math.round(responseTime),
-        activeUsers: hourActivity
-      });
-    }
-
     const systemMetrics = [
       {
         id: 'cpu',
@@ -2213,6 +2261,388 @@ function startFrontend() {
   });
 
   return frontend;
+}
+
+// Recordings API Helper Functions
+async function handleRecordingUpload(req, res, supabase) {
+  try {
+    const { sessionId, recordingData, mimeType, duration } = req.body;
+
+    if (!sessionId || !recordingData) {
+      return res.status(400).json({
+        success: false,
+        error: 'Session ID and recording data are required'
+      });
+    }
+
+    console.log(`📤 Processing recording upload for session: ${sessionId}`);
+    
+    const recordingId = `rec_${sessionId}_${Date.now()}`;
+    let cloudUploadResult = null;
+    
+    // Try to upload to cloud storage (falls back to local/base64 if not configured)
+    try {
+      // Import cloud storage service
+      const { uploadRecording, generateFileName } = await import('./src/server/services/cloudStorage.js');
+      
+      // Generate unique filename
+      const fileName = generateFileName(sessionId, 'webm');
+      
+      // Upload to cloud storage
+      cloudUploadResult = await uploadRecording(recordingData, fileName, mimeType, {
+        sessionId,
+        recordingId,
+        uploadedBy: 'local-api',
+        originalMimeType: mimeType
+      });
+      
+      console.log('✅ Cloud storage upload successful');
+      
+    } catch (cloudError) {
+      console.warn('⚠️ Cloud storage failed, falling back to base64 storage:', cloudError.message);
+      // Continue with base64 storage as fallback
+    }
+    
+    // Prepare recording data for database
+    const recordingDataForDB = {
+      id: recordingId,
+      session_id: sessionId,
+      mime_type: mimeType || 'video/webm',
+      duration: duration || 0,
+      status: 'completed',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    // Add cloud storage info if successful
+    if (cloudUploadResult && cloudUploadResult.success) {
+      recordingDataForDB.cloud_provider = cloudUploadResult.provider;
+      recordingDataForDB.cloud_path = cloudUploadResult.cloudPath;
+      recordingDataForDB.cloud_url = cloudUploadResult.cloudUrl;
+      recordingDataForDB.file_size = cloudUploadResult.fileSize;
+      recordingDataForDB.recording_options = JSON.stringify(cloudUploadResult.metadata);
+      // Don't store raw data if cloud upload successful
+    } else {
+      // Fallback: store as base64 in database
+      recordingDataForDB.recording_data = recordingData;
+      recordingDataForDB.file_size = recordingData.length;
+      recordingDataForDB.cloud_provider = 'local';
+    }
+    
+    const { data: recording, error } = await supabase
+      .from('recordings')
+      .insert(recordingDataForDB)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving recording:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to save recording',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        recordingId: recording.id,
+        sessionId: recording.session_id,
+        status: recording.status,
+        message: 'Recording uploaded successfully'
+      }
+    });
+
+  } catch (error) {
+    console.error('Recording upload error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to upload recording',
+      details: error.message
+    });
+  }
+}
+
+async function createRecordingSession(req, res, supabase) {
+  try {
+    const { studyId, participantId } = req.body;
+
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    const { data: session, error } = await supabase
+      .from('recording_sessions')
+      .insert({
+        id: sessionId,
+        study_id: studyId,
+        participant_id: participantId,
+        status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating recording session:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create recording session',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        sessionId: session.id,
+        studyId: session.study_id,
+        status: session.status,
+        message: 'Recording session created successfully'
+      }
+    });
+
+  } catch (error) {
+    console.error('Recording session creation error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to create recording session',
+      details: error.message
+    });
+  }
+}
+
+async function completeRecording(req, res, supabase) {
+  try {
+    const { sessionId } = req.body;
+
+    if (!sessionId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Session ID is required'
+      });
+    }
+
+    const { data: session, error } = await supabase
+      .from('recording_sessions')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', sessionId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error completing recording session:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to complete recording session',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        sessionId: session.id,
+        status: session.status,
+        completedAt: session.completed_at,
+        message: 'Recording session completed successfully'
+      }
+    });
+
+  } catch (error) {
+    console.error('Recording completion error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to complete recording session',
+      details: error.message
+    });
+  }
+}
+
+async function getRecordingBySession(req, res, supabase, sessionId) {
+  try {
+    const { data: recording, error } = await supabase
+      .from('recordings')
+      .select('*')
+      .eq('session_id', sessionId)
+      .single();
+
+    if (error) {
+      return res.status(404).json({
+        success: false,
+        error: 'Recording not found',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: recording
+    });
+
+  } catch (error) {
+    console.error('Get recording error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve recording',
+      details: error.message
+    });
+  }
+}
+
+async function getRecordingsByStudy(req, res, supabase, studyId) {
+  try {
+    const { data: recordings, error } = await supabase
+      .from('recordings')
+      .select('*')
+      .eq('study_id', studyId);
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve recordings',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: recordings || []
+    });
+
+  } catch (error) {
+    console.error('Get recordings by study error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve recordings',
+      details: error.message
+    });
+  }
+}
+
+async function getAllRecordings(req, res, supabase) {
+  try {
+    const { data: recordings, error } = await supabase
+      .from('recordings')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve recordings',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: recordings || [],
+      total: recordings?.length || 0
+    });
+
+  } catch (error) {
+    console.error('Get all recordings error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve recordings',
+      details: error.message
+    });
+  }
+}
+
+async function updateRecording(req, res, supabase) {
+  try {
+    const { recordingId, updates } = req.body;
+
+    if (!recordingId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Recording ID is required'
+      });
+    }
+
+    const { data: recording, error } = await supabase
+      .from('recordings')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', recordingId)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update recording',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: recording
+    });
+
+  } catch (error) {
+    console.error('Update recording error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update recording',
+      details: error.message
+    });
+  }
+}
+
+async function deleteRecording(req, res, supabase) {
+  try {
+    const { recordingId } = req.body;
+
+    if (!recordingId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Recording ID is required'
+      });
+    }
+
+    const { error } = await supabase
+      .from('recordings')
+      .delete()
+      .eq('id', recordingId);
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete recording',
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Recording deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete recording error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to delete recording',
+      details: error.message
+    });
+  }
 }
 
 // Start backend API server

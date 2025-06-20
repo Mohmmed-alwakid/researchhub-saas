@@ -11,6 +11,48 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+// Upload recording to server
+const uploadRecording = async (blob: Blob, sessionId: string) => {
+  try {
+    // Convert blob to base64 for API upload
+    const base64Data = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        resolve(base64.split(',')[1]); // Remove data:video/webm;base64, prefix
+      };
+      reader.readAsDataURL(blob);
+    });
+
+    const response = await fetch('/api/recordings?action=upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sessionId,
+        recordingData: base64Data,
+        mimeType: 'video/webm',
+        duration: 0 // Will be calculated on server
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'Upload failed');
+    }
+
+    return result.recording;
+  } catch (error) {
+    console.error('Recording upload error:', error);
+    throw error;
+  }
+};
+
 export interface RecordingOptions {
   screen: boolean;
   audio: boolean;
@@ -77,6 +119,21 @@ export const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
       } : false
     };
   }, [recordingOptions]);
+  // Stop recording
+  const handleStopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsPaused(false);
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+
+      toast.success('Recording stopped');
+    }
+  }, [isRecording]);
 
   // Initialize media streams
   const initializeStreams = useCallback(async (): Promise<MediaStream> => {
@@ -121,7 +178,9 @@ export const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
         stream.getTracks().forEach(track => {
           combinedStream.addTrack(track);
         });
-      });      return combinedStream;
+      });      
+      
+      return combinedStream;
     } catch (error) {
       console.error('Error initializing media streams:', error);
       throw new Error(`Failed to initialize recording: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -154,10 +213,18 @@ export const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
-      };
-
-      mediaRecorder.onstop = () => {
+      };      mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+        
+        // Upload recording to server
+        try {
+          await uploadRecording(blob, recordingIdRef.current || sessionId);
+          toast.success('Recording saved successfully');
+        } catch (error) {
+          console.error('Failed to upload recording:', error);
+          toast.error('Failed to save recording');
+        }
+        
         onRecordingStop?.(blob);
         
         // Clean up streams
@@ -205,24 +272,7 @@ export const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
       toast.error(message);
     } finally {
       setIsInitializing(false);
-    }
-  }, [sessionId, initializeStreams, onRecordingStart, onRecordingStop, onError, isRecording]);
-
-  // Stop recording
-  const handleStopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      setIsPaused(false);
-      
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-
-      toast.success('Recording stopped');
-    }
-  }, [isRecording]);
+    }  }, [sessionId, initializeStreams, onRecordingStart, onRecordingStop, onError, isRecording]);
 
   // Pause/Resume recording
   const handlePauseResume = useCallback(() => {
