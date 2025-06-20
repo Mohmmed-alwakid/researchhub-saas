@@ -44,119 +44,39 @@ const AdminOverview: React.FC = () => {
   useEffect(() => {
     fetchAdminStats();
   }, []);
-
-  const fetchAdminStats = async () => {    try {
-      const response = await fetch('/api/admin?action=overview', {
+  const fetchAdminStats = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('supabase.auth.token');
+      const response = await fetch('/api/admin/analytics-overview', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setStats(data.stats || {
-          totalUsers: 142,
-          activeStudies: 28,
-          monthlyRevenue: 12450,
-          totalParticipants: 89,
-          newUsersThisWeek: 15,
-          completedStudies: 156,
-          systemHealth: 'healthy',
-          recentActivity: [
-            {
-              id: '1',
-              type: 'user_registered',
-              description: 'New researcher registered',
-              timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-              user: 'john.doe@example.com'
-            },
-            {
-              id: '2',
-              type: 'study_created',
-              description: 'Mobile App UX Study created',
-              timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-              user: 'researcher@example.com'
-            },
-            {
-              id: '3',
-              type: 'payment_received',
-              description: 'Pro subscription payment received',
-              timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-              user: 'client@company.com'
-            }
-          ]
-        });
+        const result = await response.json();
+        if (result.success) {
+          setStats(result.data);
+        } else {
+          throw new Error(result.error || 'Failed to fetch stats');
+        }
       } else {
-        // Use mock data if API fails
-        setStats({
-          totalUsers: 142,
-          activeStudies: 28,
-          monthlyRevenue: 12450,
-          totalParticipants: 89,
-          newUsersThisWeek: 15,
-          completedStudies: 156,
-          systemHealth: 'healthy',
-          recentActivity: [
-            {
-              id: '1',
-              type: 'user_registered',
-              description: 'New researcher registered',
-              timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-              user: 'john.doe@example.com'
-            },
-            {
-              id: '2',
-              type: 'study_created',
-              description: 'Mobile App UX Study created',
-              timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-              user: 'researcher@example.com'
-            },
-            {
-              id: '3',
-              type: 'payment_received',
-              description: 'Pro subscription payment received',
-              timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-              user: 'client@company.com'
-            }
-          ]
-        });
+        throw new Error('Failed to fetch admin stats');
       }
     } catch (error) {
       console.error('Failed to fetch admin stats:', error);
-      // Use mock data as fallback
+      // Use fallback data in case of error
       setStats({
-        totalUsers: 142,
-        activeStudies: 28,
-        monthlyRevenue: 12450,
-        totalParticipants: 89,
-        newUsersThisWeek: 15,
-        completedStudies: 156,
-        systemHealth: 'healthy',
-        recentActivity: [
-          {
-            id: '1',
-            type: 'user_registered',
-            description: 'New researcher registered',
-            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-            user: 'john.doe@example.com'
-          },
-          {
-            id: '2',
-            type: 'study_created',
-            description: 'Mobile App UX Study created',
-            timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-            user: 'researcher@example.com'
-          },
-          {
-            id: '3',
-            type: 'payment_received',
-            description: 'Pro subscription payment received',
-            timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-            user: 'client@company.com'
-          }
-        ]
-      });
+        totalUsers: 0,
+        activeStudies: 0,
+        monthlyRevenue: 0,
+        totalParticipants: 0,
+        newUsersThisWeek: 0,
+        completedStudies: 0,
+        systemHealth: 'error',
+        recentActivity: []      });
     } finally {
       setIsLoading(false);
     }

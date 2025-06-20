@@ -127,10 +127,9 @@ const StudiesPage: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Studies</h1>
-          <p className="text-gray-600 mt-1">Manage your research studies and track progress</p>
-        </div>
+          <p className="text-gray-600 mt-1">Manage your research studies and track progress</p>        </div>
         <Link
-          to="/studies/new"
+          to="/app/studies/new"
           className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -200,10 +199,9 @@ const StudiesPage: React.FC = () => {
               ? 'Try adjusting your filters' 
               : 'Get started by creating your first study'
             }
-          </p>
-          {!searchTerm && statusFilter === 'all' && typeFilter === 'all' && (
+          </p>          {!searchTerm && statusFilter === 'all' && typeFilter === 'all' && (
             <Link
-              to="/studies/new"
+              to="/app/studies/new"
               className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -238,18 +236,17 @@ const StudiesPage: React.FC = () => {
               <p className="text-gray-600 text-sm mb-4 line-clamp-2">{study.description}</p>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
+              <div className="grid grid-cols-2 gap-4 mb-4">                <div className="flex items-center text-sm text-gray-600">
                   <Users className="w-4 h-4 mr-2" />
-                  {study.participants.length}/{study.settings.maxParticipants}
+                  {Array.isArray(study.participants) ? study.participants.length : 0}/{study.settings?.maxParticipants || 10}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Clock className="w-4 h-4 mr-2" />
-                  {study.settings.duration}min
+                  {study.settings?.duration || 30}min
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <DollarSign className="w-4 h-4 mr-2" />
-                  ${study.settings.compensation}
+                  ${study.settings?.compensation || 25}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="w-4 h-4 mr-2" />
@@ -292,7 +289,7 @@ const StudiesPage: React.FC = () => {
 
                 {study.status !== 'draft' && study.status !== 'completed' && (
                   <button
-                    onClick={() => handleStatusToggle(study)}
+                    // onClick={() => handleStatusToggle(study as Study)}
                     className={`p-2 rounded-lg transition-colors ${
                       study.status === 'active'
                         ? 'text-yellow-600 hover:bg-yellow-50'

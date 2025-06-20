@@ -12,44 +12,71 @@ import {
   Filter,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
+import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
 
 const DashboardPage = () => {
-  // Mock data - replace with actual data from API
-  const stats = [
-    { name: 'Total Studies', value: '12', change: '+2', changeType: 'increase', icon: FileText },
-    { name: 'Active Participants', value: '2,847', change: '+12%', changeType: 'increase', icon: Users },
-    { name: 'Completion Rate', value: '87%', change: '+3%', changeType: 'increase', icon: Target },
-    { name: 'Avg. Session Time', value: '24m', change: '-2m', changeType: 'decrease', icon: Clock },
-  ];
+  const [dashboardData, setDashboardData] = useState<DashboardAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  // Fetch real dashboard data on component mount
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const data = await analyticsService.getDashboardAnalytics();
+        setDashboardData(data);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+        // Set fallback data if API fails
+        setDashboardData({
+          totalStudies: 0,
+          activeParticipants: 0,
+          completionRate: 0,
+          avgSessionTime: 0,
+          activeStudies: 0,
+          recentStudies: []
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const recentStudies = [
-    {
-      id: 1,
-      title: 'E-commerce Checkout Flow',
-      status: 'active',
-      participants: 156,
-      completionRate: 89,
-      lastUpdate: '2 hours ago',
+    fetchDashboardData();
+  }, []);
+
+  // Calculate stats for display
+  const stats = dashboardData ? [
+    { 
+      name: 'Total Studies', 
+      value: dashboardData.totalStudies.toString(), 
+      change: '+2', 
+      changeType: 'increase' as const, 
+      icon: FileText 
     },
-    {
-      id: 2,
-      title: 'Mobile App Navigation',
-      status: 'completed',
-      participants: 89,
-      completionRate: 92,
-      lastUpdate: '1 day ago',
+    { 
+      name: 'Active Participants', 
+      value: dashboardData.activeParticipants.toString(), 
+      change: '+12%', 
+      changeType: 'increase' as const, 
+      icon: Users 
     },
-    {
-      id: 3,
-      title: 'Landing Page Optimization',
-      status: 'draft',
-      participants: 0,
-      completionRate: 0,
-      lastUpdate: '3 days ago',
+    { 
+      name: 'Completion Rate', 
+      value: `${dashboardData.completionRate}%`, 
+      change: '+3%', 
+      changeType: 'increase' as const, 
+      icon: Target 
     },
-  ];
+    { 
+      name: 'Avg. Session Time', 
+      value: `${dashboardData.avgSessionTime}m`, 
+      change: '-2m', 
+      changeType: 'decrease' as const, 
+      icon: Clock 
+    },
+  ] : [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -63,6 +90,19 @@ const DashboardPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            <span className="ml-2 text-gray-600">Loading dashboard...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6">
@@ -157,10 +197,9 @@ const DashboardPage = () => {
                   View All
                 </Button>
               }
-            />
-            <CardContent>
+            />            <CardContent>
               <div className="space-y-4">
-                {recentStudies.map((study, index) => (
+                {dashboardData?.recentStudies?.map((study, index) => (
                   <div 
                     key={study.id} 
                     className="p-4 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 cursor-pointer animate-slide-up"
@@ -182,7 +221,7 @@ const DashboardPage = () => {
                           <span>{study.completionRate}% completion</span>
                           <span className="mx-2">•</span>
                           <Clock className="h-4 w-4 mr-1" />
-                          <span>{study.lastUpdate}</span>
+                          <span>{new Date(study.lastUpdate).toLocaleDateString()}</span>
                         </div>
                       </div>
                       <div className="ml-4">
@@ -195,7 +234,13 @@ const DashboardPage = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                )) || (
+                  <div className="text-center py-8 text-gray-500">
+                    <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>No recent studies found</p>
+                    <p className="text-sm">Create your first study to get started</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP-Powered Study Creation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .section.active {
+            border-color: #4CAF50;
+            background-color: #f9fff9;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.secondary {
+            background-color: #2196F3;
+        }
+        button.secondary:hover {
+            background-color: #1976D2;
+        }
+        .ai-suggestion {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #2196F3;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .generated-content {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: #e0e0e0;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+        .step.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .step.completed {
+            background-color: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 MCP-Powered Study Creation</h1>
+            <p>AI-Enhanced User Testing Study Builder</p>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active" id="step1">1. Research Goals</div>
+            <div class="step" id="step2">2. AI Generation</div>
+            <div class="step" id="step3">3. Customization</div>
+            <div class="step" id="step4">4. Creation</div>
+        </div>
+
+        <!-- Step 1: Research Goals -->
+        <div class="section active" id="section1">
+            <h3>🎯 Step 1: Define Research Goals</h3>
+            <div class="form-group">
+                <label for="researchObjective">What do you want to learn from users?</label>
+                <textarea id="researchObjective" placeholder="e.g., How do users navigate our new mobile app interface?"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="targetAudience">Who is your target audience?</label>
+                <input type="text" id="targetAudience" placeholder="e.g., Mobile app users aged 25-40">
+            </div>
+            <div class="form-group">
+                <label for="studyType">What type of study?</label>
+                <select id="studyType">
+                    <option value="">Select study type...</option>
+                    <option value="usability">Usability Testing</option>
+                    <option value="card_sorting">Card Sorting</option>
+                    <option value="first_impression">First Impression Test</option>
+                    <option value="prototype">Prototype Testing</option>
+                    <option value="survey">User Survey</option>
+                    <option value="interview">User Interview</option>
+                </select>
+            </div>
+            <button onclick="generateStudyWithAI()">🚀 Generate Study with AI</button>
+        </div>
+
+        <!-- Step 2: AI Generation -->
+        <div class="section" id="section2">
+            <h3>🤖 Step 2: AI-Generated Study Content</h3>
+            <div id="aiStatus" class="status info">
+                Ready to generate AI-powered study content...
+            </div>
+            <div id="generatedContent" style="display: none;">
+                <div class="generated-content">
+                    <h4>📝 Generated Study Plan</h4>
+                    <div id="studyTitle"></div>
+                    <div id="studyDescription"></div>
+                    <div id="studyTasks"></div>
+                    <div id="studyQuestions"></div>
+                </div>
+                <button onclick="customizeStudy()" class="secondary">✏️ Customize Content</button>
+                <button onclick="createStudy()">✅ Create Study</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Customization -->
+        <div class="section" id="section3">
+            <h3>✏️ Step 3: Customize Study Details</h3>
+            <div class="form-group">
+                <label for="finalTitle">Study Title</label>
+                <input type="text" id="finalTitle">
+            </div>
+            <div class="form-group">
+                <label for="finalDescription">Study Description</label>
+                <textarea id="finalDescription"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="finalTasks">Tasks (one per line)</label>
+                <textarea id="finalTasks" style="height: 150px;"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="finalQuestions">Post-Study Questions (one per line)</label>
+                <textarea id="finalQuestions" style="height: 150px;"></textarea>
+            </div>
+            <button onclick="finalizeStudy()">🎯 Finalize Study</button>
+        </div>
+
+        <!-- Step 4: Creation -->
+        <div class="section" id="section4">
+            <h3>🎉 Step 4: Study Created Successfully</h3>
+            <div id="creationStatus"></div>
+            <div id="studyDetails" style="display: none;">
+                <h4>📊 Study Summary</h4>
+                <div id="finalStudyInfo"></div>
+                <button onclick="viewStudy()" class="secondary">👀 View Study</button>
+                <button onclick="testWithPlaywright()">🎭 Test with Playwright</button>
+                <button onclick="startNewStudy()">🆕 Create Another Study</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let generatedStudyData = {};
+
+        async function generateStudyWithAI() {
+            const objective = document.getElementById('researchObjective').value;
+            const audience = document.getElementById('targetAudience').value;
+            const type = document.getElementById('studyType').value;
+
+            if (!objective || !audience || !type) {
+                alert('Please fill in all fields before generating study content.');
+                return;
+            }
+
+            // Update status
+            const statusEl = document.getElementById('aiStatus');
+            statusEl.textContent = '🤖 AI is generating your study content...';
+            statusEl.className = 'status info';
+
+            // Simulate AI generation (replace with actual MCP call)
+            try {
+                await simulateAIGeneration();
+                
+                // Generate study content based on inputs
+                const studyContent = generateStudyContent(objective, audience, type);
+                
+                // Display generated content
+                displayGeneratedContent(studyContent);
+                
+                // Move to next step
+                moveToStep(2);
+                
+                statusEl.textContent = '✅ AI study generation completed!';
+                statusEl.className = 'status success';
+                
+            } catch (error) {
+                statusEl.textContent = '❌ Error generating study content: ' + error.message;
+                statusEl.className = 'status error';
+            }
+        }
+
+        async function simulateAIGeneration() {
+            // Simulate API call delay
+            return new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        function generateStudyContent(objective, audience, type) {
+            const studyTemplates = {
+                usability: {
+                    title: `Usability Testing: ${extractKeyword(objective)}`,
+                    description: `This study evaluates the usability and user experience of ${extractKeyword(objective)} with ${audience}. Participants will complete key tasks while we observe their behavior and gather feedback.`,
+                    tasks: [
+                        'Complete the main user journey',
+                        'Navigate to specific features mentioned in objective',
+                        'Perform typical user actions',
+                        'Find and use help or support features'
+                    ],
+                    questions: [
+                        'How easy was it to complete the main task?',
+                        'What was most confusing or difficult?',
+                        'What did you like most about the experience?',
+                        'How would you improve this interface?',
+                        'Would you recommend this to others?'
+                    ]
+                },
+                card_sorting: {
+                    title: `Card Sorting Study: ${extractKeyword(objective)}`,
+                    description: `This card sorting study helps understand how ${audience} categorize and organize information related to ${extractKeyword(objective)}.`,
+                    tasks: [
+                        'Sort cards into logical groups',
+                        'Name each group you create',
+                        'Explain your reasoning for groupings',
+                        'Identify any confusing or unclear items'
+                    ],
+                    questions: [
+                        'How confident are you in your groupings?',
+                        'Which items were hardest to categorize?',
+                        'What additional categories would be helpful?',
+                        'How would you expect to find these items normally?'
+                    ]
+                },
+                first_impression: {
+                    title: `First Impression Test: ${extractKeyword(objective)}`,
+                    description: `This study captures initial reactions and first impressions from ${audience} when encountering ${extractKeyword(objective)}.`,
+                    tasks: [
+                        'Look at the interface for 10 seconds',
+                        'Describe what you see',
+                        'Identify the main purpose',
+                        'Point out what catches your attention first'
+                    ],
+                    questions: [
+                        'What is your first impression?',
+                        'What do you think this is for?',
+                        'Who do you think the target audience is?',
+                        'What would you click on first?',
+                        'How professional does this look?'
+                    ]
+                },
+                prototype: {
+                    title: `Prototype Testing: ${extractKeyword(objective)}`,
+                    description: `This study tests an early prototype with ${audience} to validate concepts and identify improvements before development.`,
+                    tasks: [
+                        'Explore the prototype freely',
+                        'Complete the primary user flow',
+                        'Test interactive elements',
+                        'Identify missing features'
+                    ],
+                    questions: [
+                        'Does this prototype meet your expectations?',
+                        'What features are missing?',
+                        'How intuitive is the interface?',
+                        'What would you change about the design?',
+                        'Would you use this if it were available?'
+                    ]
+                },
+                survey: {
+                    title: `User Survey: ${extractKeyword(objective)}`,
+                    description: `This survey gathers quantitative and qualitative feedback from ${audience} about ${extractKeyword(objective)}.`,
+                    tasks: [
+                        'Answer all survey questions honestly',
+                        'Provide detailed explanations where requested',
+                        'Rate features and experiences',
+                        'Suggest improvements'
+                    ],
+                    questions: [
+                        'How often do you use similar products?',
+                        'Rate your overall satisfaction (1-10)',
+                        'What features are most important to you?',
+                        'What problems does this solve for you?',
+                        'How likely are you to recommend this? (NPS)'
+                    ]
+                },
+                interview: {
+                    title: `User Interview: ${extractKeyword(objective)}`,
+                    description: `This interview explores user needs, behaviors, and attitudes related to ${extractKeyword(objective)} with ${audience}.`,
+                    tasks: [
+                        'Share your background and experience',
+                        'Describe your typical workflow',
+                        'Demonstrate how you currently solve this problem',
+                        'Discuss pain points and challenges'
+                    ],
+                    questions: [
+                        'Tell me about your experience with similar products',
+                        'Walk me through your typical process',
+                        'What frustrates you most about current solutions?',
+                        'What would an ideal solution look like?',
+                        'How do you currently work around limitations?'
+                    ]
+                }
+            };
+
+            return studyTemplates[type] || studyTemplates.usability;
+        }
+
+        function extractKeyword(text) {
+            // Simple keyword extraction
+            const words = text.toLowerCase().split(' ');
+            const keywords = words.filter(word => 
+                word.length > 3 && 
+                !['what', 'how', 'when', 'where', 'why', 'who', 'the', 'and', 'or', 'but', 'with', 'for', 'from', 'to', 'of', 'in', 'on', 'at', 'by'].includes(word)
+            );
+            return keywords[0] || 'interface';
+        }
+
+        function displayGeneratedContent(content) {
+            generatedStudyData = content;
+            
+            document.getElementById('studyTitle').innerHTML = `<strong>Title:</strong> ${content.title}`;
+            document.getElementById('studyDescription').innerHTML = `<strong>Description:</strong> ${content.description}`;
+            document.getElementById('studyTasks').innerHTML = `<strong>Tasks:</strong><ul>${content.tasks.map(task => `<li>${task}</li>`).join('')}</ul>`;
+            document.getElementById('studyQuestions').innerHTML = `<strong>Questions:</strong><ul>${content.questions.map(q => `<li>${q}</li>`).join('')}</ul>`;
+            
+            document.getElementById('generatedContent').style.display = 'block';
+        }
+
+        function customizeStudy() {
+            // Pre-fill customization form
+            document.getElementById('finalTitle').value = generatedStudyData.title;
+            document.getElementById('finalDescription').value = generatedStudyData.description;
+            document.getElementById('finalTasks').value = generatedStudyData.tasks.join('\n');
+            document.getElementById('finalQuestions').value = generatedStudyData.questions.join('\n');
+            
+            moveToStep(3);
+        }
+
+        function createStudy() {
+            // Use generated content as-is
+            finalizeStudy();
+        }
+
+        async function finalizeStudy() {
+            // Get final study data
+            const finalData = {
+                title: document.getElementById('finalTitle').value || generatedStudyData.title,
+                description: document.getElementById('finalDescription').value || generatedStudyData.description,
+                tasks: (document.getElementById('finalTasks').value || generatedStudyData.tasks.join('\n')).split('\n').filter(t => t.trim()),
+                questions: (document.getElementById('finalQuestions').value || generatedStudyData.questions.join('\n')).split('\n').filter(q => q.trim()),
+                type: document.getElementById('studyType').value,
+                audience: document.getElementById('targetAudience').value,
+                objective: document.getElementById('researchObjective').value
+            };
+
+            // Show creation status
+            const statusEl = document.getElementById('creationStatus');
+            statusEl.textContent = '🚀 Creating study in ResearchHub...';
+            statusEl.className = 'status info';
+
+            try {
+                // Simulate API call to create study (replace with actual API call)
+                await createStudyInResearchHub(finalData);
+                
+                // Show success
+                statusEl.textContent = '✅ Study created successfully!';
+                statusEl.className = 'status success';
+                
+                // Display study details
+                displayFinalStudyInfo(finalData);
+                moveToStep(4);
+                
+            } catch (error) {
+                statusEl.textContent = '❌ Error creating study: ' + error.message;
+                statusEl.className = 'status error';
+            }
+        }
+
+        async function createStudyInResearchHub(studyData) {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // In a real implementation, this would make an API call to:
+            // POST /api/studies with the study data
+            console.log('Study data to be created:', studyData);
+            
+            // Store for demonstration
+            localStorage.setItem('lastCreatedStudy', JSON.stringify(studyData));
+        }
+
+        function displayFinalStudyInfo(data) {
+            const info = `
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                    <h5>${data.title}</h5>
+                    <p><strong>Type:</strong> ${data.type}</p>
+                    <p><strong>Target Audience:</strong> ${data.audience}</p>
+                    <p><strong>Tasks:</strong> ${data.tasks.length}</p>
+                    <p><strong>Questions:</strong> ${data.questions.length}</p>
+                    <p><strong>Status:</strong> Ready for participants</p>
+                </div>
+            `;
+            document.getElementById('finalStudyInfo').innerHTML = info;
+            document.getElementById('studyDetails').style.display = 'block';
+        }
+
+        function moveToStep(step) {
+            // Update step indicator
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                const sectionEl = document.getElementById(`section${i}`);
+                
+                if (i < step) {
+                    stepEl.className = 'step completed';
+                    sectionEl.className = 'section';
+                } else if (i === step) {
+                    stepEl.className = 'step active';
+                    sectionEl.className = 'section active';
+                } else {
+                    stepEl.className = 'step';
+                    sectionEl.className = 'section';
+                }
+            }
+            currentStep = step;
+        }
+
+        function viewStudy() {
+            // Open the main ResearchHub application
+            window.open('http://localhost:5175/studies', '_blank');
+        }
+
+        async function testWithPlaywright() {
+            alert('🎭 Playwright automation test would start here!\n\nThis would:\n1. Open ResearchHub\n2. Navigate to study builder\n3. Fill in study details\n4. Create the study\n5. Verify creation success');
+            
+            // In a real implementation, this would trigger Playwright automation
+            console.log('Starting Playwright test for study creation...');
+        }
+
+        function startNewStudy() {
+            // Reset form
+            document.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+            document.getElementById('generatedContent').style.display = 'none';
+            document.getElementById('studyDetails').style.display = 'none';
+            moveToStep(1);
+        }
+
+        // Initialize
+        moveToStep(1);
+    </script>
+</body>
+</html>

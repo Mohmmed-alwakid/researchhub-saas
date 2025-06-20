@@ -154,7 +154,7 @@ export const bulkUpdateUsers = async (data: {
 
 // System Analytics
 export const getSystemAnalytics = async (timeframe: '7d' | '30d' | '90d' = '30d'): Promise<SystemAnalytics> => {
-  return apiService.get<{ data: SystemAnalytics }>(`/api/admin?action=analytics&timeframe=${timeframe}`).then(response => response.data);
+  return apiService.get<{ data: SystemAnalytics }>(`/api/admin/user-behavior?timeframe=${timeframe}`).then(response => response.data);
 };
 
 // Study Oversight
@@ -203,4 +203,43 @@ export interface UserBehaviorAnalytics {
 
 export const getUserBehaviorAnalytics = async (timeframe: '7d' | '30d' | '90d' = '30d'): Promise<UserBehaviorAnalytics> => {
   return apiService.get<{ data: UserBehaviorAnalytics }>(`/api/admin?action=user-behavior&timeframe=${timeframe}`).then(response => response.data);
+};
+
+export interface SystemMetric {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  change: number;
+  status: 'healthy' | 'warning' | 'error';
+}
+
+export interface PerformanceData {
+  timestamp: string;
+  cpu: number;
+  memory: number;
+  responseTime: number;
+  activeUsers: number;
+}
+
+export interface UsageStatistic {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  change: number;
+  percentage: number;
+}
+
+export interface SystemPerformance {
+  metrics: SystemMetric[];
+  performanceData: PerformanceData[];
+  usageStatistics: UsageStatistic[];
+  timeframe: string;
+  lastUpdated: string;
+}
+
+// System Performance Analytics
+export const getSystemPerformance = async (timeframe: '1h' | '24h' | '7d' | '30d' = '24h'): Promise<SystemPerformance> => {
+  return apiService.get<{ data: SystemPerformance }>(`/api/admin/system-performance?timeframe=${timeframe}`).then(response => response.data);
 };

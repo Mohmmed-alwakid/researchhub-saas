@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Activity, 
   Users, 
@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import { ComingSoon } from '../common/ComingSoon';
-import { getSystemPerformance, type SystemMetric, type UsageStatistic } from '../../services/admin.service';
+import { getSystemPerformance, type SystemMetric, type PerformanceData, type UsageStatistic } from '../../services/admin.service';
 
 // Reuse existing analytics dashboard
 import AdvancedAnalyticsDashboard from '../analytics/AdvancedAnalyticsDashboard';
@@ -38,7 +38,8 @@ const SystemAnalytics: React.FC = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const fetchSystemPerformanceData = useCallback(async () => {
+
+  const fetchSystemPerformanceData = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -78,10 +79,11 @@ const SystemAnalytics: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedTimeRange]);
+  };
+
   useEffect(() => {
     fetchSystemPerformanceData();
-  }, [selectedTimeRange, fetchSystemPerformanceData]);
+  }, [selectedTimeRange]);
 
   const getIconForMetric = (metricId: string): React.ElementType => {
     switch (metricId) {
