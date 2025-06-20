@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,35 +15,41 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Create Supabase client 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  
-  // Handle authentication if token is provided
-  let currentUser = null;
+  // Create Supabase client (use service role for server-side operations when authenticated)
   const authHeader = req.headers.authorization;
+  let currentUser = null;
+  let supabase;
+  
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
+    // First, verify the token with anon client
+    const anonSupabase = createClient(supabaseUrl, supabaseKey);
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      const { data: { user }, error: authError } = await anonSupabase.auth.getUser(token);
       if (user && !authError) {
         currentUser = user;
-        // Set the auth context for this request
-        await supabase.auth.setSession({
-          access_token: token,
-          refresh_token: '' // Not needed for this operation
-        });
+        // Use service role client for authenticated operations to bypass RLS for server-side logic
+        supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseKey);
       }
     } catch (authErr) {
       console.log('Auth token validation failed:', authErr);
     }
   }
-  try {
-    if (req.method === 'GET') {
+  
+  // Fallback to anon client if no valid authentication
+  if (!supabase) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  try {    if (req.method === 'GET') {
       // Fetch studies from Supabase
-      const { data: studies, error } = await supabase
-        .from('studies')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let query = supabase.from('studies').select('*').order('created_at', { ascending: false });
+      
+      // If we have an authenticated user, filter by researcher_id
+      if (currentUser) {
+        query = query.eq('researcher_id', currentUser.id);
+      }
+      
+      const { data: studies, error } = await query;
 
       if (error) {
         console.error('Error fetching studies:', error);
