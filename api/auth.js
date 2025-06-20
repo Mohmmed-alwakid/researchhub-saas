@@ -120,9 +120,7 @@ export default async function handler(req, res) {
         if (profileError) {
           console.error('Profile creation error:', profileError);
         }
-      }
-
-      console.log('User logged in successfully');
+      }      console.log('User logged in successfully');
       return res.status(200).json({
         success: true,
         message: 'Login successful',
@@ -134,9 +132,9 @@ export default async function handler(req, res) {
           lastName: profile?.last_name || data.user.user_metadata?.last_name
         },
         session: {
-          accessToken: data.session.access_token,
-          refreshToken: data.session.refresh_token,
-          expiresAt: data.session.expires_at
+          access_token: data.session.access_token,  // Keep snake_case for frontend compatibility
+          refresh_token: data.session.refresh_token,
+          expires_at: data.session.expires_at
         }
       });
     }
@@ -199,16 +197,14 @@ export default async function handler(req, res) {
           success: false,
           error: error.message
         });
-      }
-
-      console.log('Token refreshed successfully');
+      }      console.log('Token refreshed successfully');
       return res.status(200).json({
         success: true,
         message: 'Token refreshed successfully',
         session: {
-          accessToken: data.session.access_token,
-          refreshToken: data.session.refresh_token,
-          expiresAt: data.session.expires_at
+          access_token: data.session.access_token,  // Keep snake_case for frontend compatibility
+          refresh_token: data.session.refresh_token,
+          expires_at: data.session.expires_at
         }
       });
     }

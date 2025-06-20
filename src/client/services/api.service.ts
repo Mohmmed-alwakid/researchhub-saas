@@ -57,7 +57,7 @@ class ApiService {
                   refreshToken,
                 });
 
-                const token = response.data.data?.accessToken || response.data.token;
+                const token = response.data.session?.access_token || response.data.data?.accessToken || response.data.token;
                 
                 // Update both localStorage and trigger Zustand store update
                 const updatedState = { ...state, token };
