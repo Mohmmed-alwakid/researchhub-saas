@@ -127,32 +127,87 @@ async function handleRecordingUpload(req, res, supabase) {
 // Create a new recording session
 async function createRecordingSession(req, res, supabase) {
   try {
-    const { sessionId, studyId, participantId, recordingOptions } = req.body;
+    const { studyId, participantId, sessionName, recordingSettings } = req.body;
+    
+    // Generate unique IDs
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Get authentication token from header
+    const authHeader = req.headers.authorization;
+    let currentUserId = null;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        if (user && !authError) {
+          currentUserId = user.id;
+        }
+      } catch (authErr) {
+        console.log('Auth verification failed:', authErr.message);
+      }
+    }
+    
+    // For now, allow unauthenticated testing - in production this should be stricter
+    const userIdToUse = currentUserId || participantId || `anonymous_${Date.now()}`;
 
-    const recordingId = `rec_${sessionId}_${Date.now()}`;
-
-    const { data: recording, error } = await supabase
-      .from('recordings')
+    // Create recording session first
+    const { data: session, error: sessionError } = await supabase
+      .from('recording_sessions')
       .insert({
-        id: recordingId,
-        session_id: sessionId,
+        id: sessionId,
         study_id: studyId,
-        participant_id: participantId,
-        status: 'recording',
-        recording_options: recordingOptions,
-        started_at: new Date().toISOString(),
+        participant_id: userIdToUse,
+        researcher_id: currentUserId,
+        session_name: sessionName || 'Recording Session',
+        recording_settings: recordingSettings || { screen: true },
+        status: 'active',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
       .select()
       .single();
 
-    if (error) {
+    if (sessionError) {
+      console.error('Error creating recording session:', sessionError);
+      throw sessionError;
+    }
+
+    // Create initial recording entry
+    const recordingId = `rec_${sessionId}_${Date.now()}`;
+    
+    const { data: recording, error } = await supabase
+      .from('recordings')
+      .insert({
+        id: recordingId,
+        session_id: sessionId,
+        study_id: studyId,
+        participant_id: userIdToUse,
+        status: 'recording',
+        recording_options: recordingSettings,
+        started_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();    if (error) {
+      console.error('Error creating recording:', error);
       throw error;
     }
 
     res.status(200).json({
       success: true,
+      sessionId: sessionId,
+      recordingId: recordingId,
+      session: {
+        id: session.id,
+        studyId: session.study_id,
+        participantId: session.participant_id,
+        sessionName: session.session_name,
+        status: session.status,
+        recordingSettings: session.recording_settings,
+        startedAt: session.started_at
+      },
       recording: {
         id: recording.id,
         sessionId: recording.session_id,
