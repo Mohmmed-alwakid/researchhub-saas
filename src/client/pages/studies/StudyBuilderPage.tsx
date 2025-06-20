@@ -191,11 +191,27 @@ const EnhancedStudyBuilderPage: React.FC = () => {
     };
     setStudyTasks(prev => [...prev, duplicatedTask]);
     toast.success(`Duplicated "${task.name}"`);
-  }, [studyTasks]);
-  const handleDeleteTask = useCallback((taskId: string) => {
+  }, [studyTasks]);  const handleDeleteTask = useCallback((taskId: string) => {
     setStudyTasks(prev => prev.filter(task => task.id !== taskId));
     toast.success('Task removed from study');
   }, []);
+
+  // Get available recording options based on study type
+  const getRecordingOptions = useCallback(() => {
+    const allOptions = [
+      { key: 'recordScreen', label: 'Screen Recording', desc: 'Record participant screen activity', studyTypes: ['usability_test'] },
+      { key: 'recordAudio', label: 'Audio Recording', desc: 'Record participant voice/think-aloud', studyTypes: ['usability_test', 'user_interview'] },
+      { key: 'recordWebcam', label: 'Webcam Recording', desc: 'Record participant facial expressions', studyTypes: ['user_interview'] },
+      { key: 'collectHeatmaps', label: 'Heatmap Data', desc: 'Track mouse movements and clicks', studyTypes: ['usability_test'] },
+      { key: 'trackClicks', label: 'Click Tracking', desc: 'Log all click interactions', studyTypes: ['usability_test'] },
+      { key: 'trackScrolls', label: 'Scroll Tracking', desc: 'Monitor scrolling behavior', studyTypes: ['usability_test'] }
+    ];
+
+    return allOptions.filter(option => 
+      option.studyTypes.includes(watchedType) || 
+      watchedType === 'survey' && ['recordAudio'].includes(option.key) // Surveys only allow audio recording
+    );
+  }, [watchedType]);
 
   const onSubmit = async (data: StudyFormData) => {
     if (studyTasks.length === 0) {
@@ -554,20 +570,34 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                       )}
                     </div>
                   </CardContent>
-                </Card>
-
-                {/* Recording Settings */}
+                </Card>                {/* Recording Settings */}
                 <Card variant="elevated">
-                  <CardHeader title="Recording Options" subtitle="Choose what data to collect" />
+                  <CardHeader title="Recording Options" subtitle={`Choose what data to collect for ${watchedType.replace('_', ' ')}`} />
                   <CardContent className="space-y-4">
-                    {[
-                      { key: 'recordScreen', label: 'Screen Recording', desc: 'Record participant screen activity' },
-                      { key: 'recordAudio', label: 'Audio Recording', desc: 'Record participant voice/think-aloud' },
-                      { key: 'recordWebcam', label: 'Webcam Recording', desc: 'Record participant facial expressions' },
-                      { key: 'collectHeatmaps', label: 'Heatmap Data', desc: 'Track mouse movements and clicks' },
-                      { key: 'trackClicks', label: 'Click Tracking', desc: 'Log all click interactions' },
-                      { key: 'trackScrolls', label: 'Scroll Tracking', desc: 'Monitor scrolling behavior' }
-                    ].map(({ key, label, desc }) => (                      <div key={key} className="flex items-start space-x-3">
+                    {/* Study type specific info */}
+                    {watchedType === 'survey' && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          📋 <strong>Survey studies</strong> focus on collecting structured responses. Limited recording options are available to maintain participant privacy.
+                        </p>
+                      </div>
+                    )}
+                    {watchedType === 'user_interview' && (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-sm text-green-800">
+                          🎤 <strong>User interviews</strong> benefit from audio and video recording to capture detailed insights and non-verbal cues.
+                        </p>
+                      </div>
+                    )}
+                    {watchedType === 'usability_test' && (
+                      <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                        <p className="text-sm text-purple-800">
+                          🖥️ <strong>Usability tests</strong> require comprehensive tracking to understand user behavior and interaction patterns.
+                        </p>
+                      </div>
+                    )}
+                    
+                    {getRecordingOptions().map(({ key, label, desc }) => (<div key={key} className="flex items-start space-x-3">
                         <input
                           {...register(`settings.${key}` as `settings.${keyof StudyFormData['settings']}`)}
                           type="checkbox"

@@ -98,12 +98,13 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
   useEffect(() => {
     loadStudyTypes();
   }, [loadStudyTypes]);
-
   useEffect(() => {
     if (studyType) {
       loadTaskTemplates(studyType);
     }
-  }, [studyType, loadTaskTemplates]);  // Update parent when tasks change
+  }, [studyType, loadTaskTemplates]);
+
+  // Update parent when tasks change
   useEffect(() => {
     onTasksChange(currentTasks);
   }, [currentTasks, onTasksChange]);

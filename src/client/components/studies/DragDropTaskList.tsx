@@ -6,8 +6,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
 } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Clock } from 'lucide-react';
-import { SortableTaskItem } from './SortableTaskItem';
+import SortableTaskItem from './SortableTaskItem.tsx';
 
 interface Task {
   id: string;

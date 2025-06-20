@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Study type definitions - Only 3 core types
 const STUDY_TYPES = [
@@ -188,23 +187,6 @@ export const EnhancedStudyBuilder: React.FC<EnhancedStudyBuilderProps> = ({
       )
     }));
   };
-
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const items = Array.from(studyData.tasks);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    // Update order property
-    const reorderedTasks = items.map((task, index) => ({
-      ...task,
-      order: index
-    }));
-
-    setStudyData(prev => ({ ...prev, tasks: reorderedTasks }));
-  };
-
   const calculateTotalDuration = () => {
     return studyData.tasks.reduce((total, task) => total + task.estimatedDuration, 0);
   };
