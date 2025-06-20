@@ -79,14 +79,35 @@ export default async function handler(req, res) {
           total: sampleStudies.length,
           message: 'Sample studies retrieved (studies table not yet created)'
         });
-        return;
-      }
+        return;      }
+
+      // Transform Supabase data to frontend-expected format
+      const transformedStudies = (studies || []).map(study => ({
+        _id: study.id,
+        title: study.title,
+        description: study.description || '',
+        type: study.settings?.type || 'usability',
+        status: study.status,
+        createdBy: study.researcher_id,
+        tasks: study.settings?.tasks || [],
+        participants: [], // TODO: fetch actual participants
+        settings: {
+          maxParticipants: study.target_participants || study.settings?.maxParticipants || 10,
+          duration: study.settings?.duration || 30,
+          compensation: study.settings?.compensation || 25,
+          recordScreen: study.settings?.recording?.screen !== false,
+          recordAudio: study.settings?.recording?.audio === true,
+          collectHeatmaps: true
+        },
+        createdAt: study.created_at,
+        updatedAt: study.updated_at || study.created_at
+      }));
 
       res.status(200).json({
         success: true,
-        studies: studies || [],
-        total: studies?.length || 0,
-        message: 'Studies retrieved successfully'      });    } else if (req.method === 'POST') {
+        studies: transformedStudies,
+        total: transformedStudies.length,
+        message: 'Studies retrieved successfully'});    } else if (req.method === 'POST') {
       // Handle study creation with authentication
       let currentUserId = null;
       
@@ -126,9 +147,7 @@ export default async function handler(req, res) {
         .from('studies')
         .insert([studyData])
         .select()
-        .single();
-
-      if (error) {
+        .single();      if (error) {
         console.error('Error creating study:', error);
         return res.status(500).json({
           success: false,
@@ -136,9 +155,31 @@ export default async function handler(req, res) {
         });
       }
 
+      // Transform the new study to match frontend expectations
+      const transformedStudy = {
+        _id: newStudy.id,
+        title: newStudy.title,
+        description: newStudy.description || '',
+        type: newStudy.settings?.type || 'usability',
+        status: newStudy.status,
+        createdBy: newStudy.researcher_id,
+        tasks: newStudy.settings?.tasks || [],
+        participants: [],
+        settings: {
+          maxParticipants: newStudy.target_participants || newStudy.settings?.maxParticipants || 10,
+          duration: newStudy.settings?.duration || 30,
+          compensation: newStudy.settings?.compensation || 25,
+          recordScreen: newStudy.settings?.recording?.screen !== false,
+          recordAudio: newStudy.settings?.recording?.audio === true,
+          collectHeatmaps: true
+        },
+        createdAt: newStudy.created_at,
+        updatedAt: newStudy.updated_at || newStudy.created_at
+      };
+
       res.status(201).json({
         success: true,
-        study: newStudy,
+        study: transformedStudy,
         message: 'Study created successfully'
       });
     } else {
