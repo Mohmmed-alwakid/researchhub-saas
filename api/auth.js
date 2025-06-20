@@ -255,12 +255,164 @@ export default async function handler(req, res) {
           lastName: profile?.last_name || user.user_metadata?.last_name,
           emailConfirmed: user.email_confirmed_at !== null
         }
+      });    }
+
+    // PASSWORD OPERATIONS
+    if (action === 'forgot-password') {
+      if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method not allowed' });
+      }
+
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email is required'
+        });
+      }
+
+      console.log('Requesting password reset for:', email);
+      
+      // Send password reset email via Supabase
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.CLIENT_URL || 'https://researchhub-saas.vercel.app'}/reset-password`,
+      });
+
+      if (error) {
+        console.error('Password reset error:', error);
+        return res.status(400).json({
+          success: false,
+          error: error.message
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Password reset email sent successfully'
+      });
+    }
+
+    if (action === 'reset-password') {
+      if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method not allowed' });
+      }
+
+      const { password } = req.body;
+      const accessToken = req.headers.authorization?.replace('Bearer ', '');
+      
+      if (!password) {
+        return res.status(400).json({
+          success: false,
+          error: 'New password is required'
+        });
+      }
+
+      if (!accessToken) {
+        return res.status(401).json({
+          success: false,
+          error: 'Access token is required'
+        });
+      }
+
+      console.log('Updating password for user');
+      
+      // Create new supabase instance with access token
+      const { data, error } = await supabase.auth.updateUser({
+        password: password
+      });
+
+      if (error) {
+        console.error('Password update error:', error);
+        return res.status(400).json({
+          success: false,
+          error: error.message
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Password updated successfully',
+        user: {
+          id: data.user?.id,
+          email: data.user?.email
+        }
+      });
+    }
+
+    if (action === 'change-password') {
+      if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method not allowed' });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+      const accessToken = req.headers.authorization?.replace('Bearer ', '');
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Current password and new password are required'
+        });
+      }
+
+      if (!accessToken) {
+        return res.status(401).json({
+          success: false,
+          error: 'Access token is required'
+        });
+      }
+
+      console.log('Changing password for user');
+      
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
+      
+      if (userError || !user) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid access token'
+        });
+      }
+
+      // Verify current password by attempting to sign in
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword
+      });
+
+      if (verifyError) {
+        return res.status(400).json({
+          success: false,
+          error: 'Current password is incorrect'
+        });
+      }
+
+      // Update password
+      const { data, error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        console.error('Password change error:', error);
+        return res.status(400).json({
+          success: false,
+          error: error.message
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Password changed successfully',
+        user: {
+          id: data.user?.id,
+          email: data.user?.email
+        }
       });
     }
 
     return res.status(400).json({
       success: false,
-      error: 'Invalid action. Use: register, login, logout, refresh, or status'
+      error: 'Invalid action. Use: register, login, logout, refresh, status, forgot-password, reset-password, or change-password'
     });
 
   } catch (error) {

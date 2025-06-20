@@ -6,6 +6,25 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// Predefined test accounts for admin setup
+const TEST_ACCOUNTS = {
+  participant: {
+    email: 'abwanwr77+participant@gmail.com',
+    password: 'Testtest123',
+    role: 'participant'
+  },
+  researcher: {
+    email: 'abwanwr77+Researcher@gmail.com', 
+    password: 'Testtest123',
+    role: 'researcher'
+  },
+  admin: {
+    email: 'abwanwr77+admin@gmail.com',
+    password: 'Testtest123',
+    role: 'admin'
+  }
+};
+
 // Helper function to verify admin access
 async function verifyAdmin(req) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -49,6 +68,9 @@ export default async function handler(req, res) {
     const adminUser = await verifyAdmin(req);
 
     switch (action) {
+      case 'setup':
+        return await handleAdminSetup(req, res);
+      
       case 'users':
         return await handleUsers(req, res);
       
@@ -101,6 +123,256 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, error: error.message });
     }
     return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Handle admin setup
+async function handleAdminSetup(req, res) {
+  // Handle both GET and POST requests for setup
+  const { action: setupAction } = req.query;
+
+  try {
+    console.log('=== ADMIN SETUP ===');
+
+    if (req.method === 'GET') {
+      // Return test account information
+      return res.status(200).json({
+        success: true,
+        message: 'Test accounts info',
+        accounts: TEST_ACCOUNTS
+      });
+    }
+
+    // Handle setup actions
+    if (setupAction === 'setup_admin') {
+      const adminEmail = 'abwanwr77+admin@gmail.com';
+      
+      // Check if admin profile exists
+      const { data: profiles, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', adminEmail);
+
+      if (fetchError) {
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to check admin profile',
+          details: fetchError.message
+        });
+      }
+
+      if (profiles && profiles.length > 0) {
+        const adminProfile = profiles[0];
+        
+        if (adminProfile.role === 'admin') {
+          return res.status(200).json({
+            success: true,
+            message: 'Admin already exists and properly configured',
+            admin: {
+              email: adminEmail,
+              role: adminProfile.role,
+              id: adminProfile.id
+            }
+          });
+        } else {
+          // Update role to admin
+          const { data: updateResult, error: updateError } = await supabase
+            .from('profiles')
+            .update({ 
+              role: 'admin',
+              updated_at: new Date().toISOString()
+            })
+            .eq('email', adminEmail)
+            .select();
+
+          if (updateError) {
+            return res.status(400).json({
+              success: false,
+              error: 'Failed to update admin role',
+              details: updateError.message
+            });
+          }
+
+          return res.status(200).json({
+            success: true,
+            message: 'Admin role updated successfully',
+            admin: {
+              email: adminEmail,
+              role: 'admin',
+              updated: true
+            }
+          });
+        }
+      } else {
+        return res.status(404).json({
+          success: false,
+          error: 'Admin profile not found. Please login first to create profile.',
+          note: 'Login at the application first, then run this setup'
+        });
+      }
+    }
+
+    if (setupAction === 'force_admin_role') {
+      const adminEmail = 'abwanwr77+admin@gmail.com';
+      
+      try {
+        const { data: updateResult, error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            role: 'admin',
+            updated_at: new Date().toISOString()
+          })
+          .eq('email', adminEmail)
+          .select();
+
+        if (updateError) {
+          // If direct update fails, try to find and update by ID
+          const { data: allProfiles, error: fetchError } = await supabase
+            .from('profiles')
+            .select('*');
+            
+          if (!fetchError && allProfiles) {
+            const existingProfile = allProfiles.find(p => p.email === adminEmail);
+            
+            if (existingProfile) {
+              const { data: updateById, error: updateByIdError } = await supabase
+                .from('profiles')
+                .update({ 
+                  role: 'admin',
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', existingProfile.id)
+                .select();
+                
+              if (updateByIdError) {
+                return res.status(400).json({
+                  success: false,
+                  error: 'Failed to update admin role by ID',
+                  details: updateByIdError.message
+                });
+              }
+              
+              return res.status(200).json({
+                success: true,
+                message: 'Admin role set successfully (updated by ID)',
+                admin: {
+                  email: adminEmail,
+                  role: 'admin',
+                  method: 'updated_by_id'
+                }
+              });
+            }
+          }
+          
+          return res.status(400).json({
+            success: false,
+            error: 'Failed to update admin role and no profile found',
+            details: updateError.message
+          });
+        }
+
+        if (updateResult && updateResult.length > 0) {
+          return res.status(200).json({
+            success: true,
+            message: 'Admin role set successfully (direct update)',
+            admin: {
+              email: adminEmail,
+              role: 'admin',
+              method: 'direct_update'
+            }
+          });
+        } else {
+          return res.status(404).json({
+            success: false,
+            error: 'Admin profile not found for update',
+            note: 'Please login first to create profile, then try again'
+          });
+        }
+      } catch (e) {
+        console.error('Force admin role error:', e);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to force admin role',
+          details: e.message
+        });
+      }
+    }
+
+    // Original create test accounts functionality
+    if (req.method === 'POST' && !setupAction) {
+      // Create predefined test accounts
+      const results = [];
+      
+      for (const [key, account] of Object.entries(TEST_ACCOUNTS)) {
+        const { email, password, role } = account;
+        
+        // Check if user already exists
+        const { data: existingUser } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .single();
+        
+        if (existingUser) {
+          results.push({ email, success: false, error: 'User already exists' });
+          continue;
+        }
+        
+        // Create new user
+        const { data, error } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          user_metadata: {
+            role
+          },
+          email_confirm: true
+        });
+
+        if (error) {
+          results.push({ email, success: false, error: error.message });
+          continue;
+        }
+        
+        // Create profile record
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: data.user.id,
+            email: email,
+            role: role,
+            status: 'active',
+            subscription_plan: 'free',
+            subscription_status: 'active',
+            is_email_verified: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }]);
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+
+        results.push({ email, success: true });
+      }
+
+      return res.status(201).json({
+        success: true,
+        results
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid setup action. Use: setup_admin, force_admin_role, or POST for test accounts'
+    });
+
+  } catch (error) {
+    console.error('Error in handleAdminSetup:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Admin setup failed',
+      message: error.message 
+    });
   }
 }
 
@@ -922,213 +1194,10 @@ async function handleStudies(req, res) {
     return res.status(200).json({ success: true, data: performanceMetrics });
   } catch (error) {
     console.error('System performance error:', error);
-    return res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-// Handle system performance metrics
-async function handleSystemPerformance(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  try {
-    const { timeframe = '24h' } = req.query;
-    
-    // Calculate date range based on timeframe
-    const now = new Date();
-    let startDate = new Date(now);
-    
-    switch (timeframe) {
-      case '1h':
-        startDate.setHours(now.getHours() - 1);
-        break;
-      case '24h':
-        startDate.setDate(now.getDate() - 1);
-        break;
-      case '7d':
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case '30d':
-        startDate.setDate(now.getDate() - 30);
-        break;
-      default:
-        startDate.setDate(now.getDate() - 1);
-    }
-
-    // Get database activity metrics
-    const { data: recentUsers, error: userError } = await supabase
-      .from('users')
-      .select('id, created_at, last_sign_in_at')
-      .gte('created_at', startDate.toISOString())
-      .limit(1000);
-
-    if (userError) {
-      console.error('User activity query error:', userError);
-    }
-
-    // Get study activity
-    const { data: recentStudies, error: studyError } = await supabase
-      .from('studies')
-      .select('id, created_at, status')
-      .gte('created_at', startDate.toISOString())
-      .limit(1000);
-
-    if (studyError) {
-      console.error('Study activity query error:', studyError);
-    }
-
-    // Calculate system metrics based on database activity
-    const totalUsers = (recentUsers || []).length;
-    const activeUsers = (recentUsers || []).filter(u => u.last_sign_in_at && 
-      new Date(u.last_sign_in_at) > startDate).length;
-    const totalStudies = (recentStudies || []).length;
-    const activeStudies = (recentStudies || []).filter(s => s.status === 'active').length;
-
-    // Generate performance data based on real activity
-    const performanceData = [];
-    const hours = timeframe === '1h' ? 1 : timeframe === '24h' ? 24 : timeframe === '7d' ? 168 : 720;
-    
-    for (let i = hours - 1; i >= 0; i--) {
-      const hourDate = new Date(now);
-      hourDate.setHours(hourDate.getHours() - i);
-      
-      // Calculate activity for this hour
-      const hourStart = new Date(hourDate);
-      hourStart.setMinutes(0, 0, 0);
-      const hourEnd = new Date(hourStart);
-      hourEnd.setHours(hourEnd.getHours() + 1);
-      
-      const hourActivity = (recentUsers || []).filter(u => {
-        const signInDate = u.last_sign_in_at ? new Date(u.last_sign_in_at) : null;
-        return signInDate && signInDate >= hourStart && signInDate < hourEnd;
-      }).length;
-      
-      // Simulate realistic performance metrics
-      const baseLoad = 30 + (hourActivity * 5); // Base load + activity impact
-      const cpuUsage = Math.min(95, baseLoad + Math.random() * 20);
-      const memoryUsage = Math.min(90, baseLoad + Math.random() * 15);
-      const responseTime = Math.max(50, 200 - (hourActivity * 2) + Math.random() * 100);
-      
-      performanceData.push({
-        timestamp: hourStart.toISOString(),
-        cpu: Math.round(cpuUsage),
-        memory: Math.round(memoryUsage),
-        responseTime: Math.round(responseTime),
-        activeUsers: hourActivity
-      });
-    }
-
-    const systemMetrics = [
-      {
-        id: 'cpu',
-        name: 'CPU Usage',
-        value: performanceData.length > 0 ? performanceData[performanceData.length - 1].cpu : 45,
-        unit: '%',
-        change: performanceData.length > 1 ? 
-          performanceData[performanceData.length - 1].cpu - performanceData[performanceData.length - 2].cpu : 0,
-        status: performanceData.length > 0 && performanceData[performanceData.length - 1].cpu > 80 ? 'warning' : 'healthy'
-      },
-      {
-        id: 'memory',
-        name: 'Memory Usage',
-        value: performanceData.length > 0 ? performanceData[performanceData.length - 1].memory : 62,
-        unit: '%',
-        change: performanceData.length > 1 ? 
-          performanceData[performanceData.length - 1].memory - performanceData[performanceData.length - 2].memory : 0,
-        status: performanceData.length > 0 && performanceData[performanceData.length - 1].memory > 85 ? 'warning' : 'healthy'
-      },
-      {
-        id: 'response_time',
-        name: 'Response Time',
-        value: performanceData.length > 0 ? performanceData[performanceData.length - 1].responseTime : 145,
-        unit: 'ms',
-        change: performanceData.length > 1 ? 
-          performanceData[performanceData.length - 2].responseTime - performanceData[performanceData.length - 1].responseTime : 0,
-        status: performanceData.length > 0 && performanceData[performanceData.length - 1].responseTime > 300 ? 'warning' : 'healthy'
-      },
-      {
-        id: 'active_users',
-        name: 'Active Users',
-        value: activeUsers,
-        unit: '',
-        change: totalUsers > activeUsers ? totalUsers - activeUsers : 0,
-        status: 'healthy'
-      }
-    ];
-
-    const usageStatistics = [
-      {
-        id: 'total_users',
-        name: 'Total Users',
-        value: totalUsers,
-        unit: 'users',
-        change: Math.round(Math.random() * 10) + 1,
-        percentage: 100
-      },
-      {
-        id: 'active_studies',
-        name: 'Active Studies',
-        value: activeStudies,
-        unit: 'studies',
-        change: totalStudies - activeStudies,
-        percentage: totalStudies > 0 ? Math.round((activeStudies / totalStudies) * 100) : 0
-      },
-      {
-        id: 'api_requests',
-        name: 'API Requests',
-        value: Math.round(activeUsers * 50 + Math.random() * 500), // Estimate based on activity
-        unit: 'requests',
-        change: Math.round(Math.random() * 100),
-        percentage: 100
-      },
-      {
-        id: 'database_queries',
-        name: 'Database Queries',
-        value: Math.round(activeUsers * 25 + Math.random() * 200),
-        unit: 'queries',
-        change: Math.round(Math.random() * 50),
-        percentage: 100
-      }
-    ];
-
-    const systemPerformanceData = {
-      metrics: systemMetrics,
-      performanceData: performanceData,
-      usageStatistics: usageStatistics,
-      timeframe: timeframe,
-      lastUpdated: now.toISOString()
-    };
-
-    return res.status(200).json({ success: true, data: systemPerformanceData });
-  } catch (error) {
-    console.error('System performance data error:', error);
-    
-    // Fallback to mock data if there's an error
-    const systemPerformanceData = {
-      metrics: [
-        { id: 'cpu', name: 'CPU Usage', value: 68, unit: '%', change: 5.2, status: 'healthy' },
-        { id: 'memory', name: 'Memory Usage', value: 74, unit: '%', change: -2.1, status: 'healthy' },
-        { id: 'response_time', name: 'Response Time', value: 145, unit: 'ms', change: -15, status: 'healthy' },
-        { id: 'active_users', name: 'Active Users', value: 23, unit: '', change: 3, status: 'healthy' }
-      ],
-      performanceData: Array.from({ length: 24 }, (_, i) => ({
-        timestamp: new Date(Date.now() - (23 - i) * 60 * 60 * 1000).toISOString(),
-        cpu: Math.floor(Math.random() * 30) + 50,
-        memory: Math.floor(Math.random() * 25) + 60,
-        responseTime: Math.floor(Math.random() * 100) + 100,
-        activeUsers: Math.floor(Math.random() * 10) + 15
-      })),
-      usageStatistics: [
-        { id: 'total_users', name: 'Total Users', value: 1247, unit: 'users', change: 23, percentage: 100 },
-        { id: 'active_studies', name: 'Active Studies', value: 89, unit: 'studies', change: 7, percentage: 78 },
-        { id: 'api_requests', name: 'API Requests', value: 15642, unit: 'requests', change: 891, percentage: 100 },
-        { id: 'database_queries', name: 'Database Queries', value: 8329, unit: 'queries', change: 456, percentage: 100 }
-      ],
-      timeframe: 'mock',
-      lastUpdated: new Date().toISOString()
-    };
-    
-    return res.status(200).json({ success: true, data: systemPerformanceData, fallback: true });
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch system performance data',
+      details: error.message
+    });
   }
 }
