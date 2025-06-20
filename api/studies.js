@@ -11,9 +11,31 @@ export default async function handler(req, res) {
   
   if (req.method === 'OPTIONS') {
     res.status(200).end();
-    return;  }
+    return;
+  }
 
+  // Create Supabase client 
   const supabase = createClient(supabaseUrl, supabaseKey);
+  
+  // Handle authentication if token is provided
+  let currentUser = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      if (user && !authError) {
+        currentUser = user;
+        // Set the auth context for this request
+        await supabase.auth.setSession({
+          access_token: token,
+          refresh_token: '' // Not needed for this operation
+        });
+      }
+    } catch (authErr) {
+      console.log('Auth token validation failed:', authErr);
+    }
+  }
   try {
     if (req.method === 'GET') {
       // Fetch studies from Supabase
@@ -59,20 +81,11 @@ export default async function handler(req, res) {
         total: studies?.length || 0,
         message: 'Studies retrieved successfully'      });    } else if (req.method === 'POST') {
       // Handle study creation with authentication
-      const authHeader = req.headers.authorization;
       let currentUserId = null;
       
-      // Try to get user from auth token
-      if (authHeader?.startsWith('Bearer ')) {
-        const token = authHeader.substring(7);
-        try {
-          const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-          if (user) {
-            currentUserId = user.id;
-          }
-        } catch (authErr) {
-          console.log('Auth token validation failed:', authErr);
-        }
+      // Use the current user if available
+      if (currentUser) {
+        currentUserId = currentUser.id;
       }
 
       const { title, description, type, tasks, settings } = req.body;
