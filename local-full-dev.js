@@ -2146,6 +2146,7 @@ app.get('/api/admin/system-performance', async (req, res) => {
 
     // Calculate system metrics based on database activity
     const systemMetrics = [
+     
       {
         id: 'cpu',
         name: 'CPU Usage',
@@ -2232,6 +2233,45 @@ app.get('/api/admin/system-performance', async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Failed to fetch system performance data'
+    });
+  }
+});
+
+// Study Builder endpoints
+app.all('/api/study-builder*', async (req, res) => {
+  try {
+    const { action } = req.query;
+    
+    console.log(`⚡ LOCAL STUDY BUILDER: ${action}`);
+
+    // Import and use the study-builder logic
+    const studyBuilderHandler = await import('./api/study-builder.js');
+    
+    // Create a mock request/response that matches Vercel's format
+    const mockReq = {
+      method: req.method,
+      query: req.query,
+      body: req.body,
+      headers: req.headers
+    };
+    
+    const mockRes = {
+      status: (code) => ({
+        json: (data) => res.status(code).json(data),
+        end: () => res.status(code).end()
+      }),
+      setHeader: (name, value) => res.setHeader(name, value)
+    };
+
+    // Call the study-builder handler
+    return await studyBuilderHandler.default(mockReq, mockRes);
+
+  } catch (error) {
+    console.error('Study Builder error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Study Builder operation failed',
+      message: error.message
     });
   }
 });

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Builder API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .study-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 15px 0; }
+        .study-type { padding: 15px; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .study-type:hover { border-color: #007bff; background-color: #f8f9fa; }
+        .study-type.selected { border-color: #007bff; background-color: #e3f2fd; }
+        .task-templates { margin: 15px 0; }
+        .task-template { padding: 10px; margin: 5px 0; border: 1px solid #dee2e6; border-radius: 4px; background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Study Builder API Test Interface</h1>
+        <p>Testing the enhanced study builder with 3 study types and smart task management</p>
+
+        <!-- Authentication Section -->
+        <div class="section">
+            <h2>🔐 Authentication</h2>
+            <div>
+                <button onclick="login()">Login as Researcher</button>
+                <button onclick="checkAuthStatus()">Check Auth Status</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+            <div id="auth-status"></div>
+        </div>
+
+        <!-- Study Types Section -->
+        <div class="section">
+            <h2>📋 Study Types (Exactly 3)</h2>
+            <button onclick="loadStudyTypes()">Load Study Types</button>
+            <div id="study-types-container"></div>
+        </div>
+
+        <!-- Task Templates Section -->
+        <div class="section">
+            <h2>⚙️ Task Templates</h2>
+            <p>Select a study type above to see compatible tasks</p>
+            <div id="selected-study-type"></div>
+            <div id="task-templates-container"></div>
+        </div>
+
+        <!-- Study Validation Section -->
+        <div class="section">
+            <h2>✅ Study Validation</h2>
+            <button onclick="testValidation()">Test Study Validation</button>
+            <div id="validation-results"></div>
+        </div>
+
+        <!-- API Response Log -->
+        <div class="section">
+            <h2>📝 API Response Log</h2>
+            <button onclick="clearLog()">Clear Log</button>
+            <pre id="api-log"></pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = localStorage.getItem('token');
+        let selectedStudyType = null;
+
+        function log(message) {
+            const logElement = document.getElementById('api-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('api-log').textContent = '';
+        }
+
+        function updateStatus(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = message;
+            element.className = isSuccess ? 'success' : 'error';
+        }
+
+        async function login() {
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const data = await response.json();
+                log(`Login Response: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    localStorage.setItem('token', authToken);
+                    updateStatus('auth-status', `✅ Logged in as: ${data.user.email} (Role: ${data.user.role})`);
+                } else {
+                    updateStatus('auth-status', `❌ Login failed: ${data.error}`, false);
+                }
+            } catch (error) {
+                log(`Login Error: ${error.message}`);
+                updateStatus('auth-status', `❌ Login error: ${error.message}`, false);
+            }
+        }
+
+        async function checkAuthStatus() {
+            if (!authToken) {
+                updateStatus('auth-status', '❌ No auth token found', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=status`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                log(`Auth Status: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success) {
+                    updateStatus('auth-status', `✅ Authenticated as: ${data.user.email} (Role: ${data.user.role})`);
+                } else {
+                    updateStatus('auth-status', `❌ Auth check failed: ${data.error}`, false);
+                }
+            } catch (error) {
+                log(`Auth Status Error: ${error.message}`);
+                updateStatus('auth-status', `❌ Auth status error: ${error.message}`, false);
+            }
+        }
+
+        async function logout() {
+            authToken = null;
+            localStorage.removeItem('token');
+            updateStatus('auth-status', '📤 Logged out');
+        }
+
+        async function loadStudyTypes() {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/study-builder?action=get_study_types`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                log(`Study Types Response: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success) {
+                    displayStudyTypes(data.data);
+                } else {
+                    alert(`Failed to load study types: ${data.error}`);
+                }
+            } catch (error) {
+                log(`Study Types Error: ${error.message}`);
+                alert(`Error loading study types: ${error.message}`);
+            }
+        }
+
+        function displayStudyTypes(studyTypes) {
+            const container = document.getElementById('study-types-container');
+            container.innerHTML = `
+                <div class="study-types">
+                    ${studyTypes.map(type => `
+                        <div class="study-type" onclick="selectStudyType('${type.id}')" id="study-type-${type.id}">
+                            <div style="font-size: 2em; margin-bottom: 10px;">${type.icon || '📋'}</div>
+                            <h3>${type.name}</h3>
+                            <p>${type.description}</p>
+                            <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                                Max Tasks: ${type.maxTasks} | Recording: ${type.recordingRecommended ? 'Yes' : 'No'}
+                            </div>
+                            <div style="font-size: 0.8em; color: #888; margin-top: 5px;">
+                                Features: ${type.features.join(', ')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function selectStudyType(studyTypeId) {
+            selectedStudyType = studyTypeId;
+            
+            // Update visual selection
+            document.querySelectorAll('.study-type').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`study-type-${studyTypeId}`).classList.add('selected');
+            
+            document.getElementById('selected-study-type').innerHTML = `
+                <strong>Selected Study Type:</strong> ${studyTypeId}
+            `;
+
+            // Load task templates for this study type
+            await loadTaskTemplates(studyTypeId);
+        }
+
+        async function loadTaskTemplates(studyType) {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/study-builder?action=get_task_templates&studyType=${studyType}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                log(`Task Templates Response for ${studyType}: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success) {
+                    displayTaskTemplates(data.data, studyType);
+                } else {
+                    alert(`Failed to load task templates: ${data.error}`);
+                }
+            } catch (error) {
+                log(`Task Templates Error: ${error.message}`);
+                alert(`Error loading task templates: ${error.message}`);
+            }
+        }
+
+        function displayTaskTemplates(templates, studyType) {
+            const container = document.getElementById('task-templates-container');
+            
+            if (templates.length === 0) {
+                container.innerHTML = `<p>No task templates available for ${studyType}</p>`;
+                return;
+            }
+
+            const groupedTemplates = templates.reduce((groups, template) => {
+                const category = template.subcategory || template.category;
+                if (!groups[category]) groups[category] = [];
+                groups[category].push(template);
+                return groups;
+            }, {});
+
+            container.innerHTML = `
+                <h3>Available Task Templates for ${studyType}</h3>
+                ${Object.entries(groupedTemplates).map(([category, templates]) => `
+                    <div style="margin: 15px 0;">
+                        <h4>${category.replace(/_/g, ' ').toUpperCase()}</h4>
+                        ${templates.map(template => `
+                            <div class="task-template">
+                                <strong>${template.name}</strong>
+                                <p>${template.description}</p>
+                                <div style="font-size: 0.8em; color: #666;">
+                                    Duration: ${template.estimatedDuration} min | 
+                                    Complexity: ${template.complexity}/5 | 
+                                    ID: ${template.id}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        async function testValidation() {
+            if (!selectedStudyType) {
+                alert('Please select a study type first');
+                return;
+            }
+
+            const testTasks = [
+                {
+                    template_id: 'navigation',
+                    name: 'Test Navigation Task',
+                    estimated_duration: 5
+                },
+                {
+                    template_id: 'prototype_testing',
+                    name: 'Test Prototype Task',
+                    estimated_duration: 10
+                }
+            ];
+
+            try {
+                const response = await fetch(`${API_BASE}/study-builder`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        action: 'validate_study',
+                        tasks: testTasks,
+                        studyType: selectedStudyType
+                    })
+                });
+
+                const data = await response.json();
+                log(`Validation Response: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success) {
+                    const validation = data.data;
+                    document.getElementById('validation-results').innerHTML = `
+                        <div class="${validation.valid ? 'success' : 'error'}">
+                            <h4>Validation Result: ${validation.valid ? '✅ Valid' : '❌ Invalid'}</h4>
+                            <p>Task Count: ${validation.taskCount}/${validation.maxTasks}</p>
+                            ${validation.errors.length > 0 ? `
+                                <h5>Errors:</h5>
+                                <ul>${validation.errors.map(error => `<li>${error}</li>`).join('')}</ul>
+                            ` : ''}
+                        </div>
+                    `;
+                } else {
+                    alert(`Validation failed: ${data.error}`);
+                }
+            } catch (error) {
+                log(`Validation Error: ${error.message}`);
+                alert(`Validation error: ${error.message}`);
+            }
+        }
+
+        // Auto-check auth status on page load
+        window.onload = function() {
+            if (authToken) {
+                checkAuthStatus();
+            }
+        };
+    </script>
+</body>
+</html>

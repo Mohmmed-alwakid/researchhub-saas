@@ -1,5 +1,10 @@
 import type { Request } from 'express';
-import type { IUserDocument } from '../../database/models/index.js';
+// import type { IUserDocument } from '../../database/models/index.js';
+
+// Temporary user document interface
+interface IUserDocument extends IUser {
+  save(): Promise<void>;
+}
 
 // User types
 export interface IUser {
@@ -624,6 +629,57 @@ export interface ITimeAnalysis {
   dailyDistribution: Array<{ day: string; sessions: number }>;
   peakTimes: Array<{ period: string; sessions: number }>;
 }
+
+// Study Builder Types (New Enhanced System)
+export interface StudyBuilderTask {
+  id: string;
+  template_id: string;
+  name: string;
+  description: string;
+  estimated_duration: number;
+  order_index: number;
+  settings?: Record<string, unknown>;
+  category?: string;
+  subcategory?: string;
+  complexity?: number;
+}
+
+export interface StudyBuilderTaskTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  estimatedDuration: number;
+  complexity?: number;
+  requiredFields: string[];
+  optionalFields: string[];
+  defaultSettings: Record<string, unknown>;
+}
+
+export interface StudyBuilderType {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  allowedTasks: string[];
+  forbiddenTasks: string[];
+  maxTasks: number;
+  minTasks: number;
+  recordingRecommended: boolean;
+  features: string[];
+}
+
+// Updated Study interface to support both old and new task formats
+export interface IStudyV2 extends Omit<IStudy, 'type' | 'tasks'> {
+  type: 'usability_test' | 'user_interview' | 'survey';
+  tasks: string[] | ITask[] | StudyBuilderTask[];
+  builderVersion?: 'legacy' | 'enhanced';
+}
+
+// Utility types for task conversion
+export type TaskUnion = ITask | StudyBuilderTask;
+export type StudyTypeUnion = IStudy['type'] | 'usability_test' | 'user_interview' | 'survey';
 
 // Type aliases for convenience
 export type User = IUser;

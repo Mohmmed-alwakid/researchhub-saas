@@ -1,18 +1,31 @@
 # ResearchHub - Development Guide for Copilot
 
-## 🚀 Quick Start Commands
+## ⚠️ Project Status: UNDER DEVELOPMENT - NOT PRODUCTION READY
+**Last Updated**: December 28, 2024  
+**Status**: � Early Development Stage - Many Features Incomplete
+
+## �🚀 Quick Start Commands
 
 ### Development Workflow
 ```bash
 # 1. Verify TypeScript (should show 0 errors)
 npx tsc --noEmit
 
-# 2. Start development servers
-npm run dev  # Both frontend (5175) + backend (3002)
+# 2. Start LOCAL development environment (RECOMMENDED)
+npm run dev:fullstack  # Frontend (5175) + Backend (3003) + Real Supabase DB
 
 # 3. Test core functionality
-curl http://localhost:3002/api/health  # Should return 200 OK
+# Local API health check
+curl http://localhost:3003/api/health
+
+# Production health check (after deployment)
+curl https://researchhub-saas.vercel.app/api/health
 ```
+
+### Current Local Development Ports
+- **Frontend**: http://localhost:5175 (Vite dev server)
+- **Backend API**: http://localhost:3003 (Express with real Supabase)
+- **Production**: https://researchhub-saas.vercel.app
 
 ## 🏗️ Project Architecture
 

@@ -10,17 +10,33 @@ import {
   Users,
   Play,
   Sparkles,
-  CheckCircle
+  CheckCircle,
+  Plus
 } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { convertTasksToAPI } from '../../utils/taskConversion';
 import toast from 'react-hot-toast';
 
-// Lazy load the heavy study builder component
-const DragDropStudyBuilder = lazy(() => 
-  import('../../components/studies/DragDropStudyBuilder').then(module => ({
-    default: module.DragDropStudyBuilder
+// Import our new UI/UX components
+import { StudyBuilderProgress } from '../../components/studies/StudyBuilderProgress';
+import { TaskLibraryModal } from '../../components/studies/TaskLibraryModal';
+import { DragDropTaskList } from '../../components/studies/DragDropTaskList';
+import { ValidationFeedback, FieldValidation } from '../../components/studies/ValidationFeedback';
+import { 
+  validateStudyTitle, 
+  validateStudyDescription, 
+  validateTasks, 
+  validateStudyDuration,
+  createValidationResult,
+  type ValidationResult 
+} from '../../utils/validation';
+
+// Lazy load the study builder integration component
+const StudyBuilderIntegration = lazy(() => 
+  import('../../components/studies/StudyBuilderIntegration').then(module => ({
+    default: module.default
   }))
 );
 
@@ -34,12 +50,21 @@ const StudyBuilderLoading = () => (
   </div>
 );
 
-import type { StudyTask } from '../../components/studies/DragDropStudyBuilder';
+// Types for the study builder integration
+interface StudyBuilderTask {
+  id: string;
+  template_id: string;
+  name: string;
+  description: string;
+  estimated_duration: number;
+  order_index: number;
+  settings?: Record<string, unknown>;
+}
 
 const studySchema = z.object({
   title: z.string().min(1, 'Study title is required'),
   description: z.string().min(1, 'Study description is required'),
-  type: z.enum(['usability', 'interview', 'survey', 'prototype']),
+  type: z.enum(['usability_test', 'user_interview', 'survey']),
   settings: z.object({
     maxParticipants: z.number().min(1, 'At least 1 participant required').max(1000),
     duration: z.number().min(5, 'Minimum 5 minutes').max(240, 'Maximum 4 hours'),
@@ -60,7 +85,17 @@ const EnhancedStudyBuilderPage: React.FC = () => {
   const { createStudy } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [studyTasks, setStudyTasks] = useState<StudyTask[]>([]);
+  const [studyTasks, setStudyTasks] = useState<StudyBuilderTask[]>([]);
+  
+  // New state for enhanced UI components
+  const [showTaskLibrary, setShowTaskLibrary] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<StudyBuilderTask | null>(null);
+  const [validation, setValidation] = useState<ValidationResult>({ 
+    isValid: true, 
+    errors: [], 
+    warnings: [], 
+    suggestions: [] 
+  });
 
   const {
     register,
@@ -72,7 +107,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
     defaultValues: {
       title: '',
       description: '',
-      type: 'usability',
+      type: 'usability_test',
       settings: {
         maxParticipants: 10,
         duration: 30,
@@ -90,16 +125,76 @@ const EnhancedStudyBuilderPage: React.FC = () => {
   const watchedType = watch('type');
   const watchedTitle = watch('title');
   const watchedDescription = watch('description');
+  const watchedSettings = watch('settings');
 
-  const steps = [
+  // Update validation when form data changes
+  React.useEffect(() => {
+    const titleErrors = validateStudyTitle(watchedTitle || '');
+    const descriptionErrors = validateStudyDescription(watchedDescription || '');
+    const taskErrors = validateTasks(studyTasks);
+    const durationErrors = validateStudyDuration(watchedSettings?.duration || 0);
+
+    const allErrors = [...titleErrors, ...descriptionErrors, ...taskErrors, ...durationErrors];
+    const errors = allErrors.filter(e => e.type === 'error');
+    const warnings = allErrors.filter(e => e.type === 'warning');
+    const suggestions = allErrors.filter(e => e.type === 'info');
+
+  setValidation(createValidationResult(errors, warnings, suggestions));
+  }, [watchedTitle, watchedDescription, studyTasks, watchedSettings?.duration]);
+
+  const steps = React.useMemo(() => [
     { id: 0, title: 'Basic Info', icon: Settings, description: 'Study details and type' },
     { id: 1, title: 'Study Flow', icon: Play, description: 'Design task sequence' },
     { id: 2, title: 'Settings', icon: Users, description: 'Recording and participant settings' },
     { id: 3, title: 'Review', icon: Eye, description: 'Final review and launch' }
-  ];
+  ], []);
+  
+  // Handle tasks change from the new study builder
+  const handleTasksChange = useCallback((newTasks: StudyBuilderTask[]) => {
+    setStudyTasks(newTasks);
+  }, []);
 
-  const handleTasksChange = useCallback((tasks: StudyTask[]) => {
-    setStudyTasks(tasks);
+  // New handlers for enhanced UI components
+  const handleAddTaskFromLibrary = useCallback((template: any) => {
+    const newTask: StudyBuilderTask = {
+      id: `task_${Date.now()}`,
+      template_id: template.id,
+      name: template.name,
+      description: template.description,
+      estimated_duration: template.estimatedDuration || 5,
+      order_index: studyTasks.length + 1,
+      settings: template.settings || {}
+    };
+    setStudyTasks(prev => [...prev, newTask]);
+    setShowTaskLibrary(false);
+    toast.success(`Added "${template.name}" to your study`);
+  }, [studyTasks]);
+
+  const handleReorderTasks = useCallback((reorderedTasks: StudyBuilderTask[]) => {
+    setStudyTasks(reorderedTasks);
+  }, []);
+  const handleEditTask = useCallback((task: StudyBuilderTask) => {
+    setTaskToEdit(task);
+    // In a real implementation, this would open a task editing modal
+    toast('Task editing modal would open here', { 
+      icon: '✏️',
+      duration: 2000 
+    });
+  }, []);
+
+  const handleDuplicateTask = useCallback((task: StudyBuilderTask) => {
+    const duplicatedTask: StudyBuilderTask = {
+      ...task,
+      id: `task_${Date.now()}`,
+      name: `${task.name} (Copy)`,
+      order_index: studyTasks.length + 1
+    };
+    setStudyTasks(prev => [...prev, duplicatedTask]);
+    toast.success(`Duplicated "${task.name}"`);
+  }, [studyTasks]);
+  const handleDeleteTask = useCallback((taskId: string) => {
+    setStudyTasks(prev => prev.filter(task => task.id !== taskId));
+    toast.success('Task removed from study');
   }, []);
 
   const onSubmit = async (data: StudyFormData) => {
@@ -110,21 +205,16 @@ const EnhancedStudyBuilderPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    try {
-      // Convert StudyTask[] to the format expected by the API
-      const tasksForAPI = studyTasks.map((task, index) => ({
-        title: task.title,
-        description: task.description,
-        type: task.type as 'navigation' | 'interaction' | 'feedback' | 'questionnaire',
-        order: index,
-        configuration: task.configuration,
-        isRequired: task.isRequired,
-        successCriteria: task.successCriteria || [],
-        timeLimit: task.timeLimit
-      }));
+    try {      // Convert StudyBuilderTask[] to the format expected by the legacy API
+      const tasksForAPI = convertTasksToAPI(studyTasks);
+      
+      // Convert study type to legacy format
+      const legacyType = data.type === 'usability_test' ? 'usability' : 
+                        data.type === 'user_interview' ? 'interview' : 'survey';
 
       await createStudy({
         ...data,
+        type: legacyType as 'survey' | 'usability' | 'interview' | 'prototype',
         tasks: tasksForAPI,
         status: 'draft'
       });
@@ -167,8 +257,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="max-w-2xl mx-auto space-y-6">
-              <div>
+            <div className="max-w-2xl mx-auto space-y-6">              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Study Title *
                 </label>
@@ -180,6 +269,17 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                 />
                 {errors.title && (
                   <p className="mt-2 text-sm text-red-600">{errors.title.message}</p>
+                )}
+                {watchedTitle && (
+                  <ValidationFeedback
+                    validation={{
+                      isValid: validateStudyTitle(watchedTitle || '').length === 0,
+                      errors: validateStudyTitle(watchedTitle || '').filter(e => e.type === 'error'),
+                      warnings: validateStudyTitle(watchedTitle || '').filter(e => e.type === 'warning'),
+                      suggestions: validateStudyTitle(watchedTitle || '').filter(e => e.type === 'info')
+                    }}
+                    className="mt-2"
+                  />
                 )}
               </div>
 
@@ -196,23 +296,33 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                 {errors.description && (
                   <p className="mt-2 text-sm text-red-600">{errors.description.message}</p>
                 )}
+                {watchedDescription && (
+                  <ValidationFeedback
+                    validation={{
+                      isValid: validateStudyDescription(watchedDescription || '').length === 0,
+                      errors: validateStudyDescription(watchedDescription || '').filter(e => e.type === 'error'),
+                      warnings: validateStudyDescription(watchedDescription || '').filter(e => e.type === 'warning'),
+                      suggestions: validateStudyDescription(watchedDescription || '').filter(e => e.type === 'info')
+                    }}
+                    className="mt-2"
+                  />
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-4">
                   Study Type *
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </label>                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
                     { 
-                      value: 'usability', 
+                      value: 'usability_test', 
                       label: 'Usability Test', 
                       desc: 'Test how users interact with your product or website', 
                       icon: '🖥️',
                       color: 'bg-blue-50 border-blue-200 text-blue-700'
                     },
                     { 
-                      value: 'interview', 
+                      value: 'user_interview', 
                       label: 'User Interview', 
                       desc: 'Conduct structured interviews to gather insights', 
                       icon: '🎤',
@@ -224,13 +334,6 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                       desc: 'Collect quantitative feedback from participants', 
                       icon: '📋',
                       color: 'bg-purple-50 border-purple-200 text-purple-700'
-                    },
-                    { 
-                      value: 'prototype', 
-                      label: 'Prototype Test', 
-                      desc: 'Test early versions of your design or concept', 
-                      icon: '🎨',
-                      color: 'bg-orange-50 border-orange-200 text-orange-700'
                     }
                   ].map((type) => (
                     <label key={type.value} className="relative cursor-pointer">
@@ -259,9 +362,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
               </div>
             </div>
           </div>
-        );
-
-      case 1:
+        );      case 1:
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -271,12 +372,119 @@ const EnhancedStudyBuilderPage: React.FC = () => {
               <p className="text-gray-600">
                 Add and arrange tasks that participants will complete during the study
               </p>
-            </div>            <Suspense fallback={<StudyBuilderLoading />}>
-              <DragDropStudyBuilder
-                onTasksChange={handleTasksChange}
-                initialTasks={studyTasks}
-              />
-            </Suspense>
+            </div>
+
+            {/* Enhanced Task Management */}
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* Main Task List */}
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900">Study Tasks</h3>
+                    <Button
+                      onClick={() => setShowTaskLibrary(true)}
+                      variant="primary"
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Task
+                    </Button>
+                  </div>
+
+                  <DragDropTaskList
+                    tasks={studyTasks.map(task => ({
+                      id: task.id,
+                      templateId: task.template_id,
+                      name: task.name,
+                      description: task.description,
+                      estimatedDuration: task.estimated_duration,
+                      settings: task.settings || {},
+                      order: task.order_index,
+                      isRequired: true // You could make this configurable
+                    }))}
+                    onReorderTasks={(reorderedTasks) => {
+                      const updatedTasks = reorderedTasks.map((task, index) => ({
+                        id: task.id,
+                        template_id: task.templateId,
+                        name: task.name,
+                        description: task.description,
+                        estimated_duration: task.estimatedDuration,
+                        order_index: index + 1,
+                        settings: task.settings
+                      }));
+                      handleReorderTasks(updatedTasks);
+                    }}
+                    onEditTask={(task) => {
+                      const studyTask: StudyBuilderTask = {
+                        id: task.id,
+                        template_id: task.templateId,
+                        name: task.name,
+                        description: task.description,
+                        estimated_duration: task.estimatedDuration,
+                        order_index: task.order,
+                        settings: task.settings
+                      };
+                      handleEditTask(studyTask);
+                    }}
+                    onDuplicateTask={(task) => {
+                      const studyTask: StudyBuilderTask = {
+                        id: task.id,
+                        template_id: task.templateId,
+                        name: task.name,
+                        description: task.description,
+                        estimated_duration: task.estimatedDuration,
+                        order_index: task.order,
+                        settings: task.settings
+                      };
+                      handleDuplicateTask(studyTask);
+                    }}
+                    onDeleteTask={handleDeleteTask}
+                    studyType={watchedType}
+                  />
+                </div>
+
+                {/* Sidebar with Progress and Validation */}
+                <div className="lg:w-80">
+                  <div className="space-y-6">
+                    {/* Validation Feedback */}
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-3">Study Validation</h4>
+                      <ValidationFeedback 
+                        validation={validation}
+                        showSuccessMessage={true}
+                      />
+                    </div>
+
+                    {/* Quick Tips */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="font-medium text-blue-900 mb-2">💡 Quick Tips</h4>
+                      <ul className="text-sm text-blue-700 space-y-1">
+                        <li>• Start with essential tasks first</li>
+                        <li>• Keep tasks focused and specific</li>
+                        <li>• Consider task duration for participants</li>
+                        <li>• Test the flow yourself first</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>            {/* Task Library Modal */}
+            <TaskLibraryModal
+              isOpen={showTaskLibrary}
+              onClose={() => setShowTaskLibrary(false)}
+              onAddTask={handleAddTaskFromLibrary}
+              studyType={watchedType}
+              currentTasks={studyTasks.map(task => ({
+                id: task.id,
+                templateId: task.template_id,
+                name: task.name,
+                description: task.description,
+                estimatedDuration: task.estimated_duration,
+                settings: task.settings || {},
+                order: task.order_index,
+                isRequired: true
+              }))}
+            />
           </div>
         );
 
@@ -380,7 +588,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
 
       case 3: {
         const formData = watch();
-        const totalEstimatedTime = studyTasks.reduce((total, task) => total + task.estimatedTime, 0);
+        const totalEstimatedTime = studyTasks.reduce((total, task) => total + task.estimated_duration, 0);
         
         return (
           <div className="space-y-6">
@@ -420,25 +628,22 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                   <Card variant="elevated">
                     <CardHeader title="Study Tasks" subtitle={`${studyTasks.length} tasks configured`} />
                     <CardContent>
-                      <div className="space-y-3">
-                        {studyTasks.map((task) => (
+                      <div className="space-y-3">                        {studyTasks.map((task) => (
                           <div key={task.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                            <div className={`w-8 h-8 rounded-lg ${task.color} flex items-center justify-center mr-3`}>
-                              <task.icon className="w-4 h-4 text-white" />
+                            <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center mr-3">
+                              <Play className="w-4 h-4 text-white" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center">
-                                <span className="font-medium text-gray-900">{task.title}</span>
-                                {task.isRequired && (
-                                  <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                                    Required
-                                  </span>
-                                )}
+                                <span className="font-medium text-gray-900">{task.name}</span>
+                                <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                                  Required
+                                </span>
                               </div>
                               <p className="text-sm text-gray-600">{task.description}</p>
                             </div>
                             <div className="text-sm text-gray-500">
-                              ~{task.estimatedTime} min
+                              ~{task.estimated_duration} min
                             </div>
                           </div>
                         ))}
@@ -529,52 +734,25 @@ const EnhancedStudyBuilderPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Progress Steps */}
+      </div>      {/* Progress Steps */}
       <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex space-x-8" aria-label="Progress">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = index === currentStep;
-              const isCompleted = index < currentStep;
-              const isClickable = index <= currentStep;
-
-              return (
-                <button
-                  key={step.id}
-                  onClick={() => isClickable && setCurrentStep(index)}
-                  disabled={!isClickable}
-                  className={`flex items-center space-x-3 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-indigo-600'
-                      : isCompleted
-                      ? 'text-green-600 hover:text-green-700'
-                      : 'text-gray-400'
-                  } ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                >
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors ${
-                    isActive
-                      ? 'border-indigo-600 bg-indigo-600 text-white'
-                      : isCompleted
-                      ? 'border-green-600 bg-green-600 text-white'
-                      : 'border-gray-300 bg-white text-gray-400'
-                  }`}>
-                    {isCompleted ? (
-                      <CheckCircle className="w-5 h-5" />
-                    ) : (
-                      <Icon className="w-4 h-4" />
-                    )}
-                  </div>
-                  <div className="text-left">
-                    <div>{step.title}</div>
-                    <div className="text-xs text-gray-500">{step.description}</div>
-                  </div>
-                </button>
-              );
-            })}
-          </nav>
+          <StudyBuilderProgress
+            currentStep={currentStep.toString()}
+            studyData={{
+              title: watchedTitle,
+              description: watchedDescription,
+              type: watchedType,
+              tasks: studyTasks,
+              settings: watchedSettings
+            }}
+            onStepClick={(stepId) => {
+              const stepIndex = parseInt(stepId);
+              if (stepIndex <= currentStep + 1) {
+                setCurrentStep(stepIndex);
+              }
+            }}
+          />
         </div>
       </div>
 

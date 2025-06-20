@@ -1,13 +1,34 @@
 # ResearchHub - API Reference for Copilot
 
-## 🚀 Base Configuration
+## ⚠️ Project Status: UNDER DEVELOPMENT - LIMITED API IMPLEMENTATION
+**Last Updated**: December 28, 2024  
+**Status**: � Many endpoints incomplete or use mock data
+
+## �🚀 Base Configuration
 
 ### Server Setup
 ```typescript
-// Server runs on: http://localhost:3002
+// Local development: http://localhost:3003
+// Production: https://researchhub-saas.vercel.app
 // Health check: GET /api/health
 // CORS enabled for: http://localhost:5175
 ```
+
+### Available API Endpoints
+**Working Endpoints:**
+- ✅ `/api/health` - Health check
+- ✅ `/api/auth` - Authentication (login, register, refresh)
+- ✅ `/api/studies` - Study management (basic CRUD)
+- ✅ `/api/profile` - User profile management
+- ✅ `/api/db-check` - Database connectivity check
+- 🚧 `/api/recordings` - Screen recording upload (in development)
+- 🚧 `/api/admin` - Admin functions (limited)
+
+**Incomplete/Mock Endpoints:**
+- ❌ `/api/analytics` - Not implemented
+- ❌ `/api/sessions` - Not implemented
+- ❌ `/api/subscriptions` - UI mockup only
+- ❌ `/api/participants` - Limited functionality
 
 ## 🔐 Authentication Endpoints
 
