@@ -38,8 +38,13 @@ export default async function handler(req, res) {
   
   // Fallback to anon client if no valid authentication
   if (!supabase) {
-    supabase = createClient(supabaseUrl, supabaseKey);
-  }
+    supabase = createClient(supabaseUrl, supabaseKey);  }
+  
+  console.log('Studies API Debug:');
+  console.log('- Auth header:', authHeader ? 'Present' : 'Missing');
+  console.log('- Current user:', currentUser ? { id: currentUser.id, email: currentUser.email } : 'None');
+  console.log('- Using Supabase client:', supabaseServiceKey ? 'Service role' : 'Anon');
+  
   try {    if (req.method === 'GET') {
       // Fetch studies from Supabase
       let query = supabase.from('studies').select('*').order('created_at', { ascending: false });
@@ -47,9 +52,21 @@ export default async function handler(req, res) {
       // If we have an authenticated user, filter by researcher_id
       if (currentUser) {
         query = query.eq('researcher_id', currentUser.id);
+        console.log('- Filtering by researcher_id:', currentUser.id);
+      } else {
+        console.log('- No authentication, returning empty results for security');
+        // For security, don't return any studies if not authenticated
+        res.status(200).json({
+          success: true,
+          studies: [],
+          total: 0,
+          message: 'Authentication required'
+        });
+        return;
       }
       
       const { data: studies, error } = await query;
+      console.log('- Database query result:', { studiesCount: studies?.length, error: error?.message });
 
       if (error) {
         console.error('Error fetching studies:', error);
