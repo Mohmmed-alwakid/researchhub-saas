@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, GripVertical } from 'lucide-react';
 
 // Local interfaces to avoid import issues
 interface StudyBuilderTask {
@@ -103,30 +103,12 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
     if (studyType) {
       loadTaskTemplates(studyType);
     }
-  }, [studyType, loadTaskTemplates]);
-
-  // Update parent when tasks change
+  }, [studyType, loadTaskTemplates]);  // Update parent when tasks change
   useEffect(() => {
     onTasksChange(currentTasks);
   }, [currentTasks, onTasksChange]);
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        setTaskTemplates(result.data);
-      } else {
-        setError(`Failed to load task templates: ${result.error}`);
-      }
-    } catch (err) {
-      console.error('Error loading task templates:', err);
-      setError('Failed to load task templates');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const addTask = (template: TaskTemplate) => {
-    const newTask: StudyTask = {
+    const newTask: StudyBuilderTask = {
       id: `temp-${Date.now()}`, // Temporary ID for new tasks
       template_id: template.id,
       name: template.name,
@@ -224,7 +206,7 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
           </div>
         ) : (
           <div className="space-y-3">
-            {currentTasks.map((task, index) => (
+            {currentTasks.map((task) => (
               <div
                 key={task.id}
                 className="flex items-center space-x-3 p-3 bg-gray-50 border border-gray-200 rounded-lg"
