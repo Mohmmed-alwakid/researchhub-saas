@@ -57,29 +57,54 @@ export default async function handler(req, res) {
         success: true,
         studies: studies || [],
         total: studies?.length || 0,
-        message: 'Studies retrieved successfully'
-      });    } else if (req.method === 'POST') {
-      // Handle study creation
-      const { title, description, type } = req.body;
+        message: 'Studies retrieved successfully'      });    } else if (req.method === 'POST') {
+      // Handle study creation with authentication
+      const authHeader = req.headers.authorization;
+      let currentUserId = null;
+      
+      // Try to get user from auth token
+      if (authHeader?.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+          if (user) {
+            currentUserId = user.id;
+          }
+        } catch (authErr) {
+          console.log('Auth token validation failed:', authErr);
+        }
+      }
+
+      const { title, description, type, tasks, settings } = req.body;
 
       if (!title) {
         return res.status(400).json({
           success: false,
           error: 'Title is required'
         });
-      }      // Insert study into Supabase
+      }
+
+      // Create study with full data from UI
+      const studyData = {
+        title,
+        description: description || '',
+        settings: {
+          type: type || 'usability',
+          recording: settings?.recording || { screen: true, audio: false, webcam: false },
+          maxParticipants: settings?.maxParticipants || 10,
+          duration: settings?.duration || 30,
+          compensation: settings?.compensation || 25,
+          tasks: tasks || []
+        },
+        status: 'draft',
+        target_participants: settings?.maxParticipants || 10,
+        researcher_id: currentUserId
+      };
+
+      // Insert study into Supabase
       const { data: newStudy, error } = await supabase
         .from('studies')
-        .insert([
-          {
-            title,
-            description: description || '',
-            settings: { type: type || 'usability' },
-            status: 'draft',
-            target_participants: 10,
-            researcher_id: null // For now, we'll set this to null since auth isn't fully integrated
-          }
-        ])
+        .insert([studyData])
         .select()
         .single();
 
