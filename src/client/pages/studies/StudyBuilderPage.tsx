@@ -1,5 +1,5 @@
 import React, { useState, useCallback, Suspense, lazy, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -139,6 +139,7 @@ const convertFromTaskListFormat = (tasks: Array<{
 
 const EnhancedStudyBuilderPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const { createStudy, updateStudy } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
@@ -156,22 +157,24 @@ const EnhancedStudyBuilderPage: React.FC = () => {
     errors: [], 
     warnings: [], 
     suggestions: [] 
-  });  const {
+  });
+
+  // Get template data from navigation state
+  const templateData = location.state?.template;const {
     register,
     handleSubmit,
     watch,
     reset,
     getValues,
-    formState: { errors }
-  } = useForm<StudyFormData>({
+    formState: { errors }  } = useForm<StudyFormData>({
     resolver: zodResolver(studySchema),
     defaultValues: {
-      title: '',
-      description: '',
-      type: 'usability_test',
+      title: templateData?.name || '',
+      description: templateData?.description || '',
+      type: templateData?.type === 'usability' ? 'usability_test' : 'usability_test',
       settings: {
-        maxParticipants: 10,
-        duration: 30,
+        maxParticipants: templateData?.participantCount || 10,
+        duration: templateData?.estimatedDuration || 30,
         compensation: 25,
         recordScreen: true,
         recordAudio: false,
@@ -267,6 +270,41 @@ const EnhancedStudyBuilderPage: React.FC = () => {
       fetchStudyData();
     }
   }, [id, reset]);
+
+  // Initialize form with template data when available
+  useEffect(() => {
+    if (templateData && !id) {
+      // Reset form with template data
+      reset({
+        title: templateData.name || '',
+        description: templateData.description || '',
+        type: templateData.type === 'usability' ? 'usability_test' : 'usability_test',
+        settings: {
+          maxParticipants: templateData.participantCount || 10,
+          duration: templateData.estimatedDuration || 30,
+          compensation: 25,
+          recordScreen: true,
+          recordAudio: false,
+          recordWebcam: false,
+          collectHeatmaps: true,
+          trackClicks: true,
+          trackScrolls: true
+        }
+      });      // Initialize tasks from template if available
+      if (templateData.tasks && Array.isArray(templateData.tasks)) {
+        const initialTasks: StudyBuilderTask[] = templateData.tasks.map((task: any, index: number) => ({
+          id: `task-${index + 1}`,
+          template_id: getTemplateIdFromTaskType(task.type as ITask['type']),
+          name: task.name,
+          description: task.description,
+          estimated_duration: 5, // Default duration
+          order_index: index,
+          settings: {}
+        }));
+        setStudyTasks(initialTasks);
+      }
+    }
+  }, [templateData, id, reset]);
 
   // Update validation when form data changes
   React.useEffect(() => {

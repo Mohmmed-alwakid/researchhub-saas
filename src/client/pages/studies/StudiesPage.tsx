@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
@@ -18,8 +18,10 @@ import {
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
 import { IStudy } from '../../../shared/types';
+import { SmartTemplateGallery, StudyTemplate } from '../../components/studies/SmartTemplateGallery';
 
 const StudiesPage: React.FC = () => {
+  const navigate = useNavigate();
   const { 
     studies, 
     studiesLoading, 
@@ -35,7 +37,29 @@ const StudiesPage: React.FC = () => {
 
   useEffect(() => {
     fetchStudies();
-  }, [fetchStudies]);  const filteredStudies = (studies || []).filter(study => {
+  }, [fetchStudies]);
+
+  // Handle template selection from SmartTemplateGallery
+  const handleTemplateSelect = (template: StudyTemplate) => {
+    // Navigate to study builder with template data
+    navigate('/app/studies/new', { 
+      state: { 
+        template: {
+          name: template.name,
+          type: template.category,
+          description: template.purpose,
+          estimatedDuration: template.estimatedDuration,
+          participantCount: template.participantCount.recommended,
+          tasks: template.preBuiltTasks
+        }
+      } 
+    });
+  };
+
+  // Handle creating study from scratch
+  const handleCreateFromScratch = () => {
+    navigate('/app/studies/new');
+  };const filteredStudies = (studies || []).filter(study => {
     const matchesSearch = (study.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (study.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || study.status === statusFilter;
@@ -162,28 +186,25 @@ const StudiesPage: React.FC = () => {
             </select>
           </div>
         </div>
-      </div>
-
-      {/* Studies Grid */}
+      </div>      {/* Studies Grid */}
       {filteredStudies.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-4 text-gray-400">
-            📊
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No studies found</h3>
-          <p className="text-gray-600 mb-4">
-            {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' 
-              ? 'Try adjusting your filters' 
-              : 'Get started by creating your first study'
-            }
-          </p>          {!searchTerm && statusFilter === 'all' && typeFilter === 'all' && (
-            <Link
-              to="/app/studies/new"
-              className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Study
-            </Link>
+        <div>
+          {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' ? (
+            // Show basic empty state when filters are applied
+            <div className="text-center py-12">
+              <div className="w-16 h-16 mx-auto mb-4 text-gray-400">
+                📊
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No studies found</h3>
+              <p className="text-gray-600 mb-4">
+                Try adjusting your filters to see more results
+              </p>
+            </div>          ) : (
+            // Show SmartTemplateGallery when no studies exist and no filters are applied
+            <SmartTemplateGallery 
+              onTemplateSelect={handleTemplateSelect}
+              onCreateFromScratch={handleCreateFromScratch}
+            />
           )}
         </div>
       ) : (

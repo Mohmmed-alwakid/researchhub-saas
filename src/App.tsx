@@ -53,24 +53,40 @@ function App() {
     const { user: currentUser, isLoading: currentIsLoading } = useAuthStore();
     
     useEffect(() => {
+      // DEBUG: Add console logs to understand what's happening
+      console.log('🔍 RoleBasedRedirect - Debug Info:', {
+        user: currentUser,
+        role: currentUser?.role,
+        isLoading: currentIsLoading,
+        timestamp: new Date().toISOString()
+      });
+      
       // Only attempt redirect if we have user data and are not loading
       if (currentUser && !currentIsLoading) {
+        console.log('🚀 RoleBasedRedirect - Attempting redirect for role:', currentUser.role);
+        
         switch (currentUser.role as string) {
           case 'participant':
+            console.log('👥 Redirecting participant to /app/participant-dashboard');
             navigate('/app/participant-dashboard', { replace: true });
             break;
           case 'admin':
           case 'super_admin':
+            console.log('🔧 Redirecting admin to /app/admin');
             navigate('/app/admin', { replace: true });
             break;
           case 'researcher':
           default:
+            console.log('🔬 Redirecting researcher to /app/dashboard');
             navigate('/app/dashboard', { replace: true });
             break;
         }
       } else if (!currentIsLoading && !currentUser) {
         // If not loading and no user, redirect to login
+        console.log('🚪 No user found, redirecting to login');
         navigate('/login', { replace: true });
+      } else {
+        console.log('⏳ Still loading user data...');
       }
     }, [currentUser, currentIsLoading, navigate]);
 

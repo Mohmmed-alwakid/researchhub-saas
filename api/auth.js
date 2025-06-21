@@ -100,8 +100,43 @@ export default async function handler(req, res) {
         .eq('id', data.user.id)
         .single();
 
-      // Get role from profile first, then from user metadata, with fallback
-      const userRole = profile?.role || data.user.user_metadata?.role || 'participant';
+      console.log('=== LOGIN DEBUG ===');
+      console.log('User ID:', data.user.id);
+      console.log('User Email:', data.user.email);
+      console.log('User metadata role:', data.user.user_metadata?.role);
+      console.log('Profile data:', profile);
+      console.log('Profile role:', profile?.role);
+
+      // Get role from metadata first (more reliable source), then profile, with fallback
+      const metadataRole = data.user.user_metadata?.role;
+      const profileRole = profile?.role;
+      
+      // If metadata role exists and differs from profile role, prioritize metadata
+      let userRole = metadataRole || profileRole || 'participant';
+      
+      // Fix profile role if it's incorrect
+      if (profile && metadataRole && profileRole !== metadataRole) {
+        console.log('🔧 ROLE MISMATCH DETECTED - Fixing profile role');
+        console.log('Metadata role:', metadataRole);
+        console.log('Profile role:', profileRole);
+        
+        // Use service role key for update
+        const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseKey);
+        
+        const { error: updateError } = await supabaseAdmin
+          .from('profiles')
+          .update({ role: metadataRole })
+          .eq('id', data.user.id);
+          
+        if (updateError) {
+          console.error('Profile role update error:', updateError);
+        } else {
+          console.log('✅ Profile role updated to:', metadataRole);
+        }
+      }
+      
+      console.log('Final assigned role:', userRole);
+      console.log('=== END LOGIN DEBUG ===');
       
       // If no profile exists, create one with the correct role
       if (!profile) {
