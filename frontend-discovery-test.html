@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Discovery Frontend Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        .warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .study-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .study-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .study-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        .study-description {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .study-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border-radius: 6px;
+        }
+        .apply-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .apply-button:hover { background: #2563eb; }
+        .apply-button:disabled { background: #9ca3af; cursor: not-allowed; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 10px 5px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .api-test {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            max-height: 400px;
+        }
+        .no-studies {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        .no-studies h3 {
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Study Discovery Frontend Test</h1>
+            <p>Testing the frontend integration with the participant-applications API</p>
+        </div>
+
+        <div class="api-test">
+            <h3>Frontend API Integration Test</h3>
+            <button onclick="testFrontendAPI()">Test Frontend API Service</button>
+            <button onclick="testWithFilters()">Test With Filters</button>
+            <button onclick="testPagination()">Test Pagination</button>
+            <div id="apiStatus" class="status info" style="display: none;"></div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Search Studies</label>
+                <input type="text" id="searchInput" placeholder="Search by title or description">
+            </div>
+            <div class="filter-group">
+                <label>Study Type</label>
+                <select id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="usability">Usability Test</option>
+                    <option value="survey">Survey</option>
+                    <option value="interview">Interview</option>
+                    <option value="card-sorting">Card Sorting</option>
+                    <option value="a-b-testing">A/B Testing</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Page</label>
+                <input type="number" id="pageInput" value="1" min="1">
+            </div>
+            <div class="filter-group">
+                <label>Limit</label>
+                <input type="number" id="limitInput" value="12" min="1" max="50">
+            </div>
+        </div>
+
+        <div id="studiesContainer"></div>
+
+        <div class="api-test">
+            <h3>Raw API Response</h3>
+            <pre id="rawResponse">Click "Test Frontend API Service" to see response...</pre>
+        </div>
+    </div>
+
+    <script>
+        // Mimic the frontend API service
+        class APIService {
+            constructor() {
+                this.baseURL = '/api/';
+            }
+
+            async get(endpoint) {
+                const response = await fetch(this.baseURL + endpoint);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }
+        }
+
+        class ParticipantApplicationsService {
+            constructor() {
+                this.apiService = new APIService();
+            }
+
+            async getPublicStudies(filters = {}) {
+                const params = new URLSearchParams();
+                
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value !== undefined && value !== '') {
+                        params.append(key, value.toString());
+                    }
+                });
+                
+                const queryString = params.toString();
+                const baseUrl = 'participant-applications?endpoint=studies/public';
+                const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
+                
+                return this.apiService.get(url);
+            }
+        }
+
+        const participantApplicationsService = new ParticipantApplicationsService();
+
+        async function testFrontendAPI() {
+            const statusDiv = document.getElementById('apiStatus');
+            const studiesContainer = document.getElementById('studiesContainer');
+            const rawResponse = document.getElementById('rawResponse');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🔄 Testing frontend API service...';
+            
+            try {
+                const response = await participantApplicationsService.getPublicStudies({
+                    page: 1,
+                    limit: 12
+                });
+                
+                rawResponse.textContent = JSON.stringify(response, null, 2);
+                
+                if (response.success) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ Frontend API Success! Found ${response.data.studies.length} public studies`;
+                    
+                    if (response.data.studies.length > 0) {
+                        displayStudies(response.data.studies, response.data.pagination);
+                    } else {
+                        studiesContainer.innerHTML = `
+                            <div class="no-studies">
+                                <h3>No Public Studies Found</h3>
+                                <p>There are currently no public studies available for participation.</p>
+                                <p>Studies must be both "active" and "public" to appear here.</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `❌ Frontend API Error: ${response.error}`;
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Frontend API Network Error: ${error.message}`;
+                rawResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testWithFilters() {
+            const search = document.getElementById('searchInput').value;
+            const type = document.getElementById('typeFilter').value;
+            const page = parseInt(document.getElementById('pageInput').value) || 1;
+            const limit = parseInt(document.getElementById('limitInput').value) || 12;
+            
+            const statusDiv = document.getElementById('apiStatus');
+            const rawResponse = document.getElementById('rawResponse');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🔄 Testing with filters...';
+            
+            try {
+                const response = await participantApplicationsService.getPublicStudies({
+                    page,
+                    limit,
+                    search: search || undefined,
+                    type: type || undefined
+                });
+                
+                rawResponse.textContent = JSON.stringify(response, null, 2);
+                
+                if (response.success) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ Filtered API Success! Found ${response.data.studies.length} studies (page ${response.data.pagination.current}/${response.data.pagination.pages})`;
+                    
+                    if (response.data.studies.length > 0) {
+                        displayStudies(response.data.studies, response.data.pagination);
+                    } else {
+                        studiesContainer.innerHTML = `
+                            <div class="no-studies">
+                                <h3>No Studies Match Your Filters</h3>
+                                <p>Try adjusting your search terms or filters.</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `❌ Filtered API Error: ${response.error}`;
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Filtered API Network Error: ${error.message}`;
+                rawResponse.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testPagination() {
+            const statusDiv = document.getElementById('apiStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🔄 Testing pagination...';
+            
+            // Test multiple pages
+            for (let page = 1; page <= 3; page++) {
+                try {
+                    const response = await participantApplicationsService.getPublicStudies({
+                        page,
+                        limit: 2
+                    });
+                    
+                    console.log(`Page ${page}:`, response);
+                } catch (error) {
+                    console.error(`Page ${page} error:`, error);
+                }
+            }
+            
+            statusDiv.className = 'status success';
+            statusDiv.textContent = '✅ Pagination test completed - check console for results';
+        }
+
+        function displayStudies(studies, pagination) {
+            const studiesContainer = document.getElementById('studiesContainer');
+            
+            const paginationInfo = pagination ? `
+                <div class="status info">
+                    📄 Showing page ${pagination.current} of ${pagination.pages} (${pagination.total} total studies)
+                </div>
+            ` : '';
+            
+            studiesContainer.innerHTML = paginationInfo + studies.map(study => `
+                <div class="study-card">
+                    <div class="study-title">${study.title}</div>
+                    <div class="study-description">${study.description}</div>
+                    <div class="study-meta">
+                        <div class="meta-item">
+                            <span>💰</span>
+                            <span>$${study.configuration.compensation}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>⏱️</span>
+                            <span>${study.configuration.duration} min</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>👥</span>
+                            <span>${study.configuration.maxParticipants} max</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📊</span>
+                            <span>${study.type}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>✅</span>
+                            <span>${study.participants.enrolled} enrolled</span>
+                        </div>
+                    </div>
+                    <button class="apply-button" onclick="applyToStudy('${study._id}')">
+                        Apply to Study
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function applyToStudy(studyId) {
+            alert(`Would apply to study: ${studyId}`);
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            setTimeout(testFrontendAPI, 1000);
+        });
+    </script>
+</body>
+</html>

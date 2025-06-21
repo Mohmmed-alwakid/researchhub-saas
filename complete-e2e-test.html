@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete E2E Test - Login and Study Discovery</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        .warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .test-step {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 10px 5px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            max-height: 300px;
+        }
+        .study-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .study-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        .study-description {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .study-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Complete E2E Test - Authentication & Study Discovery</h1>
+            <p>Testing the complete flow from login to study discovery</p>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 1: Test API Health</h3>
+            <button onclick="testHealth()">Test Health Check</button>
+            <div id="healthStatus" class="status info" style="display: none;"></div>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 2: Test Participant Login</h3>
+            <button onclick="testLogin()">Login as Participant</button>
+            <div id="loginStatus" class="status info" style="display: none;"></div>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 3: Test Public Studies API</h3>
+            <button onclick="testStudiesAPI()">Test Studies API</button>
+            <div id="studiesStatus" class="status info" style="display: none;"></div>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 4: Open Frontend with Login</h3>
+            <button onclick="openFrontend()">Open Frontend in New Tab</button>
+            <div id="frontendStatus" class="status info" style="display: none;"></div>
+        </div>
+
+        <div id="studiesContainer"></div>
+
+        <div class="test-step">
+            <h3>Raw API Responses</h3>
+            <pre id="rawResponse">Test results will appear here...</pre>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+
+        async function testHealth() {
+            const statusDiv = document.getElementById('healthStatus');
+            const rawResponse = document.getElementById('rawResponse');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🔄 Testing health check...';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/health');
+                const data = await response.json();
+                
+                rawResponse.textContent = 'HEALTH CHECK:\\n' + JSON.stringify(data, null, 2);
+                
+                if (response.ok && data.success) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ API Health Check Passed - Server is running!';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ Health Check Failed';
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Health Check Error: ${error.message}`;
+                rawResponse.textContent = `Health Check Error: ${error.message}`;
+            }
+        }
+
+        async function testLogin() {
+            const statusDiv = document.getElementById('loginStatus');
+            const rawResponse = document.getElementById('rawResponse');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🔄 Logging in as participant...';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/auth?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+participant@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const data = await response.json();
+                rawResponse.textContent = 'LOGIN RESPONSE:\\n' + JSON.stringify(data, null, 2);
+                
+                if (response.ok && data.success) {
+                    authToken = data.data.token;
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ Login Successful! Role: ${data.data.user.role}`;
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `❌ Login Failed: ${data.error || 'Unknown error'}`;
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Login Error: ${error.message}`;
+                rawResponse.textContent = `Login Error: ${error.message}`;
+            }
+        }
+
+        async function testStudiesAPI() {
+            const statusDiv = document.getElementById('studiesStatus');
+            const rawResponse = document.getElementById('rawResponse');
+            const studiesContainer = document.getElementById('studiesContainer');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🔄 Testing public studies API...';
+            
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const response = await fetch('http://localhost:3003/api/participant-applications?endpoint=studies/public&page=1&limit=12', {
+                    method: 'GET',
+                    headers
+                });
+                
+                const data = await response.json();
+                rawResponse.textContent = 'STUDIES API RESPONSE:\\n' + JSON.stringify(data, null, 2);
+                
+                if (response.ok && data.success) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ Studies API Success! Found ${data.data.studies.length} public studies`;
+                    
+                    if (data.data.studies.length > 0) {
+                        displayStudies(data.data.studies);
+                    } else {
+                        studiesContainer.innerHTML = '<div class="status warning">No public studies found. Make sure studies are both "active" and "is_public = true"</div>';
+                    }
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `❌ Studies API Failed: ${data.error || 'Unknown error'}`;
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Studies API Error: ${error.message}`;
+                rawResponse.textContent = `Studies API Error: ${error.message}`;
+            }
+        }
+
+        function displayStudies(studies) {
+            const studiesContainer = document.getElementById('studiesContainer');
+            
+            studiesContainer.innerHTML = `
+                <div class="test-step">
+                    <h3>📋 Found ${studies.length} Public Studies</h3>
+                    ${studies.map(study => `
+                        <div class="study-card">
+                            <div class="study-title">${study.title}</div>
+                            <div class="study-description">${study.description}</div>
+                            <div class="study-meta">
+                                <div class="meta-item">
+                                    <span>💰</span>
+                                    <span>$${study.configuration.compensation}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span>⏱️</span>
+                                    <span>${study.configuration.duration} min</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span>👥</span>
+                                    <span>${study.configuration.maxParticipants} max</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span>📊</span>
+                                    <span>${study.type}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span>✅</span>
+                                    <span>${study.participants.enrolled} enrolled</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function openFrontend() {
+            const statusDiv = document.getElementById('frontendStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status info';
+            statusDiv.textContent = '🔄 Opening frontend in new tab...';
+            
+            // Open the React frontend
+            const frontendWindow = window.open('http://localhost:5175/app/discover', '_blank');
+            
+            if (frontendWindow) {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ Frontend opened! You may need to login manually in the new tab.';
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ Failed to open frontend - popup blocked?';
+            }
+        }
+
+        // Auto-run health check on load
+        window.addEventListener('load', () => {
+            setTimeout(testHealth, 1000);
+        });
+    </script>
+</body>
+</html>

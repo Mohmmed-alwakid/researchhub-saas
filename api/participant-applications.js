@@ -58,8 +58,7 @@ export default async function handler(req, res) {
       const type = url.searchParams.get('type') || '';
       
       const offset = (page - 1) * limit;
-      
-      // Build query for active studies only
+        // Build query for active AND public studies only
       let query = supabase
         .from('studies')
         .select(`
@@ -73,6 +72,7 @@ export default async function handler(req, res) {
           researcher_id
         `)
         .eq('status', 'active')  // Only show active studies
+        .eq('is_public', true)   // Only show public studies
         .order('created_at', { ascending: false });
       
       // Apply search filter
@@ -84,12 +84,12 @@ export default async function handler(req, res) {
       if (type) {
         query = query.eq('settings->>type', type);
       }
-      
-      // Get total count for pagination
+        // Get total count for pagination
       const { count } = await supabase
         .from('studies')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .eq('is_public', true);
       
       // Apply pagination
       const { data: studies, error } = await query

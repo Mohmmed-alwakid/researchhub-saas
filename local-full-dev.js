@@ -2146,40 +2146,20 @@ app.get('/api/admin/system-performance', async (req, res) => {
   }
 });
 
-// Study Builder endpoints
-app.all('/api/study-builder*', async (req, res) => {
+// Participant Applications endpoints
+app.all('/api/participant-applications*', async (req, res) => {
   try {
-    const { action } = req.query;
+    // Import the participant applications handler
+    const participantApplicationsModule = await import('./api/participant-applications.js');
+    const handler = participantApplicationsModule.default;
     
-    console.log(`⚡ LOCAL STUDY BUILDER: ${action}`);
-
-    // Import and use the study-builder logic
-    const studyBuilderHandler = await import('./api/study-builder.js');
-    
-    // Create a mock request/response that matches Vercel's format
-    const mockReq = {
-      method: req.method,
-      query: req.query,
-      body: req.body,
-      headers: req.headers
-    };
-    
-    const mockRes = {
-      status: (code) => ({
-        json: (data) => res.status(code).json(data),
-        end: () => res.status(code).end()
-      }),
-      setHeader: (name, value) => res.setHeader(name, value)
-    };
-
-    // Call the study-builder handler
-    return await studyBuilderHandler.default(mockReq, mockRes);
-
+    // Call the handler with req and res
+    await handler(req, res);
   } catch (error) {
-    console.error('Study Builder error:', error);
+    console.error('❌ Participant Applications API Error:', error);
     res.status(500).json({
       success: false,
-      error: 'Study Builder operation failed',
+      error: 'Participant applications operation failed',
       message: error.message
     });
   }
