@@ -191,13 +191,24 @@ const EnhancedStudyBuilderPage: React.FC = () => {
     if (id) {
       setIsEditing(true);
       setIsLoading(true);
-      
-      // Make direct API call to get study data
+        // Make direct API call to get study data
       const fetchStudyData = async () => {
         try {
+          // Get token from Zustand auth storage (same as api.service.ts)
+          let token = null;
+          const authStorage = localStorage.getItem('auth-storage');
+          if (authStorage) {
+            try {
+              const { state } = JSON.parse(authStorage);
+              token = state?.token;
+            } catch (error) {
+              console.warn('Failed to parse auth storage:', error);
+            }
+          }
+          
           const response = await fetch(`/api/studies/${id}`, {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${token}`
             }
           });
           

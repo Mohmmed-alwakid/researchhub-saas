@@ -1,4 +1,18 @@
-// Studies API endpoint using Supabase (ES modules)
+/**
+ * Studies API Endpoint - ResearchHub SaaS Platform
+ * 
+ * Handles all study-related operations with secure authentication and RLS
+ * Supports: GET (list/single), POST (create), PUT (update)
+ * 
+ * Security Features:
+ * - JWT token authentication
+ * - Row Level Security (RLS) enforcement
+ * - researcher_id filtering for data isolation
+ * - Comprehensive error handling and logging
+ * 
+ * Last Updated: June 21, 2025
+ * Status: Production Ready ✅
+ */
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
@@ -6,30 +20,46 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export default async function handler(req, res) {
+  // CORS headers for cross-origin requests
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
-  }  // Create Supabase client with proper authentication
+  }
+
+  // Authentication and Supabase client setup
   const authHeader = req.headers.authorization;
   let currentUser = null;
   let supabase = createClient(supabaseUrl, supabaseKey);
   
-  console.log('Auth header received:', authHeader ? 'Present' : 'Missing');
-  
+  console.log('📋 Studies API Request:', {
+    method: req.method,
+    url: req.url,
+    hasAuth: !!authHeader,
+    timestamp: new Date().toISOString()
+  });  // Process authentication token
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
-    console.log('Processing auth token of length:', token.length);
+    console.log('🔐 Processing auth token:', {
+      length: token.length,
+      isValid: token.length > 50 // Basic validation
+    });
+    
     try {
-      // Set the auth token on the client to work with RLS
+      // Validate token and get user context
       const { data: { user }, error: authError } = await supabase.auth.getUser(token);
       if (user && !authError) {
         currentUser = user;
-        console.log('User authenticated successfully:', user.id);
-        // Create a new client with the auth token set
+        console.log('✅ User authenticated:', {
+          id: user.id,
+          email: user.email
+        });
+        
+        // Create authenticated Supabase client for RLS
         supabase = createClient(supabaseUrl, supabaseKey, {
           global: {
             headers: {
@@ -38,13 +68,13 @@ export default async function handler(req, res) {
           }
         });
       } else {
-        console.log('Auth error:', authError);
+        console.log('❌ Authentication failed:', authError?.message);
       }
     } catch (authErr) {
-      console.log('Auth token validation failed:', authErr);
+      console.log('💥 Auth token validation error:', authErr.message);
     }
   } else {
-    console.log('No valid auth header found');
+    console.log('⚠️ No valid Authorization header found');
   }
   
   try {    // Extract study ID from URL for PUT requests
