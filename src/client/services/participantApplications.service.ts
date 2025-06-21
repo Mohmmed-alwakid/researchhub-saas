@@ -100,20 +100,20 @@ export const participantApplicationsService = {
         params.append(key, value.toString());
       }
     });    const queryString = params.toString();
-    const url = queryString ? `participant-applications/studies/public?${queryString}` : 'participant-applications/studies/public';
+    const baseUrl = 'participant-applications?endpoint=studies/public';
+    const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
     
     return apiService.get<PublicStudiesResponse>(url);
   },
 
   /**
    * Apply to a study
-   */
-  async applyToStudy(studyId: string, application: ApplicationSubmission): Promise<{
+   */  async applyToStudy(studyId: string, application: ApplicationSubmission): Promise<{
     success: boolean;
     data: ParticipantApplication;
     message: string;
   }> {
-    return apiService.post(`participant-applications/studies/${studyId}/apply`, application);
+    return apiService.post(`participant-applications?endpoint=studies/${studyId}/apply`, application);
   },
 
   /**
@@ -131,19 +131,19 @@ export const participantApplicationsService = {
         params.append(key, value.toString());
       }
     });    const queryString = params.toString();
-    const url = queryString ? `participant-applications/applications/my?${queryString}` : 'participant-applications/applications/my';
+    const baseUrl = 'participant-applications?endpoint=my-applications';
+    const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
     
     return apiService.get<ApplicationsResponse>(url);
   },
 
   /**
    * Withdraw application
-   */
-  async withdrawApplication(applicationId: string): Promise<{
+   */  async withdrawApplication(applicationId: string): Promise<{
     success: boolean;
     message: string;
   }> {
-    return apiService.patch(`participant-applications/applications/${applicationId}/withdraw`);
+    return apiService.patch(`participant-applications?endpoint=applications/${applicationId}/withdraw`);
   },
 
   /**
@@ -161,20 +161,20 @@ export const participantApplicationsService = {
         params.append(key, value.toString());
       }
     });    const queryString = params.toString();
-    const url = queryString ? `participant-applications/studies/${studyId}/applications?${queryString}` : `participant-applications/studies/${studyId}/applications`;
+    const baseUrl = `participant-applications?endpoint=studies/${studyId}/applications`;
+    const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
     
     return apiService.get<StudyApplicationsResponse>(url);
   },
 
   /**
    * Review application (approve/reject)
-   */
-  async reviewApplication(applicationId: string, review: ApplicationReview): Promise<{
+   */  async reviewApplication(applicationId: string, review: ApplicationReview): Promise<{
     success: boolean;
     data: ParticipantApplication;
     message: string;
   }> {
-    return apiService.patch(`participant-applications/applications/${applicationId}/review`, review);
+    return apiService.patch(`participant-applications?endpoint=applications/${applicationId}/review`, review);
   }
 };
 

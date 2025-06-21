@@ -40,16 +40,14 @@ export default async function handler(req, res) {
     url: req.url,
     timestamp: new Date().toISOString()
   });
-
   try {
-    // Parse the URL to determine the endpoint
+    // Parse the URL to determine the endpoint using query parameters
     const url = new URL(req.url, `http://${req.headers.host}`);
-    const pathParts = url.pathname.split('/').filter(part => part !== '');
+    const endpoint = url.searchParams.get('endpoint');
     
-    // Remove 'api' and 'participant-applications' from path
-    const apiPath = pathParts.slice(2).join('/');
+    console.log('🔍 API Endpoint called:', endpoint, 'Method:', req.method);
 
-    if (req.method === 'GET' && apiPath === 'studies/public') {
+    if (req.method === 'GET' && endpoint === 'studies/public') {
       // GET /api/participant-applications/studies/public
       console.log('📋 Fetching public studies for participants...');
       
@@ -142,11 +140,9 @@ export default async function handler(req, res) {
             hasPrev: page > 1
           }
         }
-      });
-
-    } else if (req.method === 'POST' && apiPath.includes('/apply')) {
-      // POST /api/participant-applications/studies/:studyId/apply
-      const studyId = pathParts[4]; // Extract study ID from path
+      });    } else if (req.method === 'POST' && endpoint && endpoint.includes('/apply')) {
+      // POST /api/participant-applications?endpoint=studies/:studyId/apply
+      const studyId = endpoint.split('/')[1]; // Extract study ID from endpoint
       
       console.log(`📝 Processing application for study: ${studyId}`);
       
@@ -155,10 +151,8 @@ export default async function handler(req, res) {
       return res.status(501).json({
         success: false,
         error: 'Study applications not yet implemented'
-      });
-
-    } else if (req.method === 'GET' && apiPath === 'my-applications') {
-      // GET /api/participant-applications/my-applications
+      });    } else if (req.method === 'GET' && endpoint === 'my-applications') {
+      // GET /api/participant-applications?endpoint=my-applications
       
       console.log('📄 Fetching participant applications...');
       
