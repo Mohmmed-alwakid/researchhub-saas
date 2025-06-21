@@ -61,21 +61,25 @@ export default async function handler(req, res) {
       }
       
       console.log('PUT request URL:', req.url);
-      console.log('Extracted study ID:', studyId);
-    }
-      if (req.method === 'GET') {
+      console.log('Extracted study ID:', studyId);    }
+    
+    if (req.method === 'GET') {
       // Check if we're getting a specific study by ID
       const urlParts = req.url.split('?')[0].split('/');
       const lastPart = urlParts[urlParts.length - 1];
       const isSpecificStudy = lastPart !== 'studies' && lastPart.length > 10; // Likely a UUID
-        if (isSpecificStudy) {
+      
+      if (isSpecificStudy) {
         // Get single study by ID
         const studyId = lastPart;
         console.log('Fetching single study with ID:', studyId);
         console.log('Current user for single study:', currentUser?.id);
+        console.log('Token info - Auth header:', authHeader?.substring(0, 20) + '...');
+        console.log('Token from localStorage length would be:', authHeader?.length);
         
         // If no authenticated user, return 401
         if (!currentUser) {
+          console.log('No authenticated user found, returning 401');
           return res.status(401).json({
             success: false,
             error: 'Authentication required'
