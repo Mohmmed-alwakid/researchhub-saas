@@ -387,103 +387,12 @@ app.all('/api/profile', async (req, res) => {
   }
 });
 
-// Studies endpoints
+// Studies endpoints - import the actual handler
+import studiesHandler from './api/studies.js';
+
 app.all('/api/studies*', async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.replace('Bearer ', '');
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        error: 'Authentication required'
-      });
-    }
-
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid token'
-      });
-    }    // Implement actual studies logic
-    if (req.method === 'GET') {
-      // Fetch studies from Supabase
-      const { data: studies, error } = await supabase
-        .from('studies')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching studies:', error);
-        // Return empty studies if table doesn't exist yet
-        return res.status(200).json({
-          success: true,
-          studies: [],
-          total: 0,
-          message: 'No studies found'
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        studies: studies || [],
-        total: studies?.length || 0,
-        message: 'Studies retrieved successfully'
-      });
-    }
-
-    if (req.method === 'POST') {
-      // Handle study creation
-      const { title, description, type } = req.body;
-
-      if (!title) {
-        return res.status(400).json({
-          success: false,
-          error: 'Title is required'
-        });
-      }      // Insert study into Supabase
-      console.log('Attempting to create study with data:', { title, description, type, user: user.id });
-      
-      const { data: newStudy, error } = await supabase
-        .from('studies')
-        .insert([
-          {
-            title,
-            description: description || '',
-            settings: { type: type || 'usability' },
-            status: 'draft',
-            target_participants: 10,
-            researcher_id: user.id // Fixed: Use the authenticated user's ID, not null
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating study:', error);
-        return res.status(500).json({
-          success: false,
-          error: 'Failed to create study'
-        });
-      }
-
-      return res.status(201).json({
-        success: true,
-        study: newStudy,
-        message: 'Study created successfully'
-      });
-    }
-
-  } catch (error) {
-    console.error('Studies error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Studies operation failed',
-      message: error.message
-    });
-  }
+  // Use the actual studies.js handler which has proper data transformation
+  await studiesHandler(req, res);
 });
 
 // Recordings endpoints  

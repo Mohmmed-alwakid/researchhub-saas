@@ -230,29 +230,32 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
-  }
-
-  // Authentication handling
+  }  // Authentication handling
   const authHeader = req.headers.authorization;
   let currentUser = null;
-  let supabase;
+  let supabase = createClient(supabaseUrl, supabaseKey);
   
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
-    const anonSupabase = createClient(supabaseUrl, supabaseKey);
     try {
-      const { data: { user }, error: authError } = await anonSupabase.auth.getUser(token);
+      // Set the auth token on the client to work with RLS
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
       if (user && !authError) {
         currentUser = user;
-        supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseKey);
+        // Create a new client with the auth token set
+        supabase = createClient(supabaseUrl, supabaseKey, {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        });
+      } else {
+        console.log('Auth error:', authError);
       }
     } catch (authErr) {
       console.log('Auth token validation failed:', authErr);
     }
-  }
-  
-  if (!supabase) {
-    supabase = createClient(supabaseUrl, supabaseKey);
   }
 
   const { action } = req.query;
@@ -495,26 +498,30 @@ async function createStudyWithTasks(req, res, supabase, currentUser) {
       validation 
     });
   }
-  
-  // Create study
+    // Create study
   const totalDuration = tasks.reduce((sum, task) => sum + task.estimatedDuration, 0);
+  
+  const studyData = {
+    title: study.title,
+    description: study.description,
+    study_type_id: study.type,
+    researcher_id: currentUser.id,
+    status: 'draft',
+    settings: {
+      ...study.settings,
+      studyType: study.type,
+      totalEstimatedDuration: totalDuration
+    },
+    estimated_duration: totalDuration,
+    target_participants: study.settings?.maxParticipants || 10
+  };
+  
+  console.log('Creating study with data:', studyData);
+  console.log('Current user:', { id: currentUser.id, email: currentUser.email });
   
   const { data: createdStudy, error: studyError } = await supabase
     .from('studies')
-    .insert({
-      title: study.title,
-      description: study.description,
-      study_type_id: study.type,
-      researcher_id: currentUser.id,
-      status: 'draft',
-      settings: {
-        ...study.settings,
-        studyType: study.type,
-        totalEstimatedDuration: totalDuration
-      },
-      estimated_duration: totalDuration,
-      target_participants: study.settings?.maxParticipants || 10
-    })
+    .insert(studyData)
     .select()
     .single();
 

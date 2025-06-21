@@ -6,8 +6,12 @@ import { sessionsService } from '../services/sessions.service';
 import type { 
   Study, 
   IParticipant, 
-  ISession 
+  ISession,
+  ITask,
+  StudyStatus,
+  StudyType
 } from '../../shared/types';
+import type { CreateStudyRequest } from '../services/studies.service';
 
 // Helper function to extract error message from errors
 const getErrorMessage = (error: unknown, defaultMessage: string): string => {
@@ -125,12 +129,62 @@ export const useAppStore = create<AppState>((set) => ({
     }
   },  updateStudy: async (studyId: string, updates: Partial<Study>) => {
     try {
-      // Cast to the expected type for the service - we'll only update basic fields
-      const updateData = {
+      // Create comprehensive update data that includes all study fields
+      const updateData: Partial<CreateStudyRequest> & { status?: StudyStatus } = {
         title: updates.title,
         description: updates.description,
         status: updates.status,
+        type: updates.type,
+        targetParticipants: updates.settings?.maxParticipants,
+        duration: updates.settings?.duration,
+        compensation: updates.settings?.compensation,        tasks: updates.tasks?.map(task => {
+          // Handle both string and ITask types
+          if (typeof task === 'string') {
+            // If it's a string, we can't extract task details
+            return {
+              title: task,
+              description: '',
+              type: 'navigation' as const,
+              order: 0,
+              configuration: {
+                instructions: '',
+                heatmapTracking: false,
+                clickTracking: false,
+                scrollTracking: false
+              },
+              isRequired: true
+            };
+          } else {
+            // It's an ITask object
+            return {
+              title: task.title,
+              description: task.description,
+              type: task.type,
+              order: task.order,
+              configuration: task.configuration,
+              isRequired: task.isRequired,
+              successCriteria: task.successCriteria,
+              timeLimit: task.timeLimit
+            };
+          }
+        }),
+        settings: updates.settings ? {
+          recordScreen: Boolean(updates.settings.recordScreen),
+          recordAudio: Boolean(updates.settings.recordAudio),
+          recordWebcam: false,
+          trackClicks: true,
+          trackHovers: true,
+          trackScrolls: true,
+        } : undefined
       };
+
+      // Remove undefined values to avoid issues
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key as keyof typeof updateData] === undefined) {
+          delete updateData[key as keyof typeof updateData];
+        }
+      });
+
       const response = await studiesService.updateStudy(studyId, updateData);
       const updatedStudy = response.study;
       

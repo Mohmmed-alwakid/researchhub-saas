@@ -131,11 +131,10 @@ export const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
                     {task.category}
                   </span>
                 )}
-              </div>
-
-              {/* Task Actions */}
+              </div>              {/* Task Actions */}
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => onEditTask(task)}
                   className="p-1 text-gray-400 hover:text-blue-600 rounded transition-colors"
                   title="Edit task"
@@ -143,6 +142,7 @@ export const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => onDuplicateTask(task)}
                   className="p-1 text-gray-400 hover:text-green-600 rounded transition-colors"
                   title="Duplicate task"
@@ -150,6 +150,7 @@ export const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
                   <Copy className="w-4 h-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => onDeleteTask(task.id)}
                   className="p-1 text-gray-400 hover:text-red-600 rounded transition-colors"
                   title="Delete task"

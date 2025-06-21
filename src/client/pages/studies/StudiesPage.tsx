@@ -17,28 +17,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
-
-// Type for study object
-interface Study {
-  _id: string;
-  title: string;
-  description: string;
-  type: 'usability' | 'interview' | 'survey' | 'prototype';
-  status: 'draft' | 'recruiting' | 'active' | 'completed' | 'paused';
-  createdBy: string;
-  tasks: Record<string, unknown>[];
-  participants: string[];
-  settings: {
-    maxParticipants: number;
-    duration: number;
-    compensation: number;
-    recordScreen: boolean;
-    recordAudio: boolean;
-    collectHeatmaps: boolean;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
+import { IStudy } from '../../../shared/types';
 
 const StudiesPage: React.FC = () => {
   const { 
@@ -56,11 +35,9 @@ const StudiesPage: React.FC = () => {
 
   useEffect(() => {
     fetchStudies();
-  }, [fetchStudies]);
-
-  const filteredStudies = studies.filter(study => {
-    const matchesSearch = study.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         study.description.toLowerCase().includes(searchTerm.toLowerCase());
+  }, [fetchStudies]);  const filteredStudies = (studies || []).filter(study => {
+    const matchesSearch = (study.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (study.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || study.status === statusFilter;
     const matchesType = typeFilter === 'all' || study.type === typeFilter;
     
@@ -92,7 +69,7 @@ const StudiesPage: React.FC = () => {
     };
     
     return icons[type as keyof typeof icons] || '📊';
-  };  const handleStatusToggle = async (study: Study) => {
+  };  const handleStatusToggle = async (study: IStudy) => {
     const newStatus = study.status === 'active' ? 'paused' : 'active';
     if (study.status === 'draft') return;
     
@@ -238,7 +215,7 @@ const StudiesPage: React.FC = () => {
               {/* Stats */}
               <div className="grid grid-cols-2 gap-4 mb-4">                <div className="flex items-center text-sm text-gray-600">
                   <Users className="w-4 h-4 mr-2" />
-                  {Array.isArray(study.participants) ? study.participants.length : 0}/{study.settings?.maxParticipants || 10}
+                  {study.participants?.enrolled || 0}/{study.participants?.target || study.settings?.maxParticipants || 10}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Clock className="w-4 h-4 mr-2" />
@@ -247,10 +224,9 @@ const StudiesPage: React.FC = () => {
                 <div className="flex items-center text-sm text-gray-600">
                   <DollarSign className="w-4 h-4 mr-2" />
                   ${study.settings?.compensation || 25}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
+                </div>                <div className="flex items-center text-sm text-gray-600">
                   <Calendar className="w-4 h-4 mr-2" />
-                  {formatDistanceToNow(new Date(study.createdAt), { addSuffix: true })}
+                  {study.createdAt ? formatDistanceToNow(new Date(study.createdAt), { addSuffix: true }) : 'Unknown date'}
                 </div>
               </div>              {/* Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -262,9 +238,8 @@ const StudiesPage: React.FC = () => {
                     title="View study"
                   >
                     <Eye className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    to={`/studies/${study._id}/edit`}
+                  </Link>                  <Link
+                    to={`/app/studies/${study._id}/edit`}
                     onClick={() => setCurrentStudy(study)}
                     className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
                     title="Edit study"
@@ -289,7 +264,7 @@ const StudiesPage: React.FC = () => {
 
                 {study.status !== 'draft' && study.status !== 'completed' && (
                   <button
-                    // onClick={() => handleStatusToggle(study as Study)}
+                    onClick={() => handleStatusToggle(study)}
                     className={`p-2 rounded-lg transition-colors ${
                       study.status === 'active'
                         ? 'text-yellow-600 hover:bg-yellow-50'

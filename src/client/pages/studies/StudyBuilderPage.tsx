@@ -1,5 +1,5 @@
-import React, { useState, useCallback, Suspense, lazy } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, Suspense, lazy, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -16,14 +16,16 @@ import {
 import { useAppStore } from '../../stores/appStore';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { convertTasksToAPI } from '../../utils/taskConversion';
+import { convertTasksToAPI, convertTasksToLegacy } from '../../utils/taskConversion';
 import toast from 'react-hot-toast';
 
 // Import our new UI/UX components
 import { StudyBuilderProgress } from '../../components/studies/StudyBuilderProgress';
 import { TaskLibraryModal } from '../../components/studies/TaskLibraryModal';
 import { DragDropTaskList } from '../../components/studies/DragDropTaskList';
-import { ValidationFeedback, FieldValidation } from '../../components/studies/ValidationFeedback';
+import { TaskEditModal } from '../../components/studies/TaskEditModal';
+import { ValidationFeedback } from '../../components/studies/ValidationFeedback';
+import type { ITask } from '../../../shared/types/index';
 import { 
   validateStudyTitle, 
   validateStudyDescription, 
@@ -80,27 +82,86 @@ const studySchema = z.object({
 
 type StudyFormData = z.infer<typeof studySchema>;
 
+// Helper function to map ITask types to template IDs
+const getTemplateIdFromTaskType = (taskType: ITask['type']): string => {
+  const typeToTemplateMap: Record<ITask['type'], string> = {
+    'navigation': 'website_navigation',
+    'interaction': 'prototype_testing',
+    'questionnaire': 'questionnaire',
+    'prototype-test': 'prototype_testing'
+  };  return typeToTemplateMap[taskType] || 'prototype_testing';
+};
+
+// Helper function to convert StudyBuilderTask to DragDropTaskList Task interface
+const convertToTaskListFormat = (builderTasks: StudyBuilderTask[]) => {
+  return builderTasks.map(task => ({
+    id: task.id,
+    templateId: task.template_id,
+    name: task.name,
+    description: task.description,
+    estimatedDuration: task.estimated_duration,
+    settings: task.settings || {},
+    order: task.order_index,
+    isRequired: (task.settings?.isRequired as boolean) ?? true,
+    category: task.settings?.category as string,
+    icon: task.settings?.icon as string
+  }));
+};
+
+// Helper function to convert DragDropTaskList Task back to StudyBuilderTask
+const convertFromTaskListFormat = (tasks: Array<{
+  id: string;
+  templateId: string;
+  name: string;
+  description: string;
+  estimatedDuration: number;
+  settings: Record<string, unknown>;
+  order: number;
+  isRequired: boolean;
+  category?: string;
+  icon?: string;
+}>): StudyBuilderTask[] => {
+  return tasks.map(task => ({
+    id: task.id,
+    template_id: task.templateId,
+    name: task.name,
+    description: task.description,
+    estimated_duration: task.estimatedDuration,
+    order_index: task.order,
+    settings: {
+      ...task.settings,
+      isRequired: task.isRequired,
+      category: task.category,
+      icon: task.icon
+    }
+  }));
+};
+
 const EnhancedStudyBuilderPage: React.FC = () => {
   const navigate = useNavigate();
-  const { createStudy } = useAppStore();
+  const { id } = useParams<{ id: string }>();
+  const { createStudy, updateStudy } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [studyTasks, setStudyTasks] = useState<StudyBuilderTask[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
   
   // New state for enhanced UI components
   const [showTaskLibrary, setShowTaskLibrary] = useState(false);
+  const [showTaskEditModal, setShowTaskEditModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<StudyBuilderTask | null>(null);
   const [validation, setValidation] = useState<ValidationResult>({ 
     isValid: true, 
     errors: [], 
     warnings: [], 
     suggestions: [] 
-  });
-
-  const {
+  });  const {
     register,
     handleSubmit,
     watch,
+    reset,
+    getValues,
     formState: { errors }
   } = useForm<StudyFormData>({
     resolver: zodResolver(studySchema),
@@ -121,11 +182,80 @@ const EnhancedStudyBuilderPage: React.FC = () => {
       }
     }
   });
-
   const watchedType = watch('type');
   const watchedTitle = watch('title');
   const watchedDescription = watch('description');
   const watchedSettings = watch('settings');
+  // Load existing study data when editing
+  useEffect(() => {
+    if (id) {
+      setIsEditing(true);
+      setIsLoading(true);
+      
+      // Make direct API call to get study data
+      const fetchStudyData = async () => {
+        try {
+          const response = await fetch(`/api/studies/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch study data');
+          }
+          
+          const data = await response.json();
+          const existingStudy = data.study;
+          
+          // Map the study type back to the form format
+          const studyType = existingStudy.type === 'usability' ? 'usability_test' :
+                           existingStudy.type === 'interview' ? 'user_interview' : 'survey';
+            // Reset form with existing data
+          reset({
+            title: existingStudy.title,
+            description: existingStudy.description,
+            type: studyType as 'usability_test' | 'user_interview' | 'survey',
+            settings: {
+              maxParticipants: existingStudy.settings?.maxParticipants || 10,
+              duration: existingStudy.settings?.duration || 30,
+              compensation: existingStudy.settings?.compensation || 25,
+              recordScreen: (existingStudy.settings?.recordScreen as boolean) ?? true,
+              recordAudio: (existingStudy.settings?.recordAudio as boolean) ?? false,
+              recordWebcam: (existingStudy.settings?.recordWebcam as boolean) ?? false,
+              collectHeatmaps: (existingStudy.settings?.collectHeatmaps as boolean) ?? true,
+              trackClicks: (existingStudy.settings?.trackClicks as boolean) ?? true,
+              trackScrolls: (existingStudy.settings?.trackScrolls as boolean) ?? true
+            }
+          });          // Convert existing tasks to StudyBuilderTask format
+          if (existingStudy.tasks && existingStudy.tasks.length > 0) {
+            const convertedTasks: StudyBuilderTask[] = existingStudy.tasks
+              .filter((task: any): task is ITask => typeof task === 'object' && task !== null)
+              .map((task: any, index: number) => ({
+                id: task._id || `task_${index}`,
+                template_id: getTemplateIdFromTaskType(task.type),
+                name: task.title || 'Untitled Task',
+                description: task.description || '',
+                estimated_duration: Math.ceil((task.timeLimit || 300) / 60), // Convert seconds to minutes
+                order_index: task.order || index + 1,
+                settings: (task.configuration as unknown as Record<string, unknown>) || {}
+              }));
+            setStudyTasks(convertedTasks);
+          }
+          
+          // Start on the tasks step for editing
+          setCurrentStep(1);
+        } catch (error) {
+          console.error('Error loading study data:', error);
+          toast.error('Failed to load study data');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      fetchStudyData();
+    }
+  }, [id, reset]);
 
   // Update validation when form data changes
   React.useEffect(() => {
@@ -153,9 +283,8 @@ const EnhancedStudyBuilderPage: React.FC = () => {
   const handleTasksChange = useCallback((newTasks: StudyBuilderTask[]) => {
     setStudyTasks(newTasks);
   }, []);
-
   // New handlers for enhanced UI components
-  const handleAddTaskFromLibrary = useCallback((template: any) => {
+  const handleAddTaskFromLibrary = useCallback((template: { id: string; name: string; description: string; estimatedDuration?: number; settings?: Record<string, unknown> }) => {
     const newTask: StudyBuilderTask = {
       id: `task_${Date.now()}`,
       template_id: template.id,
@@ -168,18 +297,47 @@ const EnhancedStudyBuilderPage: React.FC = () => {
     setStudyTasks(prev => [...prev, newTask]);
     setShowTaskLibrary(false);
     toast.success(`Added "${template.name}" to your study`);
-  }, [studyTasks]);
+  }, [studyTasks]);  const handleSaveTask = useCallback(async (updatedTask: StudyBuilderTask) => {
+    // Update local state
+    const updatedTasks = studyTasks.map(task => 
+      task.id === updatedTask.id ? updatedTask : task
+    );
+    setStudyTasks(updatedTasks);
+    
+    // If we're editing an existing study, save to backend immediately
+    if (isEditing && id) {      try {
+        // Convert tasks to legacy ITask format for backend
+        const tasksForAPI = convertTasksToLegacy(updatedTasks);
+        
+        // Get current form data to include in the update
+        const currentData = getValues();
+        const legacyType = currentData.type === 'usability_test' ? 'usability' : 
+                          currentData.type === 'user_interview' ? 'interview' : 'survey';
 
-  const handleReorderTasks = useCallback((reorderedTasks: StudyBuilderTask[]) => {
+        // Update study with the new tasks - passing as ITask[] format
+        await updateStudy(id, {
+          title: currentData.title,
+          description: currentData.description,
+          type: legacyType as 'survey' | 'usability' | 'interview' | 'card-sorting' | 'a-b-testing',
+          tasks: tasksForAPI,
+          settings: currentData.settings,
+          status: 'draft'
+        });
+      }catch (error) {
+        console.error('Failed to save task changes:', error);
+        toast.error('Failed to save task changes. Please try again.');
+        return;
+      }
+    }
+    
+    setShowTaskEditModal(false);
+    setTaskToEdit(null);
+    toast.success('Task updated successfully');
+  }, [studyTasks, isEditing, id, updateStudy, getValues]);const handleReorderTasks = useCallback((reorderedTasks: StudyBuilderTask[]) => {
     setStudyTasks(reorderedTasks);
-  }, []);
-  const handleEditTask = useCallback((task: StudyBuilderTask) => {
+  }, []);const handleEditTask = useCallback((task: StudyBuilderTask) => {
     setTaskToEdit(task);
-    // In a real implementation, this would open a task editing modal
-    toast('Task editing modal would open here', { 
-      icon: '✏️',
-      duration: 2000 
-    });
+    setShowTaskEditModal(true);
   }, []);
 
   const handleDuplicateTask = useCallback((task: StudyBuilderTask) => {
@@ -211,9 +369,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
       option.studyTypes.includes(watchedType) || 
       watchedType === 'survey' && ['recordAudio'].includes(option.key) // Surveys only allow audio recording
     );
-  }, [watchedType]);
-
-  const onSubmit = async (data: StudyFormData) => {
+  }, [watchedType]);  const onSubmit = async (data: StudyFormData) => {
     if (studyTasks.length === 0) {
       toast.error('Please add at least one task to your study');
       setCurrentStep(1);
@@ -221,25 +377,47 @@ const EnhancedStudyBuilderPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    try {      // Convert StudyBuilderTask[] to the format expected by the legacy API
-      const tasksForAPI = convertTasksToAPI(studyTasks);
-      
-      // Convert study type to legacy format
-      const legacyType = data.type === 'usability_test' ? 'usability' : 
-                        data.type === 'user_interview' ? 'interview' : 'survey';
+    try {
+      if (isEditing && id) {
+        // For editing, we need to include tasks when updating the study        // Convert StudyBuilderTask[] to the format expected by the API
+        const tasksForAPI = convertTasksToLegacy(studyTasks);
+        
+        // Convert study type to legacy format
+        const legacyType = data.type === 'usability_test' ? 'usability' : 
+                          data.type === 'user_interview' ? 'interview' : 'survey';
 
-      await createStudy({
-        ...data,
-        type: legacyType as 'survey' | 'usability' | 'interview' | 'prototype',
-        tasks: tasksForAPI,
-        status: 'draft'
-      });
+        // Update study with all data including tasks
+        await updateStudy(id, {
+          title: data.title,
+          description: data.description,
+          type: legacyType as 'survey' | 'usability' | 'interview' | 'card-sorting' | 'a-b-testing',
+          tasks: tasksForAPI,
+          settings: data.settings,
+          status: 'draft'
+        });
+        toast.success('Study updated successfully!');
+      } else {
+        // Convert StudyBuilderTask[] to the format expected by the legacy API
+        const tasksForAPI = convertTasksToAPI(studyTasks);
+        
+        // Convert study type to legacy format
+        const legacyType = data.type === 'usability_test' ? 'usability' : 
+                          data.type === 'user_interview' ? 'interview' : 'survey';
 
-      toast.success('Study created successfully!');
+        // Create new study
+        await createStudy({
+          ...data,
+          type: legacyType as 'survey' | 'usability' | 'interview' | 'prototype',
+          tasks: tasksForAPI,
+          status: 'draft'
+        });
+        toast.success('Study created successfully!');
+      }
+
       navigate('/app/studies');
     } catch (error) {
-      console.error('Failed to create study:', error);
-      toast.error('Failed to create study. Please try again.');
+      console.error('Failed to save study:', error);
+      toast.error(isEditing ? 'Failed to update study. Please try again.' : 'Failed to create study. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -405,19 +583,8 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                       <Plus className="w-4 h-4" />
                       Add Task
                     </Button>
-                  </div>
-
-                  <DragDropTaskList
-                    tasks={studyTasks.map(task => ({
-                      id: task.id,
-                      templateId: task.template_id,
-                      name: task.name,
-                      description: task.description,
-                      estimatedDuration: task.estimated_duration,
-                      settings: task.settings || {},
-                      order: task.order_index,
-                      isRequired: true // You could make this configurable
-                    }))}
+                  </div>                  <DragDropTaskList
+                    tasks={convertToTaskListFormat(studyTasks)}
                     onReorderTasks={(reorderedTasks) => {
                       const updatedTasks = reorderedTasks.map((task, index) => ({
                         id: task.id,
@@ -754,7 +921,9 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Create New Study</h1>
+                <h1 className="text-xl font-semibold text-gray-900">
+                  {isEditing ? 'Edit Study' : 'Create New Study'}
+                </h1>
                 <p className="text-sm text-gray-500">Step {currentStep + 1} of {steps.length}</p>
               </div>
             </div>
@@ -825,24 +994,40 @@ const EnhancedStudyBuilderPage: React.FC = () => {
                   variant="primary"
                   disabled={isSubmitting || !canProceedToNextStep()}
                   className="flex items-center space-x-2 min-w-[140px]"
-                >
-                  {isSubmitting ? (
+                >                  {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Creating...</span>
+                      <span>{isEditing ? 'Updating...' : 'Creating...'}</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      <span>Create Study</span>
+                      <span>{isEditing ? 'Update Study' : 'Create Study'}</span>
                     </>
                   )}
                 </Button>
               )}
             </div>
-          </div>
-        </form>
-      </div>
+          </div>        </form>
+      </div>      {/* Task Library Modal */}
+      <TaskLibraryModal
+        isOpen={showTaskLibrary}
+        onClose={() => setShowTaskLibrary(false)}
+        onAddTask={handleAddTaskFromLibrary}
+        studyType={watchedType}
+        currentTasks={convertToTaskListFormat(studyTasks)}
+      />
+
+      {/* Task Edit Modal */}
+      <TaskEditModal
+        isOpen={showTaskEditModal}
+        task={taskToEdit}
+        onClose={() => {
+          setShowTaskEditModal(false);
+          setTaskToEdit(null);
+        }}
+        onSave={handleSaveTask}
+      />
     </div>
   );
 };
