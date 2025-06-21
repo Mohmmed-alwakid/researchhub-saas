@@ -364,9 +364,7 @@ export default async function handler(req, res) {
           success: false,
           error: 'Authentication required'
         });
-      }
-
-      const { title, description, type, tasks, settings } = req.body;
+      }      const { title, description, type, tasks, settings, status } = req.body;
 
       // Update study in Supabase
       const { data: updatedStudy, error } = await supabase
@@ -382,7 +380,7 @@ export default async function handler(req, res) {
             compensation: settings?.compensation,
             tasks: tasks || []
           },
-          status: 'draft',
+          status: status || 'draft', // Allow status updates, default to draft
           target_participants: settings?.maxParticipants,
           researcher_id: currentUser.id
         })
