@@ -2165,6 +2165,25 @@ app.all('/api/participant-applications*', async (req, res) => {
   }
 });
 
+// Researcher Applications endpoints
+app.all('/api/researcher-applications*', async (req, res) => {
+  try {
+    // Import the researcher applications handler
+    const researcherApplicationsModule = await import('./api/researcher-applications.js');
+    const handler = researcherApplicationsModule.default;
+    
+    // Call the handler with req and res
+    await handler(req, res);
+  } catch (error) {
+    console.error('❌ Researcher Applications API Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Researcher applications operation failed',
+      message: error.message
+    });
+  }
+});
+
 // Start frontend development server
 function startFrontend() {
   console.log('🚀 Starting Frontend Development Server...');

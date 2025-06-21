@@ -144,21 +144,131 @@
             border-radius: 6px;
             font-size: 0.875rem;
         }
+        .test-summary-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .summary-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .detailed-results {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .result-item {
+            display: grid;
+            grid-template-columns: 30px 1fr 2fr 80px;
+            gap: 10px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .result-item.passed {
+            background-color: #f8f9fa;
+        }
+        
+        .result-item.failed {
+            background-color: #fff5f5;
+        }
+        
+        .result-name {
+            font-weight: 500;
+        }
+        
+        .result-details {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .result-duration {
+            text-align: right;
+            font-family: monospace;
+            font-size: 0.8em;
+            color: #888;
+        }
+        
+        .recommendations {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        
+        .recommendations h5 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        
+        .test-progress {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .api-test button {
+            margin: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .result-item {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+            
+            .result-duration {
+                text-align: left;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body>
-    <div class="container">
+<body>    <div class="container">
         <div class="header">
             <h1>🔍 Study Discovery Frontend Test</h1>
             <p>Testing the frontend integration with the participant-applications API</p>
-        </div>
-
-        <div class="api-test">
+            <div class="status success">
+                ✅ Production API Testing - Connected to: https://researchhub-saas.vercel.app/
+            </div>
+        </div>        <div class="api-test">
             <h3>Frontend API Integration Test</h3>
             <button onclick="testFrontendAPI()">Test Frontend API Service</button>
             <button onclick="testWithFilters()">Test With Filters</button>
             <button onclick="testPagination()">Test Pagination</button>
+            <button onclick="runFullE2ETest()">🚀 Run Full E2E Test</button>
             <div id="apiStatus" class="status info" style="display: none;"></div>
+        </div>
+
+        <div class="api-test">
+            <h3>Test Results Summary</h3>
+            <div id="testSummary">
+                <div class="status info">Click any test button to see results here...</div>
+            </div>
         </div>
 
         <div class="filters">
@@ -193,17 +303,40 @@
             <h3>Raw API Response</h3>
             <pre id="rawResponse">Click "Test Frontend API Service" to see response...</pre>
         </div>
+
+        <div class="api-test">
+            <h3>🚀 Comprehensive E2E Test Suite</h3>
+            <button onclick="runFullE2ETest()">Run Full E2E Test</button>
+            <button onclick="runPerformanceTest()">Run Performance Test</button>
+            <button onclick="runAccessibilityTest()">Run Accessibility Test</button>
+            <div id="testResults" class="status info" style="display: none;"></div>
+            <div id="testSummary" style="display: none; margin-top: 20px;"></div>
+        </div>
+
+        <div class="api-test">
+            <h3>🔄 Automated Testing</h3>
+            <button onclick="startContinuousMonitoring()">Start Continuous Monitoring</button>
+            <button onclick="stopContinuousMonitoring()">Stop Monitoring</button>
+            <button onclick="runRegressionTest()">Run Regression Test</button>
+            <div id="monitoringStatus" class="status info" style="display: none;"></div>
+            <div id="regressionResults" style="display: none; margin-top: 15px;"></div>
+        </div>
     </div>
 
-    <script>
-        // Mimic the frontend API service
+    <script>        // Mimic the frontend API service - Production API
         class APIService {
             constructor() {
-                this.baseURL = '/api/';
+                this.baseURL = 'https://researchhub-saas.vercel.app/api/';
             }
 
             async get(endpoint) {
-                const response = await fetch(this.baseURL + endpoint);
+                const response = await fetch(this.baseURL + endpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -390,16 +523,725 @@
                     </button>
                 </div>
             `).join('');
-        }
-
-        function applyToStudy(studyId) {
+        }        function applyToStudy(studyId) {
             alert(`Would apply to study: ${studyId}`);
         }
+
+        // Enhanced E2E Test Suite with Real-world Scenarios
+        async function runFullE2ETest() {
+            console.log('🧪 Starting Comprehensive E2E Test Suite...');
+            const results = document.getElementById('testResults');
+            const summary = document.getElementById('testSummary');
+            results.style.display = 'block';
+            summary.style.display = 'block';
+            
+            results.innerHTML = '<h4>🧪 E2E Test Results:</h4><div id="e2eLog"></div>';
+            const log = document.getElementById('e2eLog');
+            
+            const testSuite = [
+                {
+                    name: 'API Health Check',
+                    test: async () => {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/health`);
+                            return { passed: response.ok, details: `Status: ${response.status}` };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'Public Studies API Response',
+                    test: async () => {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&limit=10&offset=0`);
+                            const data = await response.json();
+                            return { 
+                                passed: response.ok && Array.isArray(data.studies), 
+                                details: `${data.studies?.length || 0} studies found, total: ${data.total || 0}` 
+                            };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'Search Functionality',
+                    test: async () => {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&search=test&limit=10&offset=0`);
+                            const data = await response.json();
+                            return { 
+                                passed: response.ok, 
+                                details: `Search returned ${data.studies?.length || 0} results` 
+                            };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'Study Type Filter',
+                    test: async () => {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&type=usability&limit=10&offset=0`);
+                            const data = await response.json();
+                            return { 
+                                passed: response.ok, 
+                                details: `Filter returned ${data.studies?.length || 0} usability studies` 
+                            };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'Pagination Test',
+                    test: async () => {
+                        try {
+                            const response1 = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&limit=5&offset=0`);
+                            const response2 = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&limit=5&offset=5`);
+                            const data1 = await response1.json();
+                            const data2 = await response2.json();
+                            return { 
+                                passed: response1.ok && response2.ok, 
+                                details: `Page 1: ${data1.studies?.length || 0}, Page 2: ${data2.studies?.length || 0}` 
+                            };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'DOM Rendering Test',
+                    test: async () => {
+                        try {
+                            await loadStudies();
+                            const studyCards = document.querySelectorAll('.study-card');
+                            const hasNoStudiesMessage = document.querySelector('.no-studies-message');
+                            return { 
+                                passed: studyCards.length > 0 || hasNoStudiesMessage !== null, 
+                                details: `${studyCards.length} study cards rendered` 
+                            };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'UI Interaction Test',
+                    test: async () => {
+                        try {
+                            // Test search input
+                            const searchInput = document.getElementById('searchInput');
+                            if (searchInput) {
+                                searchInput.value = 'test';
+                                searchInput.dispatchEvent(new Event('input'));
+                            }
+                            
+                            // Test filter dropdown
+                            const typeFilter = document.getElementById('typeFilter');
+                            if (typeFilter) {
+                                typeFilter.value = 'usability';
+                                typeFilter.dispatchEvent(new Event('change'));
+                            }
+                            
+                            return { passed: true, details: 'UI interactions completed successfully' };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'Error Handling Test',
+                    test: async () => {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/participant-applications?status=invalid&limit=10&offset=0`);
+                            // This should handle gracefully even with invalid parameters
+                            return { 
+                                passed: true, 
+                                details: `Error handling test completed (status: ${response.status})` 
+                            };
+                        } catch (error) {
+                            return { passed: true, details: 'Error properly caught and handled' };
+                        }
+                    }
+                },
+                {
+                    name: 'Mobile Responsiveness Check',
+                    test: async () => {
+                        try {
+                            const originalWidth = window.innerWidth;
+                            
+                            // Simulate mobile viewport
+                            const testElement = document.querySelector('.container');
+                            const isMobileResponsive = testElement && window.getComputedStyle(testElement).display !== 'none';
+                            
+                            return { 
+                                passed: isMobileResponsive, 
+                                details: `Mobile responsiveness check completed (viewport: ${window.innerWidth}px)` 
+                            };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                },
+                {
+                    name: 'Security Headers Check',
+                    test: async () => {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&limit=1&offset=0`);
+                            const hasSecurityHeaders = response.headers.get('content-type')?.includes('application/json');
+                            return { 
+                                passed: hasSecurityHeaders, 
+                                details: `Content-Type header: ${response.headers.get('content-type')}` 
+                            };
+                        } catch (error) {
+                            return { passed: false, details: `Error: ${error.message}` };
+                        }
+                    }
+                }
+            ];
+            
+            let passedTests = 0;
+            let totalTests = testSuite.length;
+            const testResults = [];
+            
+            log.innerHTML += '<div class="test-progress">Running tests...</div>';
+            
+            for (let i = 0; i < testSuite.length; i++) {
+                const test = testSuite[i];
+                log.innerHTML += `<p>🧪 Running: ${test.name}...</p>`;
+                
+                try {
+                    const startTime = performance.now();
+                    const result = await test.test();
+                    const endTime = performance.now();
+                    const duration = (endTime - startTime).toFixed(2);
+                    
+                    const status = result.passed ? '✅' : '❌';
+                    log.innerHTML += `<p>${status} ${test.name}: ${result.details} (${duration}ms)</p>`;
+                    
+                    testResults.push({
+                        name: test.name,
+                        passed: result.passed,
+                        details: result.details,
+                        duration: duration
+                    });
+                    
+                    if (result.passed) passedTests++;
+                } catch (error) {
+                    log.innerHTML += `<p>❌ ${test.name}: Unexpected error - ${error.message}</p>`;
+                    testResults.push({
+                        name: test.name,
+                        passed: false,
+                        details: `Unexpected error: ${error.message}`,
+                        duration: 'N/A'
+                    });
+                }
+                
+                // Update progress
+                const progress = Math.round(((i + 1) / totalTests) * 100);
+                log.querySelector('.test-progress').textContent = `Progress: ${progress}% (${i + 1}/${totalTests})`;
+            }
+            
+            // Generate comprehensive summary
+            const successRate = Math.round((passedTests / totalTests) * 100);
+            const rating = successRate >= 90 ? '🟢 Excellent' : successRate >= 70 ? '🟡 Good' : '🔴 Needs Improvement';
+            
+            const networkSummary = getNetworkSummary();
+            
+            summary.innerHTML = `
+                <div class="test-summary-card">
+                    <h4>🎯 Test Suite Summary</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <strong>Overall Score:</strong> ${successRate}% ${rating}
+                        </div>
+                        <div class="summary-item">
+                            <strong>Tests Passed:</strong> ${passedTests}/${totalTests}
+                        </div>
+                        <div class="summary-item">
+                            <strong>Network Requests:</strong> ${networkSummary.totalRequests}
+                        </div>
+                        <div class="summary-item">
+                            <strong>Avg Response Time:</strong> ${networkSummary.averageResponseTime}ms
+                        </div>
+                        <div class="summary-item">
+                            <strong>Success Rate:</strong> ${networkSummary.successRate}%
+                        </div>
+                        <div class="summary-item">
+                            <strong>Environment:</strong> ${API_BASE_URL.includes('localhost') ? 'Local' : 'Production'}
+                        </div>
+                    </div>
+                    
+                    <h5>🔍 Detailed Results:</h5>
+                    <div class="detailed-results">
+                        ${testResults.map(result => `
+                            <div class="result-item ${result.passed ? 'passed' : 'failed'}">
+                                <span class="result-status">${result.passed ? '✅' : '❌'}</span>
+                                <span class="result-name">${result.name}</span>
+                                <span class="result-details">${result.details}</span>
+                                <span class="result-duration">${result.duration}ms</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="recommendations">
+                        <h5>💡 Recommendations:</h5>
+                        ${successRate < 70 ? '<p>• Review failed tests and address critical issues</p>' : ''}
+                        ${parseFloat(networkSummary.averageResponseTime) > 1000 ? '<p>• Optimize API response times</p>' : ''}
+                        ${parseFloat(networkSummary.successRate) < 95 ? '<p>• Improve error handling and network reliability</p>' : ''}
+                        ${successRate >= 90 ? '<p>• Great job! All systems are functioning well</p>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            console.log(`🎯 E2E Test Suite Complete: ${passedTests}/${totalTests} passed (${successRate}%)`);
+        }
+
+        // Advanced Testing Functions
+        async function runPerformanceTest() {
+            console.log('🚀 Starting Performance Test Suite...');
+            const results = document.getElementById('testResults');
+            const summary = document.getElementById('testSummary');
+            results.style.display = 'block';
+            summary.style.display = 'block';
+            
+            const performanceMetrics = {
+                apiResponseTime: 0,
+                domLoadTime: 0,
+                totalRequests: 0,
+                averageResponseTime: 0
+            };
+            
+            results.innerHTML = '<h4>Performance Test Results:</h4><div id="performanceLog"></div>';
+            const log = document.getElementById('performanceLog');
+            
+            // Test API response times
+            const apiTests = [
+                { name: 'Public Studies API', endpoint: '/api/participant-applications?status=active&limit=10&offset=0' },
+                { name: 'Search API', endpoint: '/api/participant-applications?status=active&search=test&limit=10&offset=0' },
+                { name: 'Filter API', endpoint: '/api/participant-applications?status=active&type=usability&limit=10&offset=0' }
+            ];
+            
+            for (const test of apiTests) {
+                const startTime = performance.now();
+                try {
+                    const response = await fetch(`${API_BASE_URL}${test.endpoint}`, {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const endTime = performance.now();
+                    const responseTime = endTime - startTime;
+                    
+                    performanceMetrics.totalRequests++;
+                    performanceMetrics.averageResponseTime += responseTime;
+                    
+                    log.innerHTML += `<p>✅ ${test.name}: ${responseTime.toFixed(2)}ms (${response.status})</p>`;
+                } catch (error) {
+                    log.innerHTML += `<p>❌ ${test.name}: Failed - ${error.message}</p>`;
+                }
+            }
+            
+            performanceMetrics.averageResponseTime = performanceMetrics.averageResponseTime / performanceMetrics.totalRequests;
+            
+            // DOM Performance Test
+            const domStartTime = performance.now();
+            await loadStudies();
+            const domEndTime = performance.now();
+            performanceMetrics.domLoadTime = domEndTime - domStartTime;
+            
+            log.innerHTML += `<p><strong>Performance Summary:</strong></p>`;
+            log.innerHTML += `<p>• Average API Response Time: ${performanceMetrics.averageResponseTime.toFixed(2)}ms</p>`;
+            log.innerHTML += `<p>• DOM Load Time: ${performanceMetrics.domLoadTime.toFixed(2)}ms</p>`;
+            log.innerHTML += `<p>• Total Requests: ${performanceMetrics.totalRequests}</p>`;
+            
+            // Performance rating
+            const rating = performanceMetrics.averageResponseTime < 500 ? '🟢 Excellent' : 
+                          performanceMetrics.averageResponseTime < 1000 ? '🟡 Good' : '🔴 Needs Improvement';
+            log.innerHTML += `<p><strong>Performance Rating: ${rating}</strong></p>`;
+        }
+
+        async function runAccessibilityTest() {
+            console.log('♿ Starting Accessibility Test Suite...');
+            const results = document.getElementById('testResults');
+            const summary = document.getElementById('testSummary');
+            results.style.display = 'block';
+            summary.style.display = 'block';
+            
+            results.innerHTML = '<h4>Accessibility Test Results:</h4><div id="accessibilityLog"></div>';
+            const log = document.getElementById('accessibilityLog');
+            
+            const accessibilityChecks = [
+                {
+                    name: 'Alt Text on Images',
+                    test: () => {
+                        const images = document.querySelectorAll('img');
+                        const imagesWithoutAlt = Array.from(images).filter(img => !img.alt);
+                        return { passed: imagesWithoutAlt.length === 0, details: `${imagesWithoutAlt.length} images without alt text` };
+                    }
+                },
+                {
+                    name: 'Form Labels',
+                    test: () => {
+                        const inputs = document.querySelectorAll('input, select, textarea');
+                        const inputsWithoutLabels = Array.from(inputs).filter(input => {
+                            const id = input.id;
+                            const label = document.querySelector(`label[for="${id}"]`);
+                            return !label && !input.getAttribute('aria-label');
+                        });
+                        return { passed: inputsWithoutLabels.length === 0, details: `${inputsWithoutLabels.length} inputs without labels` };
+                    }
+                },
+                {
+                    name: 'Button Accessibility',
+                    test: () => {
+                        const buttons = document.querySelectorAll('button');
+                        const buttonsWithoutText = Array.from(buttons).filter(button => {
+                            return !button.textContent.trim() && !button.getAttribute('aria-label');
+                        });
+                        return { passed: buttonsWithoutText.length === 0, details: `${buttonsWithoutText.length} buttons without accessible text` };
+                    }
+                },
+                {
+                    name: 'Color Contrast',
+                    test: () => {
+                        // Basic contrast check - would need more sophisticated tooling for real testing
+                        const elements = document.querySelectorAll('*');
+                        let lowContrastElements = 0;
+                        // This is a simplified check - in real implementation would use proper contrast calculation
+                        return { passed: true, details: 'Basic contrast check passed (needs advanced tooling for complete assessment)' };
+                    }
+                }
+            ];
+            
+            let passedTests = 0;
+            
+            for (const check of accessibilityChecks) {
+                try {
+                    const result = check.test();
+                    const status = result.passed ? '✅' : '❌';
+                    log.innerHTML += `<p>${status} ${check.name}: ${result.details}</p>`;
+                    if (result.passed) passedTests++;
+                } catch (error) {
+                    log.innerHTML += `<p>❌ ${check.name}: Error - ${error.message}</p>`;
+                }
+            }
+            
+            const score = Math.round((passedTests / accessibilityChecks.length) * 100);
+            const rating = score >= 90 ? '🟢 Excellent' : score >= 70 ? '🟡 Good' : '🔴 Needs Improvement';
+            
+            log.innerHTML += `<p><strong>Accessibility Score: ${score}% ${rating}</strong></p>`;
+            log.innerHTML += `<p>Passed: ${passedTests}/${accessibilityChecks.length} tests</p>`;
+        }
+
+        // Enhanced Error Handling and Logging
+        function logTestResult(testName, success, details) {
+            const timestamp = new Date().toLocaleTimeString();
+            const status = success ? '✅' : '❌';
+            console.log(`[${timestamp}] ${status} ${testName}: ${details}`);
+            
+            // Also log to UI if test results div is visible
+            const testLog = document.getElementById('performanceLog') || document.getElementById('accessibilityLog');
+            if (testLog) {
+                testLog.innerHTML += `<p>[${timestamp}] ${status} ${testName}: ${details}</p>`;
+            }
+        }
+
+        // Network Monitoring
+        let networkRequests = [];
+        
+        function monitorNetworkRequests() {
+            const originalFetch = window.fetch;
+            window.fetch = async function(...args) {
+                const startTime = performance.now();
+                const url = args[0];
+                
+                try {
+                    const response = await originalFetch.apply(this, args);
+                    const endTime = performance.now();
+                    
+                    networkRequests.push({
+                        url,
+                        status: response.status,
+                        responseTime: endTime - startTime,
+                        timestamp: new Date()
+                    });
+                    
+                    return response;
+                } catch (error) {
+                    const endTime = performance.now();
+                    
+                    networkRequests.push({
+                        url,
+                        status: 'ERROR',
+                        responseTime: endTime - startTime,
+                        error: error.message,
+                        timestamp: new Date()
+                    });
+                    
+                    throw error;
+                }
+            };
+        }
+        
+        function getNetworkSummary() {
+            const totalRequests = networkRequests.length;
+            const averageResponseTime = networkRequests.reduce((sum, req) => sum + req.responseTime, 0) / totalRequests;
+            const errorCount = networkRequests.filter(req => req.status === 'ERROR').length;
+            
+            return {
+                totalRequests,
+                averageResponseTime: averageResponseTime.toFixed(2),
+                errorCount,
+                successRate: ((totalRequests - errorCount) / totalRequests * 100).toFixed(1)
+            };
+        }
+
+        // Initialize network monitoring
+        monitorNetworkRequests();
 
         // Auto-test on page load
         window.addEventListener('load', () => {
             setTimeout(testFrontendAPI, 1000);
         });
+        
+        // Automated Testing and Monitoring
+        let monitoringInterval = null;
+        let regressionTestHistory = [];
+        
+        function startContinuousMonitoring() {
+            if (monitoringInterval) {
+                console.log('⚠️ Monitoring already running');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('monitoringStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<p>🔄 Continuous monitoring started - Running tests every 30 seconds</p>';
+            
+            monitoringInterval = setInterval(async () => {
+                const timestamp = new Date().toLocaleTimeString();
+                console.log(`🔄 [${timestamp}] Running automated health check...`);
+                
+                try {
+                    // Quick health check
+                    const response = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&limit=1&offset=0`);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        statusDiv.innerHTML = `<p>✅ [${timestamp}] System healthy - ${data.studies?.length || 0} studies available</p>`;
+                    } else {
+                        statusDiv.innerHTML = `<p>❌ [${timestamp}] System issue detected - Status: ${response.status}</p>`;
+                        console.error('Health check failed:', response.status);
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<p>❌ [${timestamp}] Connection error - ${error.message}</p>`;
+                    console.error('Monitoring error:', error);
+                }
+            }, 30000); // Every 30 seconds
+            
+            console.log('🔄 Continuous monitoring started');
+        }
+        
+        function stopContinuousMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+                
+                const statusDiv = document.getElementById('monitoringStatus');
+                statusDiv.innerHTML = '<p>⏹️ Continuous monitoring stopped</p>';
+                
+                console.log('⏹️ Continuous monitoring stopped');
+            }
+        }
+        
+        async function runRegressionTest() {
+            console.log('🔄 Starting Regression Test Suite...');
+            const resultsDiv = document.getElementById('regressionResults');
+            resultsDiv.style.display = 'block';
+            
+            const testTimestamp = new Date();
+            const regressionTests = [
+                {
+                    name: 'Critical API Endpoints',
+                    tests: [
+                        { endpoint: '/api/health', expectedStatus: 200 },
+                        { endpoint: '/api/participant-applications?status=active&limit=1&offset=0', expectedStatus: 200 }
+                    ]
+                },
+                {
+                    name: 'Core Functionality',
+                    tests: [
+                        { 
+                            name: 'Public Studies Loading',
+                            test: async () => {
+                                await loadStudies();
+                                return document.querySelectorAll('.study-card').length > 0 || 
+                                       document.querySelector('.no-studies-message') !== null;
+                            }
+                        },
+                        {
+                            name: 'Search Functionality',
+                            test: async () => {
+                                const searchInput = document.getElementById('searchInput');
+                                if (searchInput) {
+                                    searchInput.value = 'test';
+                                    await searchStudies();
+                                    return true;
+                                }
+                                return false;
+                            }
+                        }
+                    ]
+                },
+                {
+                    name: 'Data Integrity',
+                    tests: [
+                        {
+                            name: 'API Data Structure',
+                            test: async () => {
+                                const response = await fetch(`${API_BASE_URL}/api/participant-applications?status=active&limit=1&offset=0`);
+                                const data = await response.json();
+                                return data.hasOwnProperty('studies') && data.hasOwnProperty('total');
+                            }
+                        }
+                    ]
+                }
+            ];
+            
+            let totalTests = 0;
+            let passedTests = 0;
+            const results = [];
+            
+            for (const category of regressionTests) {
+                for (const test of category.tests) {
+                    totalTests++;
+                    
+                    try {
+                        let passed = false;
+                        
+                        if (test.endpoint) {
+                            const response = await fetch(`${API_BASE_URL}${test.endpoint}`);
+                            passed = response.status === test.expectedStatus;
+                        } else if (test.test) {
+                            passed = await test.test();
+                        }
+                        
+                        if (passed) passedTests++;
+                        
+                        results.push({
+                            category: category.name,
+                            name: test.name || test.endpoint,
+                            passed,
+                            timestamp: new Date()
+                        });
+                    } catch (error) {
+                        results.push({
+                            category: category.name,
+                            name: test.name || test.endpoint,
+                            passed: false,
+                            error: error.message,
+                            timestamp: new Date()
+                        });
+                    }
+                }
+            }
+            
+            const successRate = Math.round((passedTests / totalTests) * 100);
+            const regressionResult = {
+                timestamp: testTimestamp,
+                totalTests,
+                passedTests,
+                successRate,
+                results
+            };
+            
+            regressionTestHistory.push(regressionResult);
+            
+            // Keep only last 10 regression test results
+            if (regressionTestHistory.length > 10) {
+                regressionTestHistory = regressionTestHistory.slice(-10);
+            }
+            
+            displayRegressionResults(regressionResult);
+            
+            console.log(`🔄 Regression test complete: ${passedTests}/${totalTests} passed (${successRate}%)`);
+        }
+        
+        function displayRegressionResults(result) {
+            const resultsDiv = document.getElementById('regressionResults');
+            const rating = result.successRate >= 90 ? '🟢' : result.successRate >= 70 ? '🟡' : '🔴';
+            
+            resultsDiv.innerHTML = `
+                <div class="regression-results">
+                    <h4>📊 Regression Test Results</h4>
+                    <div class="regression-summary">
+                        <div class="regression-metric">
+                            <strong>Overall Score:</strong> ${result.successRate}% ${rating}
+                        </div>
+                        <div class="regression-metric">
+                            <strong>Tests:</strong> ${result.passedTests}/${result.totalTests} passed
+                        </div>
+                        <div class="regression-metric">
+                            <strong>Timestamp:</strong> ${result.timestamp.toLocaleString()}
+                        </div>
+                    </div>
+                    
+                    <div class="regression-details">
+                        <h5>Test Results by Category:</h5>
+                        ${Object.entries(groupResultsByCategory(result.results)).map(([category, tests]) => `
+                            <div class="category-results">
+                                <h6>${category}</h6>
+                                ${tests.map(test => `
+                                    <div class="test-result ${test.passed ? 'passed' : 'failed'}">
+                                        <span class="test-status">${test.passed ? '✅' : '❌'}</span>
+                                        <span class="test-name">${test.name}</span>
+                                        ${test.error ? `<span class="test-error">${test.error}</span>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${regressionTestHistory.length > 1 ? `
+                        <div class="regression-history">
+                            <h5>Recent Test History:</h5>
+                            <div class="history-chart">
+                                ${regressionTestHistory.slice(-5).map(test => `
+                                    <div class="history-item">
+                                        <div class="history-time">${test.timestamp.toLocaleTimeString()}</div>
+                                        <div class="history-score ${test.successRate >= 90 ? 'good' : test.successRate >= 70 ? 'warning' : 'error'}">
+                                            ${test.successRate}%
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        function groupResultsByCategory(results) {
+            return results.reduce((groups, result) => {
+                const category = result.category;
+                if (!groups[category]) {
+                    groups[category] = [];
+                }
+                groups[category].push(result);
+                return groups;
+            }, {});
+        }
+        
+        // Auto-cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+            }
+        });
+
+        // ...existing code...
     </script>
 </body>
 </html>

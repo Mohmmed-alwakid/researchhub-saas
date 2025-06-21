@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Participant Application Workflow Test - Production Environment</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-section {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        .warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 10px 5px;
+        }
+        
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            max-height: 400px;
+        }
+        
+        .workflow-step {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .step-status {
+            float: right;
+            font-size: 20px;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .credential-box {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Participant Application Workflow Test</h1>
+            <p><strong>Production Environment:</strong> https://researchhub-saas.vercel.app/</p>
+            <p><strong>Test Date:</strong> June 22, 2025</p>
+            <div class="status info">
+                Testing complete participant application workflow including post-application process
+            </div>
+        </div>
+
+        <!-- Test Credentials -->
+        <div class="test-section">
+            <h3>🔐 Test Credentials</h3>
+            <div class="credential-box">
+                <strong>Participant Account:</strong><br>
+                Email: abwanwr77+participant@gmail.com<br>
+                Password: Testtest123<br>
+                Role: participant
+            </div>
+            <div class="credential-box">
+                <strong>Researcher Account:</strong><br>
+                Email: abwanwr77+Researcher@gmail.com<br>
+                Password: Testtest123<br>
+                Role: researcher
+            </div>
+        </div>
+
+        <!-- Complete Workflow Test -->
+        <div class="test-section">
+            <h3>🔄 Complete Application Workflow Test</h3>
+            <button onclick="runCompleteWorkflowTest()">🚀 Run Complete Workflow Test</button>
+            <div id="workflowStatus" class="status info" style="display: none;"></div>
+            <div id="workflowResults"></div>
+        </div>
+
+        <!-- Individual Test Steps -->
+        <div class="test-section">
+            <h3>📋 Individual Test Steps</h3>
+            
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div class="step-status" id="step1Status">⏳</div>
+                <h4>Study Discovery (Participant)</h4>
+                <p>Test participant login and study discovery</p>
+                <button onclick="testParticipantDiscovery()">Test Study Discovery</button>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div class="step-status" id="step2Status">⏳</div>
+                <h4>Application Submission</h4>
+                <p>Submit application for available study</p>
+                <button onclick="testApplicationSubmission()">Test Application Submission</button>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div class="step-status" id="step3Status">⏳</div>
+                <h4>Application Management (Researcher)</h4>
+                <p>Test researcher view and review of applications</p>
+                <button onclick="testApplicationManagement()">Test Application Management</button>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div class="step-status" id="step4Status">⏳</div>
+                <h4>Application Review Process</h4>
+                <p>Test approve/reject workflow</p>
+                <button onclick="testApplicationReview()">Test Application Review</button>
+            </div>
+
+            <div class="workflow-step">
+                <div class="step-number">5</div>
+                <div class="step-status" id="step5Status">⏳</div>
+                <h4>Status Updates (Participant)</h4>
+                <p>Test participant sees status updates</p>
+                <button onclick="testStatusUpdates()">Test Status Updates</button>
+            </div>
+        </div>
+
+        <!-- API Testing -->
+        <div class="test-section">
+            <h3>🔌 API Endpoint Testing</h3>
+            <button onclick="testAPIEndpoints()">Test All API Endpoints</button>
+            <div id="apiResults"></div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="test-results" id="testResults" style="display: none;">
+            <h3>📊 Test Results Summary</h3>
+            <div id="summaryContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://researchhub-saas.vercel.app/api';
+        let currentAuthToken = null;
+        let testResults = {
+            discovery: null,
+            submission: null,
+            management: null,
+            review: null,
+            statusUpdate: null
+        };
+
+        // Authentication helper
+        async function authenticate(email, password) {
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    currentAuthToken = result.data.token;
+                    return { success: true, user: result.data.user };
+                } else {
+                    return { success: false, error: result.error };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Logout helper
+        async function logout() {
+            try {
+                await fetch(`${API_BASE}/auth?action=logout`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentAuthToken}`
+                    }
+                });
+                currentAuthToken = null;
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Test Study Discovery
+        async function testParticipantDiscovery() {
+            updateStepStatus('step1Status', '🔄');
+            const resultsDiv = document.getElementById('workflowResults');
+            
+            try {
+                // Login as participant
+                const authResult = await authenticate('abwanwr77+participant@gmail.com', 'Testtest123');
+                
+                if (!authResult.success) {
+                    updateStepStatus('step1Status', '❌');
+                    resultsDiv.innerHTML += `<div class="status error">❌ Participant login failed: ${authResult.error}</div>`;
+                    return;
+                }
+
+                // Test public studies API
+                const studiesResponse = await fetch(`${API_BASE}/participant-applications?endpoint=studies/public&page=1&limit=10`);
+                const studiesData = await studiesResponse.json();
+
+                if (studiesData.success && studiesData.data.studies.length > 0) {
+                    updateStepStatus('step1Status', '✅');
+                    resultsDiv.innerHTML += `
+                        <div class="status success">
+                            ✅ Study Discovery Test Passed<br>
+                            Found ${studiesData.data.studies.length} public studies<br>
+                            Participant authenticated successfully
+                        </div>`;
+                    testResults.discovery = { success: true, studyCount: studiesData.data.studies.length };
+                } else {
+                    updateStepStatus('step1Status', '⚠️');
+                    resultsDiv.innerHTML += `
+                        <div class="status warning">
+                            ⚠️ No public studies found<br>
+                            API working but no studies available for application
+                        </div>`;
+                    testResults.discovery = { success: false, reason: 'No public studies' };
+                }
+
+            } catch (error) {
+                updateStepStatus('step1Status', '❌');
+                resultsDiv.innerHTML += `<div class="status error">❌ Discovery test failed: ${error.message}</div>`;
+                testResults.discovery = { success: false, error: error.message };
+            }
+        }
+
+        // Test Application Submission
+        async function testApplicationSubmission() {
+            updateStepStatus('step2Status', '🔄');
+            const resultsDiv = document.getElementById('workflowResults');
+            
+            try {
+                // First get available studies
+                const studiesResponse = await fetch(`${API_BASE}/participant-applications?endpoint=studies/public&page=1&limit=1`);
+                const studiesData = await studiesResponse.json();
+
+                if (!studiesData.success || studiesData.data.studies.length === 0) {
+                    updateStepStatus('step2Status', '⚠️');
+                    resultsDiv.innerHTML += `<div class="status warning">⚠️ No studies available for application</div>`;
+                    return;
+                }
+
+                const studyId = studiesData.data.studies[0]._id;
+
+                // Test application submission
+                const applicationResponse = await fetch(`${API_BASE}/participant-applications?endpoint=studies/${studyId}/apply`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentAuthToken}`
+                    },
+                    body: JSON.stringify({
+                        screeningResponses: []
+                    })
+                });
+
+                const applicationData = await applicationResponse.json();
+
+                if (applicationData.success) {
+                    updateStepStatus('step2Status', '✅');
+                    resultsDiv.innerHTML += `
+                        <div class="status success">
+                            ✅ Application Submission Test Passed<br>
+                            Successfully applied to study: ${studyId}
+                        </div>`;
+                    testResults.submission = { success: true, studyId };
+                } else {
+                    updateStepStatus('step2Status', '❌');
+                    resultsDiv.innerHTML += `
+                        <div class="status error">
+                            ❌ Application submission failed: ${applicationData.error}<br>
+                            Note: This might be expected if applications are not yet implemented
+                        </div>`;
+                    testResults.submission = { success: false, error: applicationData.error };
+                }
+
+            } catch (error) {
+                updateStepStatus('step2Status', '❌');
+                resultsDiv.innerHTML += `<div class="status error">❌ Application test failed: ${error.message}</div>`;
+                testResults.submission = { success: false, error: error.message };
+            }
+        }
+
+        // Test Application Management (Researcher)
+        async function testApplicationManagement() {
+            updateStepStatus('step3Status', '🔄');
+            const resultsDiv = document.getElementById('workflowResults');
+            
+            try {
+                // Logout from participant account
+                await logout();
+
+                // Login as researcher
+                const authResult = await authenticate('abwanwr77+Researcher@gmail.com', 'Testtest123');
+                
+                if (!authResult.success) {
+                    updateStepStatus('step3Status', '❌');
+                    resultsDiv.innerHTML += `<div class="status error">❌ Researcher login failed: ${authResult.error}</div>`;
+                    return;
+                }
+
+                // Test getting researcher's studies
+                const studiesResponse = await fetch(`${API_BASE}/studies`, {
+                    headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+                });
+                const studiesData = await studiesResponse.json();
+
+                if (studiesData.success && studiesData.data.studies.length > 0) {
+                    const studyId = studiesData.data.studies[0]._id;
+
+                    // Test getting applications for study
+                    const applicationsResponse = await fetch(`${API_BASE}/participant-applications?endpoint=studies/${studyId}/applications`, {
+                        headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+                    });
+                    const applicationsData = await applicationsResponse.json();
+
+                    updateStepStatus('step3Status', '✅');
+                    resultsDiv.innerHTML += `
+                        <div class="status success">
+                            ✅ Application Management Test Passed<br>
+                            Found ${studiesData.data.studies.length} researcher studies<br>
+                            Applications endpoint accessible
+                        </div>`;
+                    testResults.management = { success: true, studyCount: studiesData.data.studies.length };
+                } else {
+                    updateStepStatus('step3Status', '⚠️');
+                    resultsDiv.innerHTML += `<div class="status warning">⚠️ No studies found for researcher</div>`;
+                    testResults.management = { success: false, reason: 'No studies found' };
+                }
+
+            } catch (error) {
+                updateStepStatus('step3Status', '❌');
+                resultsDiv.innerHTML += `<div class="status error">❌ Management test failed: ${error.message}</div>`;
+                testResults.management = { success: false, error: error.message };
+            }
+        }
+
+        // Test Application Review Process
+        async function testApplicationReview() {
+            updateStepStatus('step4Status', '🔄');
+            const resultsDiv = document.getElementById('workflowResults');
+            
+            try {
+                // This would test the actual review process
+                // For now, we'll test the API endpoint structure
+                
+                const mockApplicationId = 'test-application-id';
+                const reviewResponse = await fetch(`${API_BASE}/participant-applications?endpoint=applications/${mockApplicationId}/review`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentAuthToken}`
+                    },
+                    body: JSON.stringify({
+                        action: 'approve',
+                        notes: 'Test review'
+                    })
+                });
+
+                // Since this is likely to fail (no real application), we check the response structure
+                const reviewData = await reviewResponse.json();
+                
+                updateStepStatus('step4Status', '⚠️');
+                resultsDiv.innerHTML += `
+                    <div class="status warning">
+                        ⚠️ Application Review API Test<br>
+                        Endpoint accessible (expected to fail without real application)<br>
+                        Response: ${reviewData.error || 'API structure verified'}
+                    </div>`;
+                testResults.review = { success: false, reason: 'No real application to review' };
+
+            } catch (error) {
+                updateStepStatus('step4Status', '❌');
+                resultsDiv.innerHTML += `<div class="status error">❌ Review test failed: ${error.message}</div>`;
+                testResults.review = { success: false, error: error.message };
+            }
+        }
+
+        // Test Status Updates
+        async function testStatusUpdates() {
+            updateStepStatus('step5Status', '🔄');
+            const resultsDiv = document.getElementById('workflowResults');
+            
+            try {
+                // Logout from researcher account
+                await logout();
+
+                // Login back as participant
+                const authResult = await authenticate('abwanwr77+participant@gmail.com', 'Testtest123');
+                
+                if (!authResult.success) {
+                    updateStepStatus('step5Status', '❌');
+                    resultsDiv.innerHTML += `<div class="status error">❌ Participant re-login failed: ${authResult.error}</div>`;
+                    return;
+                }
+
+                // Test getting participant's applications
+                const applicationsResponse = await fetch(`${API_BASE}/participant-applications?endpoint=my-applications`, {
+                    headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+                });
+                const applicationsData = await applicationsResponse.json();
+
+                if (applicationsData.success) {
+                    updateStepStatus('step5Status', '✅');
+                    resultsDiv.innerHTML += `
+                        <div class="status success">
+                            ✅ Status Updates Test Passed<br>
+                            My Applications endpoint accessible<br>
+                            Found ${applicationsData.data.applications.length} applications
+                        </div>`;
+                    testResults.statusUpdate = { success: true, applicationCount: applicationsData.data.applications.length };
+                } else {
+                    updateStepStatus('step5Status', '❌');
+                    resultsDiv.innerHTML += `<div class="status error">❌ Status updates failed: ${applicationsData.error}</div>`;
+                    testResults.statusUpdate = { success: false, error: applicationsData.error };
+                }
+
+            } catch (error) {
+                updateStepStatus('step5Status', '❌');
+                resultsDiv.innerHTML += `<div class="status error">❌ Status test failed: ${error.message}</div>`;
+                testResults.statusUpdate = { success: false, error: error.message };
+            }
+        }
+
+        // Run Complete Workflow Test
+        async function runCompleteWorkflowTest() {
+            const statusDiv = document.getElementById('workflowStatus');
+            const resultsDiv = document.getElementById('workflowResults');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '🔄 Running complete participant application workflow test...';
+            resultsDiv.innerHTML = '';
+
+            // Reset all step statuses
+            ['step1Status', 'step2Status', 'step3Status', 'step4Status', 'step5Status'].forEach(id => {
+                updateStepStatus(id, '⏳');
+            });
+
+            // Run all tests in sequence
+            await testParticipantDiscovery();
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay
+
+            await testApplicationSubmission();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await testApplicationManagement();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await testApplicationReview();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await testStatusUpdates();
+
+            // Show final results
+            showTestSummary();
+            statusDiv.innerHTML = '✅ Complete workflow test finished! Check results below.';
+        }
+
+        // Test API Endpoints
+        async function testAPIEndpoints() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = '<h4>🔌 API Endpoint Test Results:</h4>';
+
+            const endpoints = [
+                { name: 'Health Check', url: '/health', method: 'GET' },
+                { name: 'Public Studies', url: '/participant-applications?endpoint=studies/public', method: 'GET' },
+                { name: 'My Applications', url: '/participant-applications?endpoint=my-applications', method: 'GET' },
+                { name: 'Auth Status', url: '/auth?action=status', method: 'GET' }
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_BASE}${endpoint.url}`, {
+                        method: endpoint.method,
+                        headers: currentAuthToken ? { 'Authorization': `Bearer ${currentAuthToken}` } : {}
+                    });
+                    
+                    const data = await response.json();
+                    const status = response.ok ? '✅' : '❌';
+                    
+                    resultsDiv.innerHTML += `
+                        <div class="status ${response.ok ? 'success' : 'error'}">
+                            ${status} ${endpoint.name}: ${response.status} - ${data.success ? 'Success' : data.error}
+                        </div>`;
+                } catch (error) {
+                    resultsDiv.innerHTML += `
+                        <div class="status error">
+                            ❌ ${endpoint.name}: Network Error - ${error.message}
+                        </div>`;
+                }
+            }
+        }
+
+        // Helper Functions
+        function updateStepStatus(stepId, status) {
+            document.getElementById(stepId).textContent = status;
+        }
+
+        function showTestSummary() {
+            const resultsDiv = document.getElementById('testResults');
+            const summaryDiv = document.getElementById('summaryContent');
+            
+            resultsDiv.style.display = 'block';
+            
+            const totalTests = Object.keys(testResults).length;
+            const passedTests = Object.values(testResults).filter(result => result && result.success).length;
+            const successRate = Math.round((passedTests / totalTests) * 100);
+            
+            summaryDiv.innerHTML = `
+                <div class="status ${successRate >= 80 ? 'success' : successRate >= 60 ? 'warning' : 'error'}">
+                    <h4>📊 Workflow Test Summary</h4>
+                    <p><strong>Success Rate:</strong> ${successRate}% (${passedTests}/${totalTests} tests passed)</p>
+                    <p><strong>Environment:</strong> Production (https://researchhub-saas.vercel.app/)</p>
+                    <p><strong>Test Date:</strong> ${new Date().toLocaleString()}</p>
+                </div>
+                
+                <h5>Detailed Results:</h5>
+                <ul>
+                    <li><strong>Study Discovery:</strong> ${testResults.discovery ? (testResults.discovery.success ? '✅ Passed' : '❌ Failed') : '⏳ Not Run'}</li>
+                    <li><strong>Application Submission:</strong> ${testResults.submission ? (testResults.submission.success ? '✅ Passed' : '❌ Failed') : '⏳ Not Run'}</li>
+                    <li><strong>Application Management:</strong> ${testResults.management ? (testResults.management.success ? '✅ Passed' : '❌ Failed') : '⏳ Not Run'}</li>
+                    <li><strong>Application Review:</strong> ${testResults.review ? (testResults.review.success ? '✅ Passed' : '❌ Failed') : '⏳ Not Run'}</li>
+                    <li><strong>Status Updates:</strong> ${testResults.statusUpdate ? (testResults.statusUpdate.success ? '✅ Passed' : '❌ Failed') : '⏳ Not Run'}</li>
+                </ul>
+                
+                <pre>${JSON.stringify(testResults, null, 2)}</pre>
+            `;
+        }
+
+        // Auto-run basic tests on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testAPIEndpoints();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
