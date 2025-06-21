@@ -13,19 +13,22 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
-  }
-  // Create Supabase client with proper authentication
+  }  // Create Supabase client with proper authentication
   const authHeader = req.headers.authorization;
   let currentUser = null;
   let supabase = createClient(supabaseUrl, supabaseKey);
   
+  console.log('Auth header received:', authHeader ? 'Present' : 'Missing');
+  
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
+    console.log('Processing auth token of length:', token.length);
     try {
       // Set the auth token on the client to work with RLS
       const { data: { user }, error: authError } = await supabase.auth.getUser(token);
       if (user && !authError) {
         currentUser = user;
+        console.log('User authenticated successfully:', user.id);
         // Create a new client with the auth token set
         supabase = createClient(supabaseUrl, supabaseKey, {
           global: {
@@ -40,6 +43,8 @@ export default async function handler(req, res) {
     } catch (authErr) {
       console.log('Auth token validation failed:', authErr);
     }
+  } else {
+    console.log('No valid auth header found');
   }
   
   try {    // Extract study ID from URL for PUT requests
@@ -63,13 +68,26 @@ export default async function handler(req, res) {
       const urlParts = req.url.split('?')[0].split('/');
       const lastPart = urlParts[urlParts.length - 1];
       const isSpecificStudy = lastPart !== 'studies' && lastPart.length > 10; // Likely a UUID
-      
-      if (isSpecificStudy) {
+        if (isSpecificStudy) {
         // Get single study by ID
         const studyId = lastPart;
         console.log('Fetching single study with ID:', studyId);
+        console.log('Current user for single study:', currentUser?.id);
         
-        let query = supabase.from('studies').select('*').eq('id', studyId).single();
+        // If no authenticated user, return 401
+        if (!currentUser) {
+          return res.status(401).json({
+            success: false,
+            error: 'Authentication required'
+          });
+        }
+        
+        // Query study with RLS - filter by researcher_id for security
+        let query = supabase.from('studies')
+          .select('*')
+          .eq('id', studyId)
+          .eq('researcher_id', currentUser.id)
+          .single();
         
         const { data: study, error } = await query;
         
