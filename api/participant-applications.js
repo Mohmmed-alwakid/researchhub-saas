@@ -140,10 +140,89 @@ export default async function handler(req, res) {
             hasPrev: page > 1
           }
         }
-      });    } else if (req.method === 'POST' && endpoint && endpoint.includes('/apply')) {
-      // POST /api/participant-applications?endpoint=studies/:studyId/apply
-      const studyId = endpoint.split('/')[1]; // Extract study ID from endpoint
+      });
       
+    } else if (req.method === 'GET' && endpoint && endpoint.startsWith('studies/') && endpoint.endsWith('/details')) {
+      // GET /api/participant-applications?endpoint=studies/:studyId/details
+      const studyId = endpoint.split('/')[1]; // Extract study ID from endpoint
+        console.log(`📖 Fetching study details for participant application: ${studyId}`);
+      
+      // First, let's check if the study exists at all
+      const { data: studyCheck, error: checkError } = await supabase
+        .from('studies')
+        .select('id, status, is_public')
+        .eq('id', studyId)
+        .single();
+        
+      console.log('🔍 Study check result:', { studyCheck, checkError });
+        // Get study details with expanded information for application
+      const { data: study, error } = await supabase
+        .from('studies')
+        .select(`
+          id,
+          title,
+          description,
+          settings,
+          status,
+          target_participants,
+          created_at,
+          researcher_id
+        `)
+        .eq('id', studyId)
+        .single();
+
+      if (error) {
+        console.error('❌ Error fetching study details:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to fetch study details'
+        });
+      }
+
+      if (!study) {
+        console.log('❌ Study not found or not public:', studyId);
+        return res.status(404).json({
+          success: false,
+          error: 'Study not found or not accessible'
+        });
+      }
+
+      // Transform study data for application page
+      const transformedStudy = {
+        _id: study.id,
+        title: study.title,
+        description: study.description,
+        type: study.settings?.type || 'usability',        researcher: {
+          name: 'Research Team' // Use default name for now
+        },
+        configuration: {
+          duration: study.settings?.duration || 30,
+          compensation: study.settings?.compensation || 0,
+          maxParticipants: study.target_participants || 10,
+          participantCriteria: {
+            minAge: study.settings?.minAge,
+            maxAge: study.settings?.maxAge,
+            location: study.settings?.location,
+            devices: study.settings?.devices,
+            customScreening: study.settings?.customScreening || []
+          },
+          instructions: study.settings?.instructions || ''
+        },
+        participants: {
+          enrolled: 0 // TODO: Calculate actual enrolled participants
+        }
+      };
+
+      console.log(`✅ Successfully fetched study details: ${study.title}`);
+      
+      return res.status(200).json({
+        success: true,
+        study: transformedStudy
+      });
+
+    } else if (req.method === 'POST' && endpoint && endpoint.includes('/apply')) {
+      // POST /api/participant-applications?endpoint=studies/:studyId/apply
+      const studyId = endpoint.split('/')[1]; // Extract study ID from endpoint      
       console.log(`📝 Processing application for study: ${studyId}`);
       
       // Get JWT token from Authorization header
@@ -155,7 +234,12 @@ export default async function handler(req, res) {
         });
       }
       
-      const token = authHeader.replace('Bearer ', '');      // Verify user authentication by decoding JWT
+      const token = authHeader.replace('Bearer ', '');
+      
+      // Declare user variable outside try-catch
+      let user = null;
+      
+      // Verify user authentication by decoding JWT
       try {
         // Decode JWT token manually (without signature verification for now)
         const tokenParts = token.split('.');
@@ -165,17 +249,17 @@ export default async function handler(req, res) {
         
         const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
         console.log('🔍 JWT payload:', payload);
-        
-        const userId = payload.sub;
+          const userId = payload.sub;
         const userEmail = payload.email;
+        const userRole = payload.user_metadata?.role; // Get role from JWT metadata
         
         if (!userId || !userEmail) {
           throw new Error('Invalid user data in token');
         }
         
-        console.log('🔍 Extracted user:', userId, userEmail);
+        console.log('🔍 Extracted user:', userId, userEmail, 'JWT Role:', userRole);
         
-        // Verify user has participant role from profiles table
+        // Try to verify user role from profiles table first, fallback to JWT role
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
@@ -184,18 +268,38 @@ export default async function handler(req, res) {
         
         console.log('🔍 Profile query result:', { profile, profileError });
         
-        if (profileError || !profile || profile.role !== 'participant') {
-          console.error('❌ Role verification failed:', { profileError, profile, expectedRole: 'participant' });
+        // Determine the user's role
+        let verifiedRole = null;
+        if (profile && !profileError) {
+          verifiedRole = profile.role;
+          console.log('✅ Role from profile:', verifiedRole);
+        } else if (userRole) {
+          verifiedRole = userRole;
+          console.log('✅ Role from JWT metadata (profile not found):', verifiedRole);
+        } else {
+          console.error('❌ No role found in profile or JWT');
+          return res.status(403).json({
+            success: false,
+            error: 'User role could not be determined'
+          });
+        }
+        
+        if (verifiedRole !== 'participant') {
+          console.error('❌ Role verification failed:', { 
+            profileRole: profile?.role, 
+            jwtRole: userRole, 
+            verifiedRole, 
+            expectedRole: 'participant' 
+          });
           return res.status(403).json({
             success: false,
             error: 'Only participants can apply to studies'
           });
         }
-        
-        console.log('✅ Role verified: participant');
+          console.log('✅ Role verified: participant');
         
         // Store user info for later use
-        const user = { id: userId, email: userEmail };
+        user = { id: userId, email: userEmail };
       } catch (authError) {
         console.error('❌ Authentication failed:', authError);
         return res.status(401).json({

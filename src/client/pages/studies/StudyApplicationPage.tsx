@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, DollarSign, Users, CheckCircle, AlertCircle } from 'lucide-react';
 import { participantApplicationsService } from '../../services/participantApplications.service';
-import { studiesService } from '../../services/studies.service';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import toast from 'react-hot-toast';
@@ -48,12 +47,12 @@ const StudyApplicationPage: React.FC = () => {
   const [screeningResponses, setScreeningResponses] = useState<Record<string, string>>({});  const fetchStudyDetails = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await studiesService.getStudy(studyId!);
+      const response = await participantApplicationsService.getStudyDetails(studyId!);
       setStudy(response.study as unknown as StudyDetails);
     } catch (error) {
       console.error('Failed to fetch study details:', error);
       toast.error('Failed to load study details');
-      navigate('/app/discover-studies');
+      navigate('/app/discover');
     } finally {
       setLoading(false);
     }

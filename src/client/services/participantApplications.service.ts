@@ -102,8 +102,37 @@ export const participantApplicationsService = {
     });    const queryString = params.toString();
     const baseUrl = 'participant-applications?endpoint=studies/public';
     const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
-    
-    return apiService.get<PublicStudiesResponse>(url);
+      return apiService.get<PublicStudiesResponse>(url);
+  },
+
+  /**
+   * Get study details for application
+   */
+  async getStudyDetails(studyId: string): Promise<{
+    success: boolean;
+    study: PublicStudy & {
+      configuration: {
+        duration: number;
+        compensation: number;
+        maxParticipants: number;
+        participantCriteria: {
+          minAge?: number;
+          maxAge?: number;
+          location?: string[];
+          devices?: string[];
+          customScreening?: Array<{
+            id: string;
+            question: string;
+            type: 'text' | 'multiple-choice' | 'boolean' | 'number';
+            options?: string[];
+            required: boolean;
+          }>;
+        };
+        instructions?: string;
+      };
+    };
+  }> {
+    return apiService.get(`participant-applications?endpoint=studies/${studyId}/details`);
   },
 
   /**
