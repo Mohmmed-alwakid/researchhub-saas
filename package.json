@@ -49,6 +49,7 @@
     "express-validator": "^7.2.1",
     "lucide-react": "^0.511.0",
     "multer": "^2.0.0",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.3",
     "playwright": "^1.53.1",
     "react": "^19.1.0",

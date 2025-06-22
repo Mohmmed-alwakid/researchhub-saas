@@ -287,8 +287,10 @@ export default async function handler(req, res) {
           error: 'Authorization token required'
         });
       }
+        const token = authHeader.replace('Bearer ', '');
       
-      const token = authHeader.replace('Bearer ', '');      // Verify user authentication by decoding JWT
+      // Verify user authentication by decoding JWT
+      let user = null;
       try {
         // Decode JWT token manually
         const tokenParts = token.split('.');
@@ -307,7 +309,7 @@ export default async function handler(req, res) {
         console.log('🔍 Extracted user for my-applications:', userId, userEmail);
         
         // Store user info
-        const user = { id: userId, email: userEmail };
+        user = { id: userId, email: userEmail };
       } catch (authError) {
         console.error('❌ Authentication failed:', authError);
         return res.status(401).json({
