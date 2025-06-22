@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, BarChart3, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
 
 // Form validation schema
@@ -85,7 +86,7 @@ const RegisterPage = () => {
       <div className="hidden lg:block relative w-0 flex-1">
         <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
           <div className="text-center text-white">
-            <BarChart3 className="h-32 w-32 mx-auto mb-8 opacity-80" />
+            <AfkarLogo variant="icon" className="h-32 w-32 mx-auto mb-8 opacity-80" />
             <h3 className="text-2xl font-bold mb-4">Start your research journey</h3>
             <p className="text-lg opacity-90 max-w-md">
               Join thousands of researchers who trust Afkar to understand their users better.
@@ -112,9 +113,8 @@ const RegisterPage = () => {
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <div className="flex items-center">
-              <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <BarChart3 className="h-6 w-6 text-white" />
+            <div className="flex items-center">              <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <AfkarLogo variant="icon" className="h-6 w-6 text-white" />
               </div>
               <h1 className="ml-3 text-2xl font-bold text-gray-900">Afkar</h1>
             </div>

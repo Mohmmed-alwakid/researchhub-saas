@@ -11,6 +11,7 @@ import {
   Eye,
   Filter,
 } from 'lucide-react';
+import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
@@ -162,9 +163,8 @@ const DashboardPage = () => {
         {/* Enhanced Header */}
         <div className="md:flex md:items-center md:justify-between mb-8">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center">
-              <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
-                <BarChart3 className="h-6 w-6 text-white" />
+            <div className="flex items-center">              <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
+                <AfkarLogo variant="icon" className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
                 <h1 className="text-3xl font-bold text-gray-900">
@@ -346,9 +346,8 @@ const DashboardPage = () => {
                 </div>
               </div>
               
-              <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
+              <div className="flex items-start space-x-4">                <div className="h-10 w-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                  <AfkarLogo variant="icon" className="h-5 w-5 text-blue-600" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">

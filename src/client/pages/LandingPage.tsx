@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { 
   PlayCircle, 
   Users, 
-  BarChart3, 
   Shield, 
   Zap, 
   CheckCircle,
@@ -12,6 +11,7 @@ import {
   TrendingUp,
   Award
 } from 'lucide-react';
+import { AfkarLogo } from '../../assets/brand/AfkarLogo';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 
@@ -21,14 +21,9 @@ const EnhancedLandingPage = () => {
       {/* Enhanced Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-soft border-b border-white/20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex justify-start lg:w-0 lg:flex-1">
+          <div className="flex justify-between items-center py-6">            <div className="flex justify-start lg:w-0 lg:flex-1">
               <Link to="/" className="flex items-center group">
-                <div className="h-10 w-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft group-hover:shadow-medium transition-all duration-200">
-                  <BarChart3 className="h-6 w-6 text-white" />
-                </div>                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  Afkar
-                </span>
+                <AfkarLogo variant="full" className="h-10 w-auto" />
               </Link>
             </div>
             
@@ -178,9 +173,8 @@ const EnhancedLandingPage = () => {
                 title: "HD Screen Recording",
                 description: "Capture crystal-clear user interactions with advanced screen recording technology. No downloads required.",
                 gradient: "from-red-500 to-pink-500"
-              },
-              {
-                icon: BarChart3,
+              },              {
+                icon: TrendingUp,
                 title: "AI-Powered Analytics",
                 description: "Get actionable insights with heatmaps, conversion funnels, and behavioral analysis powered by machine learning.",
                 gradient: "from-blue-500 to-cyan-500"

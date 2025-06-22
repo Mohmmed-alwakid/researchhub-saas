@@ -3,7 +3,8 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, AlertCircle, CheckCircle, BarChart3, Shield } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle, Shield } from 'lucide-react';
+import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
 import { authService } from '../../services';
@@ -90,7 +91,6 @@ const ResetPasswordPage = () => {
   };
 
   const passwordStrength = getPasswordStrength(password || '');
-
   // Invalid token or no token
   if (isValidToken === false) {
     return (
@@ -99,7 +99,7 @@ const ResetPasswordPage = () => {
           <div className="text-center animate-fade-in">
             <div className="flex items-center justify-center mb-8">
               <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
-                <BarChart3 className="h-7 w-7 text-white" />
+                <AfkarLogo variant="icon" className="h-7 w-7 text-white" />
               </div>
               <div className="ml-4">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -136,8 +136,7 @@ const ResetPasswordPage = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
-    );
+      </div>    );
   }
 
   // Password reset successful
@@ -148,7 +147,7 @@ const ResetPasswordPage = () => {
           <div className="text-center animate-fade-in">
             <div className="flex items-center justify-center mb-8">
               <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
-                <BarChart3 className="h-7 w-7 text-white" />
+                <AfkarLogo variant="icon" className="h-7 w-7 text-white" />
               </div>
               <div className="ml-4">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -198,9 +197,8 @@ const ResetPasswordPage = () => {
       <div className="max-w-md w-full space-y-8">
         {/* Logo and Header */}
         <div className="text-center animate-fade-in">
-          <div className="flex items-center justify-center mb-8">
-            <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
-              <BarChart3 className="h-7 w-7 text-white" />
+          <div className="flex items-center justify-center mb-8">            <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
+              <AfkarLogo variant="icon" className="h-7 w-7 text-white" />
             </div>
             <div className="ml-4">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
