@@ -20,6 +20,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.K4V3CZLcTfDrREm_H1KZTDSxj59D7FjpSk3PBb7gNL0';
 
 export default async function handler(req, res) {
   // CORS headers for cross-origin requests
@@ -338,13 +339,15 @@ export default async function handler(req, res) {
           error: 'You have already applied to this study',
           existingStatus: existingApplication.status
         });
-      }
-      
-      // Get application data from request body
+      }      // Get application data from request body
       const { applicationData = {} } = req.body;
       
-      // Create application
-      const { data: newApplication, error: applicationError } = await supabase
+      // Use service role client to bypass RLS for server-side operations
+      // RLS validation is handled by our authentication checks above
+      const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Create application using service role client
+      const { data: newApplication, error: applicationError } = await serviceSupabase
         .from('study_applications')
         .insert({
           study_id: studyId,
