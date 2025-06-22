@@ -26,9 +26,8 @@ const EnhancedLandingPage = () => {
               <Link to="/" className="flex items-center group">
                 <div className="h-10 w-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft group-hover:shadow-medium transition-all duration-200">
                   <BarChart3 className="h-6 w-6 text-white" />
-                </div>
-                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  ResearchHub
+                </div>                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  Afkar
                 </span>
               </Link>
             </div>
@@ -235,9 +234,8 @@ const EnhancedLandingPage = () => {
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-6">
             Ready to transform your user research?
-          </h2>
-          <p className="text-xl text-primary-100 mb-8">
-            Join thousands of researchers who trust ResearchHub for their user testing needs.
+          </h2>          <p className="text-xl text-primary-100 mb-8">
+            Join thousands of researchers who trust Afkar for their user testing needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="lg" className="bg-white text-primary-700 hover:bg-gray-50">

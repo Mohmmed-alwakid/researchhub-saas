@@ -162,7 +162,7 @@ const ManualPaymentFlow: React.FC = () => {
     if (!bankInfo || !selectedPlan) return;
 
     const instructions = `
-Payment Instructions - ResearchHub
+Payment Instructions - Afkar
 
 Plan: ${selectedPlan.name}
 Amount: ${selectedPlan.price} ${selectedCurrency}

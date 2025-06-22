@@ -81,13 +81,12 @@ const AppLayout = () => {
               <X className="h-6 w-6 text-white" />
             </button>
           </div>
-          <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
-            <div className="flex-shrink-0 flex items-center px-4">
+          <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">            <div className="flex-shrink-0 flex items-center px-4">
               <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">ResearchHub</span>
-            </div>            <nav className="mt-5 px-2 space-y-1">
+              <span className="ml-2 text-xl font-bold text-gray-900">Afkar</span>
+            </div><nav className="mt-5 px-2 space-y-1">
               {currentNavigation.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -119,9 +118,8 @@ const AppLayout = () => {
               <div className="flex items-center flex-shrink-0 px-4">
                 <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <BarChart3 className="h-5 w-5 text-white" />
-                </div>
-                <span className="ml-2 text-xl font-bold text-gray-900">ResearchHub</span>
-              </div>              <nav className="mt-5 flex-1 px-2 space-y-1">
+                </div>                <span className="ml-2 text-xl font-bold text-gray-900">Afkar</span>
+              </div><nav className="mt-5 flex-1 px-2 space-y-1">
                 {currentNavigation.map((item) => {
                   const Icon = item.icon;
                   return (

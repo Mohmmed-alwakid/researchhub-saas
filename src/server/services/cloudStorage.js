@@ -14,13 +14,13 @@ const CLOUD_CONFIG = {
   provider: process.env.CLOUD_STORAGE_PROVIDER || CLOUD_PROVIDERS.LOCAL,
   aws: {
     region: process.env.AWS_REGION || 'us-east-1',
-    bucketName: process.env.AWS_S3_BUCKET || 'researchhub-recordings',
+    bucketName: process.env.AWS_S3_BUCKET || 'afkar-recordings',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
   },
   gcp: {
     projectId: process.env.GCP_PROJECT_ID,
-    bucketName: process.env.GCP_STORAGE_BUCKET || 'researchhub-recordings',
+    bucketName: process.env.GCP_STORAGE_BUCKET || 'afkar-recordings',
     keyFilename: process.env.GCP_KEY_FILE
   },
   azure: {

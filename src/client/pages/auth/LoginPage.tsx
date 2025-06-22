@@ -95,9 +95,8 @@ const EnhancedLoginPage = () => {
               <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
                 <BarChart3 className="h-7 w-7 text-white" />
               </div>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  ResearchHub
+              <div className="ml-4">                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  Afkar
                 </h1>
                 <div className="flex items-center text-sm text-primary-600">
                   <Sparkles className="h-3 w-3 mr-1" />
@@ -287,9 +286,8 @@ const EnhancedLoginPage = () => {
                 <BarChart3 className="h-12 w-12 text-white" />
               </div>
               <h3 className="text-3xl font-bold mb-4">Join 10,000+ Researchers</h3>
-              <p className="text-primary-100 leading-relaxed">
-                Discover insights that drive product decisions. From startups to enterprises, 
-                teams trust ResearchHub for user research.
+              <p className="text-primary-100 leading-relaxed">                Discover insights that drive product decisions. From startups to enterprises, 
+                teams trust Afkar for user research.
               </p>
             </div>
             

@@ -60,7 +60,7 @@ interface SystemConfiguration {
 
 const defaultConfig: SystemConfiguration = {
   platform: {
-    name: 'ResearchHub',
+    name: 'Afkar',
     version: '2.1.0',
     environment: 'production',
     maintenanceMode: false,
@@ -68,9 +68,8 @@ const defaultConfig: SystemConfiguration = {
     maxStudies: 50000
   },
   email: {
-    provider: 'smtp',
-    fromAddress: 'noreply@researchhub.com',
-    fromName: 'ResearchHub',
+    provider: 'smtp',    fromAddress: 'noreply@afkar.com',
+    fromName: 'Afkar',
     dailyLimit: 1000,
     enabled: true
   },

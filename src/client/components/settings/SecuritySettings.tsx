@@ -83,7 +83,7 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user }) => {
   };
 
   const downloadBackupCodes = () => {
-    const content = `ResearchHub Backup Codes
+    const content = `Afkar Backup Codes
 Generated: ${new Date().toLocaleString()}
 Email: ${user?.email}
 
@@ -101,7 +101,7 @@ Instructions:
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `researchhub-backup-codes-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `afkar-backup-codes-${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

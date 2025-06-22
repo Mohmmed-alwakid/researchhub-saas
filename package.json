@@ -1,8 +1,8 @@
 {
-  "name": "research-hub",
+  "name": "afkar",
   "private": true,
   "version": "1.0.0",
-  "description": "SaaS platform for user testing research and feedback collection",
+  "description": "Afkar - SaaS platform for user testing research and feedback collection",
   "type": "module",
   "engines": {
     "node": ">=18.0.0",

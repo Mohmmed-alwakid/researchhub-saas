@@ -32,7 +32,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
         {!isCollapsed && (
           <div>
-            <h2 className="text-lg font-bold">ResearchHub</h2>
+            <h2 className="text-lg font-bold">Afkar</h2>
             <p className="text-xs text-gray-400">Admin Panel</p>
           </div>
         )}
@@ -95,9 +95,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       {/* Footer */}
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
         {!isCollapsed ? (
-          <div className="text-xs text-gray-400">
-            <div>ResearchHub Admin v1.0</div>
-            <div>© 2025 ResearchHub</div>
+          <div className="text-xs text-gray-400">            <div>Afkar Admin v1.0</div>
+            <div>© 2025 Afkar</div>
           </div>
         ) : (
           <div className="w-6 h-6 bg-gray-700 rounded mx-auto" />

@@ -80,7 +80,7 @@ const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ onComplete, onCancel })
   };
 
   const downloadBackupCodes = () => {
-    const content = `ResearchHub - Two-Factor Authentication Backup Codes
+    const content = `Afkar - Two-Factor Authentication Backup Codes
 Generated: ${new Date().toLocaleString()}
 
 Your backup codes (use only once each):
@@ -96,7 +96,7 @@ Important:
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'researchhub-backup-codes.txt';
+    a.download = 'afkar-backup-codes.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

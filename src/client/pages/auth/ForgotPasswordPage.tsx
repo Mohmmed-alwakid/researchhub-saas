@@ -71,7 +71,7 @@ const ForgotPasswordPage = () => {
               </div>
               <div className="ml-4">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  ResearchHub
+                  Afkar
                 </h1>
               </div>
             </div>
@@ -156,7 +156,7 @@ const ForgotPasswordPage = () => {
             </div>
             <div className="ml-4">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                ResearchHub
+                Afkar
               </h1>
             </div>
           </div>
