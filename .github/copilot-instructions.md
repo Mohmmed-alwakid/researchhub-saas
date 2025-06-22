@@ -47,6 +47,63 @@ ResearchHub is an **in-development** SaaS platform for user testing research. Re
 - **Deployment**: Vercel with GitHub auto-deploy
 - **Local Development**: Express.js local server with real Supabase connection
 
+## 🤖 MCP (Model Context Protocol) Development Tools
+**Available AI-powered development assistance tools:**
+
+### 🎭 Playwright MCP
+- **Purpose**: Automated browser testing and UI interaction
+- **Capabilities**: 
+  - End-to-end testing automation
+  - Screenshot capture and visual testing
+  - Form filling and user interaction simulation
+  - Cross-browser testing support
+- **Use Cases**: Testing study creation flows, participant workflows, admin interfaces
+
+### 🗄️ Supabase MCP  
+- **Purpose**: Database management and operations
+- **Capabilities**:
+  - Direct database queries and migrations
+  - Table creation and schema management
+  - RLS policy testing and validation
+  - Real-time data monitoring
+- **Use Cases**: Database schema updates, data migrations, security policy testing
+
+### 💾 Memory Bank MCP
+- **Purpose**: Project knowledge and context management
+- **Capabilities**:
+  - Track development progress and decisions
+  - Maintain project context across sessions
+  - Store implementation notes and learnings
+  - Decision logging and architecture documentation
+- **Use Cases**: Keeping track of complex feature implementations, architectural decisions
+
+### 🖥️ Desktop Commander MCP
+- **Purpose**: File system operations and command execution
+- **Capabilities**:
+  - File and directory management
+  - Code search and editing operations
+  - Terminal command execution
+  - Multi-file operations
+- **Use Cases**: Bulk file operations, code refactoring, project setup tasks
+
+### 📚 Context7 MCP
+- **Purpose**: Library documentation and API reference
+- **Capabilities**:
+  - Real-time documentation lookup
+  - API reference and examples
+  - Best practices and implementation patterns
+  - Framework-specific guidance
+- **Use Cases**: Getting up-to-date documentation for React, TypeScript, Supabase, etc.
+
+### 🎯 How to Leverage MCP Tools
+1. **Automated Testing**: Use Playwright MCP for comprehensive E2E testing
+2. **Database Operations**: Use Supabase MCP for complex migrations and queries
+3. **Project Documentation**: Use Memory Bank MCP to track progress and decisions
+4. **Code Operations**: Use Desktop Commander MCP for file management tasks
+5. **Reference Lookup**: Use Context7 MCP for latest library documentation
+
+**These MCP tools provide AI-powered assistance for complex development tasks, making development more efficient and reducing manual work.**
+
 ## 📁 File Organization (Current)
 - `/src/client` - React frontend components and pages
 - `/api` - Vercel serverless functions (consolidated)

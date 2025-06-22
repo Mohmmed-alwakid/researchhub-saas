@@ -9,7 +9,6 @@ import {
   HelpCircle,
   Bell,
   Search,
-  User,
   Menu,
   X,
   LogOut,
@@ -70,11 +69,10 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-100">
-      {/* Mobile sidebar */}
-      <div className={`fixed inset-0 flex z-40 md:hidden ${sidebarOpen ? '' : 'hidden'}`}>
+    <div className="h-screen flex overflow-hidden bg-gray-100">      {/* Mobile sidebar */}
+      <div className={`fixed inset-0 flex z-50 md:hidden ${sidebarOpen ? '' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl">
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button
               className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -142,15 +140,18 @@ const AppLayout = () => {
                   );
                 })}
               </nav>
-            </div>
-            <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+            </div>            <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
               <div className="flex items-center">
-                <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
-                  <User className="h-5 w-5 text-gray-600" />
+                <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-white">
+                    {user?.firstName?.charAt(0) || 'U'}{user?.lastName?.charAt(0) || ''}
+                  </span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700">John Doe</p>
-                  <p className="text-xs text-gray-500">john@example.com</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {user?.firstName || 'User'} {user?.lastName || ''}
+                  </p>
+                  <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
                 </div>
               </div>
             </div>
@@ -161,10 +162,12 @@ const AppLayout = () => {
       {/* Main content */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         {/* Top navigation */}
-        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
-          <button
-            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 md:hidden"
+        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">          <button
+            className="px-4 border-r border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 md:hidden transition-colors duration-200"
             onClick={() => setSidebarOpen(true)}
+            aria-label="Open sidebar"
+            aria-expanded={sidebarOpen}
+            type="button"
           >
             <Menu className="h-6 w-6" />
           </button>
@@ -177,12 +180,13 @@ const AppLayout = () => {
                 <div className="relative w-full text-gray-400 focus-within:text-gray-600">
                   <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
                     <Search className="h-5 w-5" />
-                  </div>
-                  <input
+                  </div>                  <input
                     id="search-field"
                     className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
-                    placeholder="Search studies, participants..."
+                    placeholder="Global search coming soon..."
                     type="search"
+                    disabled
+                    title="Global search functionality will be available in a future update"
                   />
                 </div>
               </div>

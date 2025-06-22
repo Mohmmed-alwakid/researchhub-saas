@@ -27,6 +27,7 @@ import ManualPaymentPage from './client/pages/payments/ManualPaymentPage';
 import AppLayout from './client/components/common/AppLayout';
 import AuthGuard from './client/components/auth/AuthGuard';
 import ProtectedRoute from './client/components/auth/ProtectedRoute';
+import { ErrorBoundary } from './client/components/common/ErrorBoundary';
 import { useAuthStore } from './client/stores/authStore';
 
 // Create a client
@@ -103,10 +104,11 @@ function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <Routes>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -202,6 +204,7 @@ function App() {
         </div>
       </Router>
     </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
