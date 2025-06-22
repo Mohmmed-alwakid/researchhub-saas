@@ -1,0 +1,104 @@
+/* Afkar Brand Colors */
+/* CSS Custom Properties for consistent theming across the application */
+
+:root {
+  /* Primary Colors */
+  --color-primary: #3B82F6;       /* Blue-500 */
+  --color-primary-hover: #2563EB; /* Blue-600 */
+  --color-primary-light: #DBEAFE; /* Blue-100 */
+  --color-primary-dark: #1D4ED8;  /* Blue-700 */
+
+  /* Secondary Colors */
+  --color-secondary: #6B7280;     /* Gray-500 */
+  --color-secondary-dark: #374151; /* Gray-700 */
+  --color-secondary-light: #9CA3AF; /* Gray-400 */
+
+  /* Background Colors */
+  --color-background: #FFFFFF;    /* White */
+  --color-background-alt: #F9FAFB; /* Gray-50 */
+  --color-background-dark: #111827; /* Gray-900 */
+  --color-background-card: #FFFFFF; /* White */
+
+  /* Text Colors */
+  --color-text-primary: #111827;   /* Gray-900 */
+  --color-text-secondary: #6B7280; /* Gray-500 */
+  --color-text-light: #9CA3AF;    /* Gray-400 */
+  --color-text-inverse: #FFFFFF;   /* White */
+
+  /* Border Colors */
+  --color-border: #E5E7EB;        /* Gray-200 */
+  --color-border-light: #F3F4F6;  /* Gray-100 */
+  --color-border-dark: #D1D5DB;   /* Gray-300 */
+
+  /* State Colors */
+  --color-success: #10B981;       /* Green-500 */
+  --color-success-light: #D1FAE5; /* Green-100 */
+  --color-success-dark: #059669;  /* Green-600 */
+
+  --color-warning: #F59E0B;       /* Amber-500 */
+  --color-warning-light: #FEF3C7; /* Amber-100 */
+  --color-warning-dark: #D97706;  /* Amber-600 */
+
+  --color-error: #EF4444;         /* Red-500 */
+  --color-error-light: #FEE2E2;   /* Red-100 */
+  --color-error-dark: #DC2626;    /* Red-600 */
+
+  --color-info: #3B82F6;          /* Blue-500 */
+  --color-info-light: #DBEAFE;    /* Blue-100 */
+  --color-info-dark: #2563EB;     /* Blue-600 */
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Border Radius */
+  --radius-sm: 0.125rem;  /* 2px */
+  --radius-md: 0.375rem;  /* 6px */
+  --radius-lg: 0.5rem;    /* 8px */
+  --radius-xl: 0.75rem;   /* 12px */
+  --radius-full: 9999px;  /* Full circle */
+
+  /* Spacing Scale */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 1rem;       /* 16px */
+  --space-lg: 1.5rem;     /* 24px */
+  --space-xl: 2rem;       /* 32px */
+  --space-2xl: 3rem;      /* 48px */
+}
+
+/* Dark theme variables (for future dark mode support) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #111827;
+    --color-background-alt: #1F2937;
+    --color-background-card: #1F2937;
+    --color-text-primary: #F9FAFB;
+    --color-text-secondary: #9CA3AF;
+    --color-border: #374151;
+    --color-border-light: #2D3748;
+  }
+}
+
+/* Utility classes for brand colors */
+.afkar-primary {
+  color: var(--color-primary);
+}
+
+.afkar-bg-primary {
+  background-color: var(--color-primary);
+}
+
+.afkar-border-primary {
+  border-color: var(--color-primary);
+}
+
+.afkar-text-primary {
+  color: var(--color-text-primary);
+}
+
+.afkar-bg-card {
+  background-color: var(--color-background-card);
+}
