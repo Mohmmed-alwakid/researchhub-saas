@@ -355,12 +355,14 @@ export default async function handler(req, res) {
         })
         .select('*')
         .single();
-      
-      if (applicationError) {
+        if (applicationError) {
         console.error('❌ Error creating application:', applicationError);
+        console.error('❌ Application data:', { studyId, userId: user.id, applicationData });
+        console.error('❌ Full error details:', JSON.stringify(applicationError, null, 2));
         return res.status(500).json({
           success: false,
-          error: 'Failed to submit application'
+          error: 'Failed to submit application',
+          debug: applicationError.message || 'Unknown database error'
         });
       }
       
