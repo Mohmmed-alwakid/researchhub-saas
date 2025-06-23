@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Study API Diagnosis</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .success { border-color: #10b981; background: #f0fdf4; }
+        .error { border-color: #ef4444; background: #fef2f2; }
+        .warning { border-color: #f59e0b; background: #fffbeb; }
+        .info { border-color: #3b82f6; background: #eff6ff; }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 4px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        pre {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            width: 300px;
+        }
+        
+        .status { 
+            display: inline-block; 
+            padding: 2px 8px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            font-weight: 500;
+        }
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .status.loading { background: #dbeafe; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Edit Study API Diagnosis</h1>
+        <p>Testing the API endpoints responsible for loading study data in edit mode</p>
+    </div>
+
+    <div class="container">
+        <h2>Step 1: Authentication Status</h2>
+        <div id="auth-section" class="test-section info">
+            <button onclick="checkAuth()">Check Authentication</button>
+            <div id="auth-result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Step 2: List All Studies</h2>
+        <div id="studies-section" class="test-section info">
+            <button onclick="listStudies()">List My Studies</button>
+            <div id="studies-result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Step 3: Load Specific Study</h2>
+        <div id="specific-study-section" class="test-section info">
+            <input type="text" id="studyIdInput" placeholder="Enter Study ID" />
+            <button onclick="loadSpecificStudy()">Load Study Data</button>
+            <div id="specific-study-result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Step 4: Form Reset Simulation</h2>
+        <div id="form-section" class="test-section info">
+            <button onclick="simulateFormReset()">Simulate Form Reset</button>
+            <div id="form-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let currentToken = null;
+        let currentStudies = [];
+
+        // Get auth token from localStorage (same method as StudyBuilderPage)
+        function getAuthToken() {
+            try {
+                const authStorage = localStorage.getItem('auth-storage');
+                if (authStorage) {
+                    const { state } = JSON.parse(authStorage);
+                    return state?.token;
+                }
+            } catch (error) {
+                console.error('Failed to parse auth storage:', error);
+            }
+            return null;
+        }
+
+        async function checkAuth() {
+            const authResult = document.getElementById('auth-result');
+            authResult.innerHTML = '<span class="status loading">Checking...</span>';
+            
+            try {
+                currentToken = getAuthToken();
+                
+                if (!currentToken) {
+                    authResult.innerHTML = `
+                        <div class="error">
+                            <h4>❌ No Authentication Token</h4>
+                            <p>Please log in first at <a href="http://localhost:5175" target="_blank">http://localhost:5175</a></p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/auth?action=status`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    authResult.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Authentication Success</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    authResult.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Authentication Failed</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                authResult.innerHTML = `
+                    <div class="error">
+                        <h4>💥 Authentication Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function listStudies() {
+            const studiesResult = document.getElementById('studies-result');
+            studiesResult.innerHTML = '<span class="status loading">Loading studies...</span>';
+            
+            try {
+                if (!currentToken) {
+                    currentToken = getAuthToken();
+                }
+
+                const response = await fetch(`${API_BASE}/studies`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.studies) {
+                    currentStudies = data.studies; // Store for later use
+                    studiesResult.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Studies Retrieved (${data.studies.length})</h4>
+                            ${data.studies.map(study => `
+                                <div style="margin: 8px 0; padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px;">
+                                    <strong>${study.title || 'Untitled Study'}</strong>
+                                    <br>ID: <code>${study._id}</code>
+                                    <br>Status: ${study.status}
+                                    <br>Type: ${study.type}
+                                    <button onclick="document.getElementById('studyIdInput').value='${study._id}'" 
+                                            style="font-size: 12px; padding: 4px 8px;">Use This ID</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    studiesResult.innerHTML = `
+                        <div class="warning">
+                            <h4>⚠️ No Studies Found</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                studiesResult.innerHTML = `
+                    <div class="error">
+                        <h4>💥 Studies Loading Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadSpecificStudy() {
+            const studyId = document.getElementById('studyIdInput').value.trim();
+            const specificResult = document.getElementById('specific-study-result');
+            
+            if (!studyId) {
+                specificResult.innerHTML = '<div class="warning">Please enter a Study ID</div>';
+                return;
+            }
+
+            specificResult.innerHTML = '<span class="status loading">Loading study data...</span>';
+            
+            try {
+                if (!currentToken) {
+                    currentToken = getAuthToken();
+                }
+
+                console.log('Loading study with ID:', studyId);
+                console.log('Using token:', currentToken?.substring(0, 20) + '...');
+
+                const response = await fetch(`${API_BASE}/studies/${studyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.success && data.study) {
+                    specificResult.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Study Data Retrieved</h4>
+                            <p><strong>Title:</strong> ${data.study.title || 'EMPTY/UNDEFINED'}</p>
+                            <p><strong>Description:</strong> ${data.study.description || 'EMPTY/UNDEFINED'}</p>
+                            <p><strong>Type:</strong> ${data.study.type}</p>
+                            <p><strong>Tasks:</strong> ${data.study.tasks?.length || 0} tasks</p>
+                            <h5>Full Study Object:</h5>
+                            <pre>${JSON.stringify(data.study, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    specificResult.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Load Study</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                specificResult.innerHTML = `
+                    <div class="error">
+                        <h4>💥 Study Loading Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function simulateFormReset() {
+            const formResult = document.getElementById('form-result');
+            
+            // This simulates what should happen in the StudyBuilderPage
+            const mockStudyData = {
+                title: "Test Study Title",
+                description: "Test Study Description",
+                type: "usability",
+                settings: {
+                    maxParticipants: 10,
+                    duration: 30,
+                    compensation: 25
+                }
+            };
+
+            formResult.innerHTML = `
+                <div class="info">
+                    <h4>🔍 Form Reset Simulation</h4>
+                    <p>This simulates the reset() call in StudyBuilderPage.tsx</p>
+                    <pre>reset({
+  title: "${mockStudyData.title}",
+  description: "${mockStudyData.description}",
+  type: "${mockStudyData.type === 'usability' ? 'usability_test' : 'usability_test'}",
+  settings: ${JSON.stringify(mockStudyData.settings, null, 2)}
+});</pre>
+                    <p><strong>Expected result:</strong> Form inputs should populate with these values</p>
+                    <p><strong>If not working:</strong> Check form state, validation, or re-rendering issues</p>
+                </div>
+            `;
+        }
+
+        // Auto-check auth on page load
+        window.addEventListener('load', () => {
+            checkAuth();
+        });
+    </script>
+</body>
+</html>

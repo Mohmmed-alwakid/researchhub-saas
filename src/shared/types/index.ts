@@ -636,7 +636,7 @@ export interface StudyBuilderTask {
   template_id: string;
   name: string;
   description: string;
-  estimated_duration: number;
+  estimated_duration?: number; // Make optional since we're removing from UI
   order_index: number;
   settings?: Record<string, unknown>;
   category?: string;

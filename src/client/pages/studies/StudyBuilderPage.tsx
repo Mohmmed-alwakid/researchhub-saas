@@ -58,7 +58,7 @@ interface StudyBuilderTask {
   template_id: string;
   name: string;
   description: string;
-  estimated_duration: number;
+  estimated_duration?: number; // Make optional since we're removing from UI
   order_index: number;
   settings?: Record<string, unknown>;
 }
@@ -99,7 +99,7 @@ const convertToTaskListFormat = (builderTasks: StudyBuilderTask[]) => {
     templateId: task.template_id,
     name: task.name,
     description: task.description,
-    estimatedDuration: task.estimated_duration,
+    estimatedDuration: task.estimated_duration || 5, // Default to 5 minutes
     settings: task.settings || {},
     order: task.order_index,
     isRequired: (task.settings?.isRequired as boolean) ?? true,
@@ -147,6 +147,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [studyTasks, setStudyTasks] = useState<StudyBuilderTask[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [editingStudy, setEditingStudy] = useState<{title?: string; description?: string} | null>(null); // Store the study being edited
   
   // New state for enhanced UI components
   const [showTaskLibrary, setShowTaskLibrary] = useState(false);
@@ -224,11 +225,16 @@ const EnhancedStudyBuilderPage: React.FC = () => {
           
           // Map the study type back to the form format
           const studyType = existingStudy.type === 'usability' ? 'usability_test' :
-                           existingStudy.type === 'interview' ? 'user_interview' : 'survey';
-            // Reset form with existing data
-          reset({
-            title: existingStudy.title,
-            description: existingStudy.description,
+                           existingStudy.type === 'interview' ? 'user_interview' : 'survey';          // Debug logging before reset
+          console.log('🔍 DEBUG: About to reset form with existing study data:');
+          console.log('  - Title:', existingStudy.title);
+          console.log('  - Description:', existingStudy.description);
+          console.log('  - Type:', studyType);
+          console.log('  - Full existingStudy object:', existingStudy);
+          
+          const resetData = {
+            title: existingStudy.title || '', // Ensure empty string instead of undefined
+            description: existingStudy.description || '', // Ensure empty string instead of undefined
             type: studyType as 'usability_test' | 'user_interview' | 'survey',
             settings: {
               maxParticipants: existingStudy.settings?.maxParticipants || 10,
@@ -241,16 +247,40 @@ const EnhancedStudyBuilderPage: React.FC = () => {
               trackClicks: (existingStudy.settings?.trackClicks as boolean) ?? true,
               trackScrolls: (existingStudy.settings?.trackScrolls as boolean) ?? true
             }
-          });          // Convert existing tasks to StudyBuilderTask format
+          };
+            console.log('🔍 DEBUG: Reset data object:', resetData);
+          
+          // Store the editing study for backup reference
+          setEditingStudy(existingStudy);
+          
+          // Reset form with existing data
+          reset(resetData);
+          
+          // Debug: Check form values after reset with multiple timing checks
+          setTimeout(() => {
+            const currentValues = getValues();
+            console.log('🔍 DEBUG: Form values after reset (100ms):', currentValues);
+            
+            // If values are still empty, try resetting again
+            if (!currentValues.title && resetData.title) {
+              console.log('⚠️ DEBUG: Values still empty, trying to reset again...');
+              reset(resetData);
+              
+              // Check again after second reset
+              setTimeout(() => {
+                const secondCheck = getValues();
+                console.log('🔍 DEBUG: Form values after second reset (200ms):', secondCheck);
+              }, 100);
+            }
+          }, 100);// Convert existing tasks to StudyBuilderTask format
           if (existingStudy.tasks && existingStudy.tasks.length > 0) {
             const convertedTasks: StudyBuilderTask[] = existingStudy.tasks
-              .filter((task: any): task is ITask => typeof task === 'object' && task !== null)
-              .map((task: any, index: number) => ({
+              .filter((task: ITask): task is ITask => typeof task === 'object' && task !== null)
+              .map((task: ITask, index: number) => ({
                 id: task._id || `task_${index}`,
                 template_id: getTemplateIdFromTaskType(task.type),
                 name: task.title || 'Untitled Task',
                 description: task.description || '',
-                estimated_duration: Math.ceil((task.timeLimit || 300) / 60), // Convert seconds to minutes
                 order_index: task.order || index + 1,
                 settings: (task.configuration as unknown as Record<string, unknown>) || {}
               }));
@@ -269,7 +299,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
       
       fetchStudyData();
     }
-  }, [id, reset]);
+  }, [id, reset, getValues]);
 
   // Initialize form with template data when available
   useEffect(() => {
@@ -291,13 +321,11 @@ const EnhancedStudyBuilderPage: React.FC = () => {
           trackScrolls: true
         }
       });      // Initialize tasks from template if available
-      if (templateData.tasks && Array.isArray(templateData.tasks)) {
-        const initialTasks: StudyBuilderTask[] = templateData.tasks.map((task: any, index: number) => ({
+      if (templateData.tasks && Array.isArray(templateData.tasks)) {        const initialTasks: StudyBuilderTask[] = templateData.tasks.map((task: ITask, index: number) => ({
           id: `task-${index + 1}`,
           template_id: getTemplateIdFromTaskType(task.type as ITask['type']),
-          name: task.name,
+          name: task.title,
           description: task.description,
-          estimated_duration: 5, // Default duration
           order_index: index,
           settings: {}
         }));
@@ -335,18 +363,18 @@ const EnhancedStudyBuilderPage: React.FC = () => {
   // New handlers for enhanced UI components
   const handleAddTaskFromLibrary = useCallback((template: { id: string; name: string; description: string; estimatedDuration?: number; settings?: Record<string, unknown> }) => {
     const newTask: StudyBuilderTask = {
-      id: `task_${Date.now()}`,
-      template_id: template.id,
+      id: `task_${Date.now()}`,      template_id: template.id,
       name: template.name,
       description: template.description,
-      estimated_duration: template.estimatedDuration || 5,
       order_index: studyTasks.length + 1,
       settings: template.settings || {}
     };
     setStudyTasks(prev => [...prev, newTask]);
     setShowTaskLibrary(false);
     toast.success(`Added "${template.name}" to your study`);
-  }, [studyTasks]);  const handleSaveTask = useCallback(async (updatedTask: StudyBuilderTask) => {
+  }, [studyTasks]);
+
+  const handleSaveTask = useCallback(async (updatedTask: StudyBuilderTask) => {
     // Update local state
     const updatedTasks = studyTasks.map(task => 
       task.id === updatedTask.id ? updatedTask : task
@@ -503,11 +531,11 @@ const EnhancedStudyBuilderPage: React.FC = () => {
             <div className="max-w-2xl mx-auto space-y-6">              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Study Title *
-                </label>
-                <input
+                </label>                <input
                   {...register('title')}
                   type="text"
                   placeholder="e.g., Mobile App Usability Study"
+                  defaultValue={editingStudy?.title || ''}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
                 {errors.title && (
@@ -529,11 +557,11 @@ const EnhancedStudyBuilderPage: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Study Description *
-                </label>
-                <textarea
+                </label>                <textarea
                   {...register('description')}
                   rows={4}
                   placeholder="Describe what participants will be doing and what you hope to learn..."
+                  defaultValue={editingStudy?.description || ''}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
                 {errors.description && (
@@ -705,13 +733,12 @@ const EnhancedStudyBuilderPage: React.FC = () => {
               isOpen={showTaskLibrary}
               onClose={() => setShowTaskLibrary(false)}
               onAddTask={handleAddTaskFromLibrary}
-              studyType={watchedType}
-              currentTasks={studyTasks.map(task => ({
+              studyType={watchedType}              currentTasks={studyTasks.map(task => ({
                 id: task.id,
                 templateId: task.template_id,
                 name: task.name,
                 description: task.description,
-                estimatedDuration: task.estimated_duration,
+                estimatedDuration: task.estimated_duration || 5, // Default to 5 minutes
                 settings: task.settings || {},
                 order: task.order_index,
                 isRequired: true
@@ -834,7 +861,7 @@ const EnhancedStudyBuilderPage: React.FC = () => {
 
       case 3: {
         const formData = watch();
-        const totalEstimatedTime = studyTasks.reduce((total, task) => total + task.estimated_duration, 0);
+        const totalEstimatedTime = studyTasks.reduce((total, task) => total + (task.estimated_duration || 5), 0);
         
         return (
           <div className="space-y-6">

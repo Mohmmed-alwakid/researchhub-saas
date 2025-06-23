@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Edit Study Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .success { background: #f0fdf4; border: 1px solid #10b981; }
+        .error { background: #fef2f2; border: 1px solid #ef4444; }
+        .warning { background: #fffbeb; border: 1px solid #f59e0b; }
+        .info { background: #eff6ff; border: 1px solid #3b82f6; }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 4px 0;
+        }
+        button:hover { background: #2563eb; }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            margin: 4px 0;
+        }
+        
+        pre {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Quick Edit Study Test</h1>
+        <p>Automated test to reproduce and fix the edit study issue</p>
+    </div>
+
+    <div class="container">
+        <h2>Step 1: Auto-Login</h2>
+        <div id="login-result" class="info">
+            <button onclick="autoLogin()">Auto-Login as Researcher</button>
+            <div id="login-status"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Step 2: Create Test Study</h2>
+        <div id="create-result" class="info">
+            <button onclick="createTestStudy()">Create Test Study</button>
+            <div id="create-status"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Step 3: Test Edit Functionality</h2>
+        <div id="edit-result" class="info">
+            <p>Once study is created, this will automatically test the edit functionality</p>
+            <div id="edit-status"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Debug Console Output</h2>
+        <div id="debug-output" class="info">
+            <p>Check your browser console (F12) for detailed debug output from our StudyBuilderPage changes</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+        let createdStudyId = null;
+
+        async function autoLogin() {
+            const loginStatus = document.getElementById('login-status');
+            loginStatus.innerHTML = 'Logging in...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    
+                    // Store in localStorage the same way the app does
+                    const authStorage = {
+                        state: {
+                            token: data.token,
+                            user: data.user,
+                            isAuthenticated: true
+                        },
+                        version: 0
+                    };
+                    localStorage.setItem('auth-storage', JSON.stringify(authStorage));
+                    
+                    loginStatus.innerHTML = `✅ Logged in as ${data.user.email}`;
+                    
+                    // Auto-proceed to create study
+                    setTimeout(createTestStudy, 1000);
+                } else {
+                    loginStatus.innerHTML = `❌ Login failed: ${data.error}`;
+                }
+            } catch (error) {
+                loginStatus.innerHTML = `💥 Login error: ${error.message}`;
+            }
+        }
+
+        async function createTestStudy() {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+
+            const createStatus = document.getElementById('create-status');
+            createStatus.innerHTML = 'Creating study...';
+            
+            try {
+                const studyData = {
+                    title: "Edit Bug Test Study - " + new Date().toLocaleTimeString(),
+                    description: "This study was created to test the edit bug where title and description show empty when editing an existing study.",
+                    type: 'usability_test',
+                    settings: {
+                        maxParticipants: 5,
+                        duration: 30,
+                        compensation: 25,
+                        recordScreen: true,
+                        recordAudio: false,
+                        recordWebcam: false,
+                        collectHeatmaps: true,
+                        trackClicks: true,
+                        trackScrolls: true
+                    },
+                    tasks: []
+                };
+
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    createdStudyId = data.study._id;
+                    createStatus.innerHTML = `
+                        ✅ Study created successfully!<br>
+                        <strong>ID:</strong> ${createdStudyId}<br>
+                        <strong>Title:</strong> ${data.study.title}<br>
+                        <strong>Description:</strong> ${data.study.description}
+                    `;
+                    
+                    // Auto-proceed to test edit
+                    setTimeout(testEditFunctionality, 2000);
+                } else {
+                    createStatus.innerHTML = `❌ Study creation failed: ${data.error}`;
+                }
+            } catch (error) {
+                createStatus.innerHTML = `💥 Study creation error: ${error.message}`;
+            }
+        }
+
+        async function testEditFunctionality() {
+            if (!createdStudyId) {
+                alert('Please create a study first');
+                return;
+            }
+
+            const editStatus = document.getElementById('edit-status');
+            editStatus.innerHTML = 'Testing edit functionality...';
+            
+            try {
+                // First, fetch the study data as the edit page would
+                const response = await fetch(`${API_BASE}/studies/${createdStudyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.study) {
+                    const study = data.study;
+                    
+                    editStatus.innerHTML = `
+                        <h3>📋 Edit API Response Analysis:</h3>
+                        <p><strong>Title from API:</strong> "${study.title || 'EMPTY/UNDEFINED'}"</p>
+                        <p><strong>Description from API:</strong> "${(study.description || 'EMPTY/UNDEFINED').substring(0, 100)}..."</p>
+                        <p><strong>Type:</strong> ${study.type}</p>
+                        
+                        ${!study.title ? '<div style="background: #fee2e2; padding: 8px; border-radius: 4px; margin: 8px 0;"><strong>🚨 BUG CONFIRMED:</strong> API is returning empty/undefined title!</div>' : '<div style="background: #dcfce7; padding: 8px; border-radius: 4px; margin: 8px 0;"><strong>✅ API DATA OK:</strong> Title is present in API response</div>'}
+                        
+                        <h3>🧪 Testing Real Edit Page:</h3>
+                        <p>Now opening the actual edit page to test our debug output...</p>
+                        <button onclick="openEditPage()">Open Edit Page</button>
+                        
+                        <pre>Study Object: ${JSON.stringify(study, null, 2)}</pre>
+                    `;
+                } else {
+                    editStatus.innerHTML = `❌ Failed to fetch study for edit test: ${JSON.stringify(data)}`;
+                }
+            } catch (error) {
+                editStatus.innerHTML = `💥 Edit test error: ${error.message}`;
+            }
+        }
+
+        function openEditPage() {
+            if (createdStudyId) {
+                // Open the actual edit page
+                window.open(`http://localhost:5175/studies/builder/${createdStudyId}`, '_blank');
+                
+                document.getElementById('edit-status').innerHTML += `
+                    <br><br>
+                    <div style="background: #dbeafe; padding: 8px; border-radius: 4px;">
+                        ✅ Opened edit page in new tab. Check the console (F12) for our debug output!<br>
+                        Look for messages starting with "🔍 DEBUG:"
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-start the test
+        window.addEventListener('load', () => {
+            autoLogin();
+        });
+    </script>
+</body>
+</html>

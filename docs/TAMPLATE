@@ -1,0 +1,39 @@
+1.1 Template: 
+Description: The Template Function allows researchers to create, use, and manage templates for various research activities within the Afkar platform. This feature facilitates efficient setup and consistency across studies by providing predefined structures that can be customized or reused.
+Components:
+Create New Template
+Researchers can create templates for different study types, including surveys, interviews, usability tests, etc.
+Templates should include predefined questions, tasks, and any specific configurations relevant to the study type.
+Edit Existing Templates
+Researchers can modify existing templates, updating questions, tasks, or configurations to reflect new requirements or improvements.
+Use Template
+Researchers can select a template to use when setting up a new study.
+
+Img01: Pupup after selecting study method 
+
+
+Img02: Template Tasks, Question, etc should reflect here
+Option to review the template contents before applying it to ensure it fits the current study’s needs.
+
+Img03: View Template component  Tasks/Questions and Review/Use Template 
+
+Save Custom Templates
+Researchers can save customized versions of templates for future use.
+Saved templates should include all modifications made by the researcher, including changes to questions, instructions, and study flow.
+Admin Template Management
+Add New Templates: Admins can create templates available for all researchers on the platform.
+Edit and Categorize Templates: Admins can modify existing templates and categorize them based on study type or research focus.
+Archive/Deactivate Templates: Admins have the ability to archive or deactivate templates that are outdated or no longer relevant.
+Template Categories
+Templates should be organized into categories for easy navigation and selection. Categories can include types like "Usability Testing," "Customer Feedback," "Market Research," etc.
+Functional Requirements:
+Template Creation and Editing: The system must support comprehensive template creation and editing, allowing for the inclusion of various question types, tasks, and custom instructions.
+Template Selection and Application: Researchers must be able to easily select and apply templates to new studies, with an option to review and customize before finalizing.
+Template Saving and Management: Researchers can save custom templates for reuse, with options for editing and organizing their templates.
+Admin Controls: Admins can manage the template library, ensuring templates are up-to-date, categorized correctly, and available as needed.
+Acceptance Criteria:
+Researchers can create, edit, and save templates with all necessary study components.
+Templates can be selected and applied during study setup, pre-populating the study with predefined content.
+Custom templates can be saved and reused, reflecting any changes made by the researcher.
+Admins have control over the global template library, including adding, editing, categorizing, and archiving templates.
+Templates are accessible, searchable, and categorized correctly within the platform.

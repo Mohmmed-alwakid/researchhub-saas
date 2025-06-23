@@ -92,13 +92,12 @@ export function convertLegacyTaskToStudyBuilder(legacyTask: ITask): StudyBuilder
     'questionnaire': 'questionnaire',
     'prototype-test': 'prototype_testing'
   };
-
   return {
     id: legacyTask._id,
     template_id: typeToTemplateMap[legacyTask.type] || 'prototype_testing',
     name: legacyTask.title,
     description: legacyTask.description,
-    estimated_duration: Math.ceil((legacyTask.timeLimit || 300) / 60), // Convert seconds to minutes
+    estimated_duration: Math.ceil((legacyTask.timeLimit || 300) / 60), // Convert seconds to minutes (optional)
     order_index: legacyTask.order,
     settings: {
       recordHeatmap: legacyTask.configuration.heatmapTracking,
@@ -192,7 +191,7 @@ export function convertTasksToStudyBuilder(legacyTasks: ITask[]): StudyBuilderTa
  * Determine if tasks are in StudyBuilder format
  */
 export function isStudyBuilderTask(task: TaskUnion): task is StudyBuilderTask {
-  return 'template_id' in task && 'estimated_duration' in task && 'order_index' in task;
+  return 'template_id' in task && 'order_index' in task;
 }
 
 /**

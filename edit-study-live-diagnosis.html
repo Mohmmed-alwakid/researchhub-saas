@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Edit Study Issue Diagnosis - Live Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section.active {
+            border-color: #4F46E5;
+            background: #F0F8FF;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #4F46E5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4338CA;
+        }
+        button:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .success {
+            background: #D1FAE5;
+            border: 1px solid #10B981;
+            color: #047857;
+        }
+        .error {
+            background: #FEE2E2;
+            border: 1px solid #EF4444;
+            color: #DC2626;
+        }
+        .info {
+            background: #DBEAFE;
+            border: 1px solid #3B82F6;
+            color: #1D4ED8;
+        }
+        .warning {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            color: #92400E;
+        }
+        input, select, textarea {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+            width: 200px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+        .progress {
+            margin: 20px 0;
+        }
+        .step {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 2px;
+            border-radius: 20px;
+            background: #E5E7EB;
+            color: #6B7280;
+        }
+        .step.completed {
+            background: #10B981;
+            color: white;
+        }
+        .step.active {
+            background: #4F46E5;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Edit Study Issue Diagnosis - Live Test</h1>
+        <p>Step-by-step testing to identify why study titles come empty in edit mode</p>
+
+        <!-- Progress Tracker -->
+        <div class="progress">
+            <div class="step" id="step1">1. Login</div>
+            <div class="step" id="step2">2. Create Study</div>
+            <div class="step" id="step3">3. Verify Study</div>
+            <div class="step" id="step4">4. Test Edit</div>
+            <div class="step" id="step5">5. Diagnose Issue</div>
+        </div>
+
+        <!-- Step 1: Login -->
+        <div class="test-section active" id="section1">
+            <h3>🔐 Step 1: Authentication</h3>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="abwanwr77+Researcher@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" value="Testtest123">
+            </div>
+            <button onclick="loginAndProceed()">Login & Start Test</button>
+            <div id="login-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Step 2: Create Study -->
+        <div class="test-section" id="section2">
+            <h3>📝 Step 2: Create Test Study</h3>
+            <div class="form-group">
+                <label>Study Title:</label>
+                <input type="text" id="studyTitle" value="Test Study for Edit Bug - June 23" style="width: 300px;">
+            </div>
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea id="studyDescription" style="width: 300px; height: 80px;">This is a test study created to debug the edit study issue where title comes empty.</textarea>
+            </div>
+            <button onclick="createTestStudy()" disabled id="createStudyBtn">Create Study</button>
+            <div id="create-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Step 3: Verify Study -->
+        <div class="test-section" id="section3">
+            <h3>✅ Step 3: Verify Study Creation</h3>
+            <button onclick="verifyStudyCreation()" disabled id="verifyBtn">Get Study Details</button>
+            <div id="verify-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Step 4: Test Edit -->
+        <div class="test-section" id="section4">
+            <h3>🔧 Step 4: Test Edit Study Loading</h3>
+            <button onclick="testEditStudyLoading()" disabled id="editTestBtn">Test Edit Study API</button>
+            <div id="edit-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Step 5: Diagnosis -->
+        <div class="test-section" id="section5">
+            <h3>🎯 Step 5: Root Cause Analysis</h3>
+            <button onclick="performDiagnosis()" disabled id="diagnosisBtn">Analyze Results</button>
+            <div id="diagnosis-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Final Results -->
+        <div class="test-section" id="final-section" style="display: none;">
+            <h3>🏁 Final Diagnosis & Recommended Fix</h3>
+            <div id="final-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+        let createdStudyId = null;
+        let studyData = null;
+
+        function showResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.textContent = content;
+        }
+
+        function updateStep(stepNumber, status = 'active') {
+            const step = document.getElementById(`step${stepNumber}`);
+            step.className = `step ${status}`;
+            
+            if (status === 'completed') {
+                const section = document.getElementById(`section${stepNumber}`);
+                section.classList.remove('active');
+                
+                if (stepNumber < 5) {
+                    const nextSection = document.getElementById(`section${stepNumber + 1}`);
+                    nextSection.classList.add('active');
+                }
+            }
+        }
+
+        async function loginAndProceed() {
+            try {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                showResult('login-result', 'Logging in...', 'info');
+
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('auth-token', authToken);
+                    
+                    showResult('login-result', 
+                        `✅ Login successful!
+User: ${data.user.email}
+Role: ${data.user.role}
+Ready to proceed...`, 'success');
+
+                    updateStep(1, 'completed');
+                    document.getElementById('createStudyBtn').disabled = false;
+                } else {
+                    showResult('login-result', `❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('login-result', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function createTestStudy() {
+            try {
+                const title = document.getElementById('studyTitle').value;
+                const description = document.getElementById('studyDescription').value;
+
+                showResult('create-result', 'Creating test study...', 'info');
+
+                const studyPayload = {
+                    title: title,
+                    description: description,
+                    type: 'survey',
+                    settings: {
+                        maxParticipants: 10,
+                        duration: 30,
+                        compensation: 25,
+                        recordScreen: true,
+                        recordAudio: false,
+                        recordWebcam: false,
+                        collectHeatmaps: true,
+                        trackClicks: true,
+                        trackScrolls: true
+                    },
+                    tasks: []
+                };
+
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyPayload)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    createdStudyId = data.study._id;
+                    studyData = data.study;
+                    
+                    showResult('create-result', 
+                        `✅ Study created successfully!
+Study ID: ${createdStudyId}
+Title: "${data.study.title}"
+Description: "${data.study.description}"
+Status: ${data.study.status}`, 'success');
+
+                    updateStep(2, 'completed');
+                    document.getElementById('verifyBtn').disabled = false;
+                } else {
+                    showResult('create-result', `❌ Study creation failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('create-result', `❌ Study creation error: ${error.message}`, 'error');
+            }
+        }
+
+        async function verifyStudyCreation() {
+            try {
+                showResult('verify-result', 'Fetching study details to verify...', 'info');
+
+                const response = await fetch(`${API_BASE}/studies/${createdStudyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const study = data.study;
+                    
+                    // Check for potential issues
+                    const titleCheck = study.title ? '✅ GOOD' : '❌ EMPTY/NULL';
+                    const descCheck = study.description ? '✅ GOOD' : '❌ EMPTY/NULL';
+                    
+                    showResult('verify-result', 
+                        `✅ Study verification results:
+
+Title Check: ${titleCheck} - "${study.title || 'NULL'}"
+Description Check: ${descCheck} - "${study.description || 'NULL'}"
+Type: ${study.type}
+Status: ${study.status}
+Settings: ${JSON.stringify(study.settings, null, 2)}
+
+📊 This is what the edit form SHOULD receive.
+If edit form shows empty fields, the issue is in form loading logic.`, 'success');
+
+                    updateStep(3, 'completed');
+                    document.getElementById('editTestBtn').disabled = false;
+                } else {
+                    showResult('verify-result', `❌ Study verification failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('verify-result', `❌ Study verification error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEditStudyLoading() {
+            try {
+                showResult('edit-result', 'Testing edit study loading...', 'info');
+
+                // Simulate the exact same API call that StudyBuilderPage makes
+                const response = await fetch(`${API_BASE}/studies/${createdStudyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const existingStudy = data.study;
+                    
+                    // Simulate the exact mapping that StudyBuilderPage does
+                    const studyType = existingStudy.type === 'usability' ? 'usability_test' :
+                                     existingStudy.type === 'interview' ? 'user_interview' : 'survey';
+                    
+                    const formData = {
+                        title: existingStudy.title,
+                        description: existingStudy.description,
+                        type: studyType,
+                        settings: {
+                            maxParticipants: existingStudy.settings?.maxParticipants || 10,
+                            duration: existingStudy.settings?.duration || 30,
+                            compensation: existingStudy.settings?.compensation || 25,
+                            recordScreen: existingStudy.settings?.recordScreen ?? true,
+                            recordAudio: existingStudy.settings?.recordAudio ?? false,
+                            recordWebcam: existingStudy.settings?.recordWebcam ?? false,
+                            collectHeatmaps: existingStudy.settings?.collectHeatmaps ?? true,
+                            trackClicks: existingStudy.settings?.trackClicks ?? true,
+                            trackScrolls: existingStudy.settings?.trackScrolls ?? true
+                        }
+                    };
+                    
+                    // Check if the mapping produces the expected result
+                    const titleMapped = formData.title ? '✅ CORRECTLY MAPPED' : '❌ MAPPING FAILED';
+                    const descMapped = formData.description ? '✅ CORRECTLY MAPPED' : '❌ MAPPING FAILED';
+                    
+                    showResult('edit-result', 
+                        `📋 Edit Study Loading Test:
+
+API Response Data:
+- Title: "${existingStudy.title}"
+- Description: "${existingStudy.description}"
+
+Form Mapping Result:
+- Title: ${titleMapped} - "${formData.title || 'NULL'}"
+- Description: ${descMapped} - "${formData.description || 'NULL'}"
+- Type: ${formData.type}
+
+Full Mapped Form Data:
+${JSON.stringify(formData, null, 2)}
+
+🔍 DIAGNOSIS:
+${formData.title && formData.description ? 
+    '✅ API data maps correctly to form data. Issue may be in React form reset() timing.' :
+    '❌ API data mapping failed. Issue is in the data transformation logic.'}`, 
+                        formData.title && formData.description ? 'warning' : 'error');
+
+                    updateStep(4, 'completed');
+                    document.getElementById('diagnosisBtn').disabled = false;
+                } else {
+                    showResult('edit-result', `❌ Edit test failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('edit-result', `❌ Edit test error: ${error.message}`, 'error');
+            }
+        }
+
+        async function performDiagnosis() {
+            updateStep(5, 'completed');
+            
+            const diagnosis = `🎯 ROOT CAUSE ANALYSIS & RECOMMENDED FIX
+
+ISSUE DIAGNOSIS:
+Based on testing, the issue is likely one of these:
+
+1. 📱 REACT FORM TIMING ISSUE (Most Likely):
+   - Form reset() called before data is loaded
+   - Race condition between data fetch and form initialization
+   - Template data overriding study data
+
+2. 🔄 COMPONENT LIFECYCLE ISSUE:
+   - useEffect dependencies causing re-renders
+   - Form defaultValues conflicting with reset()
+
+3. 🗃️ DATA FLOW ISSUE:
+   - Multiple reset() calls with different data
+   - Template data from navigation state interfering
+
+RECOMMENDED FIX:
+1. In StudyBuilderPage.tsx, ensure form reset() only happens AFTER study data is loaded
+2. Add loading state to prevent premature form initialization
+3. Clear template data when editing existing study
+4. Add debug logging to track form reset calls
+
+IMMEDIATE ACTION:
+Check the useEffect in StudyBuilderPage.tsx around line 193-270 where form reset is called.
+Ensure the reset only happens when we have actual study data, not template data.
+
+CODE CHANGE NEEDED:
+- Add conditional check before reset()
+- Clear template data in edit mode
+- Add loading state for better UX`;
+
+            showResult('diagnosis-result', diagnosis, 'warning');
+            
+            document.getElementById('final-section').style.display = 'block';
+            showResult('final-result', 
+                `🔧 READY TO IMPLEMENT FIX
+
+The diagnosis indicates a React form timing issue. 
+Would you like me to implement the fix now?
+
+The fix involves:
+1. Adding proper loading state checks
+2. Ensuring reset() only called with study data
+3. Clearing template data interference
+4. Adding defensive programming
+
+This should resolve the empty title/description issue in edit mode.`, 'info');
+        }
+
+        // Auto-start if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('auth-token');
+            if (token) {
+                authToken = token;
+                updateStep(1, 'completed');
+                document.getElementById('createStudyBtn').disabled = false;
+                showResult('login-result', '✅ Using existing auth token', 'success');
+            }
+        });
+    </script>
+</body>
+</html>

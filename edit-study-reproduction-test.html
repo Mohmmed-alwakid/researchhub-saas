@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Study Issue Reproduction Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .step {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .success { border-color: #10b981; background: #f0fdf4; }
+        .error { border-color: #ef4444; background: #fef2f2; }
+        .warning { border-color: #f59e0b; background: #fffbeb; }
+        .info { border-color: #3b82f6; background: #eff6ff; }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 4px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            margin: 4px 0;
+        }
+        
+        pre {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .status { 
+            display: inline-block; 
+            padding: 2px 8px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            font-weight: 500;
+        }
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .status.loading { background: #dbeafe; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Edit Study Issue Reproduction Test</h1>
+        <p>Step-by-step reproduction of the "edit study shows empty title" issue</p>
+    </div>
+
+    <!-- Step 1: Login -->
+    <div class="container">
+        <h2>Step 1: Login as Researcher</h2>
+        <div id="login-step" class="step info">
+            <div>
+                <label>Email:</label>
+                <input type="email" id="email" value="abwanwr77+Researcher@gmail.com" />
+                <label>Password:</label>
+                <input type="password" id="password" value="Testtest123" />
+            </div>
+            <button onclick="login()">Login</button>
+            <div id="login-result"></div>
+        </div>
+    </div>
+
+    <!-- Step 2: Create Study -->
+    <div class="container">
+        <h2>Step 2: Create Test Study</h2>
+        <div id="create-step" class="step info">
+            <div>
+                <label>Study Title:</label>
+                <input type="text" id="study-title" value="Test Study for Edit Bug" />
+                <label>Study Description:</label>
+                <textarea id="study-description" rows="3">This is a test study created to reproduce the edit bug where title and description show up empty when editing.</textarea>
+            </div>
+            <button onclick="createStudy()">Create Study</button>
+            <div id="create-result"></div>
+        </div>
+    </div>
+
+    <!-- Step 3: List Studies -->
+    <div class="container">
+        <h2>Step 3: Verify Study Was Created</h2>
+        <div id="list-step" class="step info">
+            <button onclick="listStudies()">List My Studies</button>
+            <div id="list-result"></div>
+        </div>
+    </div>
+
+    <!-- Step 4: Load Study for Editing -->
+    <div class="container">
+        <h2>Step 4: Load Study for Editing (This is where the bug occurs)</h2>
+        <div id="edit-step" class="step info">
+            <input type="text" id="edit-study-id" placeholder="Study ID to edit" />
+            <button onclick="loadStudyForEdit()">Load Study for Edit</button>
+            <div id="edit-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+        let createdStudyId = null;
+
+        // Login function
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginResult = document.getElementById('login-result');
+            
+            loginResult.innerHTML = '<span class="status loading">Logging in...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    
+                    // Store in localStorage the same way the app does
+                    const authStorage = {
+                        state: {
+                            token: data.token,
+                            user: data.user,
+                            isAuthenticated: true
+                        },
+                        version: 0
+                    };
+                    localStorage.setItem('auth-storage', JSON.stringify(authStorage));
+                    
+                    loginResult.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Login Successful</h4>
+                            <p>User: ${data.user.email}</p>
+                            <p>Role: ${data.user.role}</p>
+                        </div>
+                    `;
+                } else {
+                    loginResult.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Login Failed</h4>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                loginResult.innerHTML = `
+                    <div class="error">
+                        <h4>💥 Login Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Create study function
+        async function createStudy() {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+
+            const title = document.getElementById('study-title').value;
+            const description = document.getElementById('study-description').value;
+            const createResult = document.getElementById('create-result');
+            
+            createResult.innerHTML = '<span class="status loading">Creating study...</span>';
+            
+            try {
+                const studyData = {
+                    title: title,
+                    description: description,
+                    type: 'usability_test',
+                    settings: {
+                        maxParticipants: 5,
+                        duration: 30,
+                        compensation: 25,
+                        recordScreen: true,
+                        recordAudio: false,
+                        recordWebcam: false,
+                        collectHeatmaps: true,
+                        trackClicks: true,
+                        trackScrolls: true
+                    },
+                    tasks: []
+                };
+
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    createdStudyId = data.study._id;
+                    
+                    // Auto-fill the edit study ID field
+                    document.getElementById('edit-study-id').value = createdStudyId;
+                    
+                    createResult.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Study Created Successfully</h4>
+                            <p><strong>Study ID:</strong> ${createdStudyId}</p>
+                            <p><strong>Title:</strong> ${data.study.title}</p>
+                            <p><strong>Description:</strong> ${data.study.description}</p>
+                        </div>
+                    `;
+                } else {
+                    createResult.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Study Creation Failed</h4>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                createResult.innerHTML = `
+                    <div class="error">
+                        <h4>💥 Study Creation Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // List studies function
+        async function listStudies() {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+
+            const listResult = document.getElementById('list-result');
+            listResult.innerHTML = '<span class="status loading">Loading studies...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/studies`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.studies) {
+                    listResult.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Studies Retrieved (${data.studies.length})</h4>
+                            ${data.studies.map(study => `
+                                <div style="margin: 8px 0; padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px;">
+                                    <strong>Title:</strong> ${study.title || 'EMPTY/NULL'}<br>
+                                    <strong>Description:</strong> ${study.description || 'EMPTY/NULL'}<br>
+                                    <strong>ID:</strong> <code>${study._id}</code><br>
+                                    <button onclick="document.getElementById('edit-study-id').value='${study._id}'" 
+                                            style="font-size: 12px; padding: 4px 8px;">Use for Edit Test</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    listResult.innerHTML = `
+                        <div class="warning">
+                            <h4>⚠️ No Studies Found</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                listResult.innerHTML = `
+                    <div class="error">
+                        <h4>💥 Studies Loading Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load study for editing (this is where the bug should reproduce)
+        async function loadStudyForEdit() {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+
+            const studyId = document.getElementById('edit-study-id').value.trim();
+            if (!studyId) {
+                alert('Please enter a Study ID');
+                return;
+            }
+
+            const editResult = document.getElementById('edit-result');
+            editResult.innerHTML = '<span class="status loading">Loading study for edit...</span>';
+            
+            try {
+                console.log('🔍 Loading study for editing:', studyId);
+                console.log('🔑 Using token:', authToken?.substring(0, 20) + '...');
+                
+                const response = await fetch(`${API_BASE}/studies/${studyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                console.log('📋 Response status:', response.status);
+                const data = await response.json();
+                console.log('📋 Response data:', data);
+                
+                if (data.success && data.study) {
+                    const study = data.study;
+                    
+                    editResult.innerHTML = `
+                        <div class="${study.title ? 'success' : 'error'}">
+                            <h4>${study.title ? '✅' : '❌'} Study Data Retrieved</h4>
+                            <p><strong>Title:</strong> "${study.title || 'EMPTY/UNDEFINED'}"</p>
+                            <p><strong>Description:</strong> "${study.description || 'EMPTY/UNDEFINED'}"</p>
+                            <p><strong>Type:</strong> ${study.type}</p>
+                            <p><strong>Status:</strong> ${study.status}</p>
+                            
+                            ${!study.title ? '<div style="background: #fee2e2; padding: 8px; border-radius: 4px; margin: 8px 0;"><strong>🚨 BUG REPRODUCED:</strong> Title is empty/undefined!</div>' : ''}
+                            
+                            <h5>Form Reset Simulation:</h5>
+                            <pre>reset({
+  title: "${study.title || ''}",
+  description: "${study.description || ''}",
+  type: "${study.type === 'usability' ? 'usability_test' : 'usability_test'}",
+  settings: ${JSON.stringify(study.settings || {}, null, 2)}
+});</pre>
+                            
+                            <h5>Full Study Object:</h5>
+                            <pre>${JSON.stringify(study, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    editResult.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Load Study for Edit</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                editResult.innerHTML = `
+                    <div class="error">
+                        <h4>💥 Study Loading Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-login on page load for convenience
+        window.addEventListener('load', () => {
+            login();
+        });
+    </script>
+</body>
+</html>

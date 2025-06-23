@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Edit Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #4F46E5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4338CA;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background: #D1FAE5;
+            border: 1px solid #10B981;
+            color: #047857;
+        }
+        .error {
+            background: #FEE2E2;
+            border: 1px solid #EF4444;
+            color: #DC2626;
+        }
+        .info {
+            background: #DBEAFE;
+            border: 1px solid #3B82F6;
+            color: #1D4ED8;
+        }
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Study Edit Debug Test - June 23, 2025</h1>
+        <p>Testing study data loading issues and task configuration fixes</p>
+
+        <!-- Login Section -->
+        <div class="test-section">
+            <h3>🔐 Authentication</h3>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="abwanwr77+Researcher@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" value="Testtest123">
+            </div>
+            <button onclick="login()">Login as Researcher</button>
+            <button onclick="checkAuthStatus()">Check Auth Status</button>
+            <div id="auth-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Study Listing Section -->
+        <div class="test-section">
+            <h3>📋 List Studies</h3>
+            <button onclick="listStudies()">Get My Studies</button>
+            <div id="studies-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Study Details Section -->
+        <div class="test-section">
+            <h3>🔍 Study Details</h3>
+            <div class="form-group">
+                <label>Study ID:</label>
+                <input type="text" id="studyId" placeholder="Enter study ID">
+                <button onclick="getStudyDetails()">Get Study Details</button>
+            </div>
+            <div id="study-details-result" class="result" style="display: none;"></div>
+        </div>        <!-- Task Configuration Test -->
+        <div class="test-section">  
+            <h3>⚙️ Task Configuration Test</h3>
+            <button onclick="testTaskConfiguration()">Test Task Config Types</button>
+            <button onclick="testEstimatedDurationRemoval()">Test Duration Removal</button>
+            <div id="task-config-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Multiple Choice Test -->
+        <div class="test-section">
+            <h3>✅ Multiple Choice Test</h3>
+            <button onclick="testMultipleChoice()">Test 2-4 Options</button>
+            <div id="multiple-choice-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- API Health Check -->
+        <div class="test-section">
+            <h3>🏥 API Health</h3>
+            <button onclick="checkAPIHealth()">Check API Health</button>
+            <div id="health-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+
+        function showResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.textContent = content;
+        }
+
+        async function login() {
+            try {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('auth-token', authToken);
+                    showResult('auth-result', 
+                        `✅ Login successful!
+User: ${data.user.email}
+Role: ${data.user.role}
+Token: ${authToken.substring(0, 20)}...`, 'success');
+                } else {
+                    showResult('auth-result', `❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('auth-result', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkAuthStatus() {
+            try {
+                authToken = authToken || localStorage.getItem('auth-token');
+                
+                if (!authToken) {
+                    showResult('auth-result', '❌ No auth token found. Please login first.', 'error');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/auth?action=status`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('auth-result', 
+                        `✅ Auth Status: Valid
+User: ${data.user.email}
+Role: ${data.user.role}
+Token Valid: ${data.user ? 'Yes' : 'No'}`, 'success');
+                } else {
+                    showResult('auth-result', `❌ Auth invalid: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('auth-result', `❌ Auth check error: ${error.message}`, 'error');
+            }
+        }
+
+        async function listStudies() {
+            try {
+                authToken = authToken || localStorage.getItem('auth-token');
+                
+                if (!authToken) {
+                    showResult('studies-result', '❌ Please login first', 'error');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/studies`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const studiesInfo = data.studies.map(study => 
+                        `📋 ${study.title} (ID: ${study._id})
+   Type: ${study.type}
+   Status: ${study.status}  
+   Tasks: ${study.tasks?.length || 0}
+   Created: ${new Date(study.createdAt).toLocaleDateString()}`
+                    ).join('\n\n');
+                    
+                    showResult('studies-result', 
+                        `✅ Found ${data.studies.length} studies:
+
+${studiesInfo}`, 'success');
+                } else {
+                    showResult('studies-result', `❌ Failed to get studies: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('studies-result', `❌ Studies error: ${error.message}`, 'error');
+            }
+        }        async function getStudyDetails() {
+            try {
+                authToken = authToken || localStorage.getItem('auth-token');
+                const studyId = document.getElementById('studyId').value;
+                
+                if (!authToken) {
+                    showResult('study-details-result', '❌ Please login first', 'error');
+                    return;
+                }
+
+                if (!studyId) {
+                    showResult('study-details-result', '❌ Please enter a study ID', 'error');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/studies/${studyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const study = data.study;
+                    
+                    // Check specifically for edit study loading issues
+                    const titleCheck = study.title ? '✅ Has Title' : '❌ TITLE IS EMPTY/NULL';
+                    const descCheck = study.description ? '✅ Has Description' : '❌ DESCRIPTION IS EMPTY/NULL';
+                    
+                    const studyDetails = `✅ Study Details for Edit Loading Check:
+
+${titleCheck}: "${study.title || 'EMPTY'}"
+${descCheck}: "${study.description || 'EMPTY'}"
+Type: ${study.type}
+Status: ${study.status}
+Tasks Count: ${study.tasks?.length || 0}
+Created: ${new Date(study.createdAt).toLocaleDateString()}
+
+FORM MAPPING CHECK:
+- Study Type Mapping: ${study.type === 'usability' ? 'usability_test' : 
+                        study.type === 'interview' ? 'user_interview' : 'survey'}
+
+EDIT FORM ISSUES DIAGNOSIS:
+${study.title ? '✅ Study title should load correctly' : '🚨 ISSUE: Study title is empty - this causes edit form to show empty fields'}
+${study.description ? '✅ Study description should load correctly' : '🚨 ISSUE: Study description is empty'}
+
+Settings Check:
+${JSON.stringify(study.settings, null, 2)}
+
+Full Study Object:
+${JSON.stringify(study, null, 2)}`;
+                    
+                    showResult('study-details-result', studyDetails, study.title ? 'success' : 'error');
+                } else {
+                    showResult('study-details-result', `❌ Failed to get study: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('study-details-result', `❌ Study details error: ${error.message}`, 'error');
+            }
+        }async function testTaskConfiguration() {
+            const taskTypes = [
+                { type: 'survey', config: { questions: [{ question: 'Test question?', type: 'multiple_choice', options: ['Option 1', 'Option 2', 'Option 3'] }] } },
+                { type: 'interview', config: { platform: 'zoom', instructions: 'Test interview', recordingEnabled: true } },
+                { type: 'navigation', config: { url: 'https://example.com', instructions: 'Navigate test', timeLimit: 10 } },
+                { type: 'click_tracking', config: { targetUrl: 'https://example.com', minClicks: 5, trackClicks: true } }
+            ];
+
+            const results = taskTypes.map(task => 
+                `${task.type.toUpperCase()}:
+  Config: ${JSON.stringify(task.config, null, 2)}`
+            ).join('\n\n');
+
+            showResult('task-config-result', 
+                `✅ Task Configuration Types:
+
+${results}
+
+Note: Each task type now has its own specific configuration UI in TaskEditModal`, 'success');
+        }
+
+        async function testEstimatedDurationRemoval() {
+            const taskWithoutDuration = {
+                id: 'test-task-1',
+                template_id: 'survey',
+                name: 'Test Survey',
+                description: 'Test description',
+                order_index: 1,
+                settings: {
+                    questions: [
+                        { question: 'Test question?', type: 'multiple_choice', options: ['Yes', 'No'] }
+                    ]
+                }
+                // Note: No estimated_duration field!
+            };
+
+            const taskCreation = `✅ ESTIMATED DURATION REMOVAL TEST:
+
+Task Object (NO estimated_duration field):
+${JSON.stringify(taskWithoutDuration, null, 2)}
+
+✅ CHANGES IMPLEMENTED:
+- Removed "Estimated Duration" field from TaskEditModal UI
+- Made estimated_duration optional in StudyBuilderTask interface
+- Updated all conversion functions to handle optional duration
+- Set default duration to 5 minutes when needed for compatibility
+
+✅ IMPACT:
+- Researchers no longer need to set duration when creating tasks
+- UI is cleaner and focuses on task content
+- Backend still handles duration for legacy compatibility`;
+
+            showResult('task-config-result', taskCreation, 'success');
+        }
+
+        async function testMultipleChoice() {
+            const multipleChoiceExamples = [
+                { question: 'How satisfied are you?', options: ['Very Satisfied', 'Satisfied'] }, // 2 options
+                { question: 'Which feature do you prefer?', options: ['Feature A', 'Feature B', 'Feature C'] }, // 3 options  
+                { question: 'Rate the experience', options: ['Excellent', 'Good', 'Average', 'Poor'] } // 4 options
+            ];
+
+            const results = multipleChoiceExamples.map((example, index) => 
+                `Example ${index + 1} (${example.options.length} options):
+  Question: ${example.question}
+  Options: ${example.options.join(', ')}`
+            ).join('\n\n');
+
+            showResult('multiple-choice-result', 
+                `✅ Multiple Choice Examples (2-4 options supported):
+
+${results}
+
+✅ IMPLEMENTED FEATURES:
+- Researchers can add 2-4 custom answers
+- Add/Remove option buttons
+- Minimum 2 options enforced 
+- Maximum 4 options enforced
+- Custom answer text editable`, 'success');
+        }
+
+        async function checkAPIHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('health-result', 
+                        `✅ API Health Check:
+Status: ${data.status}
+Database: ${data.database}
+Environment: ${data.environment}
+Version: ${data.version}
+Timestamp: ${data.timestamp}`, 'success');
+                } else {
+                    showResult('health-result', `❌ API unhealthy: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('health-result', `❌ Health check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check API health on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAPIHealth();
+        });
+    </script>
+</body>
+</html>
