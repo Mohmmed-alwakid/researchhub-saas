@@ -86,23 +86,13 @@ const EnhancedLoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex">
+    <div className="min-h-screen bg-white flex">
       {/* Left side - Form */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-md lg:w-96">
           {/* Logo and Header */}
-          <div className="animate-fade-in">
-            <div className="flex items-center mb-8">              <div className="h-12 w-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-soft">
-                <AfkarLogo className="h-7 w-7 text-white" />
-              </div>
-              <div className="ml-4">                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  Afkar
-                </h1>
-                <div className="flex items-center text-sm text-primary-600">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  AI-Powered Research
-                </div>
-              </div>
+          <div className="animate-fade-in">            <div className="flex items-center mb-8">
+              <AfkarLogo variant="full" className="h-10 w-auto" />
             </div>
             
             <div className="mb-8">
@@ -279,12 +269,13 @@ const EnhancedLoginPage = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-accent-600"></div>
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative h-full flex items-center justify-center p-12">
-          <div className="max-w-md text-center text-white animate-fade-in">
-            <div className="mb-8">              <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <AfkarLogo className="h-12 w-12 text-white" />
+          <div className="max-w-md text-center text-white animate-fade-in">            <div className="mb-8">
+              <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <AfkarLogo variant="icon" className="h-12 w-12 text-white" />
               </div>
               <h3 className="text-3xl font-bold mb-4">Join 10,000+ Researchers</h3>
-              <p className="text-primary-100 leading-relaxed">                Discover insights that drive product decisions. From startups to enterprises, 
+              <p className="text-primary-100 leading-relaxed">
+                Discover insights that drive product decisions. From startups to enterprises, 
                 teams trust Afkar for user research.
               </p>
             </div>

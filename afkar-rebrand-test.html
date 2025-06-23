@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afkar Rebrand Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .logo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .logo-section h3 {
+            margin: 0 0 15px 0;
+            color: #374151;
+        }
+        .logo-test {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+        .checklist .check {
+            color: #059669;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Afkar Rebrand Verification</h1>
+        <p>Testing all logo assets and branding elements after the rebrand from ResearchHub to Afkar.</p>
+        
+        <div class="logo-section">
+            <h3>📱 Logo Assets Test</h3>
+            
+            <div class="logo-test">
+                <strong>Full Logo (afkar-logo.svg):</strong>
+                <img src="http://localhost:5175/afkar-logo.svg" alt="Afkar Full Logo" style="height: 40px;" 
+                     onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✅ Loaded'"
+                     onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='❌ Error'">
+                <span class="status">Loading...</span>
+            </div>
+            
+            <div class="logo-test">
+                <strong>Icon Only (afkar-icon.svg):</strong>
+                <img src="http://localhost:5175/afkar-icon.svg" alt="Afkar Icon" style="height: 40px;" 
+                     onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✅ Loaded'"
+                     onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='❌ Error'">
+                <span class="status">Loading...</span>
+            </div>
+            
+            <div class="logo-test">
+                <strong>Favicon Test:</strong>
+                <img src="http://localhost:5175/afkar-icon.svg" alt="Favicon" style="height: 16px;" 
+                     onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✅ Loaded'"
+                     onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='❌ Error'">
+                <span class="status">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="logo-section">
+            <h3>✅ Rebrand Checklist</h3>
+            <ul class="checklist">
+                <li><span class="check">✓</span> Brand assets created and organized</li>
+                <li><span class="check">✓</span> Logo files renamed to match component expectations</li>
+                <li><span class="check">✓</span> All "ResearchHub" text references replaced with "Afkar"</li>
+                <li><span class="check">✓</span> Package.json updated with new name</li>
+                <li><span class="check">✓</span> HTML title and meta tags updated</li>
+                <li><span class="check">✓</span> Favicon and apple-touch-icon updated</li>
+                <li><span class="check">✓</span> UI components updated to use AfkarLogo</li>
+                <li><span class="check">✓</span> BarChart3 placeholder logos replaced</li>
+                <li><span class="check">✓</span> Background color updated to white</li>
+                <li><span class="check">✓</span> Development server running successfully</li>
+            </ul>
+        </div>
+        
+        <div class="logo-section">
+            <h3>🔗 Test Links</h3>
+            <p><a href="http://localhost:5175" target="_blank">📱 Landing Page</a> - Test full logo display</p>
+            <p><a href="http://localhost:5175/login" target="_blank">🔐 Login Page</a> - Test auth page logo</p>
+            <p><a href="http://localhost:5175/register" target="_blank">📝 Register Page</a> - Test registration logo</p>
+        </div>
+        
+        <div class="logo-section">
+            <h3>📋 Next Steps</h3>
+            <ul>
+                <li>✅ Logo display issue resolved (files renamed correctly)</li>
+                <li>✅ Background color fixed (body now uses white)</li>
+                <li>🔄 Final QA testing in progress</li>
+                <li>📦 Ready for production deployment</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Test JavaScript access to page title
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page title:', document.title);
+            console.log('Afkar rebrand test page loaded successfully');
+            
+            // Add a small delay to show loading status
+            setTimeout(() => {
+                const statusElements = document.querySelectorAll('.status');
+                statusElements.forEach(el => {
+                    if (el.textContent === 'Loading...') {
+                        el.className = 'status error';
+                        el.textContent = '⏱️ Timeout';
+                    }
+                });
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

@@ -13,6 +13,7 @@ import {
   X,
   LogOut,
   Compass,
+  BookOpen,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
@@ -81,10 +82,7 @@ const AppLayout = () => {
               <X className="h-6 w-6 text-white" />
             </button>
           </div>          <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">            <div className="flex-shrink-0 flex items-center px-4">
-              <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <AfkarLogo variant="icon" className="h-5 w-5 text-white" />
-              </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">Afkar</span>
+              <AfkarLogo variant="full" className="h-8 w-auto" />
             </div><nav className="mt-5 px-2 space-y-1">
               {currentNavigation.map((item) => {
                 const Icon = item.icon;
@@ -114,9 +112,7 @@ const AppLayout = () => {
         <div className="flex flex-col w-64">
           <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">              <div className="flex items-center flex-shrink-0 px-4">
-                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <AfkarLogo variant="icon" className="h-5 w-5 text-white" />
-                </div>                <span className="ml-2 text-xl font-bold text-gray-900">Afkar</span>
+                <AfkarLogo variant="full" className="h-8 w-auto" />
               </div><nav className="mt-5 flex-1 px-2 space-y-1">
                 {currentNavigation.map((item) => {
                   const Icon = item.icon;

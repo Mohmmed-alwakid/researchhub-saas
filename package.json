@@ -40,6 +40,7 @@
     "@types/socket.io": "^3.0.2",
     "@vercel/blob": "^0.19.0",
     "@vercel/node": "^3.2.29",
+    "@zoom/meetingsdk": "^3.13.2",
     "axios": "^1.9.0",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",

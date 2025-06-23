@@ -90,11 +90,10 @@ const ResetPasswordPage = () => {
     return { strength: 4, text: 'Strong', color: 'green' };
   };
 
-  const passwordStrength = getPasswordStrength(password || '');
-  // Invalid token or no token
+  const passwordStrength = getPasswordStrength(password || '');  // Invalid token or no token
   if (isValidToken === false) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center animate-fade-in">
             <div className="flex items-center justify-center mb-8">
@@ -138,11 +137,10 @@ const ResetPasswordPage = () => {
         </div>
       </div>    );
   }
-
   // Password reset successful
   if (resetComplete) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center animate-fade-in">
             <div className="flex items-center justify-center mb-8">
@@ -181,19 +179,17 @@ const ResetPasswordPage = () => {
       </div>
     );
   }
-
   // Loading state
   if (isValidToken === null) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     );
   }
-
   // Reset password form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Logo and Header */}
         <div className="text-center animate-fade-in">
