@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchHub - Local Functionality Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-green { background-color: #4CAF50; }
+        .status-red { background-color: #f44336; }
+        .status-yellow { background-color: #ff9800; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 ResearchHub - Local Development Testing Dashboard</h1>
+        <p><strong>Date:</strong> June 24, 2025</p>
+        <p><strong>Environment:</strong> Local Full-Stack Development</p>
+        <p><strong>Frontend:</strong> <a href="http://localhost:5175" target="_blank">http://localhost:5175</a></p>
+        <p><strong>Backend:</strong> <a href="http://localhost:3003" target="_blank">http://localhost:3003</a></p>
+
+        <div class="grid">
+            <!-- API Health Tests -->
+            <div class="test-section">
+                <h3>🔧 API Health Tests</h3>
+                <button onclick="testAPIHealth()">Test API Health</button>
+                <button onclick="testDBConnection()">Test DB Connection</button>
+                <div id="api-health-results" class="result"></div>
+            </div>
+
+            <!-- Authentication Tests -->
+            <div class="test-section">
+                <h3>🔐 Authentication Tests</h3>
+                <button onclick="testLogin('participant')">Login as Participant</button>
+                <button onclick="testLogin('researcher')">Login as Researcher</button>
+                <button onclick="testLogin('admin')">Login as Admin</button>
+                <button onclick="testLogout()">Test Logout</button>
+                <div id="auth-results" class="result"></div>
+            </div>
+
+            <!-- Profile Tests -->
+            <div class="test-section">
+                <h3>👤 Profile Tests</h3>
+                <button onclick="testGetProfile()">Get Profile</button>
+                <button onclick="testUpdateProfile()">Update Profile</button>
+                <div id="profile-results" class="result"></div>
+            </div>
+
+            <!-- Studies Tests -->
+            <div class="test-section">
+                <h3>📚 Studies Tests</h3>
+                <button onclick="testGetStudies()">Get Studies</button>
+                <button onclick="testStudyCreation()">Test Study Creation</button>
+                <div id="studies-results" class="result"></div>
+            </div>
+
+            <!-- Admin Tests -->
+            <div class="test-section">
+                <h3>👨‍💼 Admin Tests</h3>
+                <button onclick="testAdminUsers()">Get Admin Users</button>
+                <button onclick="testAdminOverview()">Get Admin Overview</button>
+                <button onclick="testAdminAnalytics()">Get Admin Analytics</button>
+                <div id="admin-results" class="result"></div>
+            </div>
+
+            <!-- Frontend Navigation Tests -->
+            <div class="test-section">
+                <h3>🧭 Frontend Navigation Tests</h3>
+                <button onclick="testFrontendPages()">Test Page Navigation</button>
+                <button onclick="testResponsiveNavigation()">Test Mobile Navigation</button>
+                <div id="navigation-results" class="result"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Overall Test Results</h3>
+            <div id="overall-results" class="result info">
+                Click the test buttons above to verify functionality...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        const FRONTEND_BASE = 'http://localhost:5175';
+        let currentToken = null;
+        let testResults = {
+            passed: 0,
+            failed: 0,
+            total: 0
+        };
+
+        // Test credentials
+        const testAccounts = {
+            participant: { email: 'abwanwr77+participant@gmail.com', password: 'Testtest123' },
+            researcher: { email: 'abwanwr77+Researcher@gmail.com', password: 'Testtest123' },
+            admin: { email: 'abwanwr77+admin@gmail.com', password: 'Testtest123' }
+        };
+
+        function updateResults(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        function updateOverallResults() {
+            const element = document.getElementById('overall-results');
+            const percentage = testResults.total > 0 ? Math.round((testResults.passed / testResults.total) * 100) : 0;
+            element.textContent = `Tests: ${testResults.passed}/${testResults.total} passed (${percentage}%)`;
+            element.className = `result ${percentage >= 80 ? 'success' : percentage >= 50 ? 'info' : 'error'}`;
+        }
+
+        function recordTestResult(passed) {
+            testResults.total++;
+            if (passed) testResults.passed++;
+            else testResults.failed++;
+            updateOverallResults();
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(currentToken && { 'Authorization': `Bearer ${currentToken}` }),
+                        ...options.headers
+                    }
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, status: response.status, data };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function testAPIHealth() {
+            updateResults('api-health-results', '🧪 Testing API health...', 'info');
+            
+            const healthResult = await makeRequest(`${API_BASE}/health`);
+            const dbResult = await makeRequest(`${API_BASE}/db-check`);
+            
+            const healthPassed = healthResult.success && healthResult.data?.success;
+            const dbPassed = dbResult.success && dbResult.data?.success;
+            
+            recordTestResult(healthPassed);
+            recordTestResult(dbPassed);
+            
+            const message = `API Health: ${healthPassed ? '✅ PASS' : '❌ FAIL'}
+DB Connection: ${dbPassed ? '✅ PASS' : '❌ FAIL'}
+
+Health Response: ${JSON.stringify(healthResult.data, null, 2)}
+DB Response: ${JSON.stringify(dbResult.data, null, 2)}`;
+            
+            updateResults('api-health-results', message, healthPassed && dbPassed ? 'success' : 'error');
+        }
+
+        async function testDBConnection() {
+            updateResults('api-health-results', '🔍 Testing database connection...', 'info');
+            
+            const result = await makeRequest(`${API_BASE}/db-check`);
+            const passed = result.success && result.data?.success;
+            
+            recordTestResult(passed);
+            
+            const message = `Database Connection: ${passed ? '✅ PASS' : '❌ FAIL'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('api-health-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testLogin(role) {
+            updateResults('auth-results', `🔐 Testing login as ${role}...`, 'info');
+            
+            const account = testAccounts[role];
+            const result = await makeRequest(`${API_BASE}/auth?action=login`, {
+                method: 'POST',
+                body: JSON.stringify(account)
+            });
+            
+            const passed = result.success && result.data?.token;
+            if (passed) {
+                currentToken = result.data.token;
+            }
+            
+            recordTestResult(passed);
+            
+            const message = `Login as ${role}: ${passed ? '✅ PASS' : '❌ FAIL'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('auth-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testLogout() {
+            updateResults('auth-results', '🚪 Testing logout...', 'info');
+            
+            const result = await makeRequest(`${API_BASE}/auth?action=logout`, {
+                method: 'POST'
+            });
+            
+            const passed = result.success;
+            if (passed) {
+                currentToken = null;
+            }
+            
+            recordTestResult(passed);
+            
+            const message = `Logout: ${passed ? '✅ PASS' : '❌ FAIL'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('auth-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testGetProfile() {
+            updateResults('profile-results', '👤 Testing get profile...', 'info');
+            
+            if (!currentToken) {
+                updateResults('profile-results', '❌ No token available. Please login first.', 'error');
+                recordTestResult(false);
+                return;
+            }
+            
+            const result = await makeRequest(`${API_BASE}/profile`);
+            const passed = result.success && result.data;
+            
+            recordTestResult(passed);
+            
+            const message = `Get Profile: ${passed ? '✅ PASS' : '❌ FAIL'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('profile-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testUpdateProfile() {
+            updateResults('profile-results', '📝 Testing update profile...', 'info');
+            
+            if (!currentToken) {
+                updateResults('profile-results', '❌ No token available. Please login first.', 'error');
+                recordTestResult(false);
+                return;
+            }
+            
+            const result = await makeRequest(`${API_BASE}/profile`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    name: 'Test User Updated',
+                    bio: 'Testing profile update functionality'
+                })
+            });
+            
+            const passed = result.success;
+            recordTestResult(passed);
+            
+            const message = `Update Profile: ${passed ? '✅ PASS' : '❌ FAIL'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('profile-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testGetStudies() {
+            updateResults('studies-results', '📚 Testing get studies...', 'info');
+            
+            const result = await makeRequest(`${API_BASE}/studies`);
+            const passed = result.success && Array.isArray(result.data);
+            
+            recordTestResult(passed);
+            
+            const message = `Get Studies: ${passed ? '✅ PASS' : '❌ FAIL'}
+Studies Count: ${passed ? result.data.length : 'N/A'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('studies-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testStudyCreation() {
+            updateResults('studies-results', '🆕 Testing study creation...', 'info');
+            
+            // This would test study creation API if available
+            const message = `Study Creation: ⚠️ PENDING
+Note: Study creation API endpoint needs to be implemented`;
+            
+            updateResults('studies-results', message, 'info');
+        }
+
+        async function testAdminUsers() {
+            updateResults('admin-results', '👥 Testing admin users...', 'info');
+            
+            if (!currentToken) {
+                updateResults('admin-results', '❌ No token available. Please login as admin first.', 'error');
+                recordTestResult(false);
+                return;
+            }
+            
+            const result = await makeRequest(`${API_BASE}/admin/users`);
+            const passed = result.success && Array.isArray(result.data);
+            
+            recordTestResult(passed);
+            
+            const message = `Admin Users: ${passed ? '✅ PASS' : '❌ FAIL'}
+Users Count: ${passed ? result.data.length : 'N/A'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('admin-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testAdminOverview() {
+            updateResults('admin-results', '📊 Testing admin overview...', 'info');
+            
+            if (!currentToken) {
+                updateResults('admin-results', '❌ No token available. Please login as admin first.', 'error');
+                recordTestResult(false);
+                return;
+            }
+            
+            const result = await makeRequest(`${API_BASE}/admin/overview`);
+            const passed = result.success && result.data;
+            
+            recordTestResult(passed);
+            
+            const message = `Admin Overview: ${passed ? '✅ PASS' : '❌ FAIL'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('admin-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testAdminAnalytics() {
+            updateResults('admin-results', '📈 Testing admin analytics...', 'info');
+            
+            if (!currentToken) {
+                updateResults('admin-results', '❌ No token available. Please login as admin first.', 'error');
+                recordTestResult(false);
+                return;
+            }
+            
+            const result = await makeRequest(`${API_BASE}/admin/analytics`);
+            const passed = result.success && result.data;
+            
+            recordTestResult(passed);
+            
+            const message = `Admin Analytics: ${passed ? '✅ PASS' : '❌ FAIL'}
+Response: ${JSON.stringify(result.data || result.error, null, 2)}`;
+            
+            updateResults('admin-results', message, passed ? 'success' : 'error');
+        }
+
+        async function testFrontendPages() {
+            updateResults('navigation-results', '🧭 Testing frontend navigation...', 'info');
+            
+            // Test if frontend is accessible
+            try {
+                const response = await fetch(FRONTEND_BASE);
+                const passed = response.ok;
+                
+                recordTestResult(passed);
+                
+                const message = `Frontend Access: ${passed ? '✅ PASS' : '❌ FAIL'}
+Status: ${response.status}
+Note: Manual testing required for full navigation testing`;
+                
+                updateResults('navigation-results', message, passed ? 'success' : 'error');
+            } catch (error) {
+                recordTestResult(false);
+                updateResults('navigation-results', `Frontend Access: ❌ FAIL
+Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testResponsiveNavigation() {
+            updateResults('navigation-results', '📱 Testing responsive navigation...', 'info');
+            
+            const message = `Responsive Navigation: ⚠️ MANUAL TEST REQUIRED
+Note: Please test mobile navigation manually in the browser`;
+            
+            updateResults('navigation-results', message, 'info');
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testAPIHealth();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

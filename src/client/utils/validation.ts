@@ -68,9 +68,24 @@ export const validateTasks = (tasks: unknown[]): ValidationError[] => {
   const errors: ValidationError[] = [];
   
   if (!tasks || tasks.length === 0) {
-    errors.push(createValidationError('Tasks', 'At least one task is required', 'error'));
+    errors.push(createValidationError('Blocks', 'At least one block is required', 'error'));
   } else if (tasks.length > 10) {
-    errors.push(createValidationError('Tasks', 'Too many tasks may overwhelm participants', 'warning'));
+    errors.push(createValidationError('Blocks', 'Too many blocks may overwhelm participants', 'warning'));
+  }
+  
+  return errors;
+};
+
+// New validation function for blocks
+export const validateBlocks = (blocks: unknown[]): ValidationError[] => {
+  const errors: ValidationError[] = [];
+  
+  if (!blocks || blocks.length === 0) {
+    errors.push(createValidationError('Blocks', 'At least one block is required', 'error'));
+  } else if (blocks.length > 15) {
+    errors.push(createValidationError('Blocks', 'Too many blocks may overwhelm participants', 'warning'));
+  } else if (blocks.length === 1) {
+    errors.push(createValidationError('Blocks', 'Consider adding more blocks for comprehensive research', 'info'));
   }
   
   return errors;

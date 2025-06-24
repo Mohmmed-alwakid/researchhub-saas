@@ -41,10 +41,13 @@ export default async function handler(req, res) {
     timestamp: new Date().toISOString()
   });
 
+  // Initialize variables for user and profile data (scope outside try-catch)
+  let user, userProfile, authenticatedSupabase, endpoint;
+
   try {
     // Parse the URL to determine the endpoint
     const url = new URL(req.url, `http://${req.headers.host}`);
-    const endpoint = url.searchParams.get('endpoint');
+    endpoint = url.searchParams.get('endpoint');
     
     console.log('🔍 API Endpoint called:', endpoint, 'Method:', req.method);
 
@@ -57,7 +60,18 @@ export default async function handler(req, res) {
       });
     }
     
-    const token = authHeader.replace('Bearer ', '');    // Verify user authentication by decoding JWT
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Create authenticated Supabase client with the user's JWT token
+    authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    });
+
+    // Verify user authentication by decoding JWT
     try {
       // Decode JWT token manually
       const tokenParts = token.split('.');
@@ -77,8 +91,8 @@ export default async function handler(req, res) {
       
       console.log('🔍 Extracted user:', userId, userEmail);
       
-      // Verify user has researcher or admin role
-      const { data: profile, error: profileError } = await supabase
+      // Verify user has researcher or admin role using authenticated client
+      const { data: profile, error: profileError } = await authenticatedSupabase
         .from('profiles')
         .select('role')
         .eq('id', userId)
@@ -96,8 +110,9 @@ export default async function handler(req, res) {
       
       console.log('✅ Role verified:', profile.role);
       
-      // Store user info for later use
-      const user = { id: userId, email: userEmail };
+      // Store user info for later use (make accessible outside try-catch)
+      user = { id: userId, email: userEmail };
+      userProfile = profile;
     } catch (authError) {
       console.error('❌ Authentication failed:', authError);
       return res.status(401).json({
@@ -113,8 +128,8 @@ export default async function handler(req, res) {
       console.log(`📋 Fetching applications for study: ${studyId}`);
       
       // Verify study ownership (unless admin)
-      if (profile.role !== 'admin') {
-        const { data: study, error: studyError } = await supabase
+      if (userProfile.role !== 'admin') {
+        const { data: study, error: studyError } = await authenticatedSupabase
           .from('studies')
           .select('id, researcher_id')
           .eq('id', studyId)
@@ -136,8 +151,8 @@ export default async function handler(req, res) {
       
       const offset = (page - 1) * limit;
       
-      // Build query for study applications
-      let query = supabase
+      // Build query for study applications using authenticated client
+      let query = authenticatedSupabase
         .from('study_applications')
         .select(`
           id,
@@ -146,7 +161,7 @@ export default async function handler(req, res) {
           notes,
           applied_at,
           reviewed_at,
-          profiles!inner(id, email, full_name)
+          profiles!inner(id, email, first_name, last_name)
         `)
         .eq('study_id', studyId)
         .order('applied_at', { ascending: false });
@@ -156,15 +171,24 @@ export default async function handler(req, res) {
         query = query.eq('status', status);
       }
       
-      // Get total count
-      const { count } = await supabase
+      // Get total count using authenticated client
+      console.log('🔍 About to query applications for study:', studyId);
+      
+      const { count } = await authenticatedSupabase
         .from('study_applications')
         .select('*', { count: 'exact', head: true })
         .eq('study_id', studyId);
       
+      console.log('📊 Application count query result:', count);
+      
       // Apply pagination
       const { data: applications, error } = await query
         .range(offset, offset + limit - 1);
+      
+      console.log('📋 Applications query result:', { 
+        dataLength: applications ? applications.length : 0, 
+        error: error ? error.message : null 
+      });
       
       if (error) {
         console.error('❌ Error fetching applications:', error);
@@ -185,7 +209,9 @@ export default async function handler(req, res) {
         participant: {
           id: app.profiles.id,
           email: app.profiles.email,
-          name: app.profiles.full_name || app.profiles.email
+          name: (app.profiles.first_name && app.profiles.last_name) 
+            ? `${app.profiles.first_name} ${app.profiles.last_name}` 
+            : app.profiles.email
         }
       }));
       
@@ -224,8 +250,8 @@ export default async function handler(req, res) {
         });
       }
       
-      // Get application and verify ownership
-      const { data: application, error: appError } = await supabase
+      // Get application and verify ownership using authenticated client
+      const { data: application, error: appError } = await authenticatedSupabase
         .from('study_applications')
         .select(`
           id,
@@ -243,15 +269,15 @@ export default async function handler(req, res) {
       }
       
       // Verify study ownership (unless admin)
-      if (profile.role !== 'admin' && application.studies.researcher_id !== user.id) {
+      if (userProfile.role !== 'admin' && application.studies.researcher_id !== user.id) {
         return res.status(403).json({
           success: false,
           error: 'Access denied. You can only review applications for your own studies'
         });
       }
       
-      // Update application
-      const { data: updatedApplication, error: updateError } = await supabase
+      // Update application using authenticated client
+      const { data: updatedApplication, error: updateError } = await authenticatedSupabase
         .from('study_applications')
         .update({
           status,

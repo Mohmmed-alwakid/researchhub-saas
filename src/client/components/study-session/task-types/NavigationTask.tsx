@@ -7,12 +7,14 @@ interface NavigationTaskProps {
   session: any;
   onComplete: (responses: Record<string, any>) => void;
   isRecording: boolean;
+  taskVariant?: 'tree_test';
 }
 
 export const NavigationTask: React.FC<NavigationTaskProps> = ({
   task,
   onComplete,
-  isRecording
+  isRecording,
+  taskVariant
 }) => {
   const [startTime] = useState(new Date());
   const [currentUrl, setCurrentUrl] = useState('');

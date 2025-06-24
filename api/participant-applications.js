@@ -221,6 +221,87 @@ export default async function handler(req, res) {
         study: transformedStudy
       });
 
+    } else if (req.method === 'GET' && endpoint && endpoint.startsWith('studies/') && endpoint.endsWith('/application-status')) {
+      // GET /api/participant-applications?endpoint=studies/:studyId/application-status
+      const studyId = endpoint.split('/')[1]; // Extract study ID from endpoint
+      console.log(`🔍 Checking application status for study: ${studyId}`);
+      
+      // Get JWT token from Authorization header
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authorization token required'
+        });
+      }
+      
+      const token = authHeader.replace('Bearer ', '');
+      
+      try {
+        // Get user from token
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        
+        if (authError || !user) {
+          console.error('❌ Authentication failed:', authError);
+          return res.status(401).json({
+            success: false,
+            error: 'Invalid token'
+          });
+        }
+        
+        console.log(`✅ User authenticated: ${user.id} ${user.email}`);
+            // Check if user has already applied to this study
+      console.log(`🔍 Querying applications with studyId: ${studyId}, userId: ${user.id}`);
+      
+      // Create authenticated Supabase client with user's token
+      const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      });
+      
+      const { data: existingApplication, error: applicationError } = await authenticatedSupabase
+        .from('study_applications')
+        .select('id, status, applied_at')
+        .eq('study_id', studyId)
+        .eq('participant_id', user.id)
+        .maybeSingle(); // Use maybeSingle() instead of single() to handle no results gracefully
+      
+      console.log('🔍 Application query result:', { existingApplication, applicationError });
+      
+      if (applicationError) {
+        console.error('❌ Error checking application status:', applicationError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to check application status'
+        });
+      }
+      
+      const hasApplied = !!existingApplication;
+      console.log(`✅ Application status check complete: ${hasApplied ? 'HAS_APPLIED' : 'NOT_APPLIED'}`);
+      
+      return res.status(200).json({
+        success: true,
+        data: {
+          hasApplied,
+          application: existingApplication ? {
+            id: existingApplication.id,
+            status: existingApplication.status,
+            appliedAt: existingApplication.applied_at
+          } : null
+        }
+      });
+        
+      } catch (error) {
+        console.error('❌ Error in application status check:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to check application status'
+        });
+      }
+
     } else if (req.method === 'POST' && endpoint && endpoint.includes('/apply')) {
       // POST /api/participant-applications?endpoint=studies/:studyId/apply
       const studyId = endpoint.split('/')[1]; // Extract study ID from endpoint      
@@ -240,67 +321,21 @@ export default async function handler(req, res) {
       // Declare user variable outside try-catch
       let user = null;
       
-      // Verify user authentication by decoding JWT
+      // Verify user authentication using Supabase getUser method
       try {
-        // Decode JWT token manually (without signature verification for now)
-        const tokenParts = token.split('.');
-        if (tokenParts.length !== 3) {
-          throw new Error('Invalid JWT format');
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
+        
+        if (authError || !authUser) {
+          console.error('❌ Authentication failed:', authError);
+          throw new Error('Invalid token');
         }
         
-        const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
-        console.log('🔍 JWT payload:', payload);
-          const userId = payload.sub;
-        const userEmail = payload.email;
-        const userRole = payload.user_metadata?.role; // Get role from JWT metadata
-        
-        if (!userId || !userEmail) {
-          throw new Error('Invalid user data in token');
-        }
-        
-        console.log('🔍 Extracted user:', userId, userEmail, 'JWT Role:', userRole);
-        
-        // Try to verify user role from profiles table first, fallback to JWT role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', userId)
-          .single();
-        
-        console.log('🔍 Profile query result:', { profile, profileError });
-        
-        // Determine the user's role
-        let verifiedRole = null;
-        if (profile && !profileError) {
-          verifiedRole = profile.role;
-          console.log('✅ Role from profile:', verifiedRole);
-        } else if (userRole) {
-          verifiedRole = userRole;
-          console.log('✅ Role from JWT metadata (profile not found):', verifiedRole);
-        } else {
-          console.error('❌ No role found in profile or JWT');
-          return res.status(403).json({
-            success: false,
-            error: 'User role could not be determined'
-          });
-        }
-        
-        if (verifiedRole !== 'participant') {
-          console.error('❌ Role verification failed:', { 
-            profileRole: profile?.role, 
-            jwtRole: userRole, 
-            verifiedRole, 
-            expectedRole: 'participant' 
-          });
-          return res.status(403).json({
-            success: false,
-            error: 'Only participants can apply to studies'
-          });
-        }
-          console.log('✅ Role verified: participant');
+        console.log('✅ User authenticated:', authUser.id, authUser.email);
         
         // Store user info for later use
-        user = { id: userId, email: userEmail };
+        user = { id: authUser.id, email: authUser.email };
+        
+        // We'll verify role later using the authenticated client
       } catch (authError) {
         console.error('❌ Authentication failed:', authError);
         return res.status(401).json({
@@ -325,13 +360,33 @@ export default async function handler(req, res) {
         });
       }
       
-      // Check if user already applied
-      const { data: existingApplication } = await supabase
+      // Get application data from request body
+      const { applicationData = {} } = req.body;
+      
+      // Create authenticated Supabase client with user's token
+      const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      });
+      
+      // Check if user already applied using authenticated client
+      const { data: existingApplication, error: existingAppError } = await authenticatedSupabase
         .from('study_applications')
         .select('id, status')
         .eq('study_id', studyId)
         .eq('participant_id', user.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle() to handle no results gracefully
+      
+      if (existingAppError) {
+        console.error('❌ Error checking existing application:', existingAppError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to check existing application'
+        });
+      }
       
       if (existingApplication) {
         return res.status(400).json({
@@ -339,15 +394,35 @@ export default async function handler(req, res) {
           error: 'You have already applied to this study',
           existingStatus: existingApplication.status
         });
-      }      // Get application data from request body
-      const { applicationData = {} } = req.body;
+      }
       
-      // Use service role client to bypass RLS for server-side operations
-      // RLS validation is handled by our authentication checks above
-      const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey);
+      // Verify user role using authenticated client
+      const { data: profile, error: profileError } = await authenticatedSupabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
       
-      // Create application using service role client
-      const { data: newApplication, error: applicationError } = await serviceSupabase
+      if (profileError || !profile) {
+        console.error('❌ Profile not found:', profileError);
+        return res.status(403).json({
+          success: false,
+          error: 'User profile not found'
+        });
+      }
+      
+      if (profile.role !== 'participant') {
+        console.error('❌ Access denied - user role:', profile.role);
+        return res.status(403).json({
+          success: false,
+          error: 'Only participants can apply to studies'
+        });
+      }
+      
+      console.log('✅ Role verified: participant');
+      
+      // Create application using authenticated client
+      const { data: newApplication, error: applicationError } = await authenticatedSupabase
         .from('study_applications')
         .insert({
           study_id: studyId,
@@ -362,6 +437,16 @@ export default async function handler(req, res) {
         console.error('❌ Error creating application:', applicationError);
         console.error('❌ Application data:', { studyId, userId: user.id, applicationData });
         console.error('❌ Full error details:', JSON.stringify(applicationError, null, 2));
+        
+        // Handle duplicate application error
+        if (applicationError.code === '23505' && applicationError.message.includes('study_applications_study_id_participant_id_key')) {
+          return res.status(400).json({
+            success: false,
+            error: 'You have already applied to this study',
+            code: 'DUPLICATE_APPLICATION'
+          });
+        }
+        
         return res.status(500).json({
           success: false,
           error: 'Failed to submit application',

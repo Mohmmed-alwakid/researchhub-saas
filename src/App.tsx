@@ -12,6 +12,7 @@ import ResetPasswordPage from './client/pages/auth/ResetPasswordPage';
 import DashboardPage from './client/pages/dashboard/DashboardPage';
 import StudiesPage from './client/pages/studies/StudiesPage';
 import StudyBuilderPage from './client/pages/studies/StudyBuilderPage'; // Primary study builder (formerly enhanced)
+import TemplatePreviewPage from './client/pages/studies/TemplatePreviewPage';
 import StudyDiscoveryPage from './client/pages/studies/StudyDiscoveryPage';
 import StudyApplicationPage from './client/pages/studies/StudyApplicationPage';
 import StudyApplicationsManagementPage from './client/pages/studies/StudyApplicationsManagementPage';
@@ -141,6 +142,16 @@ function App() {
               <Route path="studies/new" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <StudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/create" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <StudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/template-preview" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <TemplatePreviewPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id/edit" element={

@@ -395,6 +395,14 @@ app.all('/api/studies*', async (req, res) => {
   await studiesHandler(req, res);
 });
 
+// Study Builder endpoints - import the actual handler
+import studyBuilderHandler from './api/study-builder.js';
+
+app.all('/api/study-builder*', async (req, res) => {
+  // Use the actual study-builder.js handler
+  await studyBuilderHandler(req, res);
+});
+
 // Recordings endpoints  
 app.all('/api/recordings*', async (req, res) => {
   try {

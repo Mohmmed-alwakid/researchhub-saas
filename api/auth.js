@@ -140,20 +140,37 @@ export default async function handler(req, res) {
       
       // If no profile exists, create one with the correct role
       if (!profile) {
-        const { error: profileError } = await supabase
+        console.log('📝 Creating profile for user:', data.user.id);
+        
+        // Create authenticated Supabase client with the user's session
+        const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+          global: {
+            headers: {
+              Authorization: `Bearer ${data.session.access_token}`
+            }
+          }
+        });
+        
+        const profileData = {
+          id: data.user.id,
+          email: data.user.email,
+          first_name: data.user.user_metadata?.first_name || '',
+          last_name: data.user.user_metadata?.last_name || '',
+          role: data.user.user_metadata?.role || 'participant',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        console.log('Profile data to insert:', profileData);
+        
+        const { data: newProfile, error: profileError } = await authenticatedSupabase
           .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            first_name: data.user.user_metadata?.first_name || '',
-            last_name: data.user.user_metadata?.last_name || '',
-            role: data.user.user_metadata?.role || 'participant',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
+          .insert(profileData);
         
         if (profileError) {
-          console.error('Profile creation error:', profileError);
+          console.error('❌ Profile creation error:', profileError);
+        } else {
+          console.log('✅ Profile created successfully:', newProfile);
         }
       }      console.log('User logged in successfully');
       return res.status(200).json({

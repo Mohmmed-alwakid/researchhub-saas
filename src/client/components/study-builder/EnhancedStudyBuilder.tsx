@@ -382,7 +382,7 @@ const EnhancedStudyBuilder: React.FC = () => {
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Enhanced Study Builder</h1>
-        <p className="text-gray-600">Create comprehensive user research studies with advanced task management</p>
+        <p className="text-gray-600">Create comprehensive user research studies with advanced block management</p>
       </div>
 
       {/* Progress Bar */}

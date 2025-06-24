@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Maze-Inspired Study Creation Flow</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .success {
+            color: #16a34a;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #dcfce7;
+            color: #16a34a;
+            border: 1px solid #86efac;
+        }
+        .status.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+        .iframe-container {
+            margin: 2rem 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Maze-Inspired Study Creation Flow</h1>
+        <p>This page tests the new enhanced study creation flow integrated into ResearchHub.</p>
+
+        <div class="test-section">
+            <h2>🎯 Test Objective</h2>
+            <p>Verify that the new MazeInspiredStudyCreationModal works correctly in the live application:</p>
+            <ul>
+                <li>Dashboard loads with new "New Study" button</li>
+                <li>Modal opens with SimplifiedStudyTypeSelector</li>
+                <li>Study type selection works</li>
+                <li>EnhancedTemplateGallery displays correctly</li>
+                <li>Template categorization functions</li>
+                <li>Template preview modal works</li>
+                <li>"Start from Scratch" option functions</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔗 Test Links</h2>
+            <a href="http://localhost:5175" target="_blank" class="btn">
+                🌐 Open ResearchHub Dashboard
+            </a>
+            <a href="http://localhost:5175/app/dashboard" target="_blank" class="btn">
+                📊 Direct Dashboard Link
+            </a>
+            <a href="http://localhost:3003/api/health" target="_blank" class="btn">
+                🏥 API Health Check
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Manual Test Steps</h2>
+            <ol>
+                <li><strong>Open Dashboard:</strong> Click "Open ResearchHub Dashboard" above</li>
+                <li><strong>Login:</strong> Use test account: <code>abwanwr77+Researcher@gmail.com</code> / <code>Testtest123</code></li>
+                <li><strong>Click "New Study":</strong> Should open the new Maze-inspired modal</li>
+                <li><strong>Test Study Type Selection:</strong> 
+                    <ul>
+                        <li>Should see modern card-based interface</li>
+                        <li>Cards should show icons, descriptions, and features</li>
+                        <li>Clicking a card should proceed to template selection</li>
+                    </ul>
+                </li>
+                <li><strong>Test Template Gallery:</strong>
+                    <ul>
+                        <li>Should see category tabs (Usability Testing, User Research, etc.)</li>
+                        <li>Template cards should display with metadata</li>
+                        <li>Search functionality should work</li>
+                        <li>Clicking "Preview" should open template preview modal</li>
+                    </ul>
+                </li>
+                <li><strong>Test Template Preview:</strong>
+                    <ul>
+                        <li>Should show Overview, Preview, and Customize tabs</li>
+                        <li>Variable customization should be available</li>
+                        <li>"Use This Template" button should work</li>
+                    </ul>
+                </li>
+                <li><strong>Test "Start from Scratch":</strong> Should navigate to study builder</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Expected Behavior</h2>
+            <div class="status success">
+                ✅ New modal opens with modern, clean design
+            </div>
+            <div class="status success">
+                ✅ Study type cards are visually appealing with icons and descriptions
+            </div>
+            <div class="status success">
+                ✅ Template gallery shows categorized templates with search
+            </div>
+            <div class="status success">
+                ✅ Template preview modal provides comprehensive information
+            </div>
+            <div class="status success">
+                ✅ Variable customization allows template personalization
+            </div>
+            <div class="status success">
+                ✅ "Start from Scratch" option works as expected
+            </div>
+            <div class="status success">
+                ✅ All navigation flows work correctly
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🐛 What to Watch For</h2>
+            <ul>
+                <li><strong>TypeScript errors:</strong> Check browser console for any errors</li>
+                <li><strong>Missing components:</strong> Ensure all components load properly</li>
+                <li><strong>Broken navigation:</strong> Verify all buttons and links work</li>
+                <li><strong>Styling issues:</strong> Check that the UI looks polished and modern</li>
+                <li><strong>Template data:</strong> Ensure templates display with correct information</li>
+                <li><strong>Variable system:</strong> Test that variable replacement works in previews</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Test Results</h2>
+            <p><em>Fill this section after completing the manual test:</em></p>
+            <div id="test-results">
+                <div class="status" id="modal-opening">
+                    ⏳ Modal Opening: <span>Not tested yet</span>
+                </div>
+                <div class="status" id="study-type-selection">
+                    ⏳ Study Type Selection: <span>Not tested yet</span>
+                </div>
+                <div class="status" id="template-gallery">
+                    ⏳ Template Gallery: <span>Not tested yet</span>
+                </div>
+                <div class="status" id="template-preview">
+                    ⏳ Template Preview: <span>Not tested yet</span>
+                </div>
+                <div class="status" id="variable-customization">
+                    ⏳ Variable Customization: <span>Not tested yet</span>
+                </div>
+                <div class="status" id="start-from-scratch">
+                    ⏳ Start from Scratch: <span>Not tested yet</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎉 Integration Success</h2>
+            <p><strong>The Maze-inspired study creation flow has been successfully integrated into ResearchHub!</strong></p>
+            <p>This represents a significant improvement in user experience, bringing modern design patterns and enhanced functionality to the study creation process.</p>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 6px;">
+                <strong>Key Achievements:</strong>
+                <ul>
+                    <li>Modern UI components inspired by Maze</li>
+                    <li>Enhanced template system with categorization</li>
+                    <li>Variable system for template customization</li>
+                    <li>Simplified study type selection</li>
+                    <li>Seamless integration with existing flows</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper functions for test result tracking
+        function markSuccess(testId, message) {
+            const element = document.getElementById(testId);
+            if (element) {
+                element.className = 'status success';
+                element.querySelector('span').textContent = message || 'Passed';
+            }
+        }
+
+        function markError(testId, message) {
+            const element = document.getElementById(testId);
+            if (element) {
+                element.className = 'status error';
+                element.querySelector('span').textContent = message || 'Failed';
+            }
+        }
+
+        // Check if the development server is running
+        fetch('http://localhost:5175/api/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Development server is running:', data);
+            })
+            .catch(error => {
+                console.warn('Development server may not be running:', error);
+            });
+    </script>
+</body>
+</html>

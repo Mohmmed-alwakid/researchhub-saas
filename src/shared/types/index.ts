@@ -630,74 +630,569 @@ export interface ITimeAnalysis {
   peakTimes: Array<{ period: string; sessions: number }>;
 }
 
-// Study Builder Types (New Enhanced System)
-export interface StudyBuilderTask {
+// ============================================================================
+// STUDY BLOCKS SYSTEM - Comprehensive Block-Based Architecture
+// ============================================================================
+
+// Base block interface that all blocks extend
+export interface BaseBlock {
   id: string;
-  template_id: string;
-  name: string;
-  description: string;
-  estimated_duration?: number; // Make optional since we're removing from UI
-  order_index: number;
-  settings?: Record<string, unknown>;
-  category?: string;
-  subcategory?: string;
-  complexity?: number;
+  type: BlockType;
+  order: number;
+  title: string;
+  description?: string;
+  isRequired: boolean;
+  settings: BlockSettings;
+  conditionalLogic?: ConditionalRule[];
+  analytics: AnalyticsConfig;
+  metadata?: BlockMetadata;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface StudyBuilderTaskTemplate {
+// All supported block types
+export type BlockType = 
+  | 'welcome'
+  | 'open_question'
+  | 'opinion_scale'
+  | 'simple_input'
+  | 'multiple_choice'
+  | 'context_screen'
+  | 'yes_no'
+  | 'five_second_test'
+  | 'card_sort'
+  | 'tree_test'
+  | 'screener'
+  | 'prototype_test'
+  | 'live_website_test'
+  | 'thank_you';
+
+// Block settings interface
+export interface BlockSettings {
+  [key: string]: unknown;
+  customization?: BlockCustomization;
+  validation?: BlockValidation;
+  display?: BlockDisplay;
+}
+
+// Block customization options
+export interface BlockCustomization {
+  theme?: 'default' | 'minimal' | 'brand';
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    background?: string;
+    text?: string;
+  };
+  fonts?: {
+    primary?: string;
+    secondary?: string;
+  };
+  spacing?: 'compact' | 'default' | 'spacious';
+  animation?: boolean;
+}
+
+// Block validation rules
+export interface BlockValidation {
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  customRules?: ValidationRule[];
+}
+
+// Block display options
+export interface BlockDisplay {
+  showProgressBar?: boolean;
+  showTimer?: boolean;
+  allowSkip?: boolean;
+  autoAdvance?: boolean;
+  timeLimit?: number; // seconds
+}
+
+// Conditional logic for blocks
+export interface ConditionalRule {
+  id: string;
+  condition: LogicalCondition;
+  action: ConditionalAction;
+  priority: number;
+}
+
+export interface LogicalCondition {
+  type: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'in_range';
+  field: string;
+  value: unknown;
+  operator?: 'AND' | 'OR';
+}
+
+export interface ConditionalAction {
+  type: 'show' | 'hide' | 'skip' | 'redirect' | 'modify';
+  target?: string;
+  parameters?: Record<string, unknown>;
+}
+
+// Analytics configuration for blocks
+export interface AnalyticsConfig {
+  trackInteractions: boolean;
+  trackTiming: boolean;
+  trackDropoff: boolean;
+  customEvents?: string[];
+  heatmapTracking?: boolean;
+}
+
+// Block metadata
+export interface BlockMetadata {
+  category: string;
+  subcategory?: string;
+  complexity: 'beginner' | 'intermediate' | 'advanced';
+  estimatedDuration: number; // minutes
+  tags: string[];
+  version: string;
+  author?: string;
+  lastModified: Date;
+}
+
+// Validation rule interface
+export interface ValidationRule {
+  id: string;
+  type: string;
+  parameters: Record<string, unknown>;
+  errorMessage: string;
+}
+
+// ============================================================================
+// SPECIFIC BLOCK TYPE INTERFACES
+// ============================================================================
+
+// 1. Welcome Screen Block
+export interface WelcomeBlock extends BaseBlock {
+  type: 'welcome';
+  welcomeMessage: string;
+  useCustomMessage: boolean;
+  image?: string;
+  buttons: {
+    startText: string;
+    exitText?: string;
+  };
+  studyOverview?: {
+    showDuration: boolean;
+    showParticipantCount: boolean;
+    showCompensation: boolean;
+  };
+}
+
+// 2. Open Question Block
+export interface OpenQuestionBlock extends BaseBlock {
+  type: 'open_question';
+  question: string;
+  placeholder?: string;
+  followUpQuestions?: string[];
+  aiFollowUp: {
+    enabled: boolean;
+    maxQuestions: number;
+    analysisDepth: 'basic' | 'detailed' | 'comprehensive';
+  };
+  responseSettings: {
+    minWords?: number;
+    maxWords?: number;
+    allowRichText: boolean;
+  };
+}
+
+// 3. Opinion Scale Block
+export interface OpinionScaleBlock extends BaseBlock {
+  type: 'opinion_scale';
+  question: string;
+  scaleType: 'numerical' | 'stars' | 'emotions' | 'likert' | 'custom';
+  scaleRange: {
+    min: number;
+    max: number;
+    step?: number;
+  };
+  labels: {
+    left: string;
+    right: string;
+    center?: string;
+  };
+  customOptions?: OpinionScaleOption[];
+  showNeutralOption: boolean;
+}
+
+export interface OpinionScaleOption {
+  value: number;
+  label: string;
+  icon?: string;
+  color?: string;
+}
+
+// 4. Simple Input Block
+export interface SimpleInputBlock extends BaseBlock {
+  type: 'simple_input';
+  question: string;
+  inputType: 'text' | 'number' | 'email' | 'date' | 'url' | 'phone';
+  placeholder?: string;
+  validation: {
+    required: boolean;
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+  };
+  formatting?: {
+    mask?: string;
+    transform?: 'uppercase' | 'lowercase' | 'capitalize';
+  };
+}
+
+// 5. Multiple Choice Block
+export interface MultipleChoiceBlock extends BaseBlock {
+  type: 'multiple_choice';
+  question: string;
+  options: MultipleChoiceOption[];
+  selectionType: 'single' | 'multiple';
+  randomizeOptions: boolean;
+  allowOther: boolean;
+  otherPlaceholder?: string;
+  minSelections?: number;
+  maxSelections?: number;
+}
+
+export interface MultipleChoiceOption {
+  id: string;
+  text: string;
+  value: string;
+  icon?: string;
+  description?: string;
+  isExclusive?: boolean;
+}
+
+// 6. Context Screen Block
+export interface ContextScreenBlock extends BaseBlock {
+  type: 'context_screen';
+  content: string;
+  contentType: 'text' | 'html' | 'markdown';
+  media?: {
+    type: 'image' | 'video' | 'audio';
+    url: string;
+    caption?: string;
+  };
+  navigation: {
+    showBack: boolean;
+    showNext: boolean;
+    autoAdvance: boolean;
+    timeDelay?: number;
+  };
+}
+
+// 7. Yes/No Block
+export interface YesNoBlock extends BaseBlock {
+  type: 'yes_no';
+  question: string;
+  displayStyle: 'buttons' | 'toggle' | 'cards' | 'icons';
+  customLabels?: {
+    yes: string;
+    no: string;
+  };
+  customIcons?: {
+    yes: string;
+    no: string;
+  };
+  followUpLogic?: {
+    onYes?: ConditionalAction;
+    onNo?: ConditionalAction;
+  };
+}
+
+// 8. 5-Second Test Block
+export interface FiveSecondTestBlock extends BaseBlock {
+  type: 'five_second_test';
+  stimulus: {
+    type: 'image' | 'webpage' | 'prototype';
+    url: string;
+    preloadTime?: number;
+  };
+  timing: {
+    exposureDuration: number; // seconds, default 5
+    memoryDelay?: number; // seconds between exposure and questions
+  };
+  questions: FiveSecondQuestion[];
+  settings: {
+    allowScreenshot: boolean;
+    trackEyeMovement: boolean;
+    recordReactions: boolean;
+  };
+}
+
+export interface FiveSecondQuestion {
+  id: string;
+  question: string;
+  type: 'open_text' | 'multiple_choice' | 'rating';
+  options?: string[];
+  required: boolean;
+}
+
+// 9. Card Sort Block
+export interface CardSortBlock extends BaseBlock {
+  type: 'card_sort';
+  instructions: string;
+  sortType: 'open' | 'closed' | 'hybrid';
+  cards: CardSortItem[];
+  categories?: CardSortCategory[];
+  settings: {
+    allowNewCategories: boolean;
+    maxCategories?: number;
+    minCardsPerCategory?: number;
+    maxCardsPerCategory?: number;
+    randomizeCards: boolean;
+  };
+  completionCriteria: {
+    requireAllCards: boolean;
+    allowUncategorized: boolean;
+  };
+}
+
+export interface CardSortItem {
+  id: string;
+  text: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface CardSortCategory {
+  id: string;
+  name: string;
+  description?: string;
+  color?: string;
+  isDefault?: boolean;
+}
+
+// 10. Tree Test Block
+export interface TreeTestBlock extends BaseBlock {
+  type: 'tree_test';
+  instructions: string;
+  tree: TreeNode[];
+  tasks: TreeTestTask[];
+  settings: {
+    showBreadcrumbs: boolean;
+    allowBackNavigation: boolean;
+    highlightPath: boolean;
+    randomizeTasks: boolean;
+  };
+  completionCriteria: {
+    requireAllTasks: boolean;
+    maxAttempts?: number;
+    timeLimit?: number;
+  };
+}
+
+export interface TreeNode {
+  id: string;
+  label: string;
+  children?: TreeNode[];
+  isDestination?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+export interface TreeTestTask {
+  id: string;
+  scenario: string;
+  expectedPath: string[];
+  successCriteria: {
+    exactMatch?: boolean;
+    allowAlternatives?: string[][];
+    maxClicks?: number;
+  };
+}
+
+// ============================================================================
+// STUDY BLOCKS TEMPLATES SYSTEM
+// ============================================================================
+
+export interface BlockTemplate {
   id: string;
   name: string;
   description: string;
   category: string;
   subcategory?: string;
-  estimatedDuration: number;
-  complexity?: number;
-  requiredFields: string[];
-  optionalFields: string[];
-  defaultSettings: Record<string, unknown>;
+  blockType: BlockType;
+  defaultSettings: BlockSettings;
+  previewData?: unknown;
+  metadata: BlockMetadata;
+  usage: {
+    usageCount: number;
+    popularity: number;
+    rating: number;
+    studyTypes: string[];
+  };
+  customization: {
+    allowCustomization: boolean;
+    customizableFields: string[];
+    presets?: BlockPreset[];
+  };
 }
+
+export interface BlockPreset {
+  id: string;
+  name: string;
+  description: string;
+  settings: Partial<BlockSettings>;
+  previewData?: unknown;
+}
+
+export interface StudyTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  blocks: BaseBlock[];
+  metadata: {
+    estimatedDuration: number;
+    participantCount: number;
+    difficulty: 'beginner' | 'intermediate' | 'advanced';
+    studyTypes: string[];
+    tags: string[];
+    author?: string;
+    version: string;
+    lastModified: Date;
+  };
+  usage: {
+    usageCount: number;
+    popularity: number;
+    rating: number;
+    reviews?: TemplateReview[];
+  };
+  customization: {
+    allowCustomization: boolean;
+    customizableBlocks: string[];
+    requiredBlocks: string[];
+  };
+}
+
+export interface TemplateReview {
+  id: string;
+  userId: string;
+  rating: number;
+  comment?: string;
+  tags: string[];
+  createdAt: Date;
+}
+
+// ============================================================================
+// STUDY INTERFACE UPDATES
+// ============================================================================
+
+// Updated Study interface to support blocks
+export interface IStudyV2 extends Omit<IStudy, 'type' | 'tasks'> {
+  type: 'usability_test' | 'user_interview' | 'survey';
+  blocks: BaseBlock[]; // New blocks-based system
+  tasks?: string[] | ITask[]; // Legacy tasks for backward compatibility
+  builderVersion: 'legacy' | 'blocks';
+  template?: {
+    id: string;
+    name: string;
+    customizations?: Record<string, unknown>;
+  };
+}
+
+// Legacy compatibility interfaces removed - now using StudyBuilderBlock instead
 
 export interface StudyBuilderType {
   id: string;
   name: string;
   description: string;
   icon?: string;
-  allowedTasks: string[];
-  forbiddenTasks: string[];
-  maxTasks: number;
-  minTasks: number;
+  allowedBlocks: BlockType[]; // Updated from allowedTasks to allowedBlocks
+  forbiddenBlocks: BlockType[]; // Updated from forbiddenTasks to forbiddenBlocks
+  maxBlocks: number; // Updated from maxTasks to maxBlocks
+  minBlocks: number; // Updated from minTasks to minBlocks
   recordingRecommended: boolean;
   features: string[];
+  defaultBlocks?: BlockType[]; // New: suggested blocks for this study type
+  analytics: {
+    trackUserJourney: boolean;
+    trackDropoffPoints: boolean;
+    generateInsights: boolean;
+  };
 }
 
-// Updated Study interface to support both old and new task formats
-export interface IStudyV2 extends Omit<IStudy, 'type' | 'tasks'> {
-  type: 'usability_test' | 'user_interview' | 'survey';
-  tasks: string[] | ITask[] | StudyBuilderTask[];
-  builderVersion?: 'legacy' | 'enhanced';
-}
+// ============================================================================
+// UNION TYPES AND TYPE ALIASES
+// ============================================================================
 
-// Utility types for task conversion
-export type TaskUnion = ITask | StudyBuilderTask;
+// Union type for all specific block types
+export type StudyBlock = 
+  | WelcomeBlock
+  | OpenQuestionBlock
+  | OpinionScaleBlock
+  | SimpleInputBlock
+  | MultipleChoiceBlock
+  | ContextScreenBlock
+  | YesNoBlock
+  | FiveSecondTestBlock
+  | CardSortBlock
+  | TreeTestBlock;
+
+// Utility types for block operations
+export type BlockUnion = StudyBlock;
 export type StudyTypeUnion = IStudy['type'] | 'usability_test' | 'user_interview' | 'survey';
+
+// Block response interfaces
+export interface BlockResponse {
+  blockId: string;
+  blockType: BlockType;
+  startedAt: Date;
+  completedAt?: Date;
+  duration: number;
+  response: unknown;
+  metadata?: {
+    attempts: number;
+    interactions: number;
+    validationErrors: string[];
+    userAgent?: string;
+    viewport?: { width: number; height: number };
+  };
+}
+
+// Block analytics interfaces
+export interface BlockAnalytics {
+  blockId: string;
+  blockType: BlockType;
+  metrics: {
+    completionRate: number;
+    averageTime: number;
+    dropoffRate: number;
+    interactionCount: number;
+    errorRate: number;
+    satisfactionScore?: number;
+  };
+  insights: {
+    commonErrors: string[];
+    userPatterns: string[];
+    optimizationSuggestions: string[];
+  };
+}
 
 // Type aliases for convenience
 export type User = IUser;
 export type Study = IStudy;
+export type StudyV2 = IStudyV2;
 export type Session = ISession;
-export type Task = ITask;
+export type Task = ITask; // Legacy compatibility
+export type Block = StudyBlock;
 export type Recording = IRecording;
 export type Feedback = IFeedback;
 export type Subscription = ISubscription;
 export type Participant = IParticipant;
 export type ParticipantApplication = IParticipantApplication;
 
-// Enum types
+// Enum types - Updated with block types
 export type UserRole = 'researcher' | 'participant' | 'admin' | 'super_admin';
 export type StudyType = 'usability' | 'survey' | 'interview' | 'card-sorting' | 'a-b-testing' | 'prototype';
 export type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
 export type SessionStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
-export type TaskType = 'navigation' | 'interaction' | 'questionnaire' | 'feedback';
+export type TaskType = 'navigation' | 'interaction' | 'questionnaire' | 'feedback'; // Legacy
 export type TaskStatus = 'draft' | 'active' | 'completed' | 'paused' | 'cancelled';
 export type RecordingStatus = 'recording' | 'processing' | 'completed' | 'failed';
 export type RecordingQuality = 'low' | 'medium' | 'high' | 'ultra';
@@ -708,6 +1203,11 @@ export type PaymentMethod = 'credit_card' | 'paypal' | 'bank_transfer' | 'stripe
 export type PaymentStatus = 'pending' | 'succeeded' | 'failed' | 'canceled';
 export type SubscriptionPlan = 'free' | 'basic' | 'pro' | 'enterprise';
 export type SubscriptionStatus = 'active' | 'canceled' | 'expired' | 'past_due' | 'cancel_at_period_end';
+
+// New block-specific enum types
+export type BlockStatus = 'draft' | 'active' | 'completed' | 'skipped' | 'error';
+export type BlockDifficulty = 'beginner' | 'intermediate' | 'advanced';
+export type BlockCategory = 'welcome' | 'data_collection' | 'interaction' | 'feedback' | 'testing' | 'navigation';
 
 // Enum constants for runtime usage
 export const UserRole = {
@@ -742,11 +1242,49 @@ export const SessionStatus = {
   NO_SHOW: 'no_show' as const
 } as const;
 
+// Legacy task type constants
 export const TaskType = {
   NAVIGATION: 'navigation' as const,
   INTERACTION: 'interaction' as const,
   QUESTIONNAIRE: 'questionnaire' as const,
   FEEDBACK: 'feedback' as const
+} as const;
+
+// New block type constants
+export const BlockType = {
+  WELCOME: 'welcome' as const,
+  OPEN_QUESTION: 'open_question' as const,
+  OPINION_SCALE: 'opinion_scale' as const,
+  SIMPLE_INPUT: 'simple_input' as const,
+  MULTIPLE_CHOICE: 'multiple_choice' as const,
+  CONTEXT_SCREEN: 'context_screen' as const,
+  YES_NO: 'yes_no' as const,
+  FIVE_SECOND_TEST: 'five_second_test' as const,
+  CARD_SORT: 'card_sort' as const,
+  TREE_TEST: 'tree_test' as const
+} as const;
+
+export const BlockStatus = {
+  DRAFT: 'draft' as const,
+  ACTIVE: 'active' as const,
+  COMPLETED: 'completed' as const,
+  SKIPPED: 'skipped' as const,
+  ERROR: 'error' as const
+} as const;
+
+export const BlockDifficulty = {
+  BEGINNER: 'beginner' as const,
+  INTERMEDIATE: 'intermediate' as const,
+  ADVANCED: 'advanced' as const
+} as const;
+
+export const BlockCategory = {
+  WELCOME: 'welcome' as const,
+  DATA_COLLECTION: 'data_collection' as const,
+  INTERACTION: 'interaction' as const,
+  FEEDBACK: 'feedback' as const,
+  TESTING: 'testing' as const,
+  NAVIGATION: 'navigation' as const
 } as const;
 
 export const RecordingStatus = {
@@ -797,4 +1335,174 @@ export const SubscriptionStatus = {
   EXPIRED: 'expired' as const,
   PAST_DUE: 'past_due' as const,
   CANCEL_AT_PERIOD_END: 'cancel_at_period_end' as const
+} as const;
+
+// Template category constants based on Maze analysis
+export const TEMPLATE_CATEGORIES = {
+  'usability-testing': 'Usability Testing',
+  'content-testing': 'Content Testing', 
+  'feedback-survey': 'Feedback Survey',
+  'user-interviews': 'User Interviews',
+  'concept-validation': 'Concept Validation'
+} as const;
+
+export type TemplateCategory = keyof typeof TEMPLATE_CATEGORIES;
+
+// Variable system for template customization
+export interface TemplateVariable {
+  key: string;
+  label: string;
+  defaultValue: string;
+  placeholder: string;
+  required: boolean;
+  type: 'text' | 'url' | 'number';
+}
+
+// Enhanced template interface with variable support
+export interface EnhancedStudyTemplate extends StudyTemplate {
+  variables?: TemplateVariable[];
+  categoryType: TemplateCategory;
+  benefits: string[];
+  whenToUse: string;
+  insights: string[];
+  estimatedTime: string;
+  recommendedParticipants: string;
+}
+
+// Simplified study types based on Maze analysis
+export const STUDY_TYPES = {
+  'unmoderated': {
+    id: 'unmoderated',
+    name: 'Unmoderated Study',
+    description: 'Set up surveys and usability tests for prototypes, websites, and apps.',
+    icon: 'Users',
+    recommended: true,
+    features: ['Screen recording', 'Click tracking', 'Automated analysis', 'Scalable testing']
+  },
+  'moderated': {
+    id: 'moderated', 
+    name: 'Moderated Session',
+    description: 'Schedule and run interviews, then turn insights into actionable data.',
+    icon: 'Video',
+    recommended: false,
+    features: ['Live interaction', 'Real-time probing', 'Deep insights', 'Flexible discussion']
+  }
+} as const;
+
+export type SimplifiedStudyType = keyof typeof STUDY_TYPES;
+
+// Enhanced block descriptions based on Maze analysis
+export const ENHANCED_BLOCK_DESCRIPTIONS = {
+  'welcome': {
+    displayName: 'Welcome Screen',
+    description: 'Set the stage - Introduce your study and make participants feel comfortable',
+    category: 'Introduction',
+    icon: 'Hand',
+    estimatedTime: '30 seconds',
+    whenToUse: 'Start every study to provide context and instructions'
+  },
+  'five_second_test': {
+    displayName: '5-Second Test',
+    description: 'First Impression Testing - Show your design for 5 seconds and gather immediate feedback',
+    category: 'Visual Testing',
+    icon: 'Timer',
+    estimatedTime: '2-3 minutes',
+    whenToUse: 'Test initial reactions to designs, layouts, or landing pages'
+  },
+  'opinion_scale': {
+    displayName: 'Rating & Satisfaction',
+    description: 'Quantitative Feedback - Collect ratings and satisfaction scores with visual scales',
+    category: 'Quantitative',
+    icon: 'Star',
+    estimatedTime: '1-2 minutes',
+    whenToUse: 'Measure satisfaction, ease of use, or likelihood to recommend'
+  },
+  'open_question': {
+    displayName: 'Qualitative Insights',
+    description: 'Deep Understanding - Gather detailed feedback and understand user motivations',
+    category: 'Qualitative',
+    icon: 'MessageCircle',
+    estimatedTime: '2-4 minutes',
+    whenToUse: 'Understand the "why" behind user behaviors and preferences'
+  },
+  'yes_no': {
+    displayName: 'Quick Decisions',
+    description: 'Binary Feedback - Get clear yes/no answers on specific features or concepts',
+    category: 'Validation',
+    icon: 'CheckCircle',
+    estimatedTime: '30 seconds',
+    whenToUse: 'Validate assumptions or get quick decisions on features'
+  },
+  'multiple_choice': {
+    displayName: 'Multiple Choice',
+    description: 'Structured Options - Present specific choices and analyze user preferences',
+    category: 'Selection',
+    icon: 'List',
+    estimatedTime: '1-2 minutes',
+    whenToUse: 'When you need users to select from predefined options'
+  },
+  'simple_input': {
+    displayName: 'Data Collection',
+    description: 'Structured Input - Collect specific information like names, ages, or URLs',
+    category: 'Data Entry',
+    icon: 'Edit3',
+    estimatedTime: '1-2 minutes',
+    whenToUse: 'Gather demographic data or specific user information'
+  },
+  'context_screen': {
+    displayName: 'Instructions & Context',
+    description: 'Guidance Screen - Provide instructions or context between different study sections',
+    category: 'Navigation',
+    icon: 'Info',
+    estimatedTime: '30 seconds',
+    whenToUse: 'Break up long studies or provide task-specific instructions'
+  },
+  'prototype_test': {
+    displayName: 'Interactive Testing',
+    description: 'Live Interaction - Test real user interactions with your designs and prototypes',
+    category: 'Interaction',
+    icon: 'MousePointer',
+    estimatedTime: '3-5 minutes',
+    whenToUse: 'Test actual user flows and interaction patterns'
+  },
+  'card_sort': {
+    displayName: 'Information Architecture',
+    description: 'Organization Testing - Understand how users categorize and organize information',
+    category: 'Architecture',
+    icon: 'Grid',
+    estimatedTime: '5-8 minutes',
+    whenToUse: 'Design navigation structures or organize content categories'
+  },
+  'tree_test': {
+    displayName: 'Navigation Testing',
+    description: 'Findability Test - Evaluate how easily users can find information in your structure',
+    category: 'Navigation',
+    icon: 'GitBranch',
+    estimatedTime: '3-5 minutes',
+    whenToUse: 'Test information architecture and navigation effectiveness'
+  },
+  'thank_you': {
+    displayName: 'Study Completion',
+    description: 'Appreciation Message - Thank participants and provide next steps or rewards',
+    category: 'Completion',
+    icon: 'Heart',
+    estimatedTime: '30 seconds',
+    whenToUse: 'End every study with gratitude and clear completion confirmation'
+  },
+  'image_upload': {
+    displayName: 'Visual Upload',
+    description: 'Image Collection - Gather visual content and screenshots from participants',
+    category: 'Media',
+    icon: 'Image',
+    estimatedTime: '2-3 minutes',
+    whenToUse: 'Collect visual feedback, screenshots, or user-generated images'
+  },
+  'file_upload': {
+    displayName: 'Document Collection',
+    description: 'File Sharing - Allow participants to upload documents, PDFs, or other files',
+    category: 'Media',
+    icon: 'Upload',
+    estimatedTime: '2-3 minutes',
+    whenToUse: 'Collect documents, resumes, or other file-based feedback'
+  }
 } as const;

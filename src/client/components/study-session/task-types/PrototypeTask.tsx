@@ -23,10 +23,12 @@ interface ClickTrackingTaskProps {
         options?: string[];
       }>;
     };
-  };  study: { title: string; settings?: Record<string, unknown> };
+  };  
+  study: { title: string; settings?: Record<string, unknown> };
   session: { _id: string };
   onComplete: (metadata: Record<string, unknown>) => void;
   isRecording: boolean;
+  taskVariant?: 'five_second_test';
 }
 
 interface ClickEvent {
@@ -55,7 +57,8 @@ interface UsabilityMetadata {
 export const ClickTrackingTask: React.FC<ClickTrackingTaskProps> = ({
   task,
   onComplete,
-  isRecording
+  isRecording,
+  taskVariant
 }) => {
   const [startTime] = useState(new Date());
   const [timeSpent, setTimeSpent] = useState(0);

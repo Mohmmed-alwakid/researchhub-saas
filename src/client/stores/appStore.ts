@@ -22,7 +22,7 @@ const getErrorMessage = (error: unknown, defaultMessage: string): string => {
   return defaultMessage;
 };
 
-interface TaskInput {
+export interface TaskInput {
   title: string;
   description: string;
   type: 'navigation' | 'interaction' | 'feedback' | 'questionnaire' | 'prototype' | 'heatmap';

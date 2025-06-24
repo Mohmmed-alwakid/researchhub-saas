@@ -46,6 +46,7 @@ interface SurveyTaskProps {
   };
   onComplete: (responses: Record<string, unknown>) => void;
   isRecording: boolean;
+  taskVariant?: 'open_question' | 'opinion_scale' | 'simple_input' | 'multiple_choice' | 'yes_no';
 }
 
 type ResponseValue = string | number | boolean | string[];
@@ -58,7 +59,8 @@ const isStringArray = (value: ResponseValue): value is string[] => Array.isArray
 export const SurveyTask: React.FC<SurveyTaskProps> = ({
   task,
   onComplete,
-  isRecording
+  isRecording,
+  taskVariant
 }) => {
   const [responses, setResponses] = useState<Record<string, ResponseValue>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -67,23 +69,78 @@ export const SurveyTask: React.FC<SurveyTaskProps> = ({
   const [timeSpent, setTimeSpent] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Extract questions from task configuration
-  const questions: Question[] = task.configuration?.questions || [
-    {
-      id: 'q1',
-      question: 'How would you rate your overall experience?',
-      type: 'rating',
-      required: true,
-      max: 5
-    },
-    {
-      id: 'q2',
-      question: 'What did you like most about this experience?',
-      type: 'textarea',
-      required: false,
-      placeholder: 'Please share your thoughts...'
+  // Generate questions based on task variant or use configured questions
+  const generateQuestionsForVariant = (): Question[] => {
+    if (taskVariant) {
+      switch (taskVariant) {
+        case 'open_question':
+          return [{
+            id: 'open_response',
+            question: task.title || 'Please provide your response',
+            type: 'textarea',
+            required: true,
+            placeholder: task.configuration?.instructions || 'Enter your response here...'
+          }];
+        
+        case 'opinion_scale':
+          return [{
+            id: 'scale_rating',
+            question: task.title || 'Please rate your opinion',
+            type: 'rating',
+            required: true,
+            max: 5,
+            scaleLabels: { min: 'Strongly Disagree', max: 'Strongly Agree' }
+          }];
+        
+        case 'simple_input':
+          return [{
+            id: 'simple_input',
+            question: task.title || 'Please provide your input',
+            type: 'text',
+            required: true,
+            placeholder: task.configuration?.instructions || 'Enter your response...'
+          }];
+        
+        case 'multiple_choice':
+          return [{
+            id: 'multiple_choice',
+            question: task.title || 'Please select an option',
+            type: 'radio',
+            required: true,
+            options: ['Option 1', 'Option 2', 'Option 3', 'Other']
+          }];
+        
+        case 'yes_no':
+          return [{
+            id: 'yes_no',
+            question: task.title || 'Please answer yes or no',
+            type: 'boolean',
+            required: true
+          }];
+      }
     }
-  ];
+    
+    // Fallback to configured questions or default
+    return task.configuration?.questions || [
+      {
+        id: 'q1',
+        question: 'How would you rate your overall experience?',
+        type: 'rating',
+        required: true,
+        max: 5
+      },
+      {
+        id: 'q2',
+        question: 'What did you like most about this experience?',
+        type: 'textarea',
+        required: false,
+        placeholder: 'Please share your thoughts...'
+      }
+    ];
+  };
+
+  // Extract questions from task configuration or generate based on variant
+  const questions: Question[] = generateQuestionsForVariant();
 
   // Pagination settings
   const questionsPerPage = task.configuration?.questionsPerPage || 5;

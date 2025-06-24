@@ -264,9 +264,11 @@ export default async function handler(req, res) {
     switch (action) {
       case 'getStudyTypes':
         return await getStudyTypes(req, res);
-      
-      case 'getTaskTemplates':
+        case 'getTaskTemplates':
         return await getTaskTemplates(req, res);
+      
+      case 'getBlockTemplates':
+        return await getBlockTemplates(req, res);
       
       case 'validateStudy':
         return await validateStudy(req, res);
@@ -332,6 +334,87 @@ async function getTaskTemplates(req, res) {
   return res.status(200).json({ 
     success: true, 
     taskTemplates: transformedTasks 
+  });
+}
+
+// New Block Templates API - Converts task templates to block format
+async function getBlockTemplates(req, res) {
+  const { studyType, category } = req.query;
+  
+  let filteredTasks = Object.values(TASK_TEMPLATES);
+  
+  // Filter by study type
+  if (studyType && STUDY_TYPES[studyType]) {
+    const allowedTasks = STUDY_TYPES[studyType].allowedTasks;
+    filteredTasks = filteredTasks.filter(task => allowedTasks.includes(task.id));
+  }
+  
+  // Filter by category
+  if (category) {
+    filteredTasks = filteredTasks.filter(task => task.subcategory === category);
+  }
+
+  // Map task IDs to block types
+  const taskToBlockTypeMap = {
+    'website_navigation': 'context_screen',
+    'prototype_testing': 'context_screen', 
+    'tree_testing': 'tree_test',
+    'card_sorting': 'card_sort',
+    'findability_test': 'tree_test',
+    'first_click_test': 'context_screen',
+    'menu_testing': 'context_screen',
+    'search_testing': 'context_screen',
+    'mobile_navigation': 'context_screen',
+    'warmup_conversation': 'welcome',
+    'background_questions': 'open_question',
+    'concept_feedback': 'open_question',
+    'task_discussion': 'open_question',
+    'follow_up_deep_dive': 'open_question',
+    'closing_thoughts': 'open_question',
+    'demographic_survey': 'multiple_choice',
+    'likert_scale': 'opinion_scale',
+    'net_promoter_score': 'opinion_scale',
+    'multiple_choice_single': 'multiple_choice',
+    'multiple_choice_multi': 'multiple_choice',
+    'open_ended_question': 'open_question',
+    'rating_scale': 'opinion_scale',
+    'ranking_question': 'multiple_choice'
+  };
+
+  // Transform tasks to match the BlockTemplate interface
+  const transformedBlocks = filteredTasks.map(task => ({
+    id: task.id,
+    name: task.name,
+    description: task.description,
+    category: task.category,
+    subcategory: task.subcategory,
+    blockType: taskToBlockTypeMap[task.id] || 'context_screen', // Ensure blockType is always defined
+    defaultSettings: task.defaultSettings || {},
+    previewData: generatePreviewContent(task),
+    metadata: {
+      estimatedDuration: task.estimatedDuration,
+      complexity: task.complexity === 1 ? 'beginner' : task.complexity === 2 ? 'intermediate' : 'advanced',
+      tags: generateTaskTags(task),
+      author: 'system',
+      version: '1.0.0',
+      lastUpdated: new Date().toISOString()
+    },
+    usage: {
+      usageCount: Math.floor(Math.random() * 500) + 10,
+      popularity: Math.floor(Math.random() * 100) + 1,
+      rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // 3.0 to 5.0 rating
+      studyTypes: getApplicableStudyTypes(task.id)
+    },
+    customization: {
+      allowCustomization: true,
+      customizableFields: task.requiredFields || [],
+      presets: []
+    }
+  }));
+  
+  return res.status(200).json({ 
+    success: true, 
+    blockTemplates: transformedBlocks 
   });
 }
 

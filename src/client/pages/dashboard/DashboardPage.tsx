@@ -12,15 +12,19 @@ import {
   Filter,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
+import { MazeInspiredStudyCreationModal } from '../../components/studies/MazeInspiredStudyCreationModal';
+import type { StudyTemplate } from '../../../shared/types/index';
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);  const [showMazeModal, setShowMazeModal] = useState(false);
+
   // Fetch real dashboard data on component mount
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -45,7 +49,29 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, []);  // Handle study creation flow
+  const handleCreateNewStudy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowMazeModal(true);
+  };
+
+  // Handlers for Maze-inspired modal
+  const handleMazeTemplateSelect = (template: StudyTemplate) => {
+    navigate('/app/studies/template-preview', { 
+      state: { 
+        template
+      } 
+    });
+  };
+
+  const handleMazeStartFromScratch = (studyType: string) => {
+    navigate('/app/studies/create', { 
+      state: { 
+        studyType,
+        skipTemplates: true 
+      } 
+    });
+  };
 
   // Calculate stats for display
   const stats = dashboardData ? [
@@ -180,12 +206,10 @@ const DashboardPage = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Link to="/app/studies/new">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Study
-              </Button>
-            </Link>
+            <Button onClick={() => setShowMazeModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Study
+            </Button>
           </div>
         </div>
 
@@ -301,14 +325,15 @@ const DashboardPage = () => {
           {/* Quick Actions Card */}
           <Card variant="glass" className="h-fit">
             <CardHeader title="Quick Actions" subtitle="Get started with common tasks" />
-            <CardContent>
-              <div className="space-y-3">
-                <Link to="/app/studies/new">
-                  <Button variant="primary" className="w-full justify-start">
-                    <Plus className="h-4 w-4 mr-3" />
-                    Create New Study
-                  </Button>
-                </Link>
+            <CardContent>              <div className="space-y-3">
+                <Button 
+                  variant="primary" 
+                  className="w-full justify-start" 
+                  onClick={handleCreateNewStudy}
+                >
+                  <Plus className="h-4 w-4 mr-3" />
+                  Create New Study
+                </Button>
                 <Link to="/app/participants">
                   <Button variant="secondary" className="w-full justify-start">
                     <Users className="h-4 w-4 mr-3" />
@@ -370,7 +395,13 @@ const DashboardPage = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card>        {/* Maze-Inspired Study Creation Modal */}
+        <MazeInspiredStudyCreationModal 
+          isOpen={showMazeModal} 
+          onClose={() => setShowMazeModal(false)}
+          onSelectTemplate={handleMazeTemplateSelect}
+          onStartFromScratch={handleMazeStartFromScratch}
+        />
       </div>
     </div>
   );

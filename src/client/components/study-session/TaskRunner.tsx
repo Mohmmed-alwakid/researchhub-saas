@@ -8,6 +8,8 @@ import { SurveyTask } from './task-types/SurveyTask.tsx';
 import { PrototypeTask } from './task-types/PrototypeTask.tsx';
 import { InterviewTask } from './task-types/InterviewTask.tsx';
 import { CardSortingTask } from './task-types/CardSortingTask.tsx';
+import { WelcomeBlockTask } from './task-types/WelcomeBlockTask.tsx';
+import { ContextScreenTask } from './task-types/ContextScreenTask.tsx';
 
 interface TaskRunnerProps {
   study: any;
@@ -204,7 +206,6 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
       onExit();
     }
   };
-
   const renderCurrentTask = () => {
     if (!currentTask) return null;
 
@@ -216,7 +217,11 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
       isRecording
     };
 
-    switch (currentTask.type) {
+    // Handle both legacy task types and new block types
+    const taskType = currentTask.type;
+    
+    switch (taskType) {
+      // Legacy task types (maintain backward compatibility)
       case 'navigation':
         return <NavigationTask {...taskProps} />;
       case 'questionnaire':
@@ -227,6 +232,29 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
         return <InterviewTask {...taskProps} />;
       case 'card-sorting':
         return <CardSortingTask {...taskProps} />;
+      
+      // New block types - mapped to appropriate task components
+      case 'welcome':
+        return <WelcomeBlockTask {...taskProps} />;
+      case 'open_question':
+        return <SurveyTask {...taskProps} taskVariant="open_question" />;
+      case 'opinion_scale':
+        return <SurveyTask {...taskProps} taskVariant="opinion_scale" />;
+      case 'simple_input':
+        return <SurveyTask {...taskProps} taskVariant="simple_input" />;
+      case 'multiple_choice':
+        return <SurveyTask {...taskProps} taskVariant="multiple_choice" />;
+      case 'context_screen':
+        return <ContextScreenTask {...taskProps} />;
+      case 'yes_no':
+        return <SurveyTask {...taskProps} taskVariant="yes_no" />;
+      case 'five_second_test':
+        return <PrototypeTask {...taskProps} taskVariant="five_second_test" />;
+      case 'card_sort':
+        return <CardSortingTask {...taskProps} />;
+      case 'tree_test':
+        return <NavigationTask {...taskProps} taskVariant="tree_test" />;
+      
       default:
         return <SurveyTask {...taskProps} />; // Fallback
     }

@@ -19,20 +19,9 @@ import {
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
-import { participantApplicationsService } from '../../services/participantApplications.service';
-import type { ApplicationReview } from '../../services/participantApplications.service';
+import { researcherApplicationsService } from '../../services/researcherApplications.service';
+import type { ApplicationReview, ResearcherApplication } from '../../services/researcherApplications.service';
 import { studiesService } from '../../services/studies.service';
-import type { ParticipantApplication } from '../../../shared/types';
-
-interface EnhancedApplication extends Omit<ParticipantApplication, 'participantId'> {
-  participantId: {
-    name: string;
-    email: string;
-    profile?: {
-      demographics?: Record<string, unknown>;
-    };
-  };
-}
 
 interface StudyInfo {
   _id: string;
@@ -53,7 +42,7 @@ interface ApplicationStats {
 const StudyApplicationsManagementPage: React.FC = () => {
   const { studyId } = useParams<{ studyId: string }>();
   const [study, setStudy] = useState<StudyInfo | null>(null);
-  const [applications, setApplications] = useState<EnhancedApplication[]>([]);
+  const [applications, setApplications] = useState<ResearcherApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
@@ -68,7 +57,7 @@ const StudyApplicationsManagementPage: React.FC = () => {
     rejected: 0,
     withdrawn: 0
   });
-  const [selectedApplication, setSelectedApplication] = useState<EnhancedApplication | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<ResearcherApplication | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewAction, setReviewAction] = useState<'approve' | 'reject'>('approve');
   const [rejectionReason, setRejectionReason] = useState('');
@@ -91,7 +80,7 @@ const StudyApplicationsManagementPage: React.FC = () => {
         const filters: Record<string, unknown> = { page, limit: 10 };
       if (statusFilter !== 'all') filters.status = statusFilter;
 
-      const response = await participantApplicationsService.getStudyApplications(studyId, filters);
+      const response = await researcherApplicationsService.getStudyApplications(studyId, filters);
       
       if (response.success) {
         setApplications(response.data.applications);
@@ -121,15 +110,17 @@ const StudyApplicationsManagementPage: React.FC = () => {
     if (!selectedApplication) return;
 
     try {
-      setProcessingIds(prev => new Set(prev).add(selectedApplication._id));      const reviewData: ApplicationReview = { action: reviewAction };
+      setProcessingIds(prev => new Set(prev).add(selectedApplication.id));
+
+      const reviewData: ApplicationReview = { status: reviewAction === 'approve' ? 'accepted' : 'rejected' };
       if (reviewAction === 'reject' && rejectionReason) {
-        reviewData.rejectionReason = rejectionReason;
+        reviewData.notes = rejectionReason;
       }
       if (notes) {
         reviewData.notes = notes;
       }
 
-      await participantApplicationsService.reviewApplication(selectedApplication._id, reviewData);
+      await researcherApplicationsService.reviewApplication(selectedApplication.id, reviewData);
       
       toast.success(`Application ${reviewAction}d successfully`);
       setShowReviewModal(false);
@@ -144,13 +135,13 @@ const StudyApplicationsManagementPage: React.FC = () => {
     } finally {
       setProcessingIds(prev => {
         const newSet = new Set(prev);
-        newSet.delete(selectedApplication._id);
+        newSet.delete(selectedApplication.id);
         return newSet;
       });
     }
   };
 
-  const openReviewModal = (application: EnhancedApplication, action: 'approve' | 'reject') => {
+  const openReviewModal = (application: ResearcherApplication, action: 'approve' | 'reject') => {
     setSelectedApplication(application);
     setReviewAction(action);
     setShowReviewModal(true);
@@ -189,8 +180,8 @@ const StudyApplicationsManagementPage: React.FC = () => {
   };
 
   const filteredApplications = applications.filter(app =>
-    app.participantId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    app.participantId.email.toLowerCase().includes(searchTerm.toLowerCase())
+    app.participant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.participant.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
   useEffect(() => {
     fetchStudyInfo();
@@ -373,7 +364,7 @@ const StudyApplicationsManagementPage: React.FC = () => {
         ) : (
           <div className="space-y-6">
             {filteredApplications.map((application) => (
-              <Card key={application._id} variant="elevated">
+              <Card key={application.id} variant="elevated">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -386,11 +377,11 @@ const StudyApplicationsManagementPage: React.FC = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-lg font-medium text-gray-900 truncate">
-                            {application.participantId.name}
+                            {application.participant.name}
                           </p>
                           <div className="flex items-center text-sm text-gray-500">
                             <Mail className="w-4 h-4 mr-1" />
-                            {application.participantId.email}
+                            {application.participant.email}
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">

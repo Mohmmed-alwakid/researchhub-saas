@@ -136,6 +136,23 @@ export const participantApplicationsService = {
   },
 
   /**
+   * Check if user has already applied to a study
+   */
+  async checkApplicationStatus(studyId: string): Promise<{
+    success: boolean;
+    data: {
+      hasApplied: boolean;
+      application?: {
+        id: string;
+        status: string;
+        appliedAt: string;
+      };
+    };
+  }> {
+    return apiService.get(`participant-applications?endpoint=studies/${studyId}/application-status`);
+  },
+
+  /**
    * Apply to a study
    */  async applyToStudy(studyId: string, application: ApplicationSubmission): Promise<{
     success: boolean;
