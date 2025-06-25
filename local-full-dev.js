@@ -2601,6 +2601,69 @@ async function deleteRecording(req, res, supabase) {
   }
 }
 
+// Study Sessions endpoints
+app.all('/api/study-sessions*', async (req, res) => {
+  try {
+    console.log(`🔬 Study Sessions API Request: ${req.method} ${req.url}`);
+    
+    // Import the study sessions handler
+    const studySessionsModule = await import('./api/study-sessions.js');
+    const handler = studySessionsModule.default;
+    
+    // Call the handler with req and res
+    await handler(req, res);
+  } catch (error) {
+    console.error('❌ Study Sessions API Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Study sessions operation failed',
+      message: error.message
+    });
+  }
+});
+
+// Study Blocks endpoints
+app.all('/api/study-blocks*', async (req, res) => {
+  try {
+    console.log(`🧪 Study Blocks API Request: ${req.method} ${req.url}`);
+    
+    // Import the study blocks handler
+    const studyBlocksModule = await import('./api/study-blocks.js');
+    const handler = studyBlocksModule.default;
+    
+    // Call the handler with req and res
+    await handler(req, res);
+  } catch (error) {
+    console.error('❌ Study Blocks API Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Study blocks operation failed',
+      message: error.message
+    });
+  }
+});
+
+// Block Templates endpoints
+app.all('/api/block-templates*', async (req, res) => {
+  try {
+    console.log(`🧩 Block Templates API Request: ${req.method} ${req.url}`);
+    
+    // Import the block templates handler
+    const blockTemplatesModule = await import('./api/block-templates.js');
+    const handler = blockTemplatesModule.default;
+    
+    // Call the handler with req and res
+    await handler(req, res);
+  } catch (error) {
+    console.error('❌ Block Templates API Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Block templates operation failed',
+      message: error.message
+    });
+  }
+});
+
 // Start backend API server
 function startBackend() {
   console.log('🚀 Starting Backend API Server...');

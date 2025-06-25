@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Block System Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        .success { border-color: #10b981; background-color: #f0fdf4; }
+        .error { border-color: #ef4444; background-color: #fef2f2; }
+        .info { border-color: #3b82f6; background-color: #eff6ff; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success { background: #10b981; color: white; }
+        .status.error { background: #ef4444; color: white; }
+        .status.loading { background: #f59e0b; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Study Block System Test</h1>
+        <p><strong>Environment:</strong> Local Development</p>
+        <p><strong>Backend API:</strong> http://localhost:3003</p>
+        <p><strong>Frontend:</strong> http://localhost:5175</p>
+        
+        <div class="test-section info">
+            <h2>📋 Test Overview</h2>
+            <p>This page tests the new Study Block System implementation:</p>
+            <ul>
+                <li>✅ Block Components (WelcomeBlock, ContextScreen, MultipleChoice, etc.)</li>
+                <li>✅ Study Block Session (block-by-block navigation)</li>
+                <li>✅ API Integration (/api/study-blocks)</li>
+                <li>✅ Response saving and session management</li>
+                <li>✅ Updated StudySessionPage with block system</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔐 Authentication Test</h2>
+            <p>First, let's authenticate to test the protected block API:</p>
+
+            <label>
+                Email: <input type="email" id="email" value="abwanwr77+participant@gmail.com" style="margin-left: 10px; padding: 5px; width: 250px;">
+            </label><br><br>
+            <label>
+                Password: <input type="password" id="password" value="Testtest123" style="margin-left: 10px; padding: 5px; width: 250px;">
+            </label><br><br>
+            
+            <button onclick="loginUser()">Login</button>
+            <span id="loginStatus"></span>
+        </div>
+
+        <div class="test-section">
+            <h2>📦 Study Blocks API Test</h2>
+            <p>Test the /api/study-blocks endpoint to fetch blocks for a study:</p>
+            
+            <button onclick="testBlocksAPI()" id="blocksBtn" disabled>Get Study Blocks</button>
+            <span id="blocksStatus"></span>
+            
+            <div id="blocksResult" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>💾 Block Response Saving Test</h2>
+            <p>Test saving a block response:</p>
+            
+            <button onclick="testSaveResponse()" id="saveBtn" disabled>Save Sample Response</button>
+            <span id="saveStatus"></span>
+            
+            <div id="saveResult" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🌐 Frontend Integration Test</h2>
+            <p>Test the complete participant experience:</p>
+            
+            <button onclick="openStudySession()">Open Study Session (Frontend)</button>
+            <span id="frontendStatus"></span>
+            
+            <p><small>This will open the StudySessionPage with the new block system.</small></p>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Test Results Summary</h2>
+            <div id="testSummary">
+                <p>Run the tests above to see results...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = '';
+        let testResults = {
+            login: false,
+            blocks: false,
+            save: false
+        };
+
+        async function loginUser() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const statusEl = document.getElementById('loginStatus');
+            
+            statusEl.innerHTML = '<span class="status loading">Logging in...</span>';
+
+            try {
+                const response = await fetch('http://localhost:3003/api/auth?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    statusEl.innerHTML = '<span class="status success">✅ Logged in successfully</span>';
+                    
+                    // Enable other test buttons
+                    document.getElementById('blocksBtn').disabled = false;
+                    document.getElementById('saveBtn').disabled = false;
+                    
+                    testResults.login = true;
+                    updateTestSummary();
+                } else {
+                    throw new Error(data.error || 'Login failed');
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+                console.error('Login error:', error);
+            }
+        }
+
+        async function testBlocksAPI() {
+            const statusEl = document.getElementById('blocksStatus');
+            const resultEl = document.getElementById('blocksResult');
+            
+            statusEl.innerHTML = '<span class="status loading">Loading blocks...</span>';
+
+            try {
+                // Use the hardcoded study ID from the sample blocks
+                const studyId = 'study_ecommerce_checkout_001';
+                
+                const response = await fetch(`http://localhost:3003/api/study-blocks?studyId=${studyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.blocks) {
+                    statusEl.innerHTML = `<span class="status success">✅ Loaded ${data.blocks.length} blocks</span>`;
+                    
+                    resultEl.innerHTML = `
+                        <h4>Study Blocks (${data.blocks.length} total):</h4>
+                        <pre>${JSON.stringify(data.blocks.map(b => ({
+                            id: b.id,
+                            type: b.type,
+                            title: b.title,
+                            order: b.order
+                        })), null, 2)}</pre>
+                    `;
+                    
+                    testResults.blocks = true;
+                    updateTestSummary();
+                } else {
+                    throw new Error(data.error || 'Failed to load blocks');
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+                resultEl.innerHTML = `<pre style="color: red;">${error.message}</pre>`;
+                console.error('Blocks API error:', error);
+            }
+        }
+
+        async function testSaveResponse() {
+            const statusEl = document.getElementById('saveStatus');
+            const resultEl = document.getElementById('saveResult');
+            
+            statusEl.innerHTML = '<span class="status loading">Saving response...</span>';
+
+            try {
+                const sampleResponse = {
+                    sessionId: 'test_session_' + Date.now(),
+                    blockId: 'block_1_welcome',
+                    blockType: 'welcome',
+                    response: {
+                        acknowledged: true,
+                        timestamp: new Date().toISOString()
+                    },
+                    metadata: {
+                        testRun: true,
+                        userAgent: navigator.userAgent
+                    }
+                };
+                
+                const response = await fetch('http://localhost:3003/api/study-blocks', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sampleResponse)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.innerHTML = '<span class="status success">✅ Response saved successfully</span>';
+                    resultEl.innerHTML = `
+                        <h4>Save Response Result:</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    
+                    testResults.save = true;
+                    updateTestSummary();
+                } else {
+                    throw new Error(data.error || 'Failed to save response');
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+                resultEl.innerHTML = `<pre style="color: red;">${error.message}</pre>`;
+                console.error('Save response error:', error);
+            }
+        }
+
+        function openStudySession() {
+            const statusEl = document.getElementById('frontendStatus');
+            
+            // Open the frontend with a test study session
+            const frontendUrl = 'http://localhost:5175/app/studies/study_ecommerce_checkout_001/session';
+            
+            statusEl.innerHTML = '<span class="status success">✅ Opening frontend...</span>';
+            
+            window.open(frontendUrl, '_blank');
+        }
+
+        function updateTestSummary() {
+            const summaryEl = document.getElementById('testSummary');
+            const total = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(Boolean).length;
+            
+            summaryEl.innerHTML = `
+                <h4>Test Results: ${passed}/${total} Passed</h4>
+                <ul>
+                    <li>Authentication: ${testResults.login ? '✅ PASS' : '❌ FAIL'}</li>
+                    <li>Blocks API: ${testResults.blocks ? '✅ PASS' : '❌ FAIL'}</li>
+                    <li>Save Response: ${testResults.save ? '✅ PASS' : '❌ FAIL'}</li>
+                </ul>
+                ${passed === total ? '<p style="color: green; font-weight: bold;">🎉 All tests passed! Block system is working correctly.</p>' : ''}
+            `;
+        }
+
+        // Initialize test summary
+        updateTestSummary();
+    </script>
+</body>
+</html>

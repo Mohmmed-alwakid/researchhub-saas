@@ -22,7 +22,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 export default async function handler(req, res) {
   // CORS headers for cross-origin requests
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   // Handle preflight requests
@@ -77,9 +77,9 @@ export default async function handler(req, res) {
     console.log('⚠️ No valid Authorization header found');
   }
   
-  try {    // Extract study ID from URL for PUT requests
+  try {    // Extract study ID from URL for PUT and DELETE requests
     let studyId = null;
-    if (req.method === 'PUT') {
+    if (req.method === 'PUT' || req.method === 'DELETE') {
       // Handle both /api/studies/[id] and /api/studies?id=[id] patterns
       const urlParts = req.url.split('?')[0].split('/'); // Remove query params first
       studyId = urlParts[urlParts.length - 1];
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
         studyId = url.searchParams.get('id');
       }
       
-      console.log('PUT request URL:', req.url);
+      console.log(`${req.method} request URL:`, req.url);
       console.log('Extracted study ID:', studyId);    }
     
     if (req.method === 'GET') {
@@ -420,6 +420,74 @@ export default async function handler(req, res) {
         success: true,
         study: transformedStudy,
         message: 'Study updated successfully'
+      });
+    } else if (req.method === 'DELETE') {
+      // Handle study deletion
+      console.log('=== DELETE REQUEST DEBUG ===');
+      console.log('Request URL:', req.url);
+      console.log('Study ID:', studyId);
+      console.log('Current User:', currentUser?.id);
+      console.log('=============================');
+      
+      if (!studyId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Study ID is required'
+        });
+      }
+
+      if (!currentUser) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+      }
+
+      // First, check if the study exists and belongs to the current user
+      const { data: existingStudy, error: checkError } = await supabase
+        .from('studies')
+        .select('id, status, researcher_id')
+        .eq('id', studyId)
+        .eq('researcher_id', currentUser.id)
+        .single();
+
+      if (checkError || !existingStudy) {
+        console.error('Study not found or access denied:', checkError);
+        return res.status(404).json({
+          success: false,
+          error: 'Study not found or you do not have permission to delete it'
+        });
+      }
+
+      // Optional: Only allow deletion of draft studies (business logic)
+      // Uncomment the following lines if you want to restrict deletion to draft studies only
+      /*
+      if (existingStudy.status !== 'draft') {
+        return res.status(400).json({
+          success: false,
+          error: 'Only draft studies can be deleted'
+        });
+      }
+      */
+
+      // Delete the study from Supabase
+      const { error: deleteError } = await supabase
+        .from('studies')
+        .delete()
+        .eq('id', studyId)
+        .eq('researcher_id', currentUser.id); // Double-check ownership
+
+      if (deleteError) {
+        console.error('Error deleting study:', deleteError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to delete study'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Study deleted successfully'
       });
     } else {
       res.status(405).json({

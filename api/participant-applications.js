@@ -483,27 +483,22 @@ export default async function handler(req, res) {
       }
         const token = authHeader.replace('Bearer ', '');
       
-      // Verify user authentication by decoding JWT
+      // Verify user authentication using Supabase auth (same as application-status endpoint)
       let user = null;
       try {
-        // Decode JWT token manually
-        const tokenParts = token.split('.');
-        if (tokenParts.length !== 3) {
-          throw new Error('Invalid JWT format');
+        // Get user from token using Supabase auth
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
+        
+        if (authError || !authUser) {
+          console.error('❌ Authentication failed:', authError);
+          return res.status(401).json({
+            success: false,
+            error: 'Invalid token'
+          });
         }
         
-        const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
-        const userId = payload.sub;
-        const userEmail = payload.email;
-        
-        if (!userId || !userEmail) {
-          throw new Error('Invalid user data in token');
-        }
-        
-        console.log('🔍 Extracted user for my-applications:', userId, userEmail);
-        
-        // Store user info
-        user = { id: userId, email: userEmail };
+        console.log(`✅ User authenticated for my-applications: ${authUser.id} ${authUser.email}`);
+        user = authUser;
       } catch (authError) {
         console.error('❌ Authentication failed:', authError);
         return res.status(401).json({
@@ -520,8 +515,17 @@ export default async function handler(req, res) {
       
       const offset = (page - 1) * limit;
       
+      // Create authenticated Supabase client with user's token (same as application-status endpoint)
+      const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      });
+      
       // Build query for user's applications
-      let query = supabase
+      let query = authenticatedSupabase
         .from('study_applications')
         .select(`
           id,
@@ -540,7 +544,7 @@ export default async function handler(req, res) {
       }
       
       // Get total count
-      const { count } = await supabase
+      const { count } = await authenticatedSupabase
         .from('study_applications')
         .select('*', { count: 'exact', head: true })
         .eq('participant_id', user.id);
@@ -563,12 +567,16 @@ export default async function handler(req, res) {
         status: app.status,
         appliedAt: app.applied_at,
         reviewedAt: app.reviewed_at,
-        study: {
-          id: app.studies.id,
+        studyId: {
+          _id: app.studies.id,
           title: app.studies.title,
           description: app.studies.description,
           type: app.studies.settings?.type || 'usability',
-          compensation: app.studies.settings?.compensation || 0
+          status: app.studies.status,
+          configuration: {
+            duration: app.studies.settings?.duration || 30,
+            compensation: app.studies.settings?.compensation || 0
+          }
         }
       }));
       

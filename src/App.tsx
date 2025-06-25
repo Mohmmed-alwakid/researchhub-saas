@@ -16,6 +16,7 @@ import TemplatePreviewPage from './client/pages/studies/TemplatePreviewPage';
 import StudyDiscoveryPage from './client/pages/studies/StudyDiscoveryPage';
 import StudyApplicationPage from './client/pages/studies/StudyApplicationPage';
 import StudyApplicationsManagementPage from './client/pages/studies/StudyApplicationsManagementPage';
+import StudySessionPage from './client/pages/studies/StudySessionPage';
 import ParticipantDashboardPage from './client/pages/studies/ParticipantDashboardPage';
 import ParticipantsPage from './client/pages/participants/ParticipantsPage';
 import AnalyticsPage from './client/pages/analytics/AnalyticsPage';
@@ -207,6 +208,11 @@ function App() {
               <Route path="studies/:id/apply" element={
                 <ProtectedRoute allowedRoles={['participant']}>
                   <StudyApplicationPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/:id/session" element={
+                <ProtectedRoute allowedRoles={['participant']}>
+                  <StudySessionPage />
                 </ProtectedRoute>
               } />
             </Route>

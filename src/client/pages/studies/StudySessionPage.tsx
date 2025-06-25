@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Monitor, Mic, Video, User, Clock, Target } from 'lucide-react';
-import { ScreenRecorder } from '../../components/recording/ScreenRecorder';
+import { ArrowLeft, Monitor, Mic, Clock, Target } from 'lucide-react';
+import { StudyBlockSession } from '../../components/blocks/StudyBlockSession';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import toast from 'react-hot-toast';
@@ -20,7 +20,7 @@ interface Study {
     recordAudio: boolean;
     collectHeatmaps: boolean;
   };
-  tasks: any[];
+  tasks: Record<string, string | number>[];
 }
 
 interface StudySession {
@@ -34,114 +34,110 @@ interface StudySession {
 }
 
 const StudySessionPage: React.FC = () => {
-  const { studyId } = useParams<{ studyId: string }>();
+  const { id: studyId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [study, setStudy] = useState<Study | null>(null);
   const [session, setSession] = useState<StudySession | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [sessionStarted, setSessionStarted] = useState(false);
 
   useEffect(() => {
-    loadStudy();
-  }, [studyId]);
+    const fetchStudy = async () => {
+      try {
+        setLoading(true);
+        
+        // Get token from auth storage
+        let token = null;
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          try {
+            const { state } = JSON.parse(authStorage);
+            token = state?.token;
+          } catch (error) {
+            console.warn('Failed to parse auth storage:', error);
+          }
+        }
 
-  const loadStudy = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch study details
-      const response = await fetch(`/api/studies/${studyId}`);
-      if (!response.ok) {
-        throw new Error('Failed to load study');
-      }
-      
-      const data = await response.json();
-      if (data.success) {
-        setStudy(data.study);
-      } else {
-        throw new Error(data.error || 'Failed to load study');
-      }
-    } catch (error) {
-      console.error('Error loading study:', error);
-      toast.error('Failed to load study');
-      navigate('/studies');
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+        
+        // Create or get the study session
+        console.log('🔍 Creating/getting study session for study:', studyId);
+        const createSessionResponse = await fetch(`/api/study-sessions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            studyId: studyId
+          })
+        });
 
-  const startSession = async () => {
-    try {
-      // Create a new session
-      const response = await fetch('/api/recordings?action=create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}` // Basic auth for demo
-        },
-        body: JSON.stringify({
-          studyId,
-          participantEmail: 'demo-participant@example.com', // Demo participant
-          recordingEnabled: study?.settings.recordScreen || false
-        })
-      });
+        if (!createSessionResponse.ok) {
+          throw new Error('Failed to create study session');
+        }
 
-      if (!response.ok) {
-        throw new Error('Failed to start session');
-      }
+        const createSessionData = await createSessionResponse.json();
+        if (!createSessionData.success) {
+          throw new Error(createSessionData.error || 'Failed to create study session');
+        }
 
-      const data = await response.json();
-      if (data.success) {
-        setSession(data.session);
-        setSessionStarted(true);
-        toast.success('Study session started!');
-      } else {
-        throw new Error(data.error || 'Failed to start session');
-      }
-    } catch (error) {
-      console.error('Error starting session:', error);
-      toast.error('Failed to start session');
-    }
-  };
+        const sessionId = createSessionData.session.id;
+        console.log('✅ Study session created/found:', sessionId);
 
-  const completeSession = async () => {
-    if (!session) return;
+        // Get the full session with study data
+        const getSessionResponse = await fetch(`/api/study-sessions/${sessionId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-    try {
-      const response = await fetch('/api/recordings?action=complete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: session.id
-        })
-      });
+        if (!getSessionResponse.ok) {
+          throw new Error('Failed to load study session');
+        }
 
-      if (!response.ok) {
-        throw new Error('Failed to complete session');
-      }
+        const sessionData = await getSessionResponse.json();
+        if (!sessionData.success) {
+          throw new Error(sessionData.error || 'Failed to load study session');
+        }
 
-      const data = await response.json();
-      if (data.success) {
-        toast.success('Study session completed!');
+        console.log('✅ Study session loaded:', sessionData.session);
+        
+        // Set both study and session data
+        setStudy(sessionData.session.study);
+        setSession(sessionData.session);
+      } catch (error) {
+        console.error('Error loading study:', error);
+        toast.error('Failed to load study');
         navigate('/studies');
-      } else {
-        throw new Error(data.error || 'Failed to complete session');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error completing session:', error);
-      toast.error('Failed to complete session');
+    };
+
+    if (studyId) {
+      fetchStudy();
+    }
+  }, [studyId, navigate]);
+
+  const startSession = () => {
+    if (session) {
+      setSessionStarted(true);
+      toast.success('Study session started!');
     }
   };
 
-  const nextTask = () => {
-    if (study && currentTaskIndex < study.tasks.length - 1) {
-      setCurrentTaskIndex(currentTaskIndex + 1);
-    } else {
-      completeSession();
-    }
+  const handleStudyComplete = () => {
+    toast.success('Study completed successfully!');
+    setTimeout(() => {
+      navigate('/app/participant-dashboard');
+    }, 1500);
+  };
+
+  const handleStudyExit = () => {
+    navigate('/studies');
   };
 
   if (loading) {
@@ -155,7 +151,7 @@ const StudySessionPage: React.FC = () => {
     );
   }
 
-  if (!study) {
+  if (!study || !session) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
@@ -172,6 +168,19 @@ const StudySessionPage: React.FC = () => {
     );
   }
 
+  // If session has started, show the block-by-block experience
+  if (sessionStarted) {
+    return (
+      <StudyBlockSession
+        sessionId={session.id}
+        studyId={study._id}
+        onComplete={handleStudyComplete}
+        onExit={handleStudyExit}
+      />
+    );
+  }
+
+  // Show study introduction before starting
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -215,180 +224,53 @@ const StudySessionPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {!sessionStarted ? (
-              /* Study Introduction */
-              <Card>
-                <CardHeader>
-                  <h2 className="text-xl font-semibold">Welcome to the Study</h2>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-2">Study Description</h3>
-                    <p className="text-gray-600">{study.description}</p>
-                  </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Study Introduction */}
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <h2 className="text-2xl font-semibold text-gray-900">Welcome to the Study</h2>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <h3 className="font-medium text-gray-900 mb-2">Study Description</h3>
+              <p className="text-gray-600">{study.description}</p>
+            </div>
 
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-2">What to Expect</h3>
-                    <ul className="list-disc list-inside text-gray-600 space-y-1">
-                      <li>This study will take approximately {study.settings.duration} minutes</li>
-                      {study.settings.recordScreen && <li>Your screen will be recorded during the session</li>}
-                      {study.settings.recordAudio && <li>Audio will be recorded during the session</li>}
-                      <li>You can pause or stop the session at any time</li>
-                      <li>All data will be kept confidential and used for research purposes only</li>
-                    </ul>
-                  </div>
+            <div>
+              <h3 className="font-medium text-gray-900 mb-2">What to Expect</h3>
+              <ul className="list-disc list-inside text-gray-600 space-y-1">
+                <li>This study will take approximately {study.settings.duration} minutes</li>
+                {study.settings.recordScreen && <li>Your screen will be recorded during the session</li>}
+                {study.settings.recordAudio && <li>Audio will be recorded during the session</li>}
+                <li>You will be guided through different sections step by step</li>
+                <li>You can pause or stop the session at any time</li>
+                <li>All data will be kept confidential and used for research purposes only</li>
+              </ul>
+            </div>
 
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-2">Compensation</h3>
-                    <p className="text-gray-600">
-                      You will receive <span className="font-semibold text-green-600">${study.settings.compensation}</span> for completing this study.
-                    </p>
-                  </div>
+            <div>
+              <h3 className="font-medium text-gray-900 mb-2">Compensation</h3>
+              <p className="text-gray-600">
+                You will receive <span className="font-semibold text-green-600">${study.settings.compensation}</span> for completing this study.
+              </p>
+            </div>
 
-                  <div className="pt-4">
-                    <Button onClick={startSession} className="w-full">
-                      <Target className="w-4 h-4 mr-2" />
-                      Start Study Session
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              /* Active Session */
-              <div className="space-y-6">
-                {/* Current Task */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold">
-                        Task {currentTaskIndex + 1} of {study.tasks.length || 1}
-                      </h2>
-                      <div className="text-sm text-gray-500">
-                        Session: {session?.id.slice(-8)}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {study.tasks.length > 0 ? (
-                      <div>
-                        <h3 className="font-medium text-gray-900 mb-2">
-                          {study.tasks[currentTaskIndex]?.title || `Task ${currentTaskIndex + 1}`}
-                        </h3>
-                        <p className="text-gray-600 mb-4">
-                          {study.tasks[currentTaskIndex]?.description || 'Please complete the assigned task.'}
-                        </p>
-                        <Button onClick={nextTask}>
-                          {currentTaskIndex < study.tasks.length - 1 ? 'Next Task' : 'Complete Study'}
-                        </Button>
-                      </div>
-                    ) : (
-                      <div>
-                        <h3 className="font-medium text-gray-900 mb-2">General Study Task</h3>
-                        <p className="text-gray-600 mb-4">
-                          Please interact with the system as instructed by the researcher.
-                        </p>
-                        <Button onClick={completeSession}>
-                          Complete Study
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2">New Block-by-Block Experience</h4>
+              <p className="text-blue-800 text-sm">
+                This study uses our new guided experience where you'll work through different sections one at a time. 
+                Each section is designed to collect specific feedback to help improve the product.
+              </p>
+            </div>
 
-                {/* Screen Recording Component */}
-                {study.settings.recordScreen && session && (
-                  <Card>
-                    <CardHeader>
-                      <h3 className="text-lg font-semibold">Screen Recording</h3>
-                    </CardHeader>
-                    <CardContent>
-                      <ScreenRecorder
-                        sessionId={session.id}
-                        onRecordingStart={() => toast.success('Recording started')}
-                        onRecordingStop={() => toast.success('Recording stopped')}
-                        onError={(error) => toast.error(`Recording error: ${error}`)}
-                      />
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <h3 className="text-lg font-semibold">Study Information</h3>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex items-center text-sm text-gray-600 mb-1">
-                    <User className="w-4 h-4 mr-2" />
-                    Study Type
-                  </div>
-                  <p className="font-medium capitalize">{study.type}</p>
-                </div>
-
-                <div>
-                  <div className="flex items-center text-sm text-gray-600 mb-1">
-                    <Clock className="w-4 h-4 mr-2" />
-                    Duration
-                  </div>
-                  <p className="font-medium">{study.settings.duration} minutes</p>
-                </div>
-
-                <div>
-                  <div className="flex items-center text-sm text-gray-600 mb-1">
-                    <Target className="w-4 h-4 mr-2" />
-                    Status
-                  </div>
-                  <p className="font-medium capitalize">{sessionStarted ? 'Active' : 'Ready to Start'}</p>
-                </div>
-
-                {sessionStarted && session && (
-                  <div>
-                    <div className="flex items-center text-sm text-gray-600 mb-1">
-                      <Monitor className="w-4 h-4 mr-2" />
-                      Session ID
-                    </div>
-                    <p className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                      {session.id}
-                    </p>
-                  </div>
-                )}
-
-                <div className="pt-4 border-t">
-                  <h4 className="font-medium text-gray-900 mb-2">Recording Settings</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Screen Recording:</span>
-                      <span className={study.settings.recordScreen ? 'text-green-600' : 'text-gray-400'}>
-                        {study.settings.recordScreen ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Audio Recording:</span>
-                      <span className={study.settings.recordAudio ? 'text-green-600' : 'text-gray-400'}>
-                        {study.settings.recordAudio ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Heatmaps:</span>
-                      <span className={study.settings.collectHeatmaps ? 'text-green-600' : 'text-gray-400'}>
-                        {study.settings.collectHeatmaps ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+            <div className="pt-4">
+              <Button onClick={startSession} className="w-full text-lg py-3">
+                <Target className="w-5 h-5 mr-2" />
+                Start Study Session
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Delete Study Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #005a87;
+        }
+        .button.danger {
+            background: #dc3545;
+        }
+        .button.danger:hover {
+            background: #c82333;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .study-item {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Test Delete Study Functionality</h1>
+        <p>Test the newly implemented DELETE method for studies</p>
+
+        <div class="test-section">
+            <h3>Step 1: Login as Researcher</h3>
+            <button class="button" onclick="login()">Login as Researcher</button>
+            <div id="loginResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 2: Create a Test Study (to delete)</h3>
+            <button class="button" onclick="createTestStudy()">Create Test Study</button>
+            <div id="createResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 3: List All Studies</h3>
+            <button class="button" onclick="listStudies()">List Studies</button>
+            <div id="studiesResult" class="result"></div>
+            <div id="studiesList"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 4: Delete Study</h3>
+            <p>Select a study from the list above to delete:</p>
+            <input type="text" id="studyIdInput" placeholder="Enter study ID to delete" style="width: 300px; padding: 5px;">
+            <button class="button danger" onclick="deleteStudy()">Delete Study</button>
+            <div id="deleteResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+
+        async function login() {
+            const loginData = {
+                email: 'abwanwr77+researcher@gmail.com',
+                password: 'Testtest123'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+                document.getElementById('loginResult').innerHTML = JSON.stringify(result, null, 2);
+                
+                if (result.success && result.token) {
+                    authToken = result.token;
+                    document.getElementById('loginResult').className = 'result success';
+                } else {
+                    document.getElementById('loginResult').className = 'result error';
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = `Error: ${error.message}`;
+                document.getElementById('loginResult').className = 'result error';
+            }
+        }
+
+        async function createTestStudy() {
+            if (!authToken) {
+                document.getElementById('createResult').innerHTML = 'Please login first';
+                document.getElementById('createResult').className = 'result error';
+                return;
+            }
+
+            const studyData = {
+                title: `Test Study for Deletion ${new Date().toISOString()}`,
+                description: 'This is a test study created specifically for testing the delete functionality',
+                type: 'usability',
+                tasks: [],
+                settings: {
+                    maxParticipants: 5,
+                    duration: 15,
+                    compensation: 10,
+                    recording: { screen: true, audio: false, webcam: false }
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                document.getElementById('createResult').innerHTML = JSON.stringify(result, null, 2);
+                
+                if (result.success) {
+                    document.getElementById('createResult').className = 'result success';
+                    // Auto-populate the study ID for deletion
+                    if (result.study && result.study._id) {
+                        document.getElementById('studyIdInput').value = result.study._id;
+                    }
+                } else {
+                    document.getElementById('createResult').className = 'result error';
+                }
+            } catch (error) {
+                document.getElementById('createResult').innerHTML = `Error: ${error.message}`;
+                document.getElementById('createResult').className = 'result error';
+            }
+        }
+
+        async function listStudies() {
+            if (!authToken) {
+                document.getElementById('studiesResult').innerHTML = 'Please login first';
+                document.getElementById('studiesResult').className = 'result error';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+                document.getElementById('studiesResult').innerHTML = JSON.stringify(result, null, 2);
+                
+                if (result.success) {
+                    document.getElementById('studiesResult').className = 'result success';
+                    
+                    // Display studies in a more user-friendly format
+                    const studiesList = document.getElementById('studiesList');
+                    studiesList.innerHTML = '';
+                    
+                    if (result.studies && result.studies.length > 0) {
+                        result.studies.forEach(study => {
+                            const studyDiv = document.createElement('div');
+                            studyDiv.className = 'study-item';
+                            studyDiv.innerHTML = `
+                                <div>
+                                    <strong>${study.title}</strong> (${study.status})
+                                    <br>
+                                    <small>ID: ${study._id}</small>
+                                </div>
+                                <button class="button danger" onclick="deleteSpecificStudy('${study._id}')">
+                                    Delete This Study
+                                </button>
+                            `;
+                            studiesList.appendChild(studyDiv);
+                        });
+                    } else {
+                        studiesList.innerHTML = '<p>No studies found</p>';
+                    }
+                } else {
+                    document.getElementById('studiesResult').className = 'result error';
+                }
+            } catch (error) {
+                document.getElementById('studiesResult').innerHTML = `Error: ${error.message}`;
+                document.getElementById('studiesResult').className = 'result error';
+            }
+        }
+
+        async function deleteStudy() {
+            const studyId = document.getElementById('studyIdInput').value.trim();
+            if (!studyId) {
+                document.getElementById('deleteResult').innerHTML = 'Please enter a study ID';
+                document.getElementById('deleteResult').className = 'result error';
+                return;
+            }
+
+            await deleteSpecificStudy(studyId);
+        }
+
+        async function deleteSpecificStudy(studyId) {
+            if (!authToken) {
+                document.getElementById('deleteResult').innerHTML = 'Please login first';
+                document.getElementById('deleteResult').className = 'result error';
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete study ${studyId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/studies/${studyId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+                document.getElementById('deleteResult').innerHTML = JSON.stringify(result, null, 2);
+                
+                if (result.success) {
+                    document.getElementById('deleteResult').className = 'result success';
+                    // Refresh the studies list
+                    setTimeout(() => {
+                        listStudies();
+                    }, 1000);
+                } else {
+                    document.getElementById('deleteResult').className = 'result error';
+                }
+            } catch (error) {
+                document.getElementById('deleteResult').innerHTML = `Error: ${error.message}`;
+                document.getElementById('deleteResult').className = 'result error';
+            }
+        }
+
+        // Auto-login on page load for faster testing
+        window.onload = function() {
+            login();
+        };
+    </script>
+</body>
+</html>

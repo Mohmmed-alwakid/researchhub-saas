@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Clock, DollarSign, Users, CheckCircle, AlertCircle } from 'lucide-react';
 import { participantApplicationsService } from '../../services/participantApplications.service';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
@@ -567,9 +567,12 @@ const StudyApplicationPage: React.FC = () => {
                       {/* Action Button */}
                       {existingApplication.status === 'approved' && (
                         <div className="mt-6 pt-4 border-t">
-                          <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                            View Study Instructions
-                          </button>
+                          <Link 
+                            to={`/app/studies/${studyId}/session`}
+                            className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors inline-block text-center"
+                          >
+                            Start Study Session
+                          </Link>
                         </div>
                       )}
                       

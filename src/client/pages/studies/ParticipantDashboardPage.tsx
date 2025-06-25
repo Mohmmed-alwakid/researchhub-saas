@@ -82,6 +82,9 @@ const ParticipantDashboardPage: React.FC = () => {
       const response = await participantApplicationsService.getMyApplications(filters);
       if (response.success) {
         const apps = response.data.applications as unknown as EnhancedApplication[];
+        console.log('🐛 Debug - Received applications data:', apps);
+        console.log('🐛 Debug - First application structure:', apps[0]);
+        console.log('🐛 Debug - First application study structure:', apps[0]?.study);
         setApplications(apps);
         setCurrentPage(response.data.pagination.current);
         setTotalPages(response.data.pagination.pages);
@@ -89,7 +92,9 @@ const ParticipantDashboardPage: React.FC = () => {
         // Calculate stats
         const newStats = apps.reduce((acc, app) => {
           acc.total = response.data.pagination.total;
-          acc[app.status as keyof ApplicationStats]++;
+          // Map accepted status to approved for display
+          const displayStatus = app.status === 'accepted' ? 'approved' : app.status;
+          acc[displayStatus as keyof ApplicationStats]++;
           return acc;
         }, { total: 0, pending: 0, approved: 0, rejected: 0, withdrawn: 0 });
 
@@ -134,6 +139,7 @@ const ParticipantDashboardPage: React.FC = () => {
       case 'pending':
         return <Clock className="w-4 h-4 text-yellow-600" />;
       case 'approved':
+      case 'accepted': // Handle both approved and accepted status
         return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'rejected':
         return <XCircle className="w-4 h-4 text-red-600" />;
@@ -149,6 +155,7 @@ const ParticipantDashboardPage: React.FC = () => {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'approved':
+      case 'accepted': // Handle both approved and accepted status
         return 'bg-green-100 text-green-800 border-green-200';
       case 'rejected':
         return 'bg-red-100 text-red-800 border-red-200';
@@ -159,10 +166,22 @@ const ParticipantDashboardPage: React.FC = () => {
     }
   };
 
-  const filteredApplications = applications.filter(app =>
-    app.studyId.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    app.studyId.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredApplications = applications.filter(app => {
+    // Handle both study and studyId structures for compatibility
+    const study = (app as any).study || (app as any).studyId;
+    if (!study) return false;
+    
+    const title = study.title || '';
+    const description = study.description || '';
+    
+    return title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           description.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  // Helper function to get study data from application (handles both study and studyId properties)
+  const getStudyFromApplication = (app: any) => {
+    return app.study || app.studyId;
+  };
   useEffect(() => {
     fetchApplications();
   }, [statusFilter, fetchApplications]);
@@ -346,18 +365,18 @@ const ParticipantDashboardPage: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-3">
                         <h3 className="text-lg font-semibold text-gray-900">
-                          {application.studyId.title}
+                          {getStudyFromApplication(application)?.title || 'Unknown Study'}
                         </h3>
                         <Badge className={getStatusColor(application.status)}>
                           <div className="flex items-center space-x-1">
                             {getStatusIcon(application.status)}
-                            <span className="capitalize">{application.status}</span>
+                            <span className="capitalize">{application.status === 'accepted' ? 'Approved' : application.status}</span>
                           </div>
                         </Badge>
                       </div>
 
                       <p className="text-gray-600 mb-4 line-clamp-2">
-                        {application.studyId.description}
+                        {getStudyFromApplication(application)?.description || 'No description available'}
                       </p>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
@@ -366,7 +385,7 @@ const ParticipantDashboardPage: React.FC = () => {
                           <div>
                             <p className="text-xs text-gray-500">Duration</p>
                             <p className="text-sm font-medium">
-                              {application.studyId.configuration.duration} minutes
+                              {getStudyFromApplication(application)?.configuration?.duration || 30} minutes
                             </p>
                           </div>
                         </div>
@@ -376,7 +395,7 @@ const ParticipantDashboardPage: React.FC = () => {
                           <div>
                             <p className="text-xs text-gray-500">Compensation</p>
                             <p className="text-sm font-medium">
-                              ${application.studyId.configuration.compensation}
+                              ${getStudyFromApplication(application)?.configuration?.compensation || 0}
                             </p>
                           </div>
                         </div>
@@ -386,7 +405,7 @@ const ParticipantDashboardPage: React.FC = () => {
                           <div>
                             <p className="text-xs text-gray-500">Type</p>
                             <p className="text-sm font-medium capitalize">
-                              {application.studyId.type.replace('-', ' ')}
+                              {getStudyFromApplication(application)?.type?.replace('-', ' ') || 'Usability Study'}
                             </p>
                           </div>
                         </div>
@@ -422,6 +441,17 @@ const ParticipantDashboardPage: React.FC = () => {
 
                     {/* Actions */}
                     <div className="flex items-center space-x-2 ml-4">
+                      {(application.status === 'approved' || application.status === 'accepted') && (
+                        <Link to={`/app/studies/${getStudyFromApplication(application)?._id || getStudyFromApplication(application)?.id}/session`}>
+                          <Button 
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Start Study
+                          </Button>
+                        </Link>
+                      )}
+                      
                       {application.status === 'pending' && (
                         <Button
                           onClick={() => handleWithdrawApplication(application._id)}
@@ -438,7 +468,7 @@ const ParticipantDashboardPage: React.FC = () => {
                         </Button>
                       )}
                       
-                      <Link to={`/app/study-discovery/${application.studyId._id}`}>
+                      <Link to={`/app/study-discovery/${getStudyFromApplication(application)?._id || getStudyFromApplication(application)?.id}`}>
                         <Button variant="outline" size="sm">
                           <Eye className="w-4 h-4" />
                         </Button>

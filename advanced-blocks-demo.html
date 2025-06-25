@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Study Blocks Test - ResearchHub</title>
+    <script src="https://unpkg.com/react@19/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@19/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@12/dist/framer-motion.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .shadow-soft {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .shadow-medium {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion, AnimatePresence } = window.FramerMotion;
+
+        // Analytics Tracker
+        const analyticsTracker = {
+            track: (event, data) => {
+                console.log('📊 Analytics:', event, data);
+            }
+        };
+
+        // Animation variants
+        const blockAnimations = {
+            enter: {
+                opacity: 0,
+                y: 20,
+                scale: 0.95,
+                transition: {
+                    duration: 0.3,
+                    ease: "easeOut"
+                }
+            },
+            center: {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: {
+                    duration: 0.3,
+                    ease: "easeOut"
+                }
+            },
+            exit: {
+                opacity: 0,
+                y: -20,
+                scale: 0.95,
+                transition: {
+                    duration: 0.2,
+                    ease: "easeIn"
+                }
+            }
+        };
+
+        // Conditional Branch Block
+        const ConditionalBranchBlock = ({ block, onNext }) => {
+            const [loading, setLoading] = useState(true);
+            const [nextBlockId, setNextBlockId] = useState(null);
+
+            useEffect(() => {
+                // Simulate condition evaluation
+                setTimeout(() => {
+                    setNextBlockId('next_block_demo');
+                    setLoading(false);
+                    
+                    // Auto-proceed after showing result
+                    setTimeout(() => {
+                        onNext({ branchTarget: 'next_block_demo' });
+                    }, 2000);
+                }, 1500);
+            }, []);
+
+            return (
+                <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow-soft p-8 w-full max-w-2xl mx-auto"
+                    initial="enter"
+                    animate="center"
+                    variants={blockAnimations}
+                >
+                    <div className="text-center">
+                        <div className="flex justify-center mb-6">
+                            <div className="relative">
+                                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${loading ? 'bg-blue-100' : 'bg-green-100'}`}>
+                                    {loading ? (
+                                        <motion.div
+                                            className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full"
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                        />
+                                    ) : (
+                                        <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                            {loading ? 'Personalizing Your Experience...' : 'Ready to Continue'}
+                        </h2>
+
+                        <p className="text-gray-600 mb-6">
+                            {loading ? 
+                                'We\'re customizing the next part of the study based on your responses.' :
+                                'Your personalized study path has been prepared.'
+                            }
+                        </p>
+
+                        {!loading && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p className="text-blue-800 text-sm">
+                                    Next: {nextBlockId}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            );
+        };
+
+        // Card Sort Block Demo
+        const CardSortBlock = ({ block, onNext }) => {
+            const [items] = useState([
+                { id: 'guest_checkout', name: 'Guest Checkout', description: 'Buy without creating account' },
+                { id: 'saved_payment', name: 'Saved Payment Methods', description: 'Store cards for future use' },
+                { id: 'order_tracking', name: 'Order Tracking', description: 'Track your package' },
+                { id: 'quick_shipping', name: 'Express Shipping', description: 'Fast delivery options' }
+            ]);
+            
+            const [categories] = useState([
+                { id: 'essential', name: 'Essential' },
+                { id: 'nice_to_have', name: 'Nice to Have' },
+                { id: 'not_important', name: 'Not Important' }
+            ]);
+            
+            const [sortedItems, setSortedItems] = useState({});
+            const [draggedItem, setDraggedItem] = useState(null);
+
+            const handleDragStart = (e, item) => {
+                setDraggedItem(item);
+                analyticsTracker.track('card_drag_start', { itemId: item.id });
+            };
+
+            const handleDragOver = (e) => {
+                e.preventDefault();
+            };
+
+            const handleDrop = (e, categoryId) => {
+                e.preventDefault();
+                if (draggedItem) {
+                    const newSortedItems = { ...sortedItems };
+                    
+                    // Remove from previous category
+                    Object.keys(newSortedItems).forEach(catId => {
+                        newSortedItems[catId] = newSortedItems[catId]?.filter(item => item.id !== draggedItem.id) || [];
+                    });
+                    
+                    // Add to new category
+                    if (!newSortedItems[categoryId]) {
+                        newSortedItems[categoryId] = [];
+                    }
+                    newSortedItems[categoryId].push(draggedItem);
+                    
+                    setSortedItems(newSortedItems);
+                    setDraggedItem(null);
+                    analyticsTracker.track('card_dropped', { itemId: draggedItem.id, categoryId });
+                }
+            };
+
+            const handleSubmit = () => {
+                onNext({ cardSort: sortedItems });
+            };
+
+            const unsortedItems = items.filter(item => 
+                !Object.values(sortedItems).flat().some(sorted => sorted.id === item.id)
+            );
+
+            const allItemsSorted = unsortedItems.length === 0;
+
+            return (
+                <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow-soft p-8 w-full max-w-6xl mx-auto"
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">Feature Prioritization</h2>
+                        <p className="text-gray-600 mb-4">Drag and drop features into categories based on importance</p>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <p className="text-blue-800">Sort these checkout features by importance</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        {/* Unsorted Items */}
+                        <div className="lg:col-span-1">
+                            <h3 className="font-semibold text-gray-900 mb-4">Items to Sort</h3>
+                            <div className="space-y-2 min-h-[200px] p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                {unsortedItems.map(item => (
+                                    <motion.div
+                                        key={item.id}
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, item)}
+                                        className="p-3 bg-white border border-gray-200 rounded-lg cursor-move hover:shadow-md transition-shadow"
+                                        whileHover={{ scale: 1.02 }}
+                                        whileDrag={{ scale: 1.05, zIndex: 1000 }}
+                                    >
+                                        <div className="flex items-center">
+                                            <svg className="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                            </svg>
+                                            <span className="text-sm font-medium">{item.name}</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">{item.description}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Categories */}
+                        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {categories.map(category => (
+                                <div
+                                    key={category.id}
+                                    onDragOver={handleDragOver}
+                                    onDrop={(e) => handleDrop(e, category.id)}
+                                    className="min-h-[300px] p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-blue-400 transition-colors"
+                                >
+                                    <h3 className="font-semibold text-gray-900 mb-4">{category.name}</h3>
+                                    <div className="space-y-2">
+                                        {(sortedItems[category.id] || []).map(item => (
+                                            <motion.div
+                                                key={item.id}
+                                                className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                            >
+                                                <div className="text-sm font-medium">{item.name}</div>
+                                                <p className="text-xs text-gray-500 mt-1">{item.description}</p>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="mt-8 flex justify-between items-center">
+                        <div className="text-sm text-gray-600">
+                            {unsortedItems.length} items remaining
+                        </div>
+                        
+                        <motion.button
+                            onClick={handleSubmit}
+                            disabled={!allItemsSorted}
+                            className={`px-8 py-3 rounded-xl font-medium transition-all ${
+                                allItemsSorted 
+                                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                            whileHover={{ scale: allItemsSorted ? 1.02 : 1 }}
+                            whileTap={{ scale: allItemsSorted ? 0.98 : 1 }}
+                        >
+                            Complete Sort
+                        </motion.button>
+                    </div>
+                </motion.div>
+            );
+        };
+
+        // Main App
+        const App = () => {
+            const [currentBlock, setCurrentBlock] = useState(0);
+            const [completedBlocks, setCompletedBlocks] = useState([]);
+
+            const blocks = [
+                {
+                    id: 'demo_conditional',
+                    type: 'conditional_branch',
+                    title: 'Conditional Branch Demo',
+                    description: 'Demonstrates intelligent routing'
+                },
+                {
+                    id: 'demo_card_sort',
+                    type: 'card_sort',
+                    title: 'Card Sort Demo',
+                    description: 'Interactive feature prioritization'
+                }
+            ];
+
+            const handleNext = (response) => {
+                console.log('Block completed:', response);
+                setCompletedBlocks(prev => [...prev, blocks[currentBlock].id]);
+                
+                if (currentBlock < blocks.length - 1) {
+                    setCurrentBlock(currentBlock + 1);
+                } else {
+                    alert('Demo completed!');
+                }
+            };
+
+            const renderBlock = () => {
+                const block = blocks[currentBlock];
+                
+                switch (block.type) {
+                    case 'conditional_branch':
+                        return <ConditionalBranchBlock block={block} onNext={handleNext} />;
+                    case 'card_sort':
+                        return <CardSortBlock block={block} onNext={handleNext} />;
+                    default:
+                        return <div>Unknown block type</div>;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50 py-8">
+                    <div className="max-w-6xl mx-auto px-4">
+                        <div className="text-center mb-8">
+                            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                                Advanced Study Blocks Demo
+                            </h1>
+                            <p className="text-gray-600">
+                                Testing conditional logic, animations, and card sorting
+                            </p>
+                            <div className="mt-4 bg-white rounded-lg shadow-soft p-4 inline-block">
+                                <div className="text-sm text-gray-600">
+                                    Block {currentBlock + 1} of {blocks.length} | 
+                                    Completed: {completedBlocks.length}
+                                </div>
+                                <div className="w-64 bg-gray-200 rounded-full h-2 mt-2">
+                                    <div 
+                                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                                        style={{ width: `${((currentBlock + 1) / blocks.length) * 100}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <AnimatePresence mode="wait">
+                            <div key={currentBlock}>
+                                {renderBlock()}
+                            </div>
+                        </AnimatePresence>
+
+                        <div className="mt-8 text-center">
+                            <div className="bg-white rounded-lg shadow-soft p-4 inline-block">
+                                <h3 className="font-semibold text-gray-900 mb-2">Features Demonstrated:</h3>
+                                <div className="text-sm text-gray-600 space-y-1">
+                                    <div>✅ Conditional branching with loading states</div>
+                                    <div>✅ Smooth animations with Framer Motion</div>
+                                    <div>✅ Interactive drag-and-drop card sorting</div>
+                                    <div>✅ Analytics tracking and timing data</div>
+                                    <div>✅ Responsive design and visual feedback</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

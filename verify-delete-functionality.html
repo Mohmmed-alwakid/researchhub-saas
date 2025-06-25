@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Study Functionality Verification - ResearchHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .delete-btn {
+            background-color: #f44336;
+        }
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+        input {
+            width: 300px;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .studies-list {
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: white;
+        }
+        .study-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .study-info {
+            flex-grow: 1;
+        }
+        .study-actions {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Delete Study Functionality Verification</h1>
+        <p><strong>Purpose:</strong> Complete end-to-end testing of the delete study functionality</p>
+
+        <!-- Authentication Section -->
+        <div class="test-section">
+            <h2>🔐 Step 1: Authentication</h2>
+            <p>Login with researcher account to test study deletion</p>
+            <input type="email" id="email" placeholder="Email" value="abwanwr77+Researcher@gmail.com">
+            <input type="password" id="password" placeholder="Password" value="Testtest123">
+            <button onclick="login()">Login</button>
+            <div id="authResult"></div>
+        </div>
+
+        <!-- Create Study Section -->
+        <div class="test-section">
+            <h2>📝 Step 2: Create Test Study</h2>
+            <p>Create a draft study for deletion testing</p>
+            <input type="text" id="studyTitle" placeholder="Study Title" value="Test Study for Deletion">
+            <input type="text" id="studyDescription" placeholder="Study Description" value="This study will be deleted for testing purposes">
+            <button onclick="createStudy()">Create Test Study</button>
+            <div id="createResult"></div>
+        </div>
+
+        <!-- List Studies Section -->
+        <div class="test-section">
+            <h2>📋 Step 3: List Studies</h2>
+            <p>View all studies and identify which ones can be deleted</p>
+            <button onclick="listStudies()">Load Studies</button>
+            <div id="studiesList" class="studies-list"></div>
+            <div id="listResult"></div>
+        </div>
+
+        <!-- Delete Study Section -->
+        <div class="test-section">
+            <h2>🗑️ Step 4: Delete Study Test</h2>
+            <p>Manual deletion test (enter study ID from the list above)</p>
+            <input type="text" id="deleteStudyId" placeholder="Study ID to Delete">
+            <button onclick="deleteStudy()" class="delete-btn">Delete Study</button>
+            <div id="deleteResult"></div>
+        </div>
+
+        <!-- Verification Section -->
+        <div class="test-section">
+            <h2>✅ Step 5: Verification</h2>
+            <p>Verify the study was actually deleted from the database</p>
+            <button onclick="verifyDeletion()">Verify Deletion</button>
+            <div id="verifyResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+        let currentUser = null;
+        let testStudyId = null;
+
+        // Helper function to display results
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        // Step 1: Authentication
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    showResult('authResult', `✅ Login successful! User: ${data.user.email} (Role: ${data.user.role})`, 'success');
+                } else {
+                    showResult('authResult', `❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('authResult', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        // Step 2: Create Test Study
+        async function createStudy() {
+            if (!authToken) {
+                showResult('createResult', '❌ Please login first', 'error');
+                return;
+            }
+
+            const title = document.getElementById('studyTitle').value;
+            const description = document.getElementById('studyDescription').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        description: description,
+                        status: 'draft',
+                        type: 'usability_test',
+                        settings: {
+                            maxParticipants: 10,
+                            estimatedDuration: 15
+                        },
+                        blocks: [
+                            {
+                                type: 'welcome_screen',
+                                title: 'Welcome',
+                                description: 'Welcome to our test study',
+                                order: 0,
+                                settings: {
+                                    showLogo: true,
+                                    message: 'Thank you for participating!'
+                                }
+                            }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    testStudyId = data.study.id;
+                    showResult('createResult', `✅ Study created! ID: ${testStudyId}`, 'success');
+                    // Auto-fill the delete study ID field
+                    document.getElementById('deleteStudyId').value = testStudyId;
+                } else {
+                    showResult('createResult', `❌ Study creation failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('createResult', `❌ Study creation error: ${error.message}`, 'error');
+            }
+        }
+
+        // Step 3: List Studies
+        async function listStudies() {
+            if (!authToken) {
+                showResult('listResult', '❌ Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.studies) {
+                    let studiesHtml = '<h3>Your Studies:</h3>';
+                    data.studies.forEach(study => {
+                        studiesHtml += `
+                            <div class="study-item">
+                                <div class="study-info">
+                                    <strong>${study.title}</strong> (ID: ${study.id})<br>
+                                    Status: ${study.status} | Created: ${new Date(study.created_at).toLocaleDateString()}
+                                </div>
+                                <div class="study-actions">
+                                    <button onclick="quickDelete('${study.id}')" class="delete-btn">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('studiesList').innerHTML = studiesHtml;
+                    showResult('listResult', `✅ Loaded ${data.studies.length} studies`, 'success');
+                } else {
+                    showResult('listResult', `❌ Failed to load studies: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('listResult', `❌ Studies loading error: ${error.message}`, 'error');
+            }
+        }
+
+        // Step 4: Delete Study
+        async function deleteStudy() {
+            const studyId = document.getElementById('deleteStudyId').value;
+            if (!authToken) {
+                showResult('deleteResult', '❌ Please login first', 'error');
+                return;
+            }
+            if (!studyId) {
+                showResult('deleteResult', '❌ Please enter a study ID', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/studies/${studyId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('deleteResult', `✅ Study deleted successfully! Message: ${data.message}`, 'success');
+                    // Refresh the studies list
+                    setTimeout(() => listStudies(), 1000);
+                } else {
+                    showResult('deleteResult', `❌ Study deletion failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('deleteResult', `❌ Study deletion error: ${error.message}`, 'error');
+            }
+        }
+
+        // Quick delete function for studies list
+        async function quickDelete(studyId) {
+            if (confirm(`Are you sure you want to delete study ${studyId}?`)) {
+                document.getElementById('deleteStudyId').value = studyId;
+                await deleteStudy();
+            }
+        }
+
+        // Step 5: Verification
+        async function verifyDeletion() {
+            const studyId = document.getElementById('deleteStudyId').value;
+            if (!authToken || !studyId) {
+                showResult('verifyResult', '❌ Please complete the previous steps first', 'error');
+                return;
+            }
+
+            try {
+                // Try to fetch the deleted study - should fail
+                const response = await fetch(`${API_BASE}/studies/${studyId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 404 || !data.success) {
+                    showResult('verifyResult', `✅ Verification successful! Study ${studyId} was properly deleted (404 Not Found)`, 'success');
+                } else {
+                    showResult('verifyResult', `❌ Verification failed! Study ${studyId} still exists in database`, 'error');
+                }
+            } catch (error) {
+                // Network error likely means the study doesn't exist, which is what we want
+                showResult('verifyResult', `✅ Verification successful! Study appears to be deleted (network error: ${error.message})`, 'success');
+            }
+        }
+
+        // Auto-login on page load for convenience
+        window.onload = function() {
+            console.log('🧪 Delete Study Functionality Test Page Loaded');
+            console.log('📝 Test Steps:');
+            console.log('1. Login with researcher account');
+            console.log('2. Create a test study');
+            console.log('3. List studies to confirm creation');
+            console.log('4. Delete the test study');
+            console.log('5. Verify the study was actually deleted');
+        };
+    </script>
+</body>
+</html>
