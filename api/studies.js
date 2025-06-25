@@ -1,8 +1,16 @@
 /**
- * Studies API Endpoint - ResearchHub SaaS Platform
+ * Studies API Endpoint - ResearchHub SaaS Platform (Enhanced with Study Builder)
  * 
  * Handles all study-related operations with secure authentication and RLS
- * Supports: GET (list/single), POST (create), PUT (update)
+ * Supports: GET (list/single), POST (create), PUT (update), study builder actions
+ * 
+ * Endpoints:
+ * - GET /api/studies - List user's studies
+ * - GET /api/studies/:id - Get specific study  
+ * - POST /api/studies - Create new study
+ * - PUT /api/studies/:id - Update study
+ * - POST /api/studies?action=build - Study builder operations
+ * - GET /api/studies?action=templates - Get study templates
  * 
  * Security Features:
  * - JWT token authentication
@@ -10,7 +18,7 @@
  * - researcher_id filtering for data isolation
  * - Comprehensive error handling and logging
  * 
- * Last Updated: June 21, 2025
+ * Last Updated: June 25, 2025 (Enhanced with study-builder.js functionality)
  * Status: Production Ready ✅
  */
 import { createClient } from '@supabase/supabase-js';
@@ -92,6 +100,18 @@ export default async function handler(req, res) {
       
       console.log(`${req.method} request URL:`, req.url);
       console.log('Extracted study ID:', studyId);    }
+    
+    // Handle special actions (study builder and templates)
+    const url = new URL(req.url, `http://localhost:3003`);
+    const action = url.searchParams.get('action');
+    
+    if (action === 'build') {
+      return await handleStudyBuilderActions(req, res, supabase, currentUser);
+    }
+    
+    if (action === 'templates') {
+      return await handleStudyTemplates(req, res, supabase);
+    }
     
     if (req.method === 'GET') {
       // Check if we're getting a specific study by ID
@@ -503,4 +523,184 @@ export default async function handler(req, res) {
       message: error.message
     });
   }
+}
+
+// Study Builder Actions Handler
+async function handleStudyBuilderActions(req, res, supabase, currentUser) {
+  if (!currentUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+
+  if (req.method === 'POST') {
+    const { studyData, blocks } = req.body;
+    
+    if (!studyData || !studyData.title) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Study title is required' 
+      });
+    }
+
+    try {
+      // Create the study
+      const { data: study, error: studyError } = await supabase
+        .from('studies')
+        .insert({
+          title: studyData.title,
+          description: studyData.description || '',
+          type: studyData.type || 'usability',
+          status: 'draft',
+          researcher_id: currentUser.id,
+          settings: studyData.settings || {},
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (studyError) {
+        console.error('Error creating study:', studyError);
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Failed to create study' 
+        });
+      }
+
+      // Create the blocks if provided
+      if (blocks && blocks.length > 0) {
+        const blocksToInsert = blocks.map((block, index) => ({
+          study_id: study.id,
+          block_type: block.type,
+          title: block.title || '',
+          description: block.description || '',
+          settings: block.settings || {},
+          order_index: index,
+          created_at: new Date().toISOString()
+        }));
+
+        const { error: blocksError } = await supabase
+          .from('study_blocks')
+          .insert(blocksToInsert);
+
+        if (blocksError) {
+          console.error('Error creating blocks:', blocksError);
+          // Don't fail the whole operation, just log the error
+        }
+      }
+
+      return res.status(201).json({
+        success: true,
+        data: study
+      });
+    } catch (error) {
+      console.error('Study builder error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to create study' 
+      });
+    }
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// Study Templates Handler
+async function handleStudyTemplates(req, res, supabase) {
+  if (req.method === 'GET') {
+    // Return predefined study templates
+    const templates = [
+      {
+        id: 'usability-basic',
+        name: 'Basic Usability Test',
+        description: 'Simple usability testing with tasks and feedback',
+        type: 'usability',
+        blocks: [
+          {
+            type: 'welcome_screen',
+            title: 'Welcome',
+            settings: {
+              title: 'Welcome to our usability test',
+              description: 'Thank you for participating in our study.',
+              showProgressBar: true
+            }
+          },
+          {
+            type: 'open_question',
+            title: 'First Impressions',
+            settings: {
+              question: 'What are your first impressions of this interface?',
+              required: true
+            }
+          },
+          {
+            type: 'opinion_scale',
+            title: 'Ease of Use',
+            settings: {
+              question: 'How easy was it to complete the task?',
+              scaleType: 'numerical',
+              minValue: 1,
+              maxValue: 5,
+              minLabel: 'Very Difficult',
+              maxLabel: 'Very Easy'
+            }
+          },
+          {
+            type: 'thank_you',
+            title: 'Thank You',
+            settings: {
+              title: 'Thank you for your participation!',
+              description: 'Your feedback is valuable to us.'
+            }
+          }
+        ]
+      },
+      {
+        id: 'feedback-survey',
+        name: 'Feedback Survey',
+        description: 'Collect user feedback and satisfaction ratings',
+        type: 'survey',
+        blocks: [
+          {
+            type: 'welcome_screen',
+            title: 'Welcome',
+            settings: {
+              title: 'Feedback Survey',
+              description: 'Help us improve by sharing your feedback.'
+            }
+          },
+          {
+            type: 'opinion_scale',
+            title: 'Overall Satisfaction',
+            settings: {
+              question: 'How satisfied are you with the product?',
+              scaleType: 'stars',
+              maxValue: 5
+            }
+          },
+          {
+            type: 'open_question',
+            title: 'Suggestions',
+            settings: {
+              question: 'What suggestions do you have for improvement?',
+              placeholder: 'Please share your thoughts...'
+            }
+          },
+          {
+            type: 'thank_you',
+            title: 'Thank You',
+            settings: {
+              title: 'Thank you for your feedback!',
+              description: 'We appreciate your time and input.'
+            }
+          }
+        ]
+      }
+    ];
+
+    return res.status(200).json({
+      success: true,
+      data: templates
+    });
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
 }
