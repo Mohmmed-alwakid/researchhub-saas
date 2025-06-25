@@ -18,7 +18,8 @@ import {
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
 import { IStudy } from '../../../shared/types';
-import { SmartTemplateGallery, StudyTemplate } from '../../components/studies/SmartTemplateGallery';
+import { MazeInspiredStudyCreationModal } from '../../components/studies/MazeInspiredStudyCreationModal';
+import type { StudyTemplate as StudyTemplateType } from '../../../shared/types/index';
 
 const StudiesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,32 +35,37 @@ const StudiesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [showMazeModal, setShowMazeModal] = useState(false);
 
   useEffect(() => {
     fetchStudies();
   }, [fetchStudies]);
 
-  // Handle template selection from SmartTemplateGallery
-  const handleTemplateSelect = (template: StudyTemplate) => {
-    // Navigate to study builder with template data
-    navigate('/app/studies/new', { 
+  // Handle study creation flow (same as dashboard)
+  const handleCreateNewStudy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowMazeModal(true);
+  };
+
+  // Handlers for Maze-inspired modal (same as dashboard)
+  const handleMazeTemplateSelect = (template: StudyTemplateType) => {
+    navigate('/app/studies/template-preview', { 
       state: { 
-        template: {
-          name: template.name,
-          type: template.category,
-          description: template.purpose,
-          estimatedDuration: template.estimatedDuration,
-          participantCount: template.participantCount.recommended,
-          tasks: template.preBuiltTasks
-        }
+        template
       } 
     });
   };
 
-  // Handle creating study from scratch
-  const handleCreateFromScratch = () => {
-    navigate('/app/studies/new');
-  };const filteredStudies = (studies || []).filter(study => {
+  const handleMazeStartFromScratch = (studyType: string) => {
+    navigate('/app/studies/create', { 
+      state: { 
+        studyType,
+        skipTemplates: true 
+      } 
+    });
+  };
+
+  const filteredStudies = (studies || []).filter(study => {
     const matchesSearch = (study.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (study.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || study.status === statusFilter;
@@ -129,13 +135,13 @@ const StudiesPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Studies</h1>
           <p className="text-gray-600 mt-1">Manage your research studies and track progress</p>        </div>
-        <Link
-          to="/app/studies/new"
+        <button
+          onClick={handleCreateNewStudy}
           className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Study
-        </Link>
+        </button>
       </div>
 
       {/* Filters */}
@@ -200,11 +206,23 @@ const StudiesPage: React.FC = () => {
                 Try adjusting your filters to see more results
               </p>
             </div>          ) : (
-            // Show SmartTemplateGallery when no studies exist and no filters are applied
-            <SmartTemplateGallery 
-              onTemplateSelect={handleTemplateSelect}
-              onCreateFromScratch={handleCreateFromScratch}
-            />
+            // Show empty state when no studies exist
+            <div className="text-center py-12">
+              <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <Plus className="w-12 h-12 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No studies yet</h3>
+              <p className="text-gray-600 mb-6">
+                Get started by creating your first research study
+              </p>
+              <button
+                onClick={handleCreateNewStudy}
+                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Study
+              </button>
+            </div>
           )}
         </div>
       ) : (
@@ -305,6 +323,14 @@ const StudiesPage: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Maze-Inspired Study Creation Modal */}
+      <MazeInspiredStudyCreationModal 
+        isOpen={showMazeModal} 
+        onClose={() => setShowMazeModal(false)}
+        onSelectTemplate={handleMazeTemplateSelect}
+        onStartFromScratch={handleMazeStartFromScratch}
+      />
     </div>
   );
 };

@@ -48,6 +48,7 @@ import {
 import { BlockLibraryModal } from '../../components/studies/BlockLibraryModal';
 import { DragDropBlockList } from '../../components/studies/DragDropBlockList';
 import { BlockEditModal } from '../../components/studies/BlockEditModal';
+import { UsabilityStudyBuilder } from '../../components/studies/UsabilityStudyBuilder';
 
 // Helper functions for block management
 const getBlockDisplayName = (blockType: BlockType): string => {
@@ -163,9 +164,25 @@ const StudyBuilderPage: React.FC = () => {
   } | null>(null);
   const [validation, setValidation] = useState<ValidationError[]>([]);
 
+  // Success state for showing success message
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [createdStudyId, setCreatedStudyId] = useState<string | null>(null);
+
+  // Multi-step builder state
+  const [showUsabilityBuilder, setShowUsabilityBuilder] = useState(false);
+
   // Get template data and study type from navigation state
   const templateData = location.state?.template as StudyTemplate | undefined;
   const studyType = location.state?.studyType as string | undefined;
+
+  // Check URL parameters for study type
+  const urlParams = new URLSearchParams(location.search);
+  const urlStudyType = urlParams.get('type');
+
+  // Determine if this should show the multi-step usability builder
+  const isUsabilityStudy = studyType === 'usability' || 
+    urlStudyType === 'usability' ||
+    (!studyType && !urlStudyType && !templateData && !id); // Default for new studies without template or specific type
 
   // Form setup
   const {
@@ -319,7 +336,13 @@ const StudyBuilderPage: React.FC = () => {
   // Initialize study with "Thank You" block for "Start from Scratch" option
   useEffect(() => {
     if (!templateData && !id && studyBlocks.length === 0) {
-      // This means we're starting from scratch, add default "Thank you" block
+      // Check if we should show the multi-step builder for usability studies
+      if (isUsabilityStudy && !showUsabilityBuilder) {
+        setShowUsabilityBuilder(true);
+        return; // Don't add blocks yet, let the multi-step builder handle it
+      }
+      
+      // This means we're starting from scratch with regular builder, add default "Thank you" block
       const thankYouBlock: StudyBuilderBlock = {
         id: `block_${Date.now()}_thank_you`,
         template_id: 'thank_you',
@@ -339,7 +362,7 @@ const StudyBuilderPage: React.FC = () => {
       
       setStudyBlocks([thankYouBlock]);
     }
-  }, [templateData, id, studyBlocks.length]);
+  }, [templateData, id, studyBlocks.length, isUsabilityStudy, showUsabilityBuilder]);
 
   // Create default block function
   const createDefaultBlock = useCallback((blockType: BlockType): StudyBuilderBlock => {
@@ -467,6 +490,107 @@ const StudyBuilderPage: React.FC = () => {
     setStudyBlocks(convertedBlocks);
   }, []);
 
+  // Usability Study Builder handlers
+  const handleUsabilityBuilderComplete = useCallback((data: any) => {
+    // Convert usability study data to regular study form data
+    reset({
+      title: data.title,
+      description: data.description,
+      type: 'usability',
+      settings: {
+        maxParticipants: 10,
+        duration: data.schedulingDetails?.duration || 60,
+        compensation: 25,
+        recordScreen: true,
+        recordAudio: data.sessionType === 'moderated',
+        recordWebcam: data.sessionType === 'moderated',
+        collectHeatmaps: true,
+        trackClicks: true,
+        trackScrolls: true
+      }
+    });
+
+    // Create initial blocks based on the form data
+    const blocks: StudyBuilderBlock[] = [];
+    
+    // Add welcome block
+    blocks.push({
+      id: `block_${Date.now()}_welcome`,
+      template_id: 'welcome',
+      name: 'Welcome Screen',
+      description: 'Welcome participants to your study',
+      estimated_duration: 1,
+      order_index: 0,
+      type: 'welcome',
+      settings: { showContinueButton: true }
+    });
+
+    // Add screening questions if any
+    if (data.screeningQuestions && data.screeningQuestions.length > 0) {
+      data.screeningQuestions.forEach((question: any, index: number) => {
+        blocks.push({
+          id: `block_${Date.now()}_screening_${index}`,
+          template_id: 'screener',
+          name: `Screening Question ${index + 1}`,
+          description: question.question,
+          estimated_duration: 2,
+          order_index: blocks.length,
+          type: 'screener',
+          settings: {
+            question: question.question,
+            type: question.type,
+            options: question.options || [],
+            required: question.required
+          }
+        });
+      });
+    }
+
+    // Add a default task block for usability studies
+    blocks.push({
+      id: `block_${Date.now()}_task`,
+      template_id: 'prototype_test',
+      name: 'Usability Task',
+      description: 'Main usability testing task',
+      estimated_duration: 10,
+      order_index: blocks.length,
+      type: 'prototype_test',
+      settings: {
+        prototypeUrl: '',
+        tasks: [],
+        recordInteractions: true
+      }
+    });
+
+    // Add thank you block
+    blocks.push({
+      id: `block_${Date.now()}_thank_you`,
+      template_id: 'thank_you',
+      name: 'Thank You!',
+      description: 'Thank you for participating in our study. Your feedback is valuable to us.',
+      estimated_duration: 1,
+      order_index: blocks.length,
+      type: 'thank_you',
+      settings: {
+        message: 'Thank you for participating in our study. Your feedback is valuable to us.',
+        showCompletionTime: true,
+        redirectUrl: '',
+        customMessage: ''
+      }
+    });
+
+    setStudyBlocks(blocks);
+    setShowUsabilityBuilder(false);
+  }, [reset]);
+
+  const handleUsabilityBuilderCancel = useCallback(() => {
+    setShowUsabilityBuilder(false);
+    // If we cancelled and have no existing study, redirect back to studies page
+    if (!id) {
+      navigate('/studies');
+    }
+  }, [id, navigate]);
+
   // Study submission
   const onSubmit = async (data: StudyFormData) => {
     try {
@@ -491,6 +615,10 @@ const StudyBuilderPage: React.FC = () => {
           type: data.type as 'usability' | 'survey' | 'interview' | 'card-sorting' | 'a-b-testing'
         };
         await updateStudy(id, updateData);
+        
+        // Show success message for updates
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 5000);
       } else {
         const createData = {
           ...data,
@@ -501,10 +629,17 @@ const StudyBuilderPage: React.FC = () => {
                 data.type === 'a-b-testing' ? 'prototype' : 
                 (data.type as 'usability' | 'survey' | 'interview' | 'prototype')
         };
-        await createStudy(createData);
+        const newStudy = await createStudy(createData);
+        
+        // Show success message and stay on page
+        setCreatedStudyId(newStudy._id);
+        setIsEditing(true);
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 5000);
+        
+        // Update URL to show we're now editing this study
+        window.history.replaceState(null, '', `/app/studies/edit/${newStudy._id}`);
       }
-
-      navigate('/studies');
     } catch (error) {
       console.error('Error saving study:', error);
     } finally {
@@ -530,17 +665,85 @@ const StudyBuilderPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6">
-            {/* Header */}
-            <div className="border-b border-gray-200 pb-6">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                {isEditing ? 'Edit Study' : 'Create New Study'}
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Set up your research study with custom blocks
-              </p>
-            </div>
+        {/* Show Usability Builder for new usability studies */}
+        {showUsabilityBuilder && !id ? (
+          <UsabilityStudyBuilder
+            onComplete={handleUsabilityBuilderComplete}
+            onCancel={handleUsabilityBuilderCancel}
+          />
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6">
+              {/* Header */}
+              <div className="border-b border-gray-200 pb-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                      {isEditing ? 'Edit Study' : 'Create New Study'}
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Set up your research study with custom blocks
+                    </p>
+                  </div>
+                  
+                  {/* Toggle to Usability Builder for new studies */}
+                  {!id && isUsabilityStudy && (
+                    <button
+                      type="button"
+                      onClick={() => setShowUsabilityBuilder(true)}
+                      className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-200"
+                    >
+                      Switch to Guided Setup
+                    </button>
+                  )}
+                </div>
+              </div>
+
+            {/* Success Message */}
+            {showSuccessMessage && (
+              <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-green-800">
+                      {createdStudyId ? 'Study created successfully!' : 'Study updated successfully!'}
+                    </h3>
+                    <div className="mt-2 text-sm text-green-700">
+                      <p>
+                        {createdStudyId 
+                          ? 'Your study has been created and saved as a draft. You can continue editing or publish it when ready.'
+                          : 'Your changes have been saved successfully.'
+                        }
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex space-x-3">
+                        <button
+                          type="button"
+                          onClick={() => navigate('/studies')}
+                          className="bg-green-100 text-green-800 px-3 py-1 rounded-md text-sm font-medium hover:bg-green-200"
+                        >
+                          View All Studies
+                        </button>
+                        {createdStudyId && (
+                          <button
+                            type="button"
+                            onClick={() => setShowSuccessMessage(false)}
+                            className="bg-white text-green-800 px-3 py-1 rounded-md text-sm font-medium border border-green-200 hover:bg-green-50"
+                          >
+                            Continue Editing
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Study Details */}
             <div className="grid grid-cols-1 gap-6">
@@ -648,6 +851,7 @@ const StudyBuilderPage: React.FC = () => {
             </div>
           </form>
         </div>
+        )}
       </div>
 
       {/* Modals */}
