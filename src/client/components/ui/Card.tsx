@@ -8,8 +8,10 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', padding = 'md', children, ...props }, ref) => {
-    const baseStyles = 'bg-white rounded-2xl border border-gray-200/60 transition-all duration-300 ease-in-out';
+    // Base styles using design tokens approach
+    const baseStyles = 'bg-white rounded-2xl border border-neutral-200 transition-all duration-300 ease-in-out';
     
+    // Variant styles using consistent token naming
     const variants = {
       default: 'shadow-soft hover:shadow-medium',
       interactive: 'shadow-soft hover:shadow-medium hover:scale-[1.02] cursor-pointer hover:border-primary-200',
@@ -17,10 +19,11 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       elevated: 'shadow-medium hover:shadow-large',
     };
     
+    // Padding styles using spacing tokens
     const paddings = {
       none: '',
       sm: 'p-4',
-      md: 'p-6',
+      md: 'p-6', 
       lg: 'p-8',
       xl: 'p-10',
     };

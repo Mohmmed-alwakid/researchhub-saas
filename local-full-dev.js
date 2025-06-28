@@ -395,12 +395,11 @@ app.all('/api/studies*', async (req, res) => {
   await studiesHandler(req, res);
 });
 
-// Study Builder endpoints - import the actual handler
-import studyBuilderHandler from './api/study-builder.js';
-
+// Redirect study-builder endpoints to studies API with action=build
 app.all('/api/study-builder*', async (req, res) => {
-  // Use the actual study-builder.js handler
-  await studyBuilderHandler(req, res);
+  // Redirect study-builder requests to studies API with action=build
+  req.url = req.url.replace('/api/study-builder', '/api/studies?action=build');
+  await studiesHandler(req, res);
 });
 
 // Recordings endpoints  

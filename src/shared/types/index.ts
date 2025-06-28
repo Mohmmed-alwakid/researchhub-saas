@@ -1506,3 +1506,733 @@ export const ENHANCED_BLOCK_DESCRIPTIONS = {
     whenToUse: 'Collect documents, resumes, or other file-based feedback'
   }
 } as const;
+
+// ============================================================================
+// COLLABORATIVE WORKSPACE SYSTEM - Phase 3: Collaborative Features
+// ============================================================================
+
+// Workspace types for team collaboration
+export interface IWorkspace {
+  _id: string;
+  name: string;
+  description?: string;
+  slug: string; // URL-friendly identifier
+  owner: string | IUser;
+  settings: WorkspaceSettings;
+  members: WorkspaceMember[];
+  subscription?: WorkspaceSubscription;
+  usage: WorkspaceUsage;
+  billing?: WorkspaceBilling;
+  status: 'active' | 'suspended' | 'archived';
+  features: WorkspaceFeatures;
+  branding?: WorkspaceBranding;
+  integrations?: WorkspaceIntegration[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface WorkspaceSettings {
+  visibility: 'private' | 'public' | 'invite_only';
+  defaultStudyVisibility: 'private' | 'team' | 'public';
+  allowGuestInvites: boolean;
+  requireApprovalForStudies: boolean;
+  requireApprovalForPublishing: boolean;
+  autoArchiveInactiveStudies: boolean;
+  autoArchiveDays?: number;
+  enforceTemplateUsage: boolean;
+  allowCustomBranding: boolean;
+  timezone: string;
+  language: string;
+  notifications: WorkspaceNotificationSettings;
+}
+
+export interface WorkspaceNotificationSettings {
+  emailNotifications: boolean;
+  studyStarted: boolean;
+  studyCompleted: boolean;
+  newMemberJoined: boolean;
+  pendingApprovals: boolean;
+  weeklyDigest: boolean;
+  slackIntegration?: {
+    enabled: boolean;
+    webhookUrl?: string;
+    channels?: string[];
+  };
+}
+
+export interface WorkspaceMember {
+  _id: string;
+  userId: string | IUser;
+  workspaceId: string;
+  role: WorkspaceRole;
+  permissions: WorkspacePermissions;
+  status: 'active' | 'invited' | 'suspended' | 'removed';
+  invitedBy?: string | IUser;
+  invitedAt?: Date;
+  joinedAt?: Date;
+  lastActiveAt?: Date;
+  metadata?: {
+    department?: string;
+    jobTitle?: string;
+    location?: string;
+    phoneNumber?: string;
+    customFields?: Record<string, unknown>;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type WorkspaceRole = 
+  | 'owner'        // Full control, billing access
+  | 'admin'        // Manage members, settings, approve studies
+  | 'editor'       // Create and edit studies, manage participants
+  | 'viewer'       // View studies and results, no editing
+  | 'collaborator' // Edit assigned studies only
+  | 'guest';       // Limited access to specific studies
+
+export interface WorkspacePermissions {
+  studies: {
+    create: boolean;
+    edit: boolean;
+    delete: boolean;
+    publish: boolean;
+    archive: boolean;
+    viewAll: boolean;
+    exportData: boolean;
+  };
+  members: {
+    invite: boolean;
+    remove: boolean;
+    changeRoles: boolean;
+    viewAll: boolean;
+  };
+  workspace: {
+    editSettings: boolean;
+    manageBilling: boolean;
+    manageIntegrations: boolean;
+    viewAnalytics: boolean;
+    exportData: boolean;
+  };
+  approvals: {
+    approveStudies: boolean;
+    approvePublishing: boolean;
+    viewPendingApprovals: boolean;
+  };
+}
+
+export interface WorkspaceSubscription {
+  plan: 'free' | 'team' | 'business' | 'enterprise';
+  status: 'active' | 'trial' | 'canceled' | 'past_due' | 'expired';
+  billingCycle: 'monthly' | 'annual';
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  trialEndsAt?: Date;
+  features: WorkspaceFeatures;
+  limits: WorkspaceLimits;
+  addOns?: WorkspaceAddOn[];
+}
+
+export interface WorkspaceFeatures {
+  maxMembers: number;
+  maxStudies: number;
+  maxParticipantsPerStudy: number;
+  recordingMinutes: number;
+  advancedAnalytics: boolean;
+  customBranding: boolean;
+  ssoIntegration: boolean;
+  apiAccess: boolean;
+  whitelabelReports: boolean;
+  prioritySupport: boolean;
+  collaborativeEditing: boolean;
+  approvalWorkflows: boolean;
+  advancedPermissions: boolean;
+  dataRetention: number; // days
+  exportFormats: string[];
+  integrations: string[];
+}
+
+export interface WorkspaceLimits {
+  members: number;
+  studies: number;
+  monthlyParticipants: number;
+  recordingMinutes: number;
+  dataExports: number;
+  apiCalls: number;
+}
+
+export interface WorkspaceAddOn {
+  id: string;
+  name: string;
+  type: 'extra_members' | 'extra_recording' | 'advanced_analytics' | 'custom_integration';
+  quantity: number;
+  pricePerUnit: number;
+  currency: string;
+  billingCycle: 'monthly' | 'annual';
+}
+
+export interface WorkspaceUsage {
+  currentPeriod: {
+    studiesCreated: number;
+    participantsRecruited: number;
+    recordingMinutesUsed: number;
+    dataExports: number;
+    apiCallsUsed: number;
+    activeMembers: number;
+  };
+  historical: {
+    totalStudiesCreated: number;
+    totalParticipants: number;
+    totalRecordingMinutes: number;
+    totalDataExports: number;
+  };
+  lastUpdated: Date;
+}
+
+export interface WorkspaceBilling {
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  paymentMethod?: {
+    type: 'card' | 'bank_account';
+    last4?: string;
+    brand?: string;
+    expiryMonth?: number;
+    expiryYear?: number;
+  };
+  billingAddress?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state?: string;
+    postalCode: string;
+    country: string;
+  };
+  taxId?: string;
+  invoiceEmails?: string[];
+  nextInvoiceDate?: Date;
+  nextInvoiceAmount?: number;
+  currency: string;
+}
+
+export interface WorkspaceBranding {
+  logo?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  customDomain?: string;
+  customEmailDomain?: string;
+  emailTemplates?: {
+    studyInvitation?: string;
+    studyCompletion?: string;
+    studyReminder?: string;
+  };
+  reportingTemplate?: string;
+}
+
+export interface WorkspaceIntegration {
+  id: string;
+  type: 'slack' | 'teams' | 'figma' | 'jira' | 'confluence' | 'zapier' | 'webhook' | 'sso';
+  name: string;
+  status: 'active' | 'error' | 'disabled';
+  settings: Record<string, unknown>;
+  lastSyncAt?: Date;
+  errorMessage?: string;
+  createdBy: string | IUser;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Invitation types
+export interface IWorkspaceInvitation {
+  _id: string;
+  workspaceId: string | IWorkspace;
+  email: string;
+  role: WorkspaceRole;
+  permissions?: Partial<WorkspacePermissions>;
+  status: 'pending' | 'accepted' | 'declined' | 'expired' | 'revoked';
+  invitedBy: string | IUser;
+  invitedAt: Date;
+  expiresAt: Date;
+  acceptedAt?: Date;
+  declinedAt?: Date;
+  revokedAt?: Date;
+  token: string;
+  message?: string;
+  metadata?: {
+    source?: 'manual' | 'bulk' | 'api';
+    customMessage?: string;
+    remindersSent?: number;
+    lastReminderAt?: Date;
+  };
+}
+
+// Team collaboration on studies
+export interface IStudyCollaboration {
+  _id: string;
+  studyId: string | IStudy;
+  workspaceId: string | IWorkspace;
+  collaborators: StudyCollaborator[];
+  permissions: StudyCollaborationPermissions;
+  settings: StudyCollaborationSettings;
+  activity: CollaborationActivity[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface StudyCollaborator {
+  userId: string | IUser;
+  role: 'owner' | 'editor' | 'viewer' | 'reviewer';
+  permissions: StudyCollaboratorPermissions;
+  addedBy: string | IUser;
+  addedAt: Date;
+  lastActiveAt?: Date;
+  isActive: boolean;
+}
+
+export interface StudyCollaboratorPermissions {
+  editStudy: boolean;
+  editBlocks: boolean;
+  inviteParticipants: boolean;
+  viewResults: boolean;
+  exportData: boolean;
+  manageParticipants: boolean;
+  publishStudy: boolean;
+  archiveStudy: boolean;
+  addCollaborators: boolean;
+}
+
+export interface StudyCollaborationPermissions {
+  allowRealTimeEditing: boolean;
+  requireApprovalToPublish: boolean;
+  allowComments: boolean;
+  allowSuggestions: boolean;
+  trackChanges: boolean;
+  versionControl: boolean;
+  lockEditingSections: boolean;
+}
+
+export interface StudyCollaborationSettings {
+  notifications: {
+    onChanges: boolean;
+    onComments: boolean;
+    onPublish: boolean;
+    onParticipantResponse: boolean;
+  };
+  realTime: {
+    enabled: boolean;
+    showCursors: boolean;
+    showActiveUsers: boolean;
+    conflictResolution: 'manual' | 'auto' | 'last_writer_wins';
+  };
+  versioning: {
+    enabled: boolean;
+    autoSave: boolean;
+    saveInterval: number; // minutes
+    maxVersions: number;
+  };
+}
+
+// Approval workflow system
+export interface IApprovalWorkflow {
+  _id: string;
+  workspaceId: string | IWorkspace;
+  name: string;
+  description?: string;
+  type: 'study_creation' | 'study_publishing' | 'participant_recruitment' | 'data_export' | 'custom';
+  status: 'active' | 'inactive' | 'draft';
+  stages: ApprovalStage[];
+  settings: ApprovalWorkflowSettings;
+  triggers: ApprovalTrigger[];
+  createdBy: string | IUser;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ApprovalStage {
+  _id: string;
+  name: string;
+  description?: string;
+  order: number;
+  type: 'single_approver' | 'multiple_approvers' | 'consensus' | 'automated';
+  approvers: ApprovalStageApprover[];
+  requirements: ApprovalRequirements;
+  settings: ApprovalStageSettings;
+  timeouts: ApprovalTimeouts;
+}
+
+export interface ApprovalStageApprover {
+  userId?: string | IUser;
+  role?: WorkspaceRole;
+  type: 'user' | 'role' | 'anyone_with_permission';
+  isRequired: boolean;
+  canDelegate: boolean;
+  weight?: number; // for weighted voting
+}
+
+export interface ApprovalRequirements {
+  minimumApprovers?: number;
+  requireAllApprovers?: boolean;
+  allowSelfApproval?: boolean;
+  requireComments?: boolean;
+  requireReasons?: boolean;
+  customCriteria?: ApprovalCriterion[];
+}
+
+export interface ApprovalCriterion {
+  id: string;
+  name: string;
+  description: string;
+  type: 'checkbox' | 'rating' | 'text' | 'file_upload';
+  required: boolean;
+  options?: string[];
+  validationRules?: ValidationRule[];
+}
+
+export interface ApprovalStageSettings {
+  allowParallelApproval: boolean;
+  autoAdvanceOnApproval: boolean;
+  notifyAllApprovers: boolean;
+  escalationEnabled: boolean;
+  reminderEnabled: boolean;
+  delegationEnabled: boolean;
+}
+
+export interface ApprovalTimeouts {
+  responseTimeout?: number; // hours
+  escalationTimeout?: number; // hours
+  autoApprovalTimeout?: number; // hours
+  reminderInterval?: number; // hours
+  maxReminders?: number;
+}
+
+export interface ApprovalWorkflowSettings {
+  autoStart: boolean;
+  allowSkipStages: boolean;
+  requireSequentialApproval: boolean;
+  allowWithdrawal: boolean;
+  notifyOnStart: boolean;
+  notifyOnComplete: boolean;
+  retainHistory: boolean;
+  historyRetentionDays: number;
+}
+
+export interface ApprovalTrigger {
+  type: 'manual' | 'automatic' | 'scheduled' | 'conditional';
+  conditions?: LogicalCondition[];
+  schedule?: {
+    frequency: 'once' | 'daily' | 'weekly' | 'monthly';
+    time?: string;
+    dayOfWeek?: number;
+    dayOfMonth?: number;
+  };
+}
+
+// Approval request for specific items
+export interface IApprovalRequest {
+  _id: string;
+  workflowId: string | IApprovalWorkflow;
+  workspaceId: string | IWorkspace;
+  itemType: 'study' | 'participant_recruitment' | 'data_export' | 'template' | 'custom';
+  itemId: string;
+  requestedBy: string | IUser;
+  currentStage: number;
+  status: 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'expired' | 'escalated';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  responses: ApprovalResponse[];
+  metadata: ApprovalRequestMetadata;
+  deadlines: ApprovalDeadlines;
+  notifications: ApprovalNotification[];
+  history: ApprovalHistoryEntry[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ApprovalResponse {
+  _id: string;
+  stageId: string;
+  approverId: string | IUser;
+  decision: 'approved' | 'rejected' | 'delegated' | 'escalated';
+  comments?: string;
+  reasons?: string[];
+  attachments?: string[];
+  criteriaResponses?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  respondedAt: Date;
+  delegatedTo?: string | IUser;
+}
+
+export interface ApprovalRequestMetadata {
+  title: string;
+  description: string;
+  requestedChanges?: string[];
+  businessJustification?: string;
+  impactAssessment?: string;
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
+  tags?: string[];
+  customFields?: Record<string, unknown>;
+  attachments?: ApprovalAttachment[];
+}
+
+export interface ApprovalAttachment {
+  id: string;
+  name: string;
+  type: 'document' | 'image' | 'video' | 'spreadsheet' | 'other';
+  url: string;
+  size: number;
+  uploadedBy: string | IUser;
+  uploadedAt: Date;
+}
+
+export interface ApprovalDeadlines {
+  requestedBy?: Date;
+  escalationAt?: Date;
+  hardDeadline?: Date;
+  autoApprovalAt?: Date;
+}
+
+export interface ApprovalNotification {
+  type: 'request_created' | 'response_required' | 'decision_made' | 'deadline_approaching' | 'escalated';
+  sentTo: string[];
+  sentAt: Date;
+  method: 'email' | 'in_app' | 'slack' | 'teams';
+  acknowledged?: Date;
+}
+
+export interface ApprovalHistoryEntry {
+  _id: string;
+  action: string;
+  actorId: string | IUser;
+  timestamp: Date;
+  details?: Record<string, unknown>;
+  previousState?: unknown;
+  newState?: unknown;
+}
+
+// Real-time collaboration types
+export interface ICollaborationSession {
+  _id: string;
+  studyId: string | IStudy;
+  workspaceId: string | IWorkspace;
+  activeUsers: ActiveCollaborator[];
+  locks: CollaborationLock[];
+  cursors: UserCursor[];
+  changes: CollaborationChange[];
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ActiveCollaborator {
+  userId: string | IUser;
+  sessionId: string;
+  status: 'active' | 'idle' | 'offline';
+  lastSeen: Date;
+  currentBlock?: string;
+  currentSection?: string;
+  permissions: StudyCollaboratorPermissions;
+  cursor?: UserCursor;
+}
+
+export interface UserCursor {
+  userId: string;
+  position: {
+    blockId?: string;
+    elementId?: string;
+    x?: number;
+    y?: number;
+  };
+  selection?: {
+    start: number;
+    end: number;
+    text?: string;
+  };
+  lastMoved: Date;
+}
+
+export interface CollaborationLock {
+  id: string;
+  type: 'block' | 'section' | 'settings' | 'participants';
+  resourceId: string;
+  lockedBy: string | IUser;
+  lockedAt: Date;
+  expiresAt?: Date;
+  metadata?: Record<string, unknown>;
+}
+
+export interface CollaborationChange {
+  _id: string;
+  type: 'insert' | 'update' | 'delete' | 'move';
+  userId: string | IUser;
+  timestamp: Date;
+  path: string; // JSON path to the changed property
+  oldValue?: unknown;
+  newValue?: unknown;
+  blockId?: string;
+  conflict?: boolean;
+  resolved?: boolean;
+  resolvedBy?: string | IUser;
+  resolvedAt?: Date;
+}
+
+// Collaborator presence for real-time indicators
+export interface CollaboratorPresence {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role?: WorkspaceRole;
+  status: 'active' | 'idle' | 'away' | 'offline';
+  lastActive: Date;
+  currentLocation?: {
+    studyId?: string;
+    blockId?: string;
+    section?: string;
+  };
+  sessionId?: string;
+}
+
+// Editing status for live collaboration
+export interface EditingStatus {
+  collaboratorId: string;
+  elementType: 'block' | 'setting' | 'participant' | 'template';
+  elementId?: string;
+  action: 'editing' | 'viewing' | 'commenting';
+  startedAt: Date;
+  lastUpdate: Date;
+}
+
+// Activity types for activity feed
+export interface CollaborationActivity {
+  id: string;
+  type: 'user_joined' | 'user_left' | 'block_added' | 'block_edited' | 'block_removed' | 
+        'comment_added' | 'study_published' | 'participant_invited' | 'approval_requested' |
+        'template_applied' | 'settings_changed';
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  action: string; // Human-readable action description
+  timestamp: Date;
+  entityType?: 'study' | 'block' | 'participant' | 'template' | 'workspace';
+  entityId?: string;
+  entityName?: string;
+  metadata?: {
+    oldValue?: unknown;
+    newValue?: unknown;
+    blockType?: string;
+    changes?: string[];
+    location?: string;
+  };
+  priority: 'low' | 'medium' | 'high';
+  category: 'content' | 'collaboration' | 'administration' | 'system';
+}
+
+// ============================================================================
+// COMMENT SYSTEM TYPES
+// ============================================================================
+
+export interface IStudyComment {
+  _id: string;
+  studyId: string;
+  blockId?: string;
+  userId: string | IUser;
+  parentId?: string; // for threaded comments
+  content: string;
+  type: 'comment' | 'suggestion' | 'issue' | 'question';
+  status: 'open' | 'resolved' | 'acknowledged' | 'dismissed';
+  position?: {
+    blockId?: string;
+    elementId?: string;
+    x?: number;
+    y?: number;
+  };
+  mentions?: string[]; // user IDs mentioned in the comment
+  attachments?: CommentAttachment[];
+  reactions?: CommentReaction[];
+  metadata?: Record<string, unknown>;
+  resolvedBy?: string | IUser;
+  resolvedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CommentAttachment {
+  id: string;
+  name: string;
+  type: 'image' | 'video' | 'document' | 'link';
+  url: string;
+  size?: number;
+  thumbnailUrl?: string;
+}
+
+export interface CommentReaction {
+  userId: string | IUser;
+  emoji: string;
+  addedAt: Date;
+}
+
+// ============================================================================
+// APPROVAL WORKFLOW TYPES
+// ============================================================================
+
+export interface ApprovalItem {
+  id: string;
+  studyId: string;
+  title: string;
+  author: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'pending' | 'approved' | 'rejected' | 'changes_requested';
+  type: 'new_study' | 'study_modification' | 'template_creation' | 'participant_criteria';
+  submittedAt: Date;
+  lastUpdated: Date;
+  description?: string;
+  reviewers?: string[];
+  approvedBy?: string;
+  rejectedBy?: string;
+  comments?: IStudyComment[];
+  attachments?: string[];
+  deadline?: Date;
+  estimatedReviewTime?: number;
+}
+
+// ============================================================================
+// ACTIVITY FEED TYPES  
+// ============================================================================
+
+export interface ActivityUser {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role?: WorkspaceRole;
+}
+
+export interface ActivityItem {
+  id: string;
+  type: 'user_joined' | 'user_left' | 'block_added' | 'block_edited' | 'block_removed' | 
+        'comment_added' | 'study_published' | 'participant_invited' | 'approval_requested' | 
+        'template_applied' | 'settings_changed' | 'study_approved' | 'study_rejected';
+  user: ActivityUser;
+  timestamp: Date;
+  description: string;
+  metadata?: {
+    studyId?: string;
+    blockId?: string;
+    blockType?: string;
+    commentId?: string;
+    templateId?: string;
+    participantCount?: number;
+    changes?: string[];
+    reason?: string;
+    priority?: string;
+    status?: string;
+  };
+  entityType?: 'study' | 'block' | 'comment' | 'template' | 'user' | 'workspace';
+  entityId?: string;
+  isRead?: boolean;
+  importance?: 'low' | 'medium' | 'high';
+}
+
+// ============================================================================

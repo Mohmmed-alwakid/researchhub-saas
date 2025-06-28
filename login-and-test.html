@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Login and Test Navigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Login and Navigation Test</h1>
+    
+    <div class="container">
+        <h2>Step 1: Login</h2>
+        <button onclick="performLogin()">Login as Researcher</button>
+        <div id="login-result" class="result"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Step 2: Navigate to Studies</h2>
+        <button onclick="navigateToStudies()">Go to Studies Page</button>
+        <div id="navigation-result" class="result"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Step 3: Test Study Builder</h2>
+        <button onclick="navigateToStudyBuilder()">Go to Study Builder</button>
+        <div id="builder-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        const FRONTEND_BASE = 'http://localhost:5175';
+        
+        async function performLogin() {
+            const result = document.getElementById('login-result');
+            result.innerHTML = 'Logging in...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Login response:', data);
+                
+                if (response.ok && data.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `✅ Login successful! User: ${data.user?.email}, Role: ${data.user?.role}`;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `❌ Login failed: ${data.message || 'Unknown error'}`;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                result.className = 'result error';
+                result.innerHTML = `❌ Network error: ${error.message}`;
+            }
+        }
+        
+        function navigateToStudies() {
+            const result = document.getElementById('navigation-result');
+            result.innerHTML = 'Opening studies page...';
+            window.open(`${FRONTEND_BASE}/app/studies`, '_blank');
+            result.innerHTML = 'Studies page opened in new tab';
+        }
+        
+        function navigateToStudyBuilder() {
+            const result = document.getElementById('builder-result');
+            result.innerHTML = 'Opening study builder...';
+            window.open(`${FRONTEND_BASE}/app/study-builder`, '_blank');
+            result.innerHTML = 'Study builder opened in new tab';
+        }
+    </script>
+</body>
+</html>

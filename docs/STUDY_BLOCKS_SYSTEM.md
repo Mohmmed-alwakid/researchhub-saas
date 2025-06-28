@@ -1,15 +1,22 @@
-# 📋 ResearchHub Study Blocks System
+# 📋 ResearchHub Study Blocks System - With Collaboration Features
 
 ## Overview
 
-ResearchHub uses a **modular block-based system** for building research studies. Each study consists of sequential **blocks** that serve specific purposes - from welcoming participants to collecting different types of data. This system provides maximum flexibility while maintaining consistency across research methodologies.
+ResearchHub uses a **modular block-based system** for building research studies with **integrated real-time collaboration features**. Each study consists of sequential **blocks** that serve specific purposes - from welcoming participants to collecting different types of data. The system now includes comprehensive team collaboration tools that enhance the study creation workflow.
 
-## 🧩 Block-Based Architecture
+## 🧩 Block-Based Architecture with Collaboration
 
 ### Core Concept
 - **Study** = A sequence of blocks that guide participants through the research experience
 - **Block** = A self-contained component with a specific purpose (welcome, question, image, etc.)
 - **Template** = Pre-configured collections of blocks for common research scenarios
+- **Collaboration** = Real-time team features integrated into the study building experience
+
+### Enhanced Study Builder Features ✅ **NEW - June 2025**
+- **CollaborationHeader**: Live collaboration status, team presence, and activity access
+- **CollaborationSidebar**: Team/Comments/Activity tabs with real-time updates
+- **Real-time Integration**: Study form watching, live title updates, and presence indicators
+- **Non-intrusive Design**: Collaboration enhances without disrupting the core workflow
 
 ### Block Sequence Example
 ```

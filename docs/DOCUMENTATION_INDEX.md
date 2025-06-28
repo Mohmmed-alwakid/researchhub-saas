@@ -9,11 +9,18 @@
 
 ## 🎯 Core Features & Systems
 
-### Study & Block System ⭐ **NEW & IMPROVED**
+### Study & Block System ⭐ **ENHANCED WITH COLLABORATION**
 - **[STUDY_BLOCKS_SYSTEM.md](STUDY_BLOCKS_SYSTEM.md)** - 📋 Complete study blocks architecture and implementation guide
 - **[TEMPLATE_SYSTEM.md](TEMPLATE_SYSTEM.md)** - 🎨 Template management and usage system
 - **[STUDY_BLOCKS_IMPLEMENTATION_PROGRESS.md](STUDY_BLOCKS_IMPLEMENTATION_PROGRESS.md)** - 🚧 Current implementation status and roadmap
 - **[STUDY_TASKS.md](STUDY_TASKS.md)** - 📝 Legacy task documentation (superseded by Study Blocks System)
+
+### Collaboration & Team Features ⭐ **PRODUCTION READY - JUNE 2025**
+
+- **[COLLABORATION_SYSTEM_COMPLETE.md](COLLABORATION_SYSTEM_COMPLETE.md)** - 🤝 Complete collaboration system implementation guide
+- **[COLLABORATION_INTEGRATION_COMPLETE.md](../COLLABORATION_INTEGRATION_COMPLETE.md)** - 👥 Original collaboration system documentation
+- **[STUDY_BUILDER_COLLABORATION_INTEGRATION_COMPLETE.md](../STUDY_BUILDER_COLLABORATION_INTEGRATION_COMPLETE.md)** - 🔄 Study Builder collaboration integration guide
+- **[study-builder-collaboration-test.html](../study-builder-collaboration-test.html)** - 🧪 Collaboration integration testing interface
 
 ### Permissions & Security
 - **[PERMISSION_SYSTEM.md](PERMISSION_SYSTEM.md)** - Role-based access control system

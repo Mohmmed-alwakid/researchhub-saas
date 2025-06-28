@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Studies Page Issue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { border-color: #4CAF50; background-color: #f0fff0; }
+        .error { border-color: #f44336; background-color: #fff0f0; }
+        .warning { border-color: #ff9800; background-color: #fff8e1; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐛 Debug Studies Page White Screen Issue</h1>
+    
+    <div class="container">
+        <h2>Issue Investigation</h2>
+        <p>User reports white page when navigating to <code>http://localhost:5175/app/studies</code></p>
+        
+        <div class="test-section">
+            <h3>1. Test Authentication Status</h3>
+            <button onclick="checkAuth()">Check Auth Status</button>
+            <div id="auth-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Test Studies API</h3>
+            <button onclick="testStudiesAPI()">Test Studies API</button>
+            <div id="studies-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Direct Navigation Test</h3>
+            <button onclick="navigateToStudies()">Navigate to Studies</button>
+            <button onclick="navigateToLogin()">Navigate to Login</button>
+            <button onclick="navigateToDashboard()">Navigate to Dashboard</button>
+            <div id="navigation-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Embedded Studies Page</h3>
+            <button onclick="loadStudiesPage()">Load Studies Page in Frame</button>
+            <div id="iframe-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Console Logs</h3>
+            <button onclick="clearLogs()">Clear Logs</button>
+            <div id="console-logs" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        const FRONTEND_BASE = 'http://localhost:5175';
+        
+        // Log interceptor
+        const originalLog = console.log;
+        const originalError = console.error;
+        let logs = [];
+        
+        console.log = function(...args) {
+            logs.push({ type: 'log', message: args.join(' '), time: new Date().toISOString() });
+            originalLog.apply(console, args);
+            updateConsoleLogs();
+        };
+        
+        console.error = function(...args) {
+            logs.push({ type: 'error', message: args.join(' '), time: new Date().toISOString() });
+            originalError.apply(console, args);
+            updateConsoleLogs();
+        };
+        
+        function updateConsoleLogs() {
+            const container = document.getElementById('console-logs');
+            container.innerHTML = logs.slice(-10).map(log => 
+                `<div style="color: ${log.type === 'error' ? 'red' : 'black'}; font-family: monospace; margin: 2px 0;">
+                    [${log.time.split('T')[1].split('.')[0]}] ${log.type.toUpperCase()}: ${log.message}
+                </div>`
+            ).join('');
+        }
+        
+        function clearLogs() {
+            logs = [];
+            updateConsoleLogs();
+        }
+        
+        async function checkAuth() {
+            const result = document.getElementById('auth-result');
+            result.innerHTML = 'Checking authentication...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=status`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                console.log('Auth status response:', data);
+                
+                if (response.ok && data.success) {
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Authentication Status: ${data.authenticated ? 'Authenticated' : 'Not Authenticated'}<br>
+                            User: ${data.user ? JSON.stringify(data.user, null, 2) : 'None'}<br>
+                            Role: ${data.user?.role || 'None'}
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            ❌ Auth check failed: ${data.message || 'Unknown error'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                result.innerHTML = `
+                    <div class="error">
+                        ❌ Network error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function testStudiesAPI() {
+            const result = document.getElementById('studies-result');
+            result.innerHTML = 'Testing studies API...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/studies`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                console.log('Studies API response:', data);
+                
+                if (response.ok && data.success) {
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Studies API working<br>
+                            Studies count: ${data.studies?.length || 0}<br>
+                            Studies: ${JSON.stringify(data.studies?.map(s => ({title: s.title, status: s.status})) || [], null, 2)}
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            ❌ Studies API failed: ${data.message || 'Unknown error'}<br>
+                            Status: ${response.status}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Studies API error:', error);
+                result.innerHTML = `
+                    <div class="error">
+                        ❌ Network error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function navigateToStudies() {
+            const result = document.getElementById('navigation-result');
+            result.innerHTML = 'Navigating to studies page...';
+            window.open(`${FRONTEND_BASE}/app/studies`, '_blank');
+        }
+        
+        function navigateToLogin() {
+            const result = document.getElementById('navigation-result');
+            result.innerHTML = 'Navigating to login page...';
+            window.open(`${FRONTEND_BASE}/login`, '_blank');
+        }
+        
+        function navigateToDashboard() {
+            const result = document.getElementById('navigation-result');
+            result.innerHTML = 'Navigating to dashboard...';
+            window.open(`${FRONTEND_BASE}/app/dashboard`, '_blank');
+        }
+        
+        function loadStudiesPage() {
+            const container = document.getElementById('iframe-container');
+            container.innerHTML = `
+                <iframe src="${FRONTEND_BASE}/app/studies" onload="handleIframeLoad()" onerror="handleIframeError()">
+                </iframe>
+            `;
+        }
+        
+        function handleIframeLoad() {
+            console.log('Studies page iframe loaded successfully');
+        }
+        
+        function handleIframeError() {
+            console.error('Studies page iframe failed to load');
+        }
+        
+        // Auto-run initial checks
+        window.onload = function() {
+            console.log('🚀 Debug page loaded, starting automatic checks...');
+            checkAuth();
+        };
+    </script>
+</body>
+</html>

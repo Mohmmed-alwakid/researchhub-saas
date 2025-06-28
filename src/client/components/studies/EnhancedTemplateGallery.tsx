@@ -29,6 +29,13 @@ interface EnhancedTemplateGalleryProps {
   onSelectTemplate: (template: EnhancedStudyTemplate) => void;
   studyType?: string;
   onStartFromScratch?: () => void;
+  // Enhanced intelligence props
+  recommendedTemplates?: string[];
+  intentContext?: {
+    title: string;
+    description: string;
+    priority: 'high' | 'medium' | 'low';
+  };
 }
 
 interface TemplatePreviewModalProps {
@@ -249,7 +256,9 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
   onClose,
   onSelectTemplate,
   studyType,
-  onStartFromScratch
+  onStartFromScratch,
+  recommendedTemplates = [],
+  intentContext
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory>('usability-testing');
   const [searchQuery, setSearchQuery] = useState('');
@@ -261,17 +270,43 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
     return getTemplatesByCategory(selectedCategory);
   }, [selectedCategory]);
 
-  // Filter templates based on search
+  // Enhanced filtering with intelligent recommendations
   const filteredTemplates = useMemo(() => {
-    if (!searchQuery.trim()) return templates;
+    let baseTemplates = templates;
     
-    const query = searchQuery.toLowerCase();
-    return templates.filter(template => 
-      template.name.toLowerCase().includes(query) ||
-      template.description.toLowerCase().includes(query) ||
-      template.metadata.tags.some(tag => tag.toLowerCase().includes(query))
-    );
-  }, [templates, searchQuery]);
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      baseTemplates = templates.filter(template => 
+        template.name.toLowerCase().includes(query) ||
+        template.description.toLowerCase().includes(query) ||
+        template.metadata.tags.some(tag => tag.toLowerCase().includes(query))
+      );
+    }
+
+    // Apply intelligent sorting based on recommendations
+    if (recommendedTemplates.length > 0) {
+      return baseTemplates.sort((a, b) => {
+        const aRecommended = recommendedTemplates.includes(a.id);
+        const bRecommended = recommendedTemplates.includes(b.id);
+        
+        // Recommended templates first
+        if (aRecommended && !bRecommended) return -1;
+        if (!aRecommended && bRecommended) return 1;
+        
+        // Then by priority context if available
+        if (intentContext?.priority === 'high') {
+          // For high priority, prefer templates with higher usage
+          return (b.usage?.usageCount || 0) - (a.usage?.usageCount || 0);
+        }
+        
+        // Default sort by popularity
+        return (b.usage?.rating || 0) - (a.usage?.rating || 0);
+      });
+    }
+    
+    return baseTemplates;
+  }, [templates, searchQuery, recommendedTemplates, intentContext]);
 
   // Initialize variables when template is selected
   const handleTemplateSelect = (template: EnhancedStudyTemplate) => {
@@ -351,6 +386,33 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
           </div>
         </div>
 
+        {/* Intent Context Banner */}
+        {intentContext && recommendedTemplates.length > 0 && (
+          <div className="px-6 py-4 bg-blue-50 border-b border-blue-200">
+            <div className="flex items-start gap-3">
+              <Target className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium text-blue-900 mb-1">
+                  Recommended for "{intentContext.title}"
+                </h4>
+                <p className="text-sm text-blue-700">
+                  We've selected the best templates based on your research goal: {intentContext.description.toLowerCase()}
+                </p>
+                <div className="mt-2 flex items-center gap-4 text-xs text-blue-600">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    {recommendedTemplates.length} recommended templates
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Star className="w-3 h-3" />
+                    Priority: {intentContext.priority}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Search and Filters */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-4">
@@ -389,7 +451,15 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 mb-1">{template.name}</h3>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-gray-900">{template.name}</h3>
+                          {recommendedTemplates.includes(template.id) && (
+                            <span className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                              <Sparkles className="w-3 h-3" />
+                              Recommended
+                            </span>
+                          )}
+                        </div>
                         <p className="text-gray-600 text-sm line-clamp-2">{template.description}</p>
                       </div>
                       <ChevronRight className="w-5 h-5 text-gray-400 ml-2" />

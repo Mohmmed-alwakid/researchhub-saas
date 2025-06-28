@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaboration Integration Test - ResearchHub</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .header h1 {
+            color: #2d3748;
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #48bb78;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .feature-card h3 {
+            color: #2d3748;
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            color: #4a5568;
+            position: relative;
+            padding-left: 25px;
+        }
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            color: #48bb78;
+            font-weight: bold;
+        }
+        .test-section {
+            background: #edf2f7;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .test-section h2 {
+            color: #2d3748;
+            margin: 0 0 20px 0;
+            font-size: 1.4rem;
+        }
+        .button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 5px;
+            transition: background 0.2s ease;
+        }
+        .button:hover {
+            background: #5a67d8;
+        }
+        .button.secondary {
+            background: #718096;
+        }
+        .button.secondary:hover {
+            background: #4a5568;
+        }
+        .button.success {
+            background: #48bb78;
+        }
+        .button.success:hover {
+            background: #38a169;
+        }
+        .log-area {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .endpoints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .endpoint-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .endpoint-method {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .method-get { background: #e3f2fd; color: #1976d2; }
+        .method-post { background: #e8f5e8; color: #388e3c; }
+        .method-put { background: #fff3e0; color: #f57c00; }
+        .method-delete { background: #ffebee; color: #d32f2f; }
+        .endpoint-path {
+            font-family: monospace;
+            color: #2d3748;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .endpoint-desc {
+            color: #718096;
+            font-size: 0.85rem;
+        }
+        .integration-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .status-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+        }
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .status-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        .status-description {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        .tech-stack {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .tech-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .tech-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Collaboration Integration Test</h1>
+            <p class="subtitle">Complete Collaborative Features Integration for ResearchHub</p>
+            <span class="status-badge">✅ PRODUCTION READY</span>
+        </div>
+
+        <!-- Integration Status -->
+        <div class="integration-status">
+            <div class="status-item">
+                <div class="status-icon">🎨</div>
+                <div class="status-title">Design Tokens</div>
+                <div class="status-description">Complete design system implemented</div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon">🧩</div>
+                <div class="status-title">UI Components</div>
+                <div class="status-description">Modular component library ready</div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon">👥</div>
+                <div class="status-title">Collaboration</div>
+                <div class="status-description">Real-time features integrated</div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon">✅</div>
+                <div class="status-title">Approvals</div>
+                <div class="status-description">Workflow system complete</div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon">💬</div>
+                <div class="status-title">Comments</div>
+                <div class="status-description">Threaded commenting ready</div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon">🏠</div>
+                <div class="status-title">Dashboard</div>
+                <div class="status-description">Centralized collaboration hub</div>
+            </div>
+        </div>
+
+        <!-- Feature Overview -->
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>📊 Collaboration Dashboard</h3>
+                <ul class="feature-list">
+                    <li>Real-time team presence</li>
+                    <li>Activity feed integration</li>
+                    <li>Quick action buttons</li>
+                    <li>Statistics overview</li>
+                    <li>Notification center</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🔄 Real-time Collaboration</h3>
+                <ul class="feature-list">
+                    <li>WebSocket connections</li>
+                    <li>Live cursor tracking</li>
+                    <li>Presence indicators</li>
+                    <li>Activity broadcasting</li>
+                    <li>Edit operation sync</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>✅ Approval Workflows</h3>
+                <ul class="feature-list">
+                    <li>Multi-stage approvals</li>
+                    <li>Role-based permissions</li>
+                    <li>Bulk actions</li>
+                    <li>Approval history</li>
+                    <li>Status tracking</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>💬 Comment System</h3>
+                <ul class="feature-list">
+                    <li>Threaded discussions</li>
+                    <li>User mentions</li>
+                    <li>Reaction system</li>
+                    <li>Resolution tracking</li>
+                    <li>Real-time updates</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- API Endpoints -->
+        <div class="test-section">
+            <h2>🔗 API Endpoints Integration</h2>
+            <div class="endpoints-grid">
+                <div class="endpoint-item">
+                    <div class="endpoint-method method-post">POST</div>
+                    <div class="endpoint-path">/api/collaboration</div>
+                    <div class="endpoint-desc">Real-time collaboration management</div>
+                </div>
+                <div class="endpoint-item">
+                    <div class="endpoint-method method-get">GET</div>
+                    <div class="endpoint-path">/api/approvals</div>
+                    <div class="endpoint-desc">Approval queue and workflow</div>
+                </div>
+                <div class="endpoint-item">
+                    <div class="endpoint-method method-post">POST</div>
+                    <div class="endpoint-path">/api/comments</div>
+                    <div class="endpoint-desc">Threaded comment system</div>
+                </div>
+                <div class="endpoint-item">
+                    <div class="endpoint-method method-get">WS</div>
+                    <div class="endpoint-path">ws://localhost:8080</div>
+                    <div class="endpoint-desc">WebSocket real-time server</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="tech-stack">
+            <h2>🛠️ Technology Stack</h2>
+            <div class="tech-items">
+                <span class="tech-tag">React 18</span>
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">Tailwind CSS</span>
+                <span class="tech-tag">Zustand</span>
+                <span class="tech-tag">React Query</span>
+                <span class="tech-tag">WebSocket</span>
+                <span class="tech-tag">Supabase</span>
+                <span class="tech-tag">Vercel</span>
+            </div>
+        </div>
+
+        <!-- Integration Testing -->
+        <div class="test-section">
+            <h2>🧪 Integration Testing</h2>
+            <p>Test the complete collaborative workflow:</p>
+            
+            <button class="button" onclick="testFullstack()">🚀 Test Fullstack Development</button>
+            <button class="button" onclick="testCollaboration()">👥 Test Collaboration Features</button>
+            <button class="button secondary" onclick="testApprovals()">✅ Test Approval Workflow</button>
+            <button class="button secondary" onclick="testComments()">💬 Test Comment System</button>
+            <button class="button success" onclick="openCollaborationHub()">🏠 Open Collaboration Hub</button>
+            
+            <div class="log-area" id="testLog">
+Ready for testing. Click any button above to start testing the integration.
+
+📋 Available Routes:
+• /app/collaboration - Centralized Collaboration Dashboard
+• /app/studies/new - Study Builder with collaborative features  
+• /app/dashboard - Main dashboard with team integration
+
+🔧 Local Development:
+• Frontend: http://localhost:5175
+• Backend API: http://localhost:3003
+• WebSocket: ws://localhost:8080
+
+🎯 Key Features to Test:
+1. Real-time presence and cursors
+2. Activity feed updates
+3. Approval workflow with role permissions
+4. Threaded comments with mentions
+5. WebSocket connectivity and reconnection
+6. Study creation with template integration
+7. Team collaboration dashboard
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logArea = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logArea.textContent += `\n[${timestamp}] ${message}`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').textContent = 'Test log cleared. Ready for new tests.\n';
+        }
+
+        async function testFullstack() {
+            log('🚀 Starting fullstack development test...');
+            
+            try {
+                // Test frontend
+                log('📱 Testing frontend connection...');
+                const frontendResponse = await fetch('http://localhost:5175');
+                if (frontendResponse.ok) {
+                    log('✅ Frontend (http://localhost:5175) - RUNNING');
+                } else {
+                    log('❌ Frontend not accessible');
+                }
+            } catch (error) {
+                log('❌ Frontend not running. Start with: npm run dev:fullstack');
+            }
+
+            try {
+                // Test backend API
+                log('🔧 Testing backend API...');
+                const backendResponse = await fetch('http://localhost:3003/api/health');
+                if (backendResponse.ok) {
+                    log('✅ Backend API (http://localhost:3003) - RUNNING');
+                } else {
+                    log('❌ Backend API not accessible');
+                }
+            } catch (error) {
+                log('❌ Backend API not running. Start with: npm run dev:fullstack');
+            }
+
+            log('📊 Fullstack test completed. Check status above.');
+        }
+
+        async function testCollaboration() {
+            log('👥 Testing collaboration features...');
+            
+            // Test collaboration API
+            try {
+                log('🔄 Testing collaboration API...');
+                const response = await fetch('http://localhost:3003/api/collaboration?action=get_activity_feed');
+                if (response.ok) {
+                    log('✅ Collaboration API - WORKING');
+                    const data = await response.json();
+                    log(`📊 Sample response: ${JSON.stringify(data).substring(0, 100)}...`);
+                } else {
+                    log(`❌ Collaboration API error: ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Collaboration API error: ${error.message}`);
+            }
+
+            // Test WebSocket
+            try {
+                log('🔌 Testing WebSocket connection...');
+                const ws = new WebSocket('ws://localhost:8080?token=test-token');
+                
+                ws.onopen = () => {
+                    log('✅ WebSocket connection - ESTABLISHED');
+                    ws.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
+                };
+                
+                ws.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    log(`📨 WebSocket message: ${message.type}`);
+                };
+                
+                ws.onerror = () => {
+                    log('❌ WebSocket connection failed');
+                };
+
+                setTimeout(() => ws.close(), 3000);
+            } catch (error) {
+                log(`❌ WebSocket error: ${error.message}`);
+            }
+
+            log('🎯 Collaboration test completed.');
+        }
+
+        async function testApprovals() {
+            log('✅ Testing approval workflow...');
+            
+            try {
+                log('📋 Testing approval queue API...');
+                const response = await fetch('http://localhost:3003/api/approvals?action=get_queue&workspaceId=workspace-1');
+                if (response.ok) {
+                    log('✅ Approval API - WORKING');
+                    const data = await response.json();
+                    log(`📊 Approval queue items: ${data.data?.items?.length || 0}`);
+                } else {
+                    log(`❌ Approval API error: ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Approval API error: ${error.message}`);
+            }
+
+            log('🎯 Approval workflow test completed.');
+        }
+
+        async function testComments() {
+            log('💬 Testing comment system...');
+            
+            try {
+                log('📝 Testing comments API...');
+                const response = await fetch('http://localhost:3003/api/comments?action=get_comments&entityType=study&entityId=study-1');
+                if (response.ok) {
+                    log('✅ Comments API - WORKING');
+                    const data = await response.json();
+                    log(`📊 Comments found: ${data.data?.length || 0}`);
+                } else {
+                    log(`❌ Comments API error: ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Comments API error: ${error.message}`);
+            }
+
+            log('🎯 Comment system test completed.');
+        }
+
+        function openCollaborationHub() {
+            log('🏠 Opening Collaboration Hub...');
+            log('🌐 Redirecting to: http://localhost:5175/app/collaboration');
+            window.open('http://localhost:5175/app/collaboration', '_blank');
+        }
+
+        // Initialize
+        log('🎉 Collaboration Integration Test Ready!');
+        log('📋 Click the buttons above to test different features.');
+        log('🚀 For full testing, ensure local development is running: npm run dev:fullstack');
+    </script>
+</body>
+</html>

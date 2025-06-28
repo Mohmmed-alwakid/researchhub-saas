@@ -17,13 +17,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
-import { MazeInspiredStudyCreationModal } from '../../components/studies/MazeInspiredStudyCreationModal';
-import type { StudyTemplate } from '../../../shared/types/index';
+// Removed SimplifiedStudyCreationModal - now using new StudyCreationWizard via direct navigation
 
 const DashboardPage = () => {
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);  const [showMazeModal, setShowMazeModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  // Removed showMazeModal state - now using direct navigation to StudyCreationWizard
 
   // Fetch real dashboard data on component mount
   useEffect(() => {
@@ -49,29 +49,13 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, []);  // Handle study creation flow
+  }, []);  // Handle study creation flow - navigate directly to new StudyCreationWizard
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowMazeModal(true);
+    navigate('/app/studies/create');
   };
 
-  // Handlers for Maze-inspired modal
-  const handleMazeTemplateSelect = (template: StudyTemplate) => {
-    navigate('/app/studies/template-preview', { 
-      state: { 
-        template
-      } 
-    });
-  };
-
-  const handleMazeStartFromScratch = (studyType: string) => {
-    navigate('/app/studies/create', { 
-      state: { 
-        studyType,
-        skipTemplates: true 
-      } 
-    });
-  };
+  // Removed handleStudyTypeSelect - no longer needed with direct navigation
 
   // Calculate stats for display
   const stats = dashboardData ? [
@@ -206,7 +190,7 @@ const DashboardPage = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button onClick={() => setShowMazeModal(true)}>
+            <Button onClick={handleCreateNewStudy}>
               <Plus className="h-4 w-4 mr-2" />
               New Study
             </Button>
@@ -395,13 +379,7 @@ const DashboardPage = () => {
               </div>
             </div>
           </CardContent>
-        </Card>        {/* Maze-Inspired Study Creation Modal */}
-        <MazeInspiredStudyCreationModal 
-          isOpen={showMazeModal} 
-          onClose={() => setShowMazeModal(false)}
-          onSelectTemplate={handleMazeTemplateSelect}
-          onStartFromScratch={handleMazeStartFromScratch}
-        />
+        </Card>        {/* Removed SimplifiedStudyCreationModal - now using direct navigation to StudyCreationWizard */}
       </div>
     </div>
   );

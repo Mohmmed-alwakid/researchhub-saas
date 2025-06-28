@@ -5,6 +5,7 @@ import {
   Home,
   FileText,
   Users,
+  Users2,
   Settings,
   HelpCircle,
   Bell,
@@ -43,6 +44,7 @@ const AppLayout = () => {
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Studies', href: '/app/studies', icon: FileText },
     { name: 'Participants', href: '/app/participants', icon: Users },
+    { name: 'Collaboration', href: '/app/collaboration', icon: Users2 },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/app/settings', icon: Settings },
   ];

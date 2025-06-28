@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test New Simplified Study Creation Flow</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #1e293b;
+            margin-bottom: 16px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.pending { background: #fef3c7; color: #92400e; }
+        .status.error { background: #fee2e2; color: #dc2626; }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .step {
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            border-left: 4px solid #3b82f6;
+        }
+        .code {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { 
+            background: #94a3b8; 
+            cursor: not-allowed; 
+        }
+        .result {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .result.success { background: #dcfce7; color: #166534; }
+        .result.error { background: #fee2e2; color: #dc2626; }
+        .credentials {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Simplified Study Creation Flow Test</h1>
+        <p>This page tests the new simplified study creation flow with two options: Unmoderated Study and Moderated Interviews.</p>
+        
+        <div class="credentials">
+            <strong>🔐 Test Accounts:</strong><br>
+            Researcher: <code>abwanwr77+Researcher@gmail.com</code> / <code>Testtest123</code><br>
+            Participant: <code>abwanwr77+participant@gmail.com</code> / <code>Testtest123</code><br>
+            Admin: <code>abwanwr77+admin@gmail.com</code> / <code>Testtest123</code>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📋 Test Scenarios</h2>
+        
+        <div class="test-section">
+            <h3>1. Test Unmoderated Study Creation</h3>
+            <div class="step">Login as researcher → Dashboard → Create Study → Select "Unmoderated Study" → Should redirect to Study Builder</div>
+            <button onclick="testUnmoderatedFlow()">🎯 Test Unmoderated Flow</button>
+            <div id="unmoderated-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test Moderated Interview Creation</h3>
+            <div class="step">Login as researcher → Dashboard → Create Study → Select "Moderated Interviews" → Should redirect to Interview Builder</div>
+            <button onclick="testInterviewFlow()">💬 Test Interview Flow</button>
+            <div id="interview-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Test Studies Page Access</h3>
+            <div class="step">Login as researcher → Studies page → Create Study button → Should show new simplified modal</div>
+            <button onclick="testStudiesPageFlow()">📊 Test Studies Page Flow</button>
+            <div id="studies-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Complete Interview Creation</h3>
+            <div class="step">Create a complete interview study with all settings and save it</div>
+            <button onclick="testCompleteInterviewCreation()">✅ Test Complete Interview Creation</button>
+            <div id="complete-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Manual Testing Steps</h2>
+        <div class="step">1. Open <a href="http://localhost:5175" target="_blank">http://localhost:5175</a></div>
+        <div class="step">2. Login with researcher account: <code>abwanwr77+Researcher@gmail.com</code></div>
+        <div class="step">3. Click "Create Study" button on dashboard or studies page</div>
+        <div class="step">4. Verify the new simplified modal appears with two cards</div>
+        <div class="step">5. Test both "Unmoderated Study" and "Moderated Interviews" options</div>
+        <div class="step">6. Verify routing to correct builder pages</div>
+        <div class="step">7. Test creating and saving studies of both types</div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Expected Behavior</h2>
+        <div class="test-section">
+            <h3>✅ New Simplified Modal</h3>
+            <ul>
+                <li>Shows two clear options with descriptive cards</li>
+                <li>No multi-step flow or template selection initially</li>
+                <li>Clean, intuitive interface</li>
+            </ul>
+            
+            <h3>🎯 Unmoderated Study Flow</h3>
+            <ul>
+                <li>Redirects to existing Study Builder</li>
+                <li>Uses study blocks system</li>
+                <li>Compatible with existing block system</li>
+            </ul>
+            
+            <h3>💬 Moderated Interview Flow</h3>
+            <ul>
+                <li>Redirects to new Interview Builder</li>
+                <li>No study blocks - just interview settings</li>
+                <li>Interview-specific form fields</li>
+                <li>Creates studies with type "interview"</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+
+        // Helper functions
+        async function apiRequest(endpoint, options = {}) {
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            const data = await response.json();
+            return { response, data };
+        }
+
+        async function login() {
+            try {
+                const { response, data } = await apiRequest('/auth?action=login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                if (response.ok && data.token) {
+                    authToken = data.token;
+                    return { success: true, user: data.user };
+                } else {
+                    return { success: false, error: data.error || 'Login failed' };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        function showResult(elementId, content, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isError ? 'error' : 'success'}`;
+            element.textContent = content;
+        }
+
+        // Test functions
+        async function testUnmoderatedFlow() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+
+            try {
+                const loginResult = await login();
+                if (!loginResult.success) {
+                    throw new Error(`Login failed: ${loginResult.error}`);
+                }
+
+                // Open the app in a new window to test the UI flow
+                const newWindow = window.open('http://localhost:5175/app/dashboard', '_blank');
+                
+                showResult('unmoderated-result', 
+                    `✅ Login successful as researcher\n` +
+                    `✅ New window opened to dashboard\n` +
+                    `📋 Manual step: Click "Create Study" and select "Unmoderated Study"\n` +
+                    `🎯 Expected: Should redirect to Study Builder with blocks system`
+                );
+
+            } catch (error) {
+                showResult('unmoderated-result', `❌ Error: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🎯 Test Unmoderated Flow';
+            }
+        }
+
+        async function testInterviewFlow() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+
+            try {
+                const loginResult = await login();
+                if (!loginResult.success) {
+                    throw new Error(`Login failed: ${loginResult.error}`);
+                }
+
+                // Open the app in a new window to test the UI flow
+                const newWindow = window.open('http://localhost:5175/app/dashboard', '_blank');
+                
+                showResult('interview-result', 
+                    `✅ Login successful as researcher\n` +
+                    `✅ New window opened to dashboard\n` +
+                    `📋 Manual step: Click "Create Study" and select "Moderated Interviews"\n` +
+                    `💬 Expected: Should redirect to Interview Builder (no blocks)`
+                );
+
+            } catch (error) {
+                showResult('interview-result', `❌ Error: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💬 Test Interview Flow';
+            }
+        }
+
+        async function testStudiesPageFlow() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+
+            try {
+                const loginResult = await login();
+                if (!loginResult.success) {
+                    throw new Error(`Login failed: ${loginResult.error}`);
+                }
+
+                // Open the studies page
+                const newWindow = window.open('http://localhost:5175/app/studies', '_blank');
+                
+                showResult('studies-result', 
+                    `✅ Login successful as researcher\n` +
+                    `✅ New window opened to studies page\n` +
+                    `📋 Manual step: Click "Create Study" button\n` +
+                    `🔍 Expected: Should show new simplified modal with two options`
+                );
+
+            } catch (error) {
+                showResult('studies-result', `❌ Error: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📊 Test Studies Page Flow';
+            }
+        }
+
+        async function testCompleteInterviewCreation() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+
+            try {
+                const loginResult = await login();
+                if (!loginResult.success) {
+                    throw new Error(`Login failed: ${loginResult.error}`);
+                }
+
+                // Test creating an interview study via API
+                const studyData = {
+                    title: 'Test Interview Study',
+                    description: 'A test interview created via simplified flow',
+                    type: 'interview',
+                    targetParticipants: 5,
+                    duration: 60,
+                    compensation: 50,
+                    requirements: [],
+                    tasks: [],
+                    settings: {
+                        recordScreen: false,
+                        recordAudio: true,
+                        recordWebcam: false,
+                        trackClicks: false,
+                        trackHovers: false,
+                        trackScrolls: false
+                    }
+                };
+
+                const { response, data } = await apiRequest('/studies', {
+                    method: 'POST',
+                    body: JSON.stringify(studyData)
+                });
+
+                if (response.ok) {
+                    showResult('complete-result', 
+                        `✅ Interview study created successfully!\n` +
+                        `📊 Study ID: ${data.study._id}\n` +
+                        `📝 Title: ${data.study.title}\n` +
+                        `🎯 Type: ${data.study.type}\n` +
+                        `⚙️ Settings: ${JSON.stringify(data.study.settings, null, 2)}`
+                    );
+                } else {
+                    throw new Error(`API Error: ${data.error || 'Unknown error'}`);
+                }
+
+            } catch (error) {
+                showResult('complete-result', `❌ Error: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✅ Test Complete Interview Creation';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Simplified Study Creation Flow Test Page Loaded');
+            console.log('🔗 Frontend: http://localhost:5175');
+            console.log('🔧 Backend: http://localhost:3003');
+        });
+    </script>
+</body>
+</html>

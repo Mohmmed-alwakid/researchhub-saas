@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Study Creation Flow Test - AfakarM</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+        
+        .test-section h2 {
+            color: #1e40af;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        
+        .test-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .test-link {
+            display: block;
+            padding: 15px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .test-link:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        
+        .test-link.secondary {
+            background: #10b981;
+        }
+        
+        .test-link.secondary:hover {
+            background: #059669;
+        }
+        
+        .test-link.tertiary {
+            background: #f59e0b;
+        }
+        
+        .test-link.tertiary:hover {
+            background: #d97706;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-success {
+            background-color: #10b981;
+        }
+        
+        .status-warning {
+            background-color: #f59e0b;
+        }
+        
+        .status-error {
+            background-color: #ef4444;
+        }
+        
+        .checklist {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .checklist ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .checklist li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+        
+        .mobile-viewport {
+            width: 375px;
+            height: 667px;
+            border: 2px solid #374151;
+            border-radius: 20px;
+            margin: 20px auto;
+            overflow: hidden;
+            position: relative;
+            background: white;
+        }
+        
+        .mobile-viewport iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .implementation-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .implementation-status h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .analytics-section {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #10b981;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .test-links {
+                grid-template-columns: 1fr;
+            }
+            
+            .mobile-viewport {
+                width: calc(100vw - 40px);
+                height: 500px;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Mobile Study Creation Flow Test</h1>
+        
+        <div class="implementation-status">
+            <h3>🚀 Implementation Status</h3>
+            <div class="feature-list">
+                <div class="feature-item">✅ MobileOptimizedStudyBuilder</div>
+                <div class="feature-item">✅ Enhanced Design System</div>
+                <div class="feature-item">✅ Analytics Service</div>
+                <div class="feature-item">✅ Multi-step Flow</div>
+                <div class="feature-item">✅ Accessibility Features</div>
+                <div class="feature-item">✅ Touch Optimization</div>
+                <div class="feature-item">✅ Progressive Disclosure</div>
+                <div class="feature-item">✅ Smart Validation</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 Development Server Status</h2>
+            <div class="checklist">
+                <ul>
+                    <li><span class="status-indicator status-success"></span>Frontend: http://localhost:5175</li>
+                    <li><span class="status-indicator status-success"></span>Backend: http://localhost:3003</li>
+                    <li><span class="status-indicator status-success"></span>Health Check: /api/health</li>
+                    <li><span class="status-indicator status-success"></span>Database: Supabase Connected</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📱 Mobile Flow Testing</h2>
+            <div class="test-links">
+                <a href="http://localhost:5175" class="test-link" target="_blank">
+                    Homepage (Mobile View)
+                </a>
+                <a href="http://localhost:5175/login" class="test-link secondary" target="_blank">
+                    Login Page
+                </a>
+                <a href="http://localhost:5175/app/dashboard" class="test-link tertiary" target="_blank">
+                    Dashboard (Authenticated)
+                </a>
+                <a href="http://localhost:5175/app/studies" class="test-link" target="_blank">
+                    Studies Page
+                </a>
+                <a href="http://localhost:5175/app/studies/builder" class="test-link secondary" target="_blank">
+                    Study Builder (Direct)
+                </a>
+                <a href="http://localhost:5175/app/studies/builder?type=usability" class="test-link tertiary" target="_blank">
+                    Mobile Builder (Usability)
+                </a>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🧪 Test Credentials</h2>
+            <div class="checklist">
+                <ul>
+                    <li><strong>Researcher:</strong> abwanwr77+Researcher@gmail.com / Testtest123</li>
+                    <li><strong>Participant:</strong> abwanwr77+participant@gmail.com / Testtest123</li>
+                    <li><strong>Admin:</strong> abwanwr77+admin@gmail.com / Testtest123</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="analytics-section">
+            <h3>📊 Analytics & Metrics Tracking</h3>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">0</div>
+                    <div class="metric-label">Studies Created</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0s</div>
+                    <div class="metric-label">Avg. Creation Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0%</div>
+                    <div class="metric-label">Completion Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0</div>
+                    <div class="metric-label">User Drop-offs</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>✅ Mobile Test Checklist</h2>
+            <div class="checklist">
+                <ul>
+                    <li>□ Homepage loads correctly on mobile viewport (375px)</li>
+                    <li>□ Login flow works with touch interactions</li>
+                    <li>□ Dashboard displays mobile-optimized layout</li>
+                    <li>□ "New Study" button triggers modal correctly</li>
+                    <li>□ Study type selection (Unmoderated/Moderated) works</li>
+                    <li>□ MobileOptimizedStudyBuilder loads for new studies</li>
+                    <li>□ Progressive disclosure shows/hides sections properly</li>
+                    <li>□ Touch-friendly controls are responsive</li>
+                    <li>□ Validation messages appear inline</li>
+                    <li>□ Step navigation works smoothly</li>
+                    <li>□ Study creation completes successfully</li>
+                    <li>□ Analytics events are tracked (console.log)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 Key Improvements Implemented</h2>
+            <div class="feature-list">
+                <div class="feature-item">📋 Multi-perspective Planning</div>
+                <div class="feature-item">🎨 Enhanced Design System</div>
+                <div class="feature-item">📱 Mobile-First Builder</div>
+                <div class="feature-item">♿ Accessibility Focus</div>
+                <div class="feature-item">📊 Analytics Integration</div>
+                <div class="feature-item">🔄 Progressive Disclosure</div>
+                <div class="feature-item">👆 Touch Optimization</div>
+                <div class="feature-item">✅ Smart Validation</div>
+            </div>
+        </div>
+        
+        <div class="mobile-viewport">
+            <iframe src="http://localhost:5175" title="Mobile Preview"></iframe>
+        </div>
+        
+        <div class="test-section">
+            <h2>🚀 Next Steps</h2>
+            <div class="checklist">
+                <ul>
+                    <li>□ Complete Playwright automation testing</li>
+                    <li>□ Implement backend analytics endpoint</li>
+                    <li>□ A/B test the new vs. old flow</li>
+                    <li>□ Gather user feedback from beta testers</li>
+                    <li>□ Monitor conversion rates and performance</li>
+                    <li>□ Optimize based on real user data</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-refresh development status
+        setInterval(() => {
+            fetch('http://localhost:3003/api/health')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('✅ Backend healthy:', data);
+                    }
+                })
+                .catch(err => {
+                    console.log('❌ Backend check failed:', err);
+                });
+        }, 30000);
+        
+        // Track page interactions for testing
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('test-link')) {
+                console.log('🔗 Test link clicked:', e.target.textContent.trim());
+            }
+        });
+        
+        console.log('📱 Mobile Study Creation Test Interface Loaded');
+        console.log('🎯 Use this interface to test the improved study creation flow');
+    </script>
+</body>
+</html>

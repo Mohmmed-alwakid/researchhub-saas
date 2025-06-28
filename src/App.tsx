@@ -11,8 +11,8 @@ import ForgotPasswordPage from './client/pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './client/pages/auth/ResetPasswordPage';
 import DashboardPage from './client/pages/dashboard/DashboardPage';
 import StudiesPage from './client/pages/studies/StudiesPage';
-import StudyBuilderPage from './client/pages/studies/StudyBuilderPage'; // Primary study builder (formerly enhanced)
-import TemplatePreviewPage from './client/pages/studies/TemplatePreviewPage';
+import InterviewBuilderPage from './client/pages/studies/InterviewBuilderPage'; // Interview creation page
+import StudyResultsPage from './client/pages/studies/StudyResultsPage';
 import StudyDiscoveryPage from './client/pages/studies/StudyDiscoveryPage';
 import StudyApplicationPage from './client/pages/studies/StudyApplicationPage';
 import StudyApplicationsManagementPage from './client/pages/studies/StudyApplicationsManagementPage';
@@ -24,6 +24,9 @@ import BillingSettingsPage from './client/pages/settings/BillingSettingsPage';
 import SettingsPage from './client/pages/settings/SettingsPage';
 import AdminDashboard from './client/pages/admin/AdminDashboard';
 import ManualPaymentPage from './client/pages/payments/ManualPaymentPage';
+import CollaborationPage from './client/pages/collaboration/CollaborationPage';
+import { CreativeJourneyPage } from './client/pages/journey/CreativeJourneyPage';
+import { StudyBuilderPage as ProfessionalStudyBuilderPage } from './client/pages/study-builder/StudyBuilderPage';
 
 // Import layouts
 import AppLayout from './client/components/common/AppLayout';
@@ -140,24 +143,34 @@ function App() {
                   <StudiesPage />
                 </ProtectedRoute>
               } />
-              <Route path="studies/new" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
-                  <StudyBuilderPage />
-                </ProtectedRoute>
-              } />
               <Route path="studies/create" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
-                  <StudyBuilderPage />
+                  <ProfessionalStudyBuilderPage />
                 </ProtectedRoute>
               } />
-              <Route path="studies/template-preview" element={
+              <Route path="study-builder" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
-                  <TemplatePreviewPage />
+                  <ProfessionalStudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/creative-journey" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <CreativeJourneyPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/create-interview" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <InterviewBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id/edit" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
-                  <StudyBuilderPage />
+                  <ProfessionalStudyBuilderPage />
+                </ProtectedRoute>
+              } />
+              <Route path="studies/:id/results" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <StudyResultsPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id/applications" element={
@@ -173,6 +186,11 @@ function App() {
               <Route path="analytics" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <AnalyticsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="collaboration" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <CollaborationPage />
                 </ProtectedRoute>
               } />
               <Route path="settings" element={<SettingsPage />} />
@@ -213,6 +231,11 @@ function App() {
               <Route path="studies/:id/session" element={
                 <ProtectedRoute allowedRoles={['participant']}>
                   <StudySessionPage />
+                </ProtectedRoute>
+              } />
+              <Route path="creative-journey" element={
+                <ProtectedRoute allowedRoles={['participant']}>
+                  <CreativeJourneyPage />
                 </ProtectedRoute>
               } />
             </Route>

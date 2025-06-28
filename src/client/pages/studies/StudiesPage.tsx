@@ -13,13 +13,12 @@ import {
   Calendar,
   Clock,
   DollarSign,
-  UserCheck
+  UserCheck,
+  BarChart3
 } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
 import { IStudy } from '../../../shared/types';
-import { MazeInspiredStudyCreationModal } from '../../components/studies/MazeInspiredStudyCreationModal';
-import type { StudyTemplate as StudyTemplateType } from '../../../shared/types/index';
 
 const StudiesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -35,34 +34,15 @@ const StudiesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [showMazeModal, setShowMazeModal] = useState(false);
 
   useEffect(() => {
     fetchStudies();
   }, [fetchStudies]);
 
-  // Handle study creation flow (same as dashboard)
+  // Handle study creation flow - direct to new Study Builder
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowMazeModal(true);
-  };
-
-  // Handlers for Maze-inspired modal (same as dashboard)
-  const handleMazeTemplateSelect = (template: StudyTemplateType) => {
-    navigate('/app/studies/template-preview', { 
-      state: { 
-        template
-      } 
-    });
-  };
-
-  const handleMazeStartFromScratch = (studyType: string) => {
-    navigate('/app/studies/create', { 
-      state: { 
-        studyType,
-        skipTemplates: true 
-      } 
-    });
+    navigate('/app/study-builder');
   };
 
   const filteredStudies = (studies || []).filter(study => {
@@ -110,6 +90,22 @@ const StudiesPage: React.FC = () => {
     }
   };
 
+  const handlePublishStudy = async (study: IStudy) => {
+    try {
+      // Update study to active status and make it public
+      await updateStudy(study._id, { 
+        status: 'active',
+        visibility: 'public' 
+      });
+      
+      // Show success message
+      alert('Ready to go!\n\nLooking good! Is it time to put this in front of testers and start collecting insights?');
+    } catch (error) {
+      console.error('Failed to publish study:', error);
+      alert('Failed to publish study. Please try again.');
+    }
+  };
+
   const handleDelete = async (studyId: string) => {
     if (window.confirm('Are you sure you want to delete this study? This action cannot be undone.')) {
       try {
@@ -134,14 +130,24 @@ const StudiesPage: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Studies</h1>
-          <p className="text-gray-600 mt-1">Manage your research studies and track progress</p>        </div>
-        <button
-          onClick={handleCreateNewStudy}
-          className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Study
-        </button>
+          <p className="text-gray-600 mt-1">Manage your research studies and track progress</p>        
+        </div>
+        <div className="flex space-x-3">
+          <Link
+            to="/app/study-builder"
+            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Study
+          </Link>
+          <button
+            onClick={handleCreateNewStudy}
+            className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Quick Study
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -228,14 +234,17 @@ const StudiesPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStudies.map((study) => (
-            <div key={study._id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div 
+              key={study._id} 
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => navigate(`/app/studies/${study._id}/results`)}
+            >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
                   <span className="text-2xl mr-3">{getTypeIcon(study.type)}</span>
                   <div>
                     <h3 className="font-semibold text-gray-900 line-clamp-1">{study.title}</h3>
-                    <p className="text-sm text-gray-600 capitalize">{study.type}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -269,17 +278,23 @@ const StudiesPage: React.FC = () => {
                 </div>
               </div>              {/* Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
                   <Link
                     to={`/studies/${study._id}`}
-                    onClick={() => setCurrentStudy(study)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentStudy(study);
+                    }}
                     className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
                     title="View study"
                   >
                     <Eye className="w-4 h-4" />
                   </Link>                  <Link
                     to={`/app/studies/${study._id}/edit`}
-                    onClick={() => setCurrentStudy(study)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentStudy(study);
+                    }}
                     className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
                     title="Edit study"
                   >
@@ -287,13 +302,17 @@ const StudiesPage: React.FC = () => {
                   </Link>
                   <Link
                     to={`/app/studies/${study._id}/applications`}
+                    onClick={(e) => e.stopPropagation()}
                     className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                     title="View applications"
                   >
                     <UserCheck className="w-4 h-4" />
                   </Link>
                   <button
-                    onClick={() => handleDelete(study._id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(study._id);
+                    }}
                     className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                     title="Delete study"
                   >
@@ -301,36 +320,84 @@ const StudiesPage: React.FC = () => {
                   </button>
                 </div>
 
-                {study.status !== 'draft' && study.status !== 'completed' && (
-                  <button
-                    onClick={() => handleStatusToggle(study)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      study.status === 'active'
-                        ? 'text-yellow-600 hover:bg-yellow-50'
-                        : 'text-green-600 hover:bg-green-50'
-                    }`}
-                    title={study.status === 'active' ? 'Pause study' : 'Resume study'}
-                  >
-                    {study.status === 'active' ? (
-                      <Pause className="w-4 h-4" />
-                    ) : (
-                      <Play className="w-4 h-4" />
-                    )}
-                  </button>
-                )}
+                {/* Action buttons based on study status */}
+                <div className="flex items-center space-x-2">
+                  {/* Draft studies: Start Testing button */}
+                  {study.status === 'draft' && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePublishStudy(study);
+                      }}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                      title="Publish study and make it available to participants"
+                    >
+                      Start Testing
+                    </button>
+                  )}
+
+                  {/* Active/Paused studies: Management buttons */}
+                  {(study.status === 'active' || study.status === 'paused') && (
+                    <>
+                      <Link
+                        to={`/app/studies/${study._id}/applications`}
+                        className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium inline-flex items-center gap-2"
+                        title="Manage participant applications"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <UserCheck className="w-4 h-4" />
+                        Applications
+                      </Link>
+                      
+                      <Link
+                        to={`/app/studies/${study._id}/results`}
+                        className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium inline-flex items-center gap-2"
+                        title="View study results and analytics"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                        Results
+                      </Link>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStatusToggle(study);
+                        }}
+                        className={`p-2 rounded-lg transition-colors ${
+                          study.status === 'active'
+                            ? 'text-yellow-600 hover:bg-yellow-50'
+                            : 'text-green-600 hover:bg-green-50'
+                        }`}
+                        title={study.status === 'active' ? 'Pause study' : 'Resume study'}
+                      >
+                        {study.status === 'active' ? (
+                          <Pause className="w-4 h-4" />
+                        ) : (
+                          <Play className="w-4 h-4" />
+                        )}
+                      </button>
+                    </>
+                  )}
+
+                  {/* Completed studies: View Results only */}
+                  {study.status === 'completed' && (
+                    <Link
+                      to={`/app/studies/${study._id}/results`}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium inline-flex items-center gap-2"
+                      title="View final study results"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      View Results
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      {/* Maze-Inspired Study Creation Modal */}
-      <MazeInspiredStudyCreationModal 
-        isOpen={showMazeModal} 
-        onClose={() => setShowMazeModal(false)}
-        onSelectTemplate={handleMazeTemplateSelect}
-        onStartFromScratch={handleMazeStartFromScratch}
-      />
     </div>
   );
 };

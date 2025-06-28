@@ -2,28 +2,40 @@
 
 <!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
 
-## ⚠️ Project Status: ACTIVE DEVELOPMENT - MULTI-STEP STUDY CREATION COMPLETE
-**Last Updated**: June 23, 2025  
-**Status**: 🚧 Early Development Stage - Study Creation Flow & Block System Production Ready  
-**Build Status**: ✅ 0 TypeScript errors, Multi-Step Study Creation Complete
+## ⚠️ Project Status: ACTIVE DEVELOPMENT - NEW STUDY BUILDER SYSTEM COMPLETE
+**Last Updated**: June 28, 2025  
+**Status**: 🚧 Early Development Stage - Professional Study Builder Implemented & Legacy System Replaced  
+**Build Status**: ✅ 0 TypeScript errors, New Study Builder System Production Ready
 
 ## 📋 Project Overview
-ResearchHub is an **in-development** SaaS platform for user testing research. Recent major progress includes a complete **Multi-Step Study Creation Flow** with guided modals, enhanced **Study Blocks System** with custom editing interfaces, and comprehensive **Template Integration**.
+ResearchHub is an **in-development** SaaS platform for user testing research. Recent major progress includes a complete **Professional Study Builder** with enterprise-grade user experience, enhanced **Study Blocks System** with custom editing interfaces, comprehensive **Template Integration** with detailed previews, and **Interactive Study Preview** for researchers.
 
 ### ACTUAL Implementation Status (Current Reality)
 - ✅ **Authentication System**: Complete JWT auth with role management
 - ✅ **Database**: Supabase with RLS security properly implemented
-- ✅ **Study Creation Flow**: Multi-step modal system with template integration
+- ✅ **Professional Study Builder**: Complete 6-step wizard with enterprise-grade UX
 - ✅ **Study Blocks System**: 13 block types with custom editing interfaces
-- ✅ **Template System**: Browse, preview, and seamlessly apply pre-configured templates
+- ✅ **Template System**: Enhanced template preview with detailed information
+- ✅ **Interactive Study Preview**: Researchers can experience participant view
 - ✅ **Block Library**: Predefined block types with descriptions and enhanced UI
 - ✅ **Role-Based Access**: Working admin/researcher/participant system
 - ✅ **Local Development**: Optimized full-stack development environment
 - ✅ **API Endpoints**: Core functionality working with real database
 - ✅ **Frontend**: Modern React with TypeScript, production-ready components
+- ✅ **Collaboration Features**: Real-time team collaboration fully integrated in Study Builder
+- ✅ **Backend APIs**: Collaboration, approval, and comments APIs with WebSocket server
+- ✅ **Database Schema**: Collaboration tables and RLS policies ready for production
 - 🚧 **Production Deployment**: Working but with Vercel function limits
 
-## ✅ Recent Major Achievements (June 23, 2025)
+## ✅ Recent Major Achievements (June 28, 2025)
+- **Legacy System Replacement**: Completely replaced old study creation with new Study Builder
+- **Professional Study Builder**: Enterprise-grade 6-step wizard matching industry standards
+- **Enhanced Template Preview**: Complete template information with block breakdown and usage stats
+- **Interactive Study Preview**: Full participant experience preview for researchers
+- **Conditional Form Fields**: Smart field display based on study type (duration/audio for interviews only)
+- **Optional Research Objectives**: Streamlined form flow with optional objective fields
+- **Routing Optimization**: All study creation routes now point to new Study Builder
+- **Code Cleanup**: Removed legacy study creation components and unused imports
 - **Multi-Step Study Creation**: Complete guided modal flow (type selection → template selection → preview → builder)
 - **Enhanced Block Editing**: Custom editing interfaces for 5-Second Test, Open Question, and Simple Input blocks
 - **Study Builder Refactor**: Complete TypeScript refactor with StudyBuilderBlock interface and type safety
@@ -35,7 +47,8 @@ ResearchHub is an **in-development** SaaS platform for user testing research. Re
 - **Zero Build Errors**: Clean TypeScript compilation confirmed
 
 ## 🚧 In Development (Partial Implementation)
-- **Backend Block APIs**: Need to add block template endpoints
+- **Backend Collaboration APIs**: Ready for production deployment (WebSocket server created)
+- **Database Migrations**: Collaboration tables ready for production deployment
 - **Block Session Rendering**: For participant experience
 - **Advanced Block Features**: AI integration, conditional logic, advanced analytics
 - **Template Creation UI**: Visual template builder for researchers  
@@ -358,6 +371,49 @@ const getDefaultBlockSettings = (type: BlockType): Record<string, any> => { /* .
 - **Custom Editing**: Specialized interfaces for complex block configuration
 
 ## ⚠️ Important Development Rules
+
+### 🏗️ MANDATORY Development Process (ALL REQUESTS)
+**CRITICAL: Follow this process for EVERY request before any implementation**
+
+#### 1. 📋 REQUIREMENTS VALIDATION PHASE
+- **STOP**: Check if detailed requirements exist for this request
+- **READ**: Review existing requirements document (create if missing)
+- **VALIDATE**: Ensure requirements are complete and approved
+- **DOCUMENT**: Create requirements.md file following template in `DEVELOPMENT_STANDARDS_FRAMEWORK.md`
+
+#### 2. 🔍 EXISTING CODE ANALYSIS PHASE  
+- **SEARCH**: Find all existing implementations related to the request
+- **ANALYZE**: Understand current patterns, architecture, and conventions
+- **DECISION**: Extend existing code vs. create new (PREFER EXTEND)
+- **RULE**: Never create new components when existing ones can be enhanced
+- **EXAMPLE**: StudyCreationWizard exists - enhance it, don't replace it
+
+#### 3. 📝 IMPLEMENTATION PLAN PHASE
+- **DESIGN**: Technical approach that builds on existing systems
+- **COMPATIBILITY**: Ensure backward compatibility and integration
+- **APPROVAL**: Present plan to user before proceeding
+- **ENHANCEMENT**: Always prefer enhancement over replacement
+
+#### 4. ✅ QUALITY ASSURANCE PHASE
+- **BUILD**: Follow approved plan exactly
+- **TEST**: Comprehensive testing including existing functionality
+- **DOCUMENT**: Update all relevant documentation
+- **VALIDATE**: Ensure no regression in existing features
+
+### 🚫 CRITICAL ANTI-PATTERNS (NEVER DO)
+1. **Creating new systems when existing ones can be enhanced**
+2. **Starting implementation without detailed requirements**
+3. **Replacing working code instead of extending it**
+4. **Ignoring existing patterns and conventions**
+5. **Building without understanding existing architecture**
+6. **Creating duplicate functionality**
+
+### 📋 REQUIREMENTS FRAMEWORK
+- **See**: `DEVELOPMENT_STANDARDS_FRAMEWORK.md` for complete template
+- **Rule**: No coding without approved requirements document
+- **Guarantee**: Same requirements = Same output, always
+- **Consistency**: Requirements ensure reproducible development outcomes
+- **Example**: `STUDY_CREATION_WIZARD_IMPROVEMENTS_REQUIREMENTS.md` shows proper format
 
 ### 🚀 Local Development First
 1. **Always develop locally first**: Use `npm run dev:fullstack`
