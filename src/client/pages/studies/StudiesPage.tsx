@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
@@ -22,6 +22,7 @@ import { IStudy } from '../../../shared/types';
 
 const StudiesPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { 
     studies, 
     studiesLoading, 
@@ -38,6 +39,32 @@ const StudiesPage: React.FC = () => {
   useEffect(() => {
     fetchStudies();
   }, [fetchStudies]);
+
+  // Refresh studies when returning from study builder
+  useEffect(() => {
+    // If user is coming from study builder, refresh the studies list
+    if (location.state?.fromStudyBuilder) {
+      console.log('👀 Detected return from Study Builder, refreshing studies...');
+      fetchStudies();
+    }
+  }, [location.state, fetchStudies]);
+
+  // Also refresh when window regains focus (user returns from another tab/app)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log('🔍 Window focused, refreshing studies...');
+      fetchStudies();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [fetchStudies]);
+
+  // Handle manual refresh
+  const handleRefresh = () => {
+    console.log('🔄 Manual refresh triggered');
+    fetchStudies();
+  };
 
   // Handle study creation flow - direct to new Study Builder
   const handleCreateNewStudy = (e: React.MouseEvent) => {
@@ -133,6 +160,16 @@ const StudiesPage: React.FC = () => {
           <p className="text-gray-600 mt-1">Manage your research studies and track progress</p>        
         </div>
         <div className="flex space-x-3">
+          <button
+            onClick={handleRefresh}
+            className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
+            title="Refresh studies list"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
           <Link
             to="/app/study-builder"
             className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"

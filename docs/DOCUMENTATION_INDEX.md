@@ -38,6 +38,11 @@
 - **[BACKEND_STRUCTURE.md](BACKEND_STRUCTURE.md)** - API structure and backend architecture
 - **[APP_FLOW.md](APP_FLOW.md)** - Application flow and user journeys
 
+## 🔧 Technical Issues & Resolutions
+
+### Bug Fixes & Solutions
+- **[STUDY_STATUS_ISSUE_RESOLUTION.md](../STUDY_STATUS_ISSUE_RESOLUTION.md)** - 🐛 Study status display issue resolution (June 28, 2025)
+
 ### Code Quality & Maintenance
 - **[TYPESCRIPT_FIXING_JOURNEY.md](TYPESCRIPT_FIXING_JOURNEY.md)** - TypeScript implementation and fixes
 
@@ -121,6 +126,13 @@
 - **Security Review**: → [SECURITY_CHECKLIST.md](SECURITY_CHECKLIST.md)
 
 ## 📈 Recent Updates
+
+### June 28, 2025 - Study Status Issue Resolution
+- ✅ **RESOLVED**: Study status display issue completely fixed
+- ✅ **DOCUMENTED**: [STUDY_STATUS_ISSUE_RESOLUTION.md](../STUDY_STATUS_ISSUE_RESOLUTION.md) - Comprehensive resolution report
+- ✅ **ENHANCED**: StudiesPage with multiple refresh mechanisms
+- ✅ **IMPROVED**: User experience when returning from Study Builder
+- ✅ **VERIFIED**: Both API and UI testing confirm fix works correctly
 
 ### June 23, 2025 - Major Documentation Overhaul
 - ✅ **NEW**: [STUDY_BLOCKS_SYSTEM.md](STUDY_BLOCKS_SYSTEM.md) - Complete rewrite with technical specifications

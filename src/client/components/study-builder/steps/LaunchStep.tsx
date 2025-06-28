@@ -39,6 +39,7 @@ export const LaunchStep: React.FC<StepProps> = ({
         title: formData.title,
         description: formData.description,
         type: formData.type || 'usability_test',
+        status: 'active', // Set study to active when launching from wizard
         tasks: formData.blocks?.map((block, index) => ({
           id: block.id,
           order: index + 1,
@@ -137,7 +138,7 @@ export const LaunchStep: React.FC<StepProps> = ({
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => navigate('/app/studies')}
+                onClick={() => navigate('/app/studies', { state: { fromStudyBuilder: true } })}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 View All Studies

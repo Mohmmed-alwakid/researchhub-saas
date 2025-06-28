@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Study Status Issue</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Study Status Issue</h1>
+        <p>This test will help us identify why the study status shows as "draft" after launching with "active" status.</p>
+
+        <div class="test-section">
+            <h2>Step 1: Authentication</h2>
+            <p>First, let's authenticate with the researcher account:</p>
+            <button onclick="testAuth()">Test Authentication</button>
+            <div id="auth-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Step 2: Create Study with 'active' Status</h2>
+            <p>Create a study with explicit 'active' status:</p>
+            <button onclick="createActiveStudy()">Create Active Study</button>
+            <div id="create-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Step 3: Fetch Studies List</h2>
+            <p>Retrieve the studies list to see the actual status:</p>
+            <button onclick="fetchStudies()">Fetch Studies</button>
+            <div id="fetch-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Step 4: Database Direct Check</h2>
+            <p>Check what's actually in the database:</p>
+            <button onclick="checkDatabase()">Check Database</button>
+            <div id="db-result"></div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let createdStudyId = null;
+
+        function showResult(elementId, type, message, data = null) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <div class="${type}">
+                    <strong>${message}</strong>
+                    ${data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''}
+                </div>
+            `;
+        }
+
+        async function testAuth() {
+            try {
+                const response = await fetch('http://localhost:3003/api/auth?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.token) {
+                    authToken = result.token;
+                    showResult('auth-result', 'success', 'Authentication successful!', {
+                        token: authToken.substring(0, 20) + '...',
+                        user: result.user
+                    });
+                } else {
+                    showResult('auth-result', 'error', 'Authentication failed!', result);
+                }
+            } catch (error) {
+                showResult('auth-result', 'error', 'Authentication error!', { error: error.message });
+            }
+        }
+
+        async function createActiveStudy() {
+            if (!authToken) {
+                showResult('create-result', 'error', 'Please authenticate first!');
+                return;
+            }
+
+            const studyData = {
+                title: `Test Study Status - ${new Date().toISOString()}`,
+                description: 'Testing if the study status updates correctly when set to active',
+                type: 'usability_test',
+                status: 'active', // EXPLICITLY setting to active
+                tasks: [
+                    {
+                        id: 'welcome-001',
+                        order: 1,
+                        type: 'welcome_screen',
+                        title: 'Welcome',
+                        description: 'Welcome to our study',
+                        settings: {}
+                    },
+                    {
+                        id: 'thankyou-002',
+                        order: 2,
+                        type: 'thank_you',
+                        title: 'Thank You',
+                        description: 'Thank you for participating',
+                        settings: {}
+                    }
+                ],
+                settings: {
+                    maxParticipants: 15,
+                    duration: 30,
+                    compensation: 25,
+                    recording: {
+                        screen: true,
+                        audio: false,
+                        webcam: false
+                    }
+                }
+            };
+
+            console.log('Creating study with data:', studyData);
+
+            try {
+                const response = await fetch('http://localhost:3003/api/studies', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.study) {
+                    createdStudyId = result.study._id || result.study.id;
+                    showResult('create-result', 'success', 'Study created successfully!', {
+                        studyId: createdStudyId,
+                        status: result.study.status,
+                        title: result.study.title,
+                        fullResponse: result
+                    });
+                } else {
+                    showResult('create-result', 'error', 'Study creation failed!', result);
+                }
+            } catch (error) {
+                showResult('create-result', 'error', 'Study creation error!', { error: error.message });
+            }
+        }
+
+        async function fetchStudies() {
+            if (!authToken) {
+                showResult('fetch-result', 'error', 'Please authenticate first!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3003/api/studies', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.studies) {
+                    const recentStudy = createdStudyId ? 
+                        result.studies.find(s => s._id === createdStudyId || s.id === createdStudyId) :
+                        result.studies[0];
+
+                    showResult('fetch-result', 'success', 'Studies fetched successfully!', {
+                        totalStudies: result.studies.length,
+                        recentStudy: recentStudy ? {
+                            id: recentStudy._id || recentStudy.id,
+                            title: recentStudy.title,
+                            status: recentStudy.status,
+                            createdAt: recentStudy.createdAt
+                        } : null,
+                        allStudies: result.studies.map(s => ({
+                            id: s._id || s.id,
+                            title: s.title,
+                            status: s.status
+                        }))
+                    });
+                } else {
+                    showResult('fetch-result', 'error', 'Failed to fetch studies!', result);
+                }
+            } catch (error) {
+                showResult('fetch-result', 'error', 'Fetch studies error!', { error: error.message });
+            }
+        }
+
+        async function checkDatabase() {
+            if (!authToken) {
+                showResult('db-result', 'error', 'Please authenticate first!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3003/api/db-check', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+                showResult('db-result', 'info', 'Database check completed!', result);
+            } catch (error) {
+                showResult('db-result', 'error', 'Database check error!', { error: error.message });
+            }
+        }
+
+        // Auto-run authentication on page load
+        window.addEventListener('load', () => {
+            setTimeout(testAuth, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -28,6 +28,9 @@ ResearchHub is an **in-development** SaaS platform for user testing research. Re
 - 🚧 **Production Deployment**: Working but with Vercel function limits
 
 ## ✅ Recent Major Achievements (June 28, 2025)
+- **Study Status Issue Resolution**: Completely fixed status display bug with comprehensive testing
+- **Enhanced StudiesPage**: Added multiple refresh mechanisms for real-time data consistency
+- **API Verification**: Confirmed backend correctly handles study status field
 - **Legacy System Replacement**: Completely replaced old study creation with new Study Builder
 - **Professional Study Builder**: Enterprise-grade 6-step wizard matching industry standards
 - **Enhanced Template Preview**: Complete template information with block breakdown and usage stats

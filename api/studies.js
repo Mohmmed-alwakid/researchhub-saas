@@ -296,7 +296,7 @@ export default async function handler(req, res) {
         currentUserId = currentUser.id;
       }
 
-      const { title, description, type, tasks, settings } = req.body;
+      const { title, description, type, tasks, settings, status } = req.body;
 
       if (!title) {
         return res.status(400).json({
@@ -317,7 +317,7 @@ export default async function handler(req, res) {
           compensation: settings?.compensation || 25,
           tasks: tasks || []
         },
-        status: 'draft',
+        status: status || 'draft', // Use provided status or default to 'draft'
         target_participants: settings?.maxParticipants || 10,
         researcher_id: currentUserId
       };      console.log('Creating study with data:', studyData);
