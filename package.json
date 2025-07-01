@@ -64,7 +64,6 @@
     "recharts": "^2.15.3",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "stripe": "^18.2.0",
     "tailwind-merge": "^3.3.0",
     "zod": "^3.25.32",
     "zustand": "^5.0.5"
@@ -102,6 +101,6 @@
     "semver": "^7.5.2",
     "tar": "^6.2.1",
     "undici": "^5.28.6",
-    "path-to-regexp": "^6.2.3"
+    "path-to-regexp": "^1.8.0"
   }
 }

@@ -11,7 +11,7 @@ This roadmap is based on actual implementation analysis and realistic developmen
 ### Current Reality
 - **Foundation**: Strong (Auth, User Management, Database)
 - **Core Research Features**: Missing (Screen Recording, Analytics)
-- **Business Features**: Partial (Manual payments work, Stripe incomplete)
+- **Business Features**: Complete (Points system implemented, replacing Stripe)
 
 ### Timeline to Production
 - **Phase 1 (3 months)**: Core research functionality
@@ -127,20 +127,20 @@ This roadmap is based on actual implementation analysis and realistic developmen
 
 ---
 
-### Month 6: Payment System Completion
+### Month 6: Points System Enhancement
 
-**Week 1-2: Stripe Integration**
-- Complete Stripe integration
-- Automated billing system
-- Subscription lifecycle management
+**Week 1-2: Advanced Points Features**
+- Enhanced points system features
+- Advanced analytics and reporting
+- Integration with all platform features
 
 **Priority Tasks:**
 ```
-[ ] Stripe webhook processing
-[ ] Automated subscription billing
-[ ] Payment method management
-[ ] Invoice generation
-[ ] Billing automation
+[ ] Advanced points analytics
+[ ] Points cost optimization
+[ ] Bulk points assignment
+[ ] Points usage forecasting
+[ ] Enhanced admin controls
 ```
 
 ---

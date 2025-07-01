@@ -11,7 +11,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { SecuritySettings } from '../../components/settings/SecuritySettings';
-import { SubscriptionManager } from '../../components/subscription/SubscriptionManager';
+import { PointsManager } from '../../components/subscription/PointsManager';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../stores/authStore';
@@ -241,7 +241,7 @@ const SettingsPage: React.FC = () => {
         } : undefined} />;
 
       case 'billing':
-        return <SubscriptionManager />;
+        return <PointsManager />;
 
       case 'notifications':
         return (

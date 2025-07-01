@@ -45,7 +45,7 @@ ResearchHub is a **SaaS platform for user testing research** that allows researc
 - **Screen Recording**: UI implemented, backend integration pending
 - **Analytics Dashboard**: Mock data, needs real analytics implementation
 - **Session Replay**: Frontend ready, video processing needed
-- **Payment Processing**: Stripe integration planned
+- **Payment Processing**: Points-based system with admin-controlled allocation
 
 ### ❌ Not Yet Implemented
 

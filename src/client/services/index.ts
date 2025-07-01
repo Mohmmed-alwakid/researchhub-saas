@@ -1,7 +1,7 @@
 export { apiService, default as api } from './api.service';
 export { authService, default as auth } from './auth.service';
 export { studiesService, default as studies } from './studies.service';
-export { paymentService, default as payment } from './payment.service';
+export { pointsService, default as points } from './payment.service';
 export { participantsService, default as participants } from './participants.service';
 export { sessionsService, default as sessions } from './sessions.service';
 
@@ -25,14 +25,9 @@ export type {
 } from './studies.service';
 
 export type {
-  SubscriptionPlan,
-  PaymentMethod,
-  Subscription,
-  Invoice,
-  CreateCheckoutSessionRequest,
-  CreateCheckoutSessionResponse,
-  CreatePortalSessionResponse,
-} from './payment.service';
+  IPointsBalance,
+  IPointsTransaction,
+} from '../../shared/types';
 
 export type {
   InviteParticipantRequest,

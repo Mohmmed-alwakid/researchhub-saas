@@ -73,7 +73,7 @@ const SubscriptionManager: React.FC = () => {
           "Real-time billing and payment processing",
           "Revenue analytics and reporting",
           "Subscriber management and support",
-          "Stripe integration for secure payments",
+          "Points system for study access control",
           "Automated billing and invoicing"
         ]}
         expectedRelease="Q4 2024"

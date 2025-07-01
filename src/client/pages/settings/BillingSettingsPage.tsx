@@ -10,8 +10,8 @@ import {
   CreditCard
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { paymentService } from '../../services/payment.service';
-import { SubscriptionManager } from '../../components/subscription/SubscriptionManager';
+import { pointsService } from '../../services/payment.service';
+import { PointsManager } from '../../components/subscription/PointsManager';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 
@@ -51,9 +51,24 @@ const BillingSettingsPage = () => {
 
   const loadUsageStats = async () => {
     try {
-      const response = await paymentService.getUsageStats();
+      // Points system doesn't need usage stats - just show points balance
+      const response = await pointsService.getBalance();
       if (response.success) {
-        setUsageStats(response);
+        setUsageStats({
+          success: true,
+          usage: {
+            studiesCreated: response.balance?.totalSpent || 0,
+            participantsRecruited: 0,
+            recordingMinutes: 0,
+            dataExports: 0
+          },
+          limits: {
+            studiesCreated: -1,
+            participantsRecruited: -1,
+            recordingMinutes: -1,
+            dataExports: -1
+          }
+        });
       }
     } catch (error) {
       console.error('Error loading usage stats:', error);
@@ -86,9 +101,9 @@ const BillingSettingsPage = () => {
         <p className="mt-2 text-gray-600">
           Manage your subscription, view usage, and download invoices.
         </p>
-      </div>      {/* Subscription Manager */}
+      </div>      {/* Points Manager */}
       <div className="mb-8">
-        <SubscriptionManager />
+        <PointsManager />
       </div>
 
       {/* Manual Payment Option */}

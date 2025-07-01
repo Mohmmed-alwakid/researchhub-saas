@@ -1,5 +1,10 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModuleconst PaymentMethod = {
+    ADMIN_ASSIGNMENT: 'admin_assignment',
+    SUBSCRIPTION_PLAN: 'subscription_plan',
+    MANUAL_ADJUSTMENT: 'manual_adjustment',
+    POINTS_SYSTEM: 'points_system'
+};alue: true });
 exports.SubscriptionStatus = exports.SubscriptionPlan = exports.PaymentStatus = exports.PaymentMethod = exports.FeedbackStatus = exports.RecordingQuality = exports.RecordingStatus = exports.TaskType = exports.SessionStatus = exports.StudyStatus = exports.StudyType = exports.UserRole = void 0;
 // Enum constants for runtime usage
 exports.UserRole = {
@@ -55,14 +60,14 @@ exports.FeedbackStatus = {
     RESPONDED: 'responded'
 };
 exports.PaymentMethod = {
-    CREDIT_CARD: 'credit_card',
-    PAYPAL: 'paypal',
-    BANK_TRANSFER: 'bank_transfer',
-    STRIPE: 'stripe'
+    ADMIN_ASSIGNMENT: 'admin_assignment',
+    SUBSCRIPTION_PLAN: 'subscription_plan',
+    MANUAL_ADJUSTMENT: 'manual_adjustment',
+    POINTS_SYSTEM: 'points_system'
 };
 exports.PaymentStatus = {
     PENDING: 'pending',
-    SUCCEEDED: 'succeeded',
+    COMPLETED: 'completed',
     FAILED: 'failed',
     CANCELED: 'canceled'
 };

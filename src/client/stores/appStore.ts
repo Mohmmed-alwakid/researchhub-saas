@@ -7,9 +7,7 @@ import type {
   Study, 
   IParticipant, 
   ISession,
-  ITask,
-  StudyStatus,
-  StudyType
+  StudyStatus
 } from '../../shared/types';
 import type { CreateStudyRequest } from '../services/studies.service';
 
@@ -93,7 +91,7 @@ export const useAppStore = create<AppState>((set) => ({
       const message = getErrorMessage(error, 'Failed to fetch studies');
       toast.error(message);
     }
-  },createStudy: async (studyData: StudyInput) => {
+  },  createStudy: async (studyData: StudyInput) => {
     try {
       const response = await studiesService.createStudy({
         title: studyData.title,
@@ -120,14 +118,20 @@ export const useAppStore = create<AppState>((set) => ({
         studies: [newStudy, ...state.studies]
       }));
       
-      toast.success('Study created successfully');
+      // Show success message with points information if available
+      if (response.pointsDeducted) {
+        toast.success(`Study created successfully! ${response.pointsDeducted} points deducted.`);
+      } else {
+        toast.success('Study created successfully');
+      }
+      
       return newStudy;
     } catch (error: unknown) {
       const message = getErrorMessage(error, 'Failed to create study');
       toast.error(message);
       throw error;
     }
-  },  updateStudy: async (studyId: string, updates: Partial<Study>) => {
+  },updateStudy: async (studyId: string, updates: Partial<Study>) => {
     try {
       // Create comprehensive update data that includes all study fields
       const updateData: Partial<CreateStudyRequest> & { status?: StudyStatus } = {

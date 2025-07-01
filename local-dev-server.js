@@ -4,8 +4,10 @@ import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
 import applicationsHandler from './api/applications.js';
 import studiesHandler from './api/studies.js';
-import studySessionsHandler from './api/study-sessions.js';
 import blocksHandler from './api/blocks.js';
+import authHandler from './api/auth.js';
+import pointsHandler from './api/points.js';
+import performanceHandler from './api/performance.js';
 
 const app = express();
 const PORT = 3001;
@@ -306,16 +308,34 @@ app.all('/api/studies*', async (req, res) => {
   return await studiesHandler(req, res);
 });
 
-// Study Sessions endpoints
-app.all('/api/study-sessions*', async (req, res) => {
-  console.log(`=== STUDY SESSIONS API: ${req.method} ${req.url} ===`);
-  return await studySessionsHandler(req, res);
-});
+// Study Sessions endpoints - TODO: Create study-sessions.js API
+// app.all('/api/study-sessions*', async (req, res) => {
+//   console.log(`=== STUDY SESSIONS API: ${req.method} ${req.url} ===`);
+//   return await studySessionsHandler(req, res);
+// });
 
 // Blocks endpoints (for study blocks and templates)
 app.all('/api/blocks*', async (req, res) => {
   console.log(`=== BLOCKS API: ${req.method} ${req.url} ===`);
   return await blocksHandler(req, res);
+});
+
+// Auth endpoints
+app.all('/api/auth*', async (req, res) => {
+  console.log(`=== AUTH API: ${req.method} ${req.url} ===`);
+  return await authHandler(req, res);
+});
+
+// Points endpoints  
+app.all('/api/points*', async (req, res) => {
+  console.log(`=== POINTS API: ${req.method} ${req.url} ===`);
+  return await pointsHandler(req, res);
+});
+
+// Performance endpoints
+app.all('/api/performance*', async (req, res) => {
+  console.log(`=== PERFORMANCE API: ${req.method} ${req.url} ===`);
+  return await performanceHandler(req, res);
 });
 
 // Legacy study-blocks endpoint (redirect to blocks)

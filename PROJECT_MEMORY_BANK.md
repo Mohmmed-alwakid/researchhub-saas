@@ -147,7 +147,7 @@ curl http://localhost:5175             # Frontend accessibility
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Express.js + TypeScript + MongoDB + Mongoose  
 - **Authentication**: JWT tokens + refresh tokens
-- **Payments**: Stripe integration
+- **Payments**: Points system (replaced Stripe)
 - **Real-time**: Socket.io for live features
 - **Cloud**: AWS deployment ready (EC2, S3, CloudFront)
 
@@ -188,7 +188,7 @@ ADMIN_ORGANIZATION=Your Organization
 2. ✅ **Screen Recording**: WebRTC-based recording with cloud storage
 3. ✅ **Participant Management**: Recruitment, screening, and compensation
 4. ✅ **Analytics Dashboard**: Heatmaps, session replays, insights
-5. ✅ **Payment System**: Stripe integration for subscriptions and payouts
+5. ✅ **Payment System**: Points system for study access control
 6. ✅ **Authentication System**: Complete JWT-based auth flow
 7. ✅ **Database Models**: All MongoDB schemas implemented
 8. ✅ **API Endpoints**: RESTful APIs with proper validation
@@ -444,7 +444,9 @@ PORT=3002  # Updated from 5000 to avoid conflicts
 CLIENT_URL=http://localhost:5173
 MONGODB_URI=mongodb://localhost:27017/researchhub
 JWT_SECRET=your-secret-key
-STRIPE_SECRET_KEY=sk_test_...
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-key
 
 # Production (.env.production)
 NODE_ENV=production

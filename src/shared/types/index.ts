@@ -459,17 +459,41 @@ export interface IDeviceInfo {
   os: string;
 }
 
-// Subscription types
+// Subscription types (Points-based system)
 export interface ISubscription {
   _id: string;
   userId: string;
   plan: 'free' | 'basic' | 'pro' | 'enterprise';
   status: 'active' | 'canceled' | 'expired' | 'past_due' | 'cancel_at_period_end';
-  stripeSubscriptionId?: string;
+  pointsBalance: number;
+  pointsUsed: number;
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
   features: ISubscriptionFeatures;
   usage: IUsageMetrics;
+}
+
+// Points System types
+export interface IPointsTransaction {
+  _id: string;
+  userId: string;
+  type: 'assigned' | 'consumed' | 'refunded' | 'expired';
+  amount: number;
+  balance: number;
+  reason: string;
+  studyId?: string;
+  assignedBy?: string; // Admin user ID who assigned points
+  createdAt: Date;
+  expiresAt?: Date;
+}
+
+export interface IPointsBalance {
+  userId: string;
+  totalPoints: number;
+  availablePoints: number;
+  usedPoints: number;
+  expiredPoints: number;
+  lastUpdated: Date;
 }
 
 export interface ISubscriptionFeatures {
@@ -519,51 +543,19 @@ export interface INotification {
   createdAt: Date;
 }
 
-// Payment types
+// Payment types (Points-based system)
 export interface IPayment {
   _id: string;
   userId: string;
   subscriptionId?: string;
-  stripePaymentIntentId?: string;
-  stripeChargeId?: string;
-  stripeInvoiceId?: string;
-  stripeCustomerId?: string;
-  type: 'payment' | 'payout' | 'refund' | 'subscription';
-  status: 'pending' | 'succeeded' | 'failed' | 'canceled';
-  amount: number;
-  currency: string;
-  amountReceived?: number;
-  stripeFee?: number;
-  applicationFee?: number;
-  netAmount?: number;
-  refundAmount?: number;
-  paymentMethod: 'credit_card' | 'paypal' | 'bank_transfer' | 'stripe';
-  paymentMethodDetails?: {
-    card?: {
-      brand?: string;
-      last4?: string;
-      expMonth?: number;
-      expYear?: number;
-      country?: string;
-      funding?: string;
-    };
-    bank?: {
-      accountType?: string;
-      bankName?: string;
-      last4?: string;
-      routingNumber?: string;
-    };
-  };
+  type: 'points_assigned' | 'points_consumed' | 'points_refunded' | 'subscription';
+  status: 'pending' | 'completed' | 'failed' | 'canceled';
+  pointsAmount: number;
   description: string;
-  failureReason?: string;
-  riskScore?: number;
-  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
-  retryAttempts?: number;
+  assignedBy?: string; // Admin user ID for manual assignments
+  studyId?: string; // If points were consumed for a study
+  paymentMethod: 'admin_assignment' | 'subscription_plan' | 'manual_adjustment';
   metadata?: Record<string, unknown>;
-  paidAt?: Date;
-  failedAt?: Date;
-  attemptedAt?: Date;
-  processedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -1410,7 +1402,7 @@ export type RecordingQuality = 'low' | 'medium' | 'high' | 'ultra';
 export type FeedbackType = 'rating' | 'comment' | 'suggestion' | 'issue' | 'compliment';
 export type FeedbackStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed';
 export type PaymentType = 'payment' | 'payout' | 'refund' | 'subscription';
-export type PaymentMethod = 'credit_card' | 'paypal' | 'bank_transfer' | 'stripe';
+export type PaymentMethod = 'admin_assignment' | 'subscription_plan' | 'manual_adjustment' | 'points_system';
 export type PaymentStatus = 'pending' | 'succeeded' | 'failed' | 'canceled';
 export type SubscriptionPlan = 'free' | 'basic' | 'pro' | 'enterprise';
 export type SubscriptionStatus = 'active' | 'canceled' | 'expired' | 'past_due' | 'cancel_at_period_end';
@@ -1520,15 +1512,15 @@ export const FeedbackStatus = {
 } as const;
 
 export const PaymentMethod = {
-  CREDIT_CARD: 'credit_card' as const,
-  PAYPAL: 'paypal' as const,
-  BANK_TRANSFER: 'bank_transfer' as const,
-  STRIPE: 'stripe' as const
+  ADMIN_ASSIGNMENT: 'admin_assignment' as const,
+  SUBSCRIPTION_PLAN: 'subscription_plan' as const,
+  MANUAL_ADJUSTMENT: 'manual_adjustment' as const,
+  POINTS_SYSTEM: 'points_system' as const
 } as const;
 
 export const PaymentStatus = {
   PENDING: 'pending' as const,
-  SUCCEEDED: 'succeeded' as const,
+  COMPLETED: 'completed' as const,
   FAILED: 'failed' as const,
   CANCELED: 'canceled' as const
 } as const;
@@ -1900,14 +1892,14 @@ export interface WorkspaceUsage {
 }
 
 export interface WorkspaceBilling {
-  stripeCustomerId?: string;
-  stripeSubscriptionId?: string;
+  pointsBalance: number;
+  pointsUsed: number;
+  lastPointsAssignment?: Date;
+  assignedBy?: string;
   paymentMethod?: {
-    type: 'card' | 'bank_account';
-    last4?: string;
-    brand?: string;
-    expiryMonth?: number;
-    expiryYear?: number;
+    type: 'admin_assignment' | 'subscription_plan';
+    assignmentReason?: string;
+    expiryDate?: Date;
   };
   billingAddress?: {
     line1: string;

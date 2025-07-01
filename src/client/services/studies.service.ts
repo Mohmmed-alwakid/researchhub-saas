@@ -49,6 +49,8 @@ export interface StudiesResponse {
 export interface StudyResponse {
   success: boolean;
   study: Study;
+  pointsDeducted?: number;
+  message?: string;
 }
 
 export interface StudyAnalytics {

@@ -35,6 +35,7 @@ import AuthGuard from './client/components/auth/AuthGuard';
 import ProtectedRoute from './client/components/auth/ProtectedRoute';
 import { ErrorBoundary } from './client/components/ErrorBoundary';
 import { PerformanceMonitor } from './client/components/PerformanceMonitor';
+import FloatingReportButton from './client/components/performance/FloatingReportButton';
 import { useAuthStore } from './client/stores/authStore';
 
 // Create a client
@@ -252,6 +253,7 @@ function App() {
           </Routes>
           <Toaster position="top-right" />
           <PerformanceMonitor showMetrics={process.env.NODE_ENV === 'development'} />
+          <FloatingReportButton />
         </div>
       </Router>
     </QueryClientProvider>

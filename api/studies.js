@@ -360,17 +360,98 @@ export default async function handler(req, res) {
       console.log('Using currentUserId:', currentUserId);
       console.log('Using service role?', !!supabaseServiceKey);
       
+      // Calculate points needed for study creation
+      const baseStudyCost = 50; // Base cost per study
+      const blockCount = (tasks || []).length || 1; // Number of blocks/tasks
+      const blockCost = blockCount * 10; // 10 points per block
+      const participantCost = (settings?.maxParticipants || 10) * 5; // 5 points per participant
+      const totalPointsNeeded = baseStudyCost + blockCost + participantCost;
+      
+      console.log('Points calculation:', {
+        baseStudyCost,
+        blockCount,
+        blockCost,
+        participantCost,
+        totalPointsNeeded
+      });
+      
+      // Check user's points balance before creating study
+      const { data: pointsBalance, error: pointsError } = await supabase
+        .from('points_balance')
+        .select('total_points')
+        .eq('user_id', currentUserId)
+        .single();
+      
+      if (pointsError && pointsError.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error checking points balance:', pointsError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to verify points balance'
+        });
+      }
+      
+      const currentPoints = pointsBalance?.total_points || 0;
+      
+      if (currentPoints < totalPointsNeeded) {
+        return res.status(400).json({
+          success: false,
+          error: `Insufficient points. You need ${totalPointsNeeded} points but have ${currentPoints}. Please contact an administrator to add more points to your account.`,
+          pointsNeeded: totalPointsNeeded,
+          currentPoints: currentPoints
+        });
+      }
+      
       // Insert study into Supabase
       const { data: newStudy, error } = await supabase
         .from('studies')
         .insert([studyData])
         .select()
-        .single();if (error) {
+        .single();      if (error) {
         console.error('Error creating study:', error);
         return res.status(500).json({
           success: false,
           error: 'Failed to create study'
         });
+      }
+
+      // Deduct points after successful study creation
+      try {
+        const { error: transactionError } = await supabase
+          .from('points_transactions')
+          .insert([{
+            user_id: currentUserId,
+            type: 'deduction',
+            amount: totalPointsNeeded,
+            description: `Study creation: ${title}`,
+            reference_type: 'study',
+            reference_id: newStudy.id
+          }]);
+        
+        if (transactionError) {
+          console.error('Error recording points transaction:', transactionError);
+          // Don't fail the study creation, but log the issue
+        }
+        
+        // Also record the study cost for tracking
+        const { error: costError } = await supabase
+          .from('study_costs')
+          .insert([{
+            study_id: newStudy.id,
+            base_cost: baseStudyCost,
+            block_cost: blockCost,
+            participant_cost: participantCost,
+            total_cost: totalPointsNeeded
+          }]);
+        
+        if (costError) {
+          console.error('Error recording study cost:', costError);
+          // Don't fail the study creation, but log the issue
+        }
+        
+        console.log('Points deducted successfully:', totalPointsNeeded);
+      } catch (pointsDeductionError) {
+        console.error('Error in points deduction process:', pointsDeductionError);
+        // Continue with study creation success response
       }
 
       // Transform the new study to match frontend expectations
@@ -399,7 +480,8 @@ export default async function handler(req, res) {
       res.status(201).json({
         success: true,
         study: transformedStudy,
-        message: 'Study created successfully'
+        pointsDeducted: totalPointsNeeded,
+        message: `Study created successfully. ${totalPointsNeeded} points deducted.`
       });    } else if (req.method === 'PUT') {
       // Handle study updates
       console.log('=== PUT REQUEST DEBUG ===');

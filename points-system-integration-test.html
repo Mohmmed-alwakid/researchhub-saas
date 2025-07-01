@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points System Integration Test - ResearchHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { border-color: #4CAF50; background-color: #f1f8e9; }
+        .error { border-color: #f44336; background-color: #ffebee; }
+        .warning { border-color: #ff9800; background-color: #fff3e0; }
+        .info { border-color: #2196F3; background-color: #e3f2fd; }
+        
+        button {
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #1976D2; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .status {
+            padding: 8px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #4CAF50; color: white; }
+        .status.error { background: #f44336; color: white; }
+        .status.info { background: #2196F3; color: white; }
+        
+        .json-display {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .auth-info {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Points System Integration Test</h1>
+        <p>Complete testing suite for the new points-based system in ResearchHub</p>
+        
+        <div class="auth-info">
+            <strong>Test Accounts Available:</strong><br>
+            Admin: abwanwr77+admin@gmail.com (Password: Testtest123)<br>
+            Researcher: abwanwr77+Researcher@gmail.com (Password: Testtest123)<br>
+            Participant: abwanwr77+participant@gmail.com (Password: Testtest123)
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Authentication Section -->
+        <div class="container">
+            <h2>🔐 Authentication</h2>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" value="abwanwr77+Researcher@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" value="Testtest123">
+            </div>
+            <button onclick="login()">Login</button>
+            <button onclick="logout()">Logout</button>
+            <div id="auth-status"></div>
+        </div>
+
+        <!-- Points Management Section -->
+        <div class="container">
+            <h2>💰 Points Management</h2>
+            <button onclick="getPointsBalance()">Get Points Balance</button>
+            <button onclick="getPointsHistory()">Get Points History</button>
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="assignPoints">Assign Points (Admin Only):</label>
+                <input type="number" id="assignPoints" placeholder="Amount" min="1">
+                <input type="text" id="assignUserId" placeholder="User ID">
+                <input type="text" id="assignReason" placeholder="Reason">
+                <button onclick="assignPoints()">Assign Points</button>
+            </div>
+            <div id="points-status"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📚 Study Creation with Points Deduction</h2>
+        <div class="form-group">
+            <label for="studyTitle">Study Title:</label>
+            <input type="text" id="studyTitle" value="Points System Test Study">
+        </div>
+        <div class="form-group">
+            <label for="studyDescription">Study Description:</label>
+            <textarea id="studyDescription">Testing the new points system integration</textarea>
+        </div>
+        <div class="form-group">
+            <label for="studyType">Study Type:</label>
+            <select id="studyType">
+                <option value="usability">Usability Testing</option>
+                <option value="interview">User Interview</option>
+                <option value="survey">Survey</option>
+                <option value="cardSort">Card Sorting</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="maxParticipants">Max Participants:</label>
+            <input type="number" id="maxParticipants" value="10" min="1">
+        </div>
+        <button onclick="createStudy()">Create Study (Will Deduct Points)</button>
+        <div id="study-status"></div>
+    </div>
+
+    <div class="container">
+        <h2>🐛 Performance Monitoring Test</h2>
+        <button onclick="testPerformanceReporting()">Test Performance Report</button>
+        <button onclick="simulateError()">Simulate Error</button>
+        <button onclick="getPerformanceMetrics()">Get Performance Metrics</button>
+        <div id="performance-status"></div>
+    </div>
+
+    <div class="container">
+        <h2>📊 API Response Display</h2>
+        <div id="response-display" class="json-display">API responses will appear here...</div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let authToken = localStorage.getItem('token');
+        let currentUser = null;
+
+        // Display functions
+        function displayStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function displayResponse(data) {
+            document.getElementById('response-display').textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Authentication functions
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                displayResponse(data);
+
+                if (data.success) {
+                    authToken = data.data.session.access_token;
+                    currentUser = data.data.user;
+                    localStorage.setItem('token', authToken);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    displayStatus('auth-status', `✅ Logged in as ${currentUser.email} (${currentUser.user_metadata?.role || 'No role'})`, 'success');
+                } else {
+                    displayStatus('auth-status', `❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                displayStatus('auth-status', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            displayStatus('auth-status', '👋 Logged out', 'info');
+        }
+
+        // Points functions
+        async function getPointsBalance() {
+            if (!authToken) {
+                displayStatus('points-status', '❌ Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/points?action=balance`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                displayResponse(data);
+
+                if (data.success) {
+                    displayStatus('points-status', `💰 Points Balance: ${data.data.available_points} points`, 'success');
+                } else {
+                    displayStatus('points-status', `❌ Failed to get balance: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                displayStatus('points-status', `❌ Balance error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getPointsHistory() {
+            if (!authToken) {
+                displayStatus('points-status', '❌ Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/points?action=history`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                displayResponse(data);
+
+                if (data.success) {
+                    displayStatus('points-status', `📊 History: ${data.data.length} transactions`, 'success');
+                } else {
+                    displayStatus('points-status', `❌ Failed to get history: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                displayStatus('points-status', `❌ History error: ${error.message}`, 'error');
+            }
+        }
+
+        async function assignPoints() {
+            if (!authToken) {
+                displayStatus('points-status', '❌ Please login first', 'error');
+                return;
+            }
+
+            const amount = parseInt(document.getElementById('assignPoints').value);
+            const userId = document.getElementById('assignUserId').value;
+            const reason = document.getElementById('assignReason').value;
+
+            if (!amount || !userId || !reason) {
+                displayStatus('points-status', '❌ Please fill all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/points?action=assign`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ amount, userId, reason })
+                });
+
+                const data = await response.json();
+                displayResponse(data);
+
+                if (data.success) {
+                    displayStatus('points-status', `✅ Assigned ${amount} points successfully`, 'success');
+                } else {
+                    displayStatus('points-status', `❌ Failed to assign points: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                displayStatus('points-status', `❌ Assignment error: ${error.message}`, 'error');
+            }
+        }
+
+        // Study creation function
+        async function createStudy() {
+            if (!authToken) {
+                displayStatus('study-status', '❌ Please login first', 'error');
+                return;
+            }
+
+            const studyData = {
+                title: document.getElementById('studyTitle').value,
+                description: document.getElementById('studyDescription').value,
+                type: document.getElementById('studyType').value,
+                targetParticipants: parseInt(document.getElementById('maxParticipants').value),
+                duration: 30,
+                compensation: 0,
+                requirements: [],
+                tasks: [],
+                settings: {
+                    recordScreen: false,
+                    recordAudio: false,
+                    recordWebcam: false,
+                    trackClicks: true,
+                    trackHovers: true,
+                    trackScrolls: true
+                }
+            };
+
+            try {
+                displayStatus('study-status', '⏳ Creating study and deducting points...', 'info');
+
+                const response = await fetch(`${API_BASE}/api/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const data = await response.json();
+                displayResponse(data);
+
+                if (data.success) {
+                    const pointsMsg = data.pointsDeducted ? ` (${data.pointsDeducted} points deducted)` : '';
+                    displayStatus('study-status', `✅ Study created successfully${pointsMsg}`, 'success');
+                } else {
+                    displayStatus('study-status', `❌ Failed to create study: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                displayStatus('study-status', `❌ Study creation error: ${error.message}`, 'error');
+            }
+        }
+
+        // Performance monitoring functions
+        async function testPerformanceReporting() {
+            if (!authToken) {
+                displayStatus('performance-status', '❌ Please login first', 'error');
+                return;
+            }
+
+            const reportData = {
+                type: 'bug',
+                category: 'performance',
+                severity: 'medium',
+                title: 'Test Performance Report',
+                description: 'Testing the performance reporting system',
+                steps: ['Open points test page', 'Click test button', 'See this report'],
+                expected: 'Report should be submitted successfully',
+                actual: 'Testing the system',
+                browserInfo: navigator.userAgent,
+                url: window.location.href,
+                performanceMetrics: {
+                    loadTime: performance.now(),
+                    memoryUsage: performance.memory ? performance.memory.usedJSHeapSize : 0
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/performance?action=report`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reportData)
+                });
+
+                const data = await response.json();
+                displayResponse(data);
+
+                if (data.success) {
+                    displayStatus('performance-status', '✅ Performance report submitted successfully', 'success');
+                } else {
+                    displayStatus('performance-status', `❌ Failed to submit report: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                displayStatus('performance-status', `❌ Report error: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateError() {
+            try {
+                // Intentionally cause an error
+                throw new Error('Simulated error for testing');
+            } catch (error) {
+                displayStatus('performance-status', `🔥 Simulated error: ${error.message}`, 'error');
+                console.error('Simulated error:', error);
+            }
+        }
+
+        async function getPerformanceMetrics() {
+            const metrics = {
+                loadTime: performance.now(),
+                navigationStart: performance.timing.navigationStart,
+                loadEventEnd: performance.timing.loadEventEnd,
+                memoryUsage: performance.memory ? performance.memory.usedJSHeapSize : 'Not available',
+                connectionType: navigator.connection ? navigator.connection.effectiveType : 'Unknown'
+            };
+
+            displayResponse(metrics);
+            displayStatus('performance-status', '📊 Performance metrics collected', 'info');
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            // Check if already logged in
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+            
+            if (storedToken && storedUser) {
+                authToken = storedToken;
+                currentUser = JSON.parse(storedUser);
+                displayStatus('auth-status', `✅ Already logged in as ${currentUser.email}`, 'success');
+            }
+
+            displayStatus('auth-status', '🚀 Points System Test Ready', 'info');
+        };
+    </script>
+</body>
+</html>
