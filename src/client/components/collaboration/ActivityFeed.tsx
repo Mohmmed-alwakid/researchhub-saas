@@ -58,8 +58,6 @@ interface ActivityFeedProps {
   isLoading?: boolean;
   /** Callback when activity is clicked */
   onActivityClick?: (activity: ActivityItem) => void;
-  /** Callback when user is mentioned */
-  onUserMention?: (user: ActivityUser, activity: ActivityItem) => void;
   /** Show compact view */
   compact?: boolean;
   /** Maximum number of items to display */
@@ -71,7 +69,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   currentUser,
   isLoading = false,
   onActivityClick,
-  onUserMention,
   compact = false,
   maxItems
 }) => {
@@ -239,7 +236,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             isExpanded={expandedItems.has(activity.id)}
             onToggleExpanded={() => toggleExpanded(activity.id)}
             onClick={() => onActivityClick?.(activity)}
-            onUserMention={onUserMention}
             getActivityIcon={getActivityIcon}
             getActivityMessage={getActivityMessage}
             formatRelativeTime={formatRelativeTime}
@@ -343,7 +339,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
                   isExpanded={false}
                   onToggleExpanded={() => {}}
                   onClick={() => onActivityClick?.(activity)}
-                  onUserMention={onUserMention}
                   getActivityIcon={getActivityIcon}
                   getActivityMessage={getActivityMessage}
                   formatRelativeTime={formatRelativeTime}
@@ -372,7 +367,6 @@ interface ActivityItemCardProps {
   isExpanded: boolean;
   onToggleExpanded: () => void;
   onClick?: () => void;
-  onUserMention?: (user: ActivityUser, activity: ActivityItem) => void;
   getActivityIcon: (type: ActivityType) => React.ReactNode;
   getActivityMessage: (activity: ActivityItem) => string;
   formatRelativeTime: (date: Date) => string;
@@ -385,7 +379,6 @@ const ActivityItemCard: React.FC<ActivityItemCardProps> = ({
   isExpanded,
   onToggleExpanded,
   onClick,
-  onUserMention,
   getActivityIcon,
   getActivityMessage,
   formatRelativeTime
@@ -477,10 +470,6 @@ const ActivityItemCard: React.FC<ActivityItemCardProps> = ({
                             variant="secondary"
                             size="sm"
                             className="cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onUserMention?.(user, activity);
-                            }}
                           >
                             {user.name}
                           </Badge>

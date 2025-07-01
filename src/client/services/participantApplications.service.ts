@@ -2,7 +2,7 @@ import { apiService } from './api.service';
 import type { ParticipantApplication } from '../../shared/types';
 
 export interface PublicStudy {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   type: string;
@@ -100,7 +100,7 @@ export const participantApplicationsService = {
         params.append(key, value.toString());
       }
     });    const queryString = params.toString();
-    const baseUrl = 'participant-applications?endpoint=studies/public';
+    const baseUrl = 'applications?endpoint=studies/public';
     const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
       return apiService.get<PublicStudiesResponse>(url);
   },
@@ -132,7 +132,7 @@ export const participantApplicationsService = {
       };
     };
   }> {
-    return apiService.get(`participant-applications?endpoint=studies/${studyId}/details`);
+    return apiService.get(`applications?endpoint=studies/${studyId}/details`);
   },
 
   /**
@@ -149,7 +149,7 @@ export const participantApplicationsService = {
       };
     };
   }> {
-    return apiService.get(`participant-applications?endpoint=studies/${studyId}/application-status`);
+    return apiService.get(`applications?endpoint=applications/status/${studyId}`);
   },
 
   /**
@@ -159,7 +159,7 @@ export const participantApplicationsService = {
     data: ParticipantApplication;
     message: string;
   }> {
-    return apiService.post(`participant-applications?endpoint=studies/${studyId}/apply`, application);
+    return apiService.post(`applications?endpoint=studies/${studyId}/apply`, application);
   },
 
   /**
@@ -177,7 +177,7 @@ export const participantApplicationsService = {
         params.append(key, value.toString());
       }
     });    const queryString = params.toString();
-    const baseUrl = 'participant-applications?endpoint=my-applications';
+    const baseUrl = 'applications?endpoint=applications/my-applications';
     const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
     
     return apiService.get<ApplicationsResponse>(url);
@@ -189,7 +189,7 @@ export const participantApplicationsService = {
     success: boolean;
     message: string;
   }> {
-    return apiService.patch(`participant-applications?endpoint=applications/${applicationId}/withdraw`);
+    return apiService.patch(`applications?endpoint=applications/${applicationId}/withdraw`);
   },
 
   /**
@@ -207,7 +207,7 @@ export const participantApplicationsService = {
         params.append(key, value.toString());
       }
     });    const queryString = params.toString();
-    const baseUrl = `participant-applications?endpoint=studies/${studyId}/applications`;
+    const baseUrl = `applications?endpoint=studies/${studyId}/applications`;
     const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
     
     return apiService.get<StudyApplicationsResponse>(url);
@@ -220,7 +220,7 @@ export const participantApplicationsService = {
     data: ParticipantApplication;
     message: string;
   }> {
-    return apiService.patch(`participant-applications?endpoint=applications/${applicationId}/review`, review);
+    return apiService.patch(`applications?endpoint=applications/${applicationId}/review`, review);
   }
 };
 

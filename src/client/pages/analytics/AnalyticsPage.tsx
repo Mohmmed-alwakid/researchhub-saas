@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   BarChart3, 
@@ -26,11 +26,20 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import { Card, CardContent } from '../../components/ui/Card';
 import HeatmapAnalytics from '../../components/analytics/HeatmapAnalytics';
 import SessionReplay from '../../components/analytics/SessionReplay';
 import AdvancedAnalyticsDashboard from '../../components/analytics/AdvancedAnalyticsDashboard';
 import { useAppStore } from '../../stores/appStore';
 import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
+import type { 
+  AnalyticsUIData, 
+  OverviewAnalyticsData, 
+  ResponseAnalyticsData,
+  TimelineData,
+  BlockPerformance,
+  ParticipantJourney
+} from '../../../shared/types/analytics';
 
 const AnalyticsPage: React.FC = () => {
   const { ENABLE_ADVANCED_ANALYTICS } = useFeatureFlags();
@@ -39,58 +48,127 @@ const AnalyticsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState('7d');
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsUIData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - replace with actual API calls
-  const [analyticsData] = useState({
-    overview: {
-      totalSessions: 127,
-      completedSessions: 89,
-      averageDuration: 1847, // seconds
-      completionRate: 78.3,
-      bounceRate: 12.4,
-      userSatisfaction: 4.2
-    },
-    sessionsByDay: [
-      { date: '2024-01-01', sessions: 15, completed: 12 },
-      { date: '2024-01-02', sessions: 23, completed: 18 },
-      { date: '2024-01-03', sessions: 18, completed: 14 },
-      { date: '2024-01-04', sessions: 31, completed: 25 },
-      { date: '2024-01-05', sessions: 28, completed: 22 },
-      { date: '2024-01-06', sessions: 20, completed: 16 },
-      { date: '2024-01-07', sessions: 25, completed: 19 }
-    ],
-    taskCompletion: [
-      { task: 'Task 1: Navigation', completion: 92, avgTime: 180 },
-      { task: 'Task 2: Search', completion: 85, avgTime: 245 },
-      { task: 'Task 3: Checkout', completion: 67, avgTime: 420 },
-      { task: 'Task 4: Contact', completion: 78, avgTime: 165 }
-    ],
-    deviceBreakdown: [
-      { device: 'Desktop', value: 68, color: '#3B82F6' },
-      { device: 'Mobile', value: 25, color: '#10B981' },
-      { device: 'Tablet', value: 7, color: '#F59E0B' }
-    ],    heatmapData: [
-      { x: 400, y: 200, intensity: 85, eventType: 'click' as const, timestamp: 1000 },
-      { x: 450, y: 250, intensity: 70, eventType: 'click' as const, timestamp: 2000 },
-      { x: 300, y: 400, intensity: 60, eventType: 'move' as const, timestamp: 3000 },
-      { x: 600, y: 300, intensity: 90, eventType: 'click' as const, timestamp: 4000 },
-      { x: 500, y: 350, intensity: 45, eventType: 'scroll' as const, timestamp: 5000 }
-    ],
-    sessions: [
-      {
-        id: 'session-1',
-        participantId: 'user-123',
-        startTime: '2024-01-07T10:30:00Z',
-        duration: 1234,
-        completionRate: 85,
-        recordingUrl: '/recordings/session-1.webm',        events: [
-          { id: 'evt-1', timestamp: 1000, type: 'click' as const, x: 400, y: 200, element: 'button.submit' },
-          { id: 'evt-2', timestamp: 2500, type: 'scroll' as const, x: 0, y: 300 },
-          { id: 'evt-3', timestamp: 4000, type: 'click' as const, x: 600, y: 150, element: 'a.navigation' }
-        ]
+  // Fetch analytics data from API
+  const fetchAnalyticsData = useCallback(async (type: string = 'overview') => {
+    if (!studyId) return null;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`/api/blocks?action=analytics&studyId=${studyId}&type=${type}`);
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch analytics data');
       }
-    ]
-  });
+      
+      return result.data;
+    } catch (err) {
+      console.error('Analytics fetch error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load analytics');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [studyId]);
+
+  // Load overview and response analytics on mount
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      if (!studyId) return;
+      
+      try {
+        const [overviewData, responseData] = await Promise.all([
+          fetchAnalyticsData('overview'),
+          fetchAnalyticsData('responses')
+        ]);
+        
+        if (overviewData && responseData) {
+          const overview = overviewData as OverviewAnalyticsData;
+          const responses = responseData as ResponseAnalyticsData;
+          
+          // Combine and format the data for the UI
+          setAnalyticsData({
+            overview: {
+              totalSessions: overview.overview.totalParticipants,
+              completedSessions: Math.round(overview.overview.totalParticipants * (overview.overview.completionRate / 100)),
+              averageDuration: overview.overview.avgSessionTime || 0,
+              completionRate: overview.overview.completionRate,
+              bounceRate: 100 - overview.overview.completionRate, // Inverse of completion rate
+              userSatisfaction: 4.2 // Default value, should come from satisfaction surveys
+            },
+            sessionsByDay: overview.timeline.map((day: TimelineData) => ({
+              date: day.date,
+              sessions: day.count,
+              completed: Math.round(day.count * 0.8) // Estimate based on completion rate
+            })),
+            taskCompletion: responses.blockPerformance.map((block: BlockPerformance) => ({
+              task: block.title,
+              completion: block.responseRate,
+              avgTime: block.averageTime
+            })),
+            deviceBreakdown: [
+              { device: 'Desktop', value: 68, color: '#3B82F6' },
+              { device: 'Mobile', value: 25, color: '#10B981' },
+              { device: 'Tablet', value: 7, color: '#F59E0B' }
+            ],
+            // Keep heatmap and session replay data as mock for now
+            heatmapData: [
+              { x: 400, y: 200, intensity: 85, eventType: 'click' as const, timestamp: 1000 },
+              { x: 450, y: 250, intensity: 70, eventType: 'click' as const, timestamp: 2000 },
+              { x: 300, y: 400, intensity: 60, eventType: 'move' as const, timestamp: 3000 },
+              { x: 600, y: 300, intensity: 90, eventType: 'click' as const, timestamp: 4000 },
+              { x: 500, y: 350, intensity: 45, eventType: 'scroll' as const, timestamp: 5000 }
+            ],
+            sessions: responses.participantJourney.map((step: ParticipantJourney, index: number) => ({
+              id: `session-${index + 1}`,
+              participantId: `user-${index + 1}`,
+              startTime: new Date(Date.now() - (index * 3600000)).toISOString(),
+              duration: Math.floor(Math.random() * 1000) + 500,
+              completionRate: step.conversionRate,
+              recordingUrl: `/recordings/session-${index + 1}.webm`,
+              events: [
+                { id: `evt-${index}-1`, timestamp: 1000, type: 'click' as const, x: 400, y: 200, element: 'button.submit' },
+                { id: `evt-${index}-2`, timestamp: 2500, type: 'scroll' as const, x: 0, y: 300 },
+                { id: `evt-${index}-3`, timestamp: 4000, type: 'click' as const, x: 600, y: 150, element: 'a.navigation' }
+              ]
+            })),
+            // Add raw analytics data for advanced features
+            rawOverview: overview,
+            rawResponses: responses
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load analytics:', err);
+        setError('Failed to load analytics data');
+      }
+    };
+
+    loadAnalytics();
+  }, [studyId, fetchAnalyticsData]);
+
+  // Mock data fallback for when no data is available yet
+  const fallbackData = {
+    overview: {
+      totalSessions: 0,
+      completedSessions: 0,
+      averageDuration: 0,
+      completionRate: 0,
+      bounceRate: 0,
+      userSatisfaction: 0
+    },
+    sessionsByDay: [],
+    taskCompletion: [],
+    deviceBreakdown: [],
+    heatmapData: [],
+    sessions: []
+  };
+
   useEffect(() => {
     // Find study in current studies array or fetch all studies if needed
     if (studyId && !currentStudy) {
@@ -111,10 +189,72 @@ const AnalyticsPage: React.FC = () => {
     });
   };
 
-  const exportData = (format: 'csv' | 'pdf') => {
-    // Implementation for data export
-    console.log(`Exporting analytics data as ${format.toUpperCase()}`);
-  };  const tabs = [
+  const exportData = async (format: 'csv' | 'pdf') => {
+    if (!studyId) {
+      console.error('No study ID available for export');
+      return;
+    }
+
+    try {
+      if (format === 'csv') {
+        const response = await fetch(`/api/blocks?action=analytics&studyId=${studyId}&type=export`);
+        if (response.ok) {
+          const csvContent = await response.text();
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `study-${studyId}-analytics.csv`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        }
+      } else {
+        // PDF export would need additional implementation
+        console.log(`PDF export not yet implemented`);
+      }
+    } catch (error) {
+      console.error(`Failed to export data as ${format}:`, error);
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading analytics data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to Load Analytics</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const displayData = analyticsData || fallbackData;
+
+  const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     ...(ENABLE_ADVANCED_ANALYTICS ? [{ id: 'advanced', label: 'Advanced', icon: Zap }] : []),
     { id: 'heatmaps', label: 'Heatmaps', icon: MousePointer },
@@ -201,62 +341,71 @@ const AnalyticsPage: React.FC = () => {
           <div className="space-y-8">
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
+              <Card>
+                <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="p-2 bg-blue-100 rounded-lg">
                     <Users className="w-6 h-6 text-blue-600" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-500">Total Sessions</p>
-                    <p className="text-2xl font-bold text-gray-900">{analyticsData.overview.totalSessions}</p>
+                    <p className="text-2xl font-bold text-gray-900">{displayData.overview.totalSessions}</p>
                   </div>
                 </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow-sm border p-6">
+              <Card>
+                <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="p-2 bg-green-100 rounded-lg">
                     <Target className="w-6 h-6 text-green-600" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-500">Completion Rate</p>
-                    <p className="text-2xl font-bold text-gray-900">{analyticsData.overview.completionRate}%</p>
+                    <p className="text-2xl font-bold text-gray-900">{displayData.overview.completionRate}%</p>
                   </div>
                 </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow-sm border p-6">
+              <Card>
+                <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="p-2 bg-yellow-100 rounded-lg">
                     <Clock className="w-6 h-6 text-yellow-600" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-500">Avg. Duration</p>
-                    <p className="text-2xl font-bold text-gray-900">{formatDuration(analyticsData.overview.averageDuration)}</p>
+                    <p className="text-2xl font-bold text-gray-900">{formatDuration(displayData.overview.averageDuration)}</p>
                   </div>
                 </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow-sm border p-6">
+              <Card>
+                <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="p-2 bg-purple-100 rounded-lg">
                     <TrendingUp className="w-6 h-6 text-purple-600" />
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-500">Satisfaction</p>
-                    <p className="text-2xl font-bold text-gray-900">{analyticsData.overview.userSatisfaction}/5</p>
+                    <p className="text-2xl font-bold text-gray-900">{displayData.overview.userSatisfaction}/5</p>
                   </div>
                 </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Sessions Over Time */}
-              <div className="bg-white rounded-lg shadow-sm border p-6">
+              <Card>
+                <CardContent className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Sessions Over Time</h3>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={analyticsData.sessionsByDay}>
+                  <LineChart data={displayData.sessionsByDay}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" tickFormatter={formatDate} />
                     <YAxis />
@@ -268,44 +417,49 @@ const AnalyticsPage: React.FC = () => {
                     <Line type="monotone" dataKey="completed" stroke="#10B981" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
+                </CardContent>
+              </Card>
 
               {/* Device Breakdown */}
-              <div className="bg-white rounded-lg shadow-sm border p-6">
+              <Card>
+                <CardContent className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Device Breakdown</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={analyticsData.deviceBreakdown}
+                      data={displayData.deviceBreakdown}
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
                       dataKey="value"
                       label={({ device, value }) => `${device}: ${value}%`}
                     >
-                      {analyticsData.deviceBreakdown.map((entry, index) => (
+                      {displayData.deviceBreakdown.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Task Completion Analysis */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Task Completion Analysis</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={analyticsData.taskCompletion}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="task" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="completion" fill="#3B82F6" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Task Completion Analysis</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={displayData.taskCompletion}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="task" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="completion" fill="#3B82F6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
           </div>        )}
 
         {/* Advanced Analytics Tab */}
@@ -324,7 +478,7 @@ const AnalyticsPage: React.FC = () => {
           <div>
             <HeatmapAnalytics
               studyId={studyId}
-              data={analyticsData.heatmapData}
+              data={displayData.heatmapData}
               showControls={true}
             />
           </div>
@@ -343,16 +497,21 @@ const AnalyticsPage: React.FC = () => {
                     ← Back to sessions list
                   </button>
                 </div>
-                <SessionReplay
-                  sessionId={selectedSession}
-                  recordingUrl={analyticsData.sessions[0].recordingUrl}
-                  events={analyticsData.sessions[0].events}
-                  duration={analyticsData.sessions[0].duration}
-                  showEvents={true}
-                />
+                {displayData.sessions[0] && (
+                  <SessionReplay
+                    sessionId={selectedSession}
+                    recordingUrl={displayData.sessions[0].recordingUrl}
+                    events={displayData.sessions[0].events.map(event => ({
+                      ...event,
+                      type: event.type === 'move' ? 'hover' : event.type
+                    }))}
+                    duration={displayData.sessions[0].duration}
+                    showEvents={true}
+                  />
+                )}
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-sm border">
+              <Card>
                 <div className="p-6 border-b border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-900">Session Recordings</h3>
                   <p className="text-sm text-gray-500 mt-1">
@@ -360,7 +519,7 @@ const AnalyticsPage: React.FC = () => {
                   </p>
                 </div>
                 <div className="divide-y divide-gray-200">
-                  {analyticsData.sessions.map((session) => (
+                  {displayData.sessions.map((session) => (
                     <div key={session.id} className="p-6 hover:bg-gray-50 cursor-pointer" 
                          onClick={() => setSelectedSession(session.id)}>
                       <div className="flex items-center justify-between">
@@ -387,18 +546,20 @@ const AnalyticsPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             )}
           </div>
         )}
 
         {/* Task Analysis Tab */}
         {activeTab === 'tasks' && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Task Performance Analysis</h3>
-            <div className="space-y-6">
-              {analyticsData.taskCompletion.map((task, index) => (
-                <div key={index} className="border rounded-lg p-4">
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Task Performance Analysis</h3>
+              <div className="space-y-6">
+                {displayData.taskCompletion.map((task, index) => (
+                  <Card key={index}>
+                    <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="font-medium text-gray-900">{task.task}</h4>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -429,10 +590,12 @@ const AnalyticsPage: React.FC = () => {
                       ></div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

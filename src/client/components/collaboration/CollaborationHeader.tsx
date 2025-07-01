@@ -114,7 +114,7 @@ export const CollaborationHeader: React.FC<CollaborationHeaderProps> = ({
       ));
     };
 
-    const handleActivityUpdate = (data: any) => {
+    const handleActivityUpdate = () => {
       setActivityCount(prev => prev + 1);
     };
 

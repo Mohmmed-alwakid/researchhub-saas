@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Researcher Studies API</title>
+</head>
+<body>
+    <h1>Testing Researcher Studies API</h1>
+    <div id="output"></div>
+    
+    <script>
+async function testResearcherStudiesAPI() {
+  const output = document.getElementById('output');
+  output.innerHTML = '<p>🔍 Testing researcher studies API...</p>';
+  
+  try {
+    // Use the researcher token (we'll need to get it)
+    // For now, let's test without authentication to see what we get
+    const response = await fetch('http://localhost:3003/api/studies');
+    const data = await response.json();
+    
+    output.innerHTML += `<p>✅ API Response Status: ${response.status}</p>`;
+    output.innerHTML += `<pre>API Response: ${JSON.stringify(data, null, 2)}</pre>`;
+    
+  } catch (error) {
+    output.innerHTML += `<p>❌ Error testing API: ${error}</p>`;
+  }
+}
+
+testResearcherStudiesAPI();
+    </script>
+</body>
+</html>

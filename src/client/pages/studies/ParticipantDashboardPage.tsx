@@ -498,16 +498,15 @@ const ParticipantDashboardPage: React.FC = () => {
                       <Button
                         key={pageNum}
                         onClick={() => fetchApplications(pageNum)}
-                        variant={pageNum === currentPage ? "primary" : "outline"}
+                        variant={currentPage === pageNum ? 'primary' : 'outline'}
                         size="sm"
-                        className="w-10"
                       >
                         {pageNum}
                       </Button>
                     );
                   })}
                 </div>
-
+                
                 <Button
                   onClick={() => fetchApplications(currentPage + 1)}
                   disabled={currentPage === totalPages}
@@ -526,3 +525,4 @@ const ParticipantDashboardPage: React.FC = () => {
 };
 
 export default ParticipantDashboardPage;
+   

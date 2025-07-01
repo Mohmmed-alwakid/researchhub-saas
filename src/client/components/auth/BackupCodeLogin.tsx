@@ -55,7 +55,7 @@ const BackupCodeLogin: React.FC<BackupCodeLoginProps> = ({
       
       if (validBackupCodes.includes(data.code.toUpperCase())) {
         toast.success('Backup code verified successfully!');
-        toast.info('This backup code has been used and is no longer valid.');
+        toast('This backup code has been used and is no longer valid.', { type: 'error' });
         onSuccess('mock-jwt-token');
       } else {
         const newAttempts = remainingAttempts - 1;

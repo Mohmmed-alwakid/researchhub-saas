@@ -1,5 +1,9 @@
 // Task format conversion utilities for bridging legacy and new study builder formats
-import type { ITask, StudyBuilderTask, TaskUnion } from '../../shared/types/index.js';
+import type { ITask, StudyBuilderBlock, BlockType } from '../../shared/types/index.js';
+
+// Type aliases for compatibility
+type StudyBuilderTask = StudyBuilderBlock;
+type TaskUnion = ITask | StudyBuilderTask;
 
 /**
  * Convert StudyBuilderTask to API TaskInput format
@@ -11,28 +15,31 @@ export function convertStudyBuilderTaskToAPI(builderTask: StudyBuilderTask): {
   order: number;
   settings?: Record<string, unknown>;
 } {
-  // Map template IDs to API task types
-  const templateToAPITypeMap: Record<string, 'navigation' | 'interaction' | 'feedback' | 'questionnaire' | 'prototype' | 'heatmap'> = {
-    'website_navigation': 'navigation',
-    'prototype_testing': 'prototype',
-    'tree_testing': 'navigation',
-    'card_sorting': 'interaction',
-    'first_click_test': 'navigation',
-    'interview_questions': 'questionnaire',
-    'conversation_starter': 'questionnaire',
-    'background_questions': 'questionnaire',
-    'questionnaire': 'questionnaire',
-    'likert_scale': 'questionnaire',
+  // Map block types to API task types
+  const blockTypeToAPITypeMap: Record<BlockType, 'navigation' | 'interaction' | 'feedback' | 'questionnaire' | 'prototype' | 'heatmap'> = {
+    'welcome': 'interaction',
+    'open_question': 'questionnaire',
+    'opinion_scale': 'questionnaire',
+    'simple_input': 'questionnaire',
     'multiple_choice': 'questionnaire',
-    'demographics': 'questionnaire',
-    'net_promoter_score': 'questionnaire'
+    'context_screen': 'interaction',
+    'yes_no': 'questionnaire',
+    'five_second_test': 'heatmap',
+    'card_sort': 'interaction',
+    'tree_test': 'navigation',
+    'screener': 'questionnaire',
+    'prototype_test': 'prototype',
+    'live_website_test': 'navigation',
+    'thank_you': 'interaction',
+    'image_upload': 'interaction',
+    'file_upload': 'interaction'
   };
 
   return {
-    title: builderTask.name,
+    title: builderTask.title,
     description: builderTask.description,
-    type: templateToAPITypeMap[builderTask.template_id] || 'interaction',
-    order: builderTask.order_index,
+    type: blockTypeToAPITypeMap[builderTask.type] || 'interaction',
+    order: builderTask.order,
     settings: builderTask.settings || {}
   };
 }
@@ -41,21 +48,24 @@ export function convertStudyBuilderTaskToAPI(builderTask: StudyBuilderTask): {
  * Convert StudyBuilderTask to legacy ITask format
  */
 export function convertStudyBuilderTaskToLegacy(builderTask: StudyBuilderTask): ITask {
-  // Map common template IDs to legacy task types
-  const templateToTypeMap: Record<string, ITask['type']> = {
-    'website_navigation': 'navigation',
-    'prototype_testing': 'prototype-test',
-    'tree_testing': 'navigation',
-    'card_sorting': 'interaction',
-    'first_click_test': 'navigation',
-    'interview_questions': 'questionnaire',
-    'conversation_starter': 'questionnaire',
-    'background_questions': 'questionnaire',
-    'questionnaire': 'questionnaire',
-    'likert_scale': 'questionnaire',
+  // Map block types to legacy task types
+  const blockTypeToLegacyTypeMap: Record<BlockType, ITask['type']> = {
+    'welcome': 'interaction',
+    'open_question': 'questionnaire',
+    'opinion_scale': 'questionnaire',
+    'simple_input': 'questionnaire',
     'multiple_choice': 'questionnaire',
-    'demographics': 'questionnaire',
-    'net_promoter_score': 'questionnaire'
+    'context_screen': 'interaction',
+    'yes_no': 'questionnaire',
+    'five_second_test': 'prototype-test',
+    'card_sort': 'interaction',
+    'tree_test': 'navigation',
+    'screener': 'questionnaire',
+    'prototype_test': 'prototype-test',
+    'live_website_test': 'navigation',
+    'thank_you': 'interaction',
+    'image_upload': 'interaction',
+    'file_upload': 'interaction'
   };
 
   const settings = builderTask.settings || {};
@@ -63,10 +73,10 @@ export function convertStudyBuilderTaskToLegacy(builderTask: StudyBuilderTask): 
   return {
     _id: builderTask.id,
     studyId: '', // Will be set by the parent study
-    title: builderTask.name,
+    title: builderTask.title,
     description: builderTask.description,
-    type: templateToTypeMap[builderTask.template_id] || 'interaction',
-    order: builderTask.order_index,
+    type: blockTypeToLegacyTypeMap[builderTask.type] || 'interaction',
+    order: builderTask.order,
     configuration: {
       instructions: builderTask.description,
       heatmapTracking: Boolean(settings.recordHeatmap),
@@ -85,20 +95,20 @@ export function convertStudyBuilderTaskToLegacy(builderTask: StudyBuilderTask): 
  * Convert legacy ITask to StudyBuilderTask format
  */
 export function convertLegacyTaskToStudyBuilder(legacyTask: ITask): StudyBuilderTask {
-  // Map legacy task types to template IDs
-  const typeToTemplateMap: Record<ITask['type'], string> = {
-    'navigation': 'website_navigation',
-    'interaction': 'prototype_testing',
-    'questionnaire': 'questionnaire',
-    'prototype-test': 'prototype_testing'
+  // Map legacy task types to block types
+  const legacyTypeToBlockTypeMap: Record<ITask['type'], BlockType> = {
+    'navigation': 'tree_test',
+    'interaction': 'card_sort',
+    'questionnaire': 'multiple_choice',
+    'prototype-test': 'five_second_test'
   };
+  
   return {
     id: legacyTask._id,
-    template_id: typeToTemplateMap[legacyTask.type] || 'prototype_testing',
-    name: legacyTask.title,
+    type: legacyTypeToBlockTypeMap[legacyTask.type] || 'multiple-choice',
+    title: legacyTask.title,
     description: legacyTask.description,
-    estimated_duration: Math.ceil((legacyTask.timeLimit || 300) / 60), // Convert seconds to minutes (optional)
-    order_index: legacyTask.order,
+    order: legacyTask.order,
     settings: {
       recordHeatmap: legacyTask.configuration.heatmapTracking,
       trackClicks: legacyTask.configuration.clickTracking,
@@ -108,28 +118,8 @@ export function convertLegacyTaskToStudyBuilder(legacyTask: ITask): StudyBuilder
       timeLimit: legacyTask.timeLimit,
       isRequired: legacyTask.isRequired,
       ...legacyTask.configuration
-    },
-    category: getTaskCategory(legacyTask.type),
-    complexity: 2 // Default complexity
+    }
   };
-}
-
-/**
- * Get task category based on legacy type
- */
-function getTaskCategory(type: ITask['type']): string {
-  switch (type) {
-    case 'navigation':
-      return 'usability';
-    case 'interaction':
-      return 'usability';
-    case 'prototype-test':
-      return 'usability';
-    case 'questionnaire':
-      return 'survey';
-    default:
-      return 'usability';
-  }
 }
 
 /**
@@ -191,7 +181,7 @@ export function convertTasksToStudyBuilder(legacyTasks: ITask[]): StudyBuilderTa
  * Determine if tasks are in StudyBuilder format
  */
 export function isStudyBuilderTask(task: TaskUnion): task is StudyBuilderTask {
-  return 'template_id' in task && 'order_index' in task;
+  return 'type' in task && 'order' in task && !('_id' in task);
 }
 
 /**

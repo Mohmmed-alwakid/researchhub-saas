@@ -16,6 +16,9 @@ import {
   UserCheck,
   BarChart3
 } from 'lucide-react';
+// Enhanced UI components for professional appearance
+import { Button, Input } from '../../components/ui';
+import { Card, CardContent } from '../../components/ui/Card';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
 import { IStudy } from '../../../shared/types';
@@ -160,23 +163,27 @@ const StudiesPage: React.FC = () => {
           <p className="text-gray-600 mt-1">Manage your research studies and track progress</p>        
         </div>
         <div className="flex space-x-3">
-          <button
+          <Button
             onClick={handleRefresh}
-            className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
+            variant="secondary"
+            size="md"
             title="Refresh studies list"
+            leftIcon={
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            }
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
             Refresh
-          </button>
-          <Link
-            to="/app/study-builder"
-            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"
+          </Button>
+          <Button
+            onClick={() => navigate('/app/study-builder')}
+            variant="primary"
+            size="md"
+            leftIcon={<Plus className="w-4 h-4" />}
           >
-            <Plus className="w-4 h-4 mr-2" />
             Create Study
-          </Link>
+          </Button>
           <button
             onClick={handleCreateNewStudy}
             className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
@@ -188,20 +195,20 @@ const StudiesPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
           <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search studies..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
+            <Input
+              type="text"
+              placeholder="Search studies..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              leftIcon={<Search className="w-4 h-4" />}
+              variant="default"
+              size="md"
+            />
           </div>
 
           {/* Status Filter */}
@@ -234,8 +241,11 @@ const StudiesPage: React.FC = () => {
               <option value="prototype">Prototype</option>
             </select>
           </div>
-        </div>
-      </div>      {/* Studies Grid */}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Studies Grid */}
       {filteredStudies.length === 0 ? (
         <div>
           {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' ? (
@@ -271,9 +281,9 @@ const StudiesPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStudies.map((study) => (
-            <div 
+            <Card 
               key={study._id} 
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+              className="p-6 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => navigate(`/app/studies/${study._id}/results`)}
             >
               {/* Header */}
@@ -376,15 +386,18 @@ const StudiesPage: React.FC = () => {
                   {/* Active/Paused studies: Management buttons */}
                   {(study.status === 'active' || study.status === 'paused') && (
                     <>
-                      <Link
-                        to={`/app/studies/${study._id}/applications`}
-                        className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium inline-flex items-center gap-2"
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/app/studies/${study._id}/applications`);
+                        }}
+                        variant="primary"
+                        size="sm"
+                        leftIcon={<UserCheck className="w-4 h-4" />}
                         title="Manage participant applications"
-                        onClick={(e) => e.stopPropagation()}
                       >
-                        <UserCheck className="w-4 h-4" />
                         Applications
-                      </Link>
+                      </Button>
                       
                       <Link
                         to={`/app/studies/${study._id}/results`}
@@ -431,7 +444,7 @@ const StudiesPage: React.FC = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

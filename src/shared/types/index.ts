@@ -9,15 +9,29 @@ interface IUserDocument extends IUser {
 // User types
 export interface IUser {
   _id: string;
+  id?: string; // Alternative ID property for compatibility
   email: string;
   firstName: string;
   lastName: string;
+  name?: string; // Computed or alternative name property
   role: 'researcher' | 'participant' | 'admin' | 'super_admin';
   avatar?: string;
   isVerified: boolean;
   subscription?: ISubscription;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Supabase-specific user interface for compatibility
+export interface SupabaseUser {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  role?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IUserProfile {
@@ -142,7 +156,7 @@ export interface IParticipantApplication {
   _id: string;
   studyId: string;
   participantId: string;
-  status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
+  status: 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'accepted'; // Added 'accepted' for compatibility
   screeningResponses: Array<{
     questionId: string;
     question: string;
@@ -164,7 +178,7 @@ export interface IParticipant {
   firstName: string;
   lastName: string;
   demographics?: Record<string, unknown>;
-  status: 'invited' | 'accepted' | 'declined' | 'completed' | 'no_show';
+  status: 'invited' | 'accepted' | 'declined' | 'completed' | 'no_show' | 'screened' | 'qualified' | 'disqualified'; // Added missing status values
   invitedAt: Date;
   acceptedAt?: Date;
   completedAt?: Date;
@@ -665,11 +679,36 @@ export type BlockType =
   | 'screener'
   | 'prototype_test'
   | 'live_website_test'
-  | 'thank_you';
+  | 'thank_you'
+  | 'image_upload'
+  | 'file_upload';
 
 // Block settings interface
 export interface BlockSettings {
   [key: string]: unknown;
+  // Common settings
+  message?: string;
+  content?: string;
+  duration?: number | string;
+  question?: string;
+  placeholder?: string;
+  options?: string[];
+  minLength?: number;
+  maxLength?: number;
+  minValue?: number;
+  maxValue?: number;
+  labels?: {
+    min?: string;
+    max?: string;
+    left?: string;
+    right?: string;
+  };
+  instructions?: string;
+  url?: string;
+  nextSteps?: string;
+  tasks?: string[];
+  followUpQuestions?: Array<{ id: string; question: string; type: string }>;
+  // Customization options
   customization?: BlockCustomization;
   validation?: BlockValidation;
   display?: BlockDisplay;
@@ -750,6 +789,10 @@ export interface BlockMetadata {
   version: string;
   author?: string;
   lastModified: Date;
+  // Additional properties used in components
+  icon?: string;
+  color?: string;
+  description?: string;
 }
 
 // Validation rule interface
@@ -1005,6 +1048,168 @@ export interface TreeTestTask {
   };
 }
 
+// 11. Thank You Block
+export interface ThankYouBlock extends BaseBlock {
+  type: 'thank_you';
+  message: string;
+  showSummary: boolean;
+  nextSteps?: string;
+  contact?: {
+    email?: string;
+    website?: string;
+    social?: string;
+  };
+  completion?: {
+    showCertificate: boolean;
+    showReward: boolean;
+    downloadResults: boolean;
+  };
+}
+
+// 12. Image Upload Block
+export interface ImageUploadBlock extends BaseBlock {
+  type: 'image_upload';
+  instructions: string;
+  uploadSettings: {
+    maxFiles: number;
+    maxSizeBytes: number;
+    allowedFormats: string[];
+    requireDescription: boolean;
+  };
+  prompt?: string;
+}
+
+// 13. File Upload Block
+export interface FileUploadBlock extends BaseBlock {
+  type: 'file_upload';
+  instructions: string;
+  uploadSettings: {
+    maxFiles: number;
+    maxSizeBytes: number;
+    allowedFormats: string[];
+    requireDescription: boolean;
+  };
+  prompt?: string;
+}
+
+// 14. Screener Block
+export interface ScreenerBlock extends BaseBlock {
+  type: 'screener';
+  questions: ScreeningQuestion[];
+  logic: ScreeningLogic;
+  settings: {
+    randomizeQuestions: boolean;
+    allowPartialCompletion: boolean;
+    showProgress: boolean;
+  };
+}
+
+export interface ScreeningQuestion {
+  id: string;
+  question: string;
+  type: 'text' | 'multiple_choice' | 'yes_no' | 'number' | 'date';
+  options?: string[];
+  required: boolean;
+  disqualifyAnswers?: string[];
+  skipLogic?: ConditionalAction;
+}
+
+export interface ScreeningLogic {
+  qualificationCriteria: QualificationCriterion[];
+  disqualificationRules: DisqualificationRule[];
+  quotas?: QuotaRule[];
+}
+
+export interface QualificationCriterion {
+  id: string;
+  questionId: string;
+  operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains' | 'in';
+  value: unknown;
+  weight?: number;
+}
+
+export interface DisqualificationRule {
+  id: string;
+  questionId: string;
+  operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains' | 'in';
+  value: unknown;
+  message?: string;
+}
+
+export interface QuotaRule {
+  id: string;
+  name: string;
+  target: number;
+  current: number;
+  criteria: QualificationCriterion[];
+}
+
+// 15. Prototype Test Block
+export interface PrototypeTestBlock extends BaseBlock {
+  type: 'prototype_test';
+  prototypeUrl: string;
+  prototypeType: 'figma' | 'invision' | 'marvel' | 'framer' | 'principle' | 'url';
+  tasks: PrototypeTask[];
+  settings: {
+    recordInteractions: boolean;
+    trackClicks: boolean;
+    trackScrolling: boolean;
+    trackTime: boolean;
+    allowZoom: boolean;
+    allowFullscreen: boolean;
+  };
+}
+
+export interface PrototypeTask {
+  id: string;
+  title: string;
+  description: string;
+  successCriteria: string[];
+  timeLimit?: number;
+  startUrl?: string;
+  expectedFlow?: string[];
+}
+
+// 16. Live Website Test Block
+export interface LiveWebsiteTestBlock extends BaseBlock {
+  type: 'live_website_test';
+  websiteUrl: string;
+  tasks: WebsiteTask[];
+  settings: {
+    recordScreen: boolean;
+    trackClicks: boolean;
+    trackScrolling: boolean;
+    trackMouseMovement: boolean;
+    allowNavigation: boolean;
+    restrictToDomain: boolean;
+    captureConsoleErrors: boolean;
+  };
+}
+
+export interface WebsiteTask {
+  id: string;
+  title: string;
+  description: string;
+  startUrl?: string;
+  successCriteria: string[];
+  timeLimit?: number;
+  allowBackButton: boolean;
+}
+
+// ============================================================================
+// STUDY BUILDER INTEGRATION TYPES
+// ============================================================================
+
+// StudyBuilderBlock interface used in StudyBuilder components
+export interface StudyBuilderBlock {
+  id: string;
+  type: BlockType;
+  order: number;
+  title: string;
+  description: string;
+  settings: Record<string, unknown>;
+}
+
 // ============================================================================
 // STUDY BLOCKS TEMPLATES SYSTEM
 // ============================================================================
@@ -1132,7 +1337,13 @@ export type StudyBlock =
   | YesNoBlock
   | FiveSecondTestBlock
   | CardSortBlock
-  | TreeTestBlock;
+  | TreeTestBlock
+  | ThankYouBlock
+  | ImageUploadBlock
+  | FileUploadBlock
+  | ScreenerBlock
+  | PrototypeTestBlock
+  | LiveWebsiteTestBlock;
 
 // Utility types for block operations
 export type BlockUnion = StudyBlock;
@@ -2081,11 +2292,13 @@ export interface CollaboratorPresence {
   role?: WorkspaceRole;
   status: 'active' | 'idle' | 'away' | 'offline';
   lastActive: Date;
+  lastSeen?: Date; // Added for compatibility with existing code
   currentLocation?: {
     studyId?: string;
     blockId?: string;
     section?: string;
   };
+  currentElement?: string; // Added for compatibility with existing code
   sessionId?: string;
 }
 
@@ -2133,7 +2346,9 @@ export interface IStudyComment {
   studyId: string;
   blockId?: string;
   userId: string | IUser;
+  authorId?: string; // Added for compatibility with existing code
   parentId?: string; // for threaded comments
+  parentCommentId?: string; // Alternative property name used in some components
   content: string;
   type: 'comment' | 'suggestion' | 'issue' | 'question';
   status: 'open' | 'resolved' | 'acknowledged' | 'dismissed';

@@ -10,6 +10,7 @@ import {
   MoreHorizontal
 } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
+import { Card, CardContent } from '../../components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
 
 interface InviteData {
@@ -239,8 +240,9 @@ const ParticipantsPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
           <div className="flex-1">
             <div className="relative">
@@ -286,8 +288,9 @@ const ParticipantsPage: React.FC = () => {
               ))}
             </select>
           </div>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Participants List */}
       {filteredParticipants.length === 0 ? (
@@ -313,7 +316,7 @@ const ParticipantsPage: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <Card>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -415,7 +418,7 @@ const ParticipantsPage: React.FC = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Invite Modal */}

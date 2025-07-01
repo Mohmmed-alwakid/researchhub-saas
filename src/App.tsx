@@ -11,6 +11,7 @@ import ForgotPasswordPage from './client/pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './client/pages/auth/ResetPasswordPage';
 import DashboardPage from './client/pages/dashboard/DashboardPage';
 import StudiesPage from './client/pages/studies/StudiesPage';
+import StudyDetailPage from './client/pages/studies/StudyDetailPage';
 import InterviewBuilderPage from './client/pages/studies/InterviewBuilderPage'; // Interview creation page
 import StudyResultsPage from './client/pages/studies/StudyResultsPage';
 import StudyDiscoveryPage from './client/pages/studies/StudyDiscoveryPage';
@@ -24,15 +25,16 @@ import BillingSettingsPage from './client/pages/settings/BillingSettingsPage';
 import SettingsPage from './client/pages/settings/SettingsPage';
 import AdminDashboard from './client/pages/admin/AdminDashboard';
 import ManualPaymentPage from './client/pages/payments/ManualPaymentPage';
-import CollaborationPage from './client/pages/collaboration/CollaborationPage';
 import { CreativeJourneyPage } from './client/pages/journey/CreativeJourneyPage';
 import { StudyBuilderPage as ProfessionalStudyBuilderPage } from './client/pages/study-builder/StudyBuilderPage';
+import OrganizationDashboard from './client/pages/organization/OrganizationDashboard';
 
 // Import layouts
 import AppLayout from './client/components/common/AppLayout';
 import AuthGuard from './client/components/auth/AuthGuard';
 import ProtectedRoute from './client/components/auth/ProtectedRoute';
-import { ErrorBoundary } from './client/components/common/ErrorBoundary';
+import { ErrorBoundary } from './client/components/ErrorBoundary';
+import { PerformanceMonitor } from './client/components/PerformanceMonitor';
 import { useAuthStore } from './client/stores/authStore';
 
 // Create a client
@@ -143,6 +145,11 @@ function App() {
                   <StudiesPage />
                 </ProtectedRoute>
               } />
+              <Route path="studies/:id" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                  <StudyDetailPage />
+                </ProtectedRoute>
+              } />
               <Route path="studies/create" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <ProfessionalStudyBuilderPage />
@@ -173,7 +180,7 @@ function App() {
                   <StudyResultsPage />
                 </ProtectedRoute>
               } />
-              <Route path="studies/:id/applications" element={
+              <Route path="studies/:studyId/applications" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
                   <StudyApplicationsManagementPage />
                 </ProtectedRoute>
@@ -188,11 +195,14 @@ function App() {
                   <AnalyticsPage />
                 </ProtectedRoute>
               } />
-              <Route path="collaboration" element={
+              
+              {/* Organization Routes */}
+              <Route path="organizations" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
-                  <CollaborationPage />
+                  <OrganizationDashboard />
                 </ProtectedRoute>
               } />
+              
               <Route path="settings" element={<SettingsPage />} />
               <Route path="settings/billing" element={
                 <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
@@ -241,6 +251,7 @@ function App() {
             </Route>
           </Routes>
           <Toaster position="top-right" />
+          <PerformanceMonitor showMetrics={process.env.NODE_ENV === 'development'} />
         </div>
       </Router>
     </QueryClientProvider>

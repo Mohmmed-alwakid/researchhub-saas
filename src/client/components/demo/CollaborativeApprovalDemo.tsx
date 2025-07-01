@@ -4,15 +4,10 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import ApprovalQueue, { ApprovalItem } from '../approval/ApprovalQueue';
-import StudyApprovalCard from '../approval/StudyApprovalCard';
-import ApprovalHistory from '../approval/ApprovalHistory';
 import CollaborativeStudyBuilder from '../collaboration/CollaborativeStudyBuilder';
 import ActivityFeed, { ActivityItem, ActivityUser } from '../collaboration/ActivityFeed';
 import CollaborationIndicators from '../collaboration/CollaborationIndicators';
 import CommentSystem from '../collaboration/CommentSystem';
-import { collaborationService } from '../../services/collaborationService';
-import { approvalService } from '../../services/approvalService';
-import { commentsService } from '../../services/commentsService';
 import type { 
   WorkspaceRole,
   IStudy,
@@ -32,14 +27,11 @@ interface CollaborativeApprovalDemoProps {
     avatar?: string;
     role: WorkspaceRole;
   };
-  /** Current workspace ID */
-  workspaceId: string;
   className?: string;
 }
 
 export const CollaborativeApprovalDemo: React.FC<CollaborativeApprovalDemoProps> = ({
   currentUser,
-  workspaceId,
   className = ''
 }) => {
   const [activeTab, setActiveTab] = useState('queue');

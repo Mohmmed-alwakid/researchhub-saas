@@ -40,6 +40,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
   const [taskStartTime, setTaskStartTime] = useState<Date | null>(null);
   const [sessionStartTime] = useState(new Date());
   const [taskCompletions, setTaskCompletions] = useState<ITaskCompletion[]>([]);
+  const [interactions, setInteractions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const {
     isRecording,
@@ -53,6 +54,22 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
   const currentTask = tasks[currentTaskIndex];
   const isLastTask = currentTaskIndex === tasks.length - 1;
   const totalTasks = tasks.length;
+
+  // Track user interactions
+  const trackInteraction = useCallback((interaction: {
+    type: string;
+    target?: string;
+    value?: any;
+    timestamp: Date;
+  }) => {
+    if (currentTask) {
+      setInteractions(prev => [...prev, {
+        ...interaction,
+        taskId: currentTask._id,
+        taskIndex: currentTaskIndex
+      }]);
+    }
+  }, [currentTask, currentTaskIndex]);
 
   // Initialize task tracking
   useEffect(() => {
@@ -77,7 +94,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
       responses,
       duration,
       success: true,
-      interactions: [], // TODO: Collect from task components
+      interactions: interactions.filter(i => i.taskId === currentTask._id),
       startedAt: taskStartTime,
       completedAt
     };

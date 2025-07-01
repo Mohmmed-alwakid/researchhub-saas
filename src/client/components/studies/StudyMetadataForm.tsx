@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form';
+import { UseFormRegister, FieldErrors } from 'react-hook-form';
 
 export interface StudyFormData {
   title: string;
@@ -21,14 +21,12 @@ export interface StudyFormData {
 interface StudyMetadataFormProps {
   register: UseFormRegister<StudyFormData>;
   errors: FieldErrors<StudyFormData>;
-  watch: UseFormWatch<StudyFormData>;
   isSubmitting: boolean;
 }
 
 export const StudyMetadataForm: React.FC<StudyMetadataFormProps> = ({
   register,
   errors,
-  watch,
   isSubmitting
 }) => {
 

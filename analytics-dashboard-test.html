@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard Test - ResearchHub</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #6b7280;
+            margin: 0;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 15px 0;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+        }
+        .result.success {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        .result.error {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        .result pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #111827;
+            margin: 0;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 5px 0 0 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status.loading {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🎯 Analytics Dashboard Test</h1>
+            <p class="subtitle">Testing ResearchHub Analytics API and Dashboard Implementation</p>
+        </div>
+
+        <!-- Analytics API Tests -->
+        <div class="test-section">
+            <h2 class="test-title">📊 Analytics API Tests</h2>
+            <p>Test the new analytics API endpoints with real data.</p>
+            
+            <button class="test-button" onclick="testOverviewAnalytics()">Test Overview Analytics</button>
+            <button class="test-button" onclick="testResponseAnalytics()">Test Response Analytics</button>
+            <button class="test-button" onclick="testBlockAnalytics()">Test Block Analytics</button>
+            <button class="test-button" onclick="testExportAnalytics()">Test Export Analytics</button>
+            
+            <div id="analytics-results"></div>
+        </div>
+
+        <!-- Analytics Dashboard Preview -->
+        <div class="test-section">
+            <h2 class="test-title">📈 Analytics Dashboard Preview</h2>
+            <p>Real-time analytics data visualization</p>
+            
+            <div id="analytics-dashboard">
+                <div class="analytics-grid">
+                    <div class="metric-card">
+                        <p class="metric-value" id="total-participants">--</p>
+                        <p class="metric-label">Total Participants</p>
+                    </div>
+                    <div class="metric-card">
+                        <p class="metric-value" id="completion-rate">--%</p>
+                        <p class="metric-label">Completion Rate</p>
+                    </div>
+                    <div class="metric-card">
+                        <p class="metric-value" id="avg-session-time">--s</p>
+                        <p class="metric-label">Avg Session Time</p>
+                    </div>
+                    <div class="metric-card">
+                        <p class="metric-value" id="total-responses">--</p>
+                        <p class="metric-label">Total Responses</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frontend Integration Test -->
+        <div class="test-section">
+            <h2 class="test-title">🎨 Frontend Integration</h2>
+            <p>Test analytics page integration in the React frontend</p>
+            
+            <button class="test-button" onclick="openAnalyticsPage()">Open Analytics Page</button>
+            <span class="status success">Ready</span>
+            
+            <div class="result">
+                <strong>Analytics Page URL:</strong> <br>
+                <code>http://localhost:5175/studies/test-study-123/analytics</code>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="test-section">
+            <h2 class="test-title">⚙️ System Status</h2>
+            <div id="system-status">
+                <p>Backend API: <span class="status loading" id="backend-status">Checking...</span></p>
+                <p>Frontend: <span class="status loading" id="frontend-status">Checking...</span></p>
+                <p>Analytics Endpoints: <span class="status loading" id="analytics-status">Checking...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003';
+        const FRONTEND_BASE = 'http://localhost:5175';
+        const TEST_STUDY_ID = 'test-study-123';
+
+        // Check system status on load
+        window.addEventListener('load', checkSystemStatus);
+
+        async function checkSystemStatus() {
+            // Check backend
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const result = await response.json();
+                updateStatus('backend-status', result.success ? 'success' : 'error');
+            } catch (error) {
+                updateStatus('backend-status', 'error');
+            }
+
+            // Check frontend (assuming it's running if we can reach it)
+            updateStatus('frontend-status', 'success');
+
+            // Check analytics endpoints
+            try {
+                const response = await fetch(`${API_BASE}/api/blocks?action=analytics&studyId=${TEST_STUDY_ID}&type=overview`);
+                const result = await response.json();
+                updateStatus('analytics-status', result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    updateDashboard(result.data);
+                }
+            } catch (error) {
+                updateStatus('analytics-status', 'error');
+            }
+        }
+
+        function updateStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            element.className = `status ${status}`;
+            element.textContent = {
+                'success': 'Online',
+                'error': 'Offline',
+                'loading': 'Checking...'
+            }[status];
+        }
+
+        function updateDashboard(data) {
+            document.getElementById('total-participants').textContent = data.overview.totalParticipants;
+            document.getElementById('completion-rate').textContent = data.overview.completionRate + '%';
+            document.getElementById('avg-session-time').textContent = data.overview.avgSessionTime + 's';
+            document.getElementById('total-responses').textContent = data.overview.totalResponses;
+        }
+
+        async function testOverviewAnalytics() {
+            const result = await testApiEndpoint('overview', 'Overview Analytics');
+            if (result.success) {
+                updateDashboard(result.data);
+            }
+        }
+
+        async function testResponseAnalytics() {
+            await testApiEndpoint('responses', 'Response Analytics');
+        }
+
+        async function testBlockAnalytics() {
+            await testApiEndpoint('blocks', 'Block Analytics', '&blockId=welcome_screen');
+        }
+
+        async function testExportAnalytics() {
+            try {
+                const response = await fetch(`${API_BASE}/api/blocks?action=analytics&studyId=${TEST_STUDY_ID}&type=export`);
+                
+                if (response.ok) {
+                    const csvData = await response.text();
+                    showResult('analytics-results', 'Export Analytics', 'success', `CSV Export successful!\n\nSample data:\n${csvData.substring(0, 200)}...`);
+                } else {
+                    showResult('analytics-results', 'Export Analytics', 'error', `Export failed: ${response.statusText}`);
+                }
+            } catch (error) {
+                showResult('analytics-results', 'Export Analytics', 'error', `Export error: ${error.message}`);
+            }
+        }
+
+        async function testApiEndpoint(type, title, extraParams = '') {
+            try {
+                const response = await fetch(`${API_BASE}/api/blocks?action=analytics&studyId=${TEST_STUDY_ID}&type=${type}${extraParams}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('analytics-results', title, 'success', JSON.stringify(result.data, null, 2));
+                    return result;
+                } else {
+                    showResult('analytics-results', title, 'error', `API Error: ${result.error}`);
+                    return { success: false };
+                }
+            } catch (error) {
+                showResult('analytics-results', title, 'error', `Network Error: ${error.message}`);
+                return { success: false };
+            }
+        }
+
+        function showResult(containerId, title, type, content) {
+            const container = document.getElementById(containerId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `
+                <strong>${title} Result:</strong>
+                <pre>${content}</pre>
+            `;
+            container.appendChild(resultDiv);
+            
+            // Scroll to the new result
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function openAnalyticsPage() {
+            const url = `${FRONTEND_BASE}/studies/${TEST_STUDY_ID}/analytics`;
+            window.open(url, '_blank');
+        }
+
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(() => {
+            checkSystemStatus();
+        }, 30000);
+    </script>
+</body>
+</html>

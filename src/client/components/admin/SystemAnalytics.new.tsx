@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import { ComingSoon } from '../common/ComingSoon';
-import { getSystemPerformance, type SystemMetric, type PerformanceData, type UsageStatistic } from '../../services/admin.service';
+import { getSystemPerformance, type SystemMetric, type UsageStatistic } from '../../services/admin.service';
 
 // Reuse existing analytics dashboard
 import AdvancedAnalyticsDashboard from '../analytics/AdvancedAnalyticsDashboard';

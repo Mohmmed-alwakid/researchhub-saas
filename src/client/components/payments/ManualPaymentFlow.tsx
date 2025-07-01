@@ -4,7 +4,6 @@ import {
   Upload,
   Check,
   Clock,
-  X,
   AlertCircle,
   Copy,
   Download,
@@ -57,7 +56,6 @@ const ManualPaymentFlow: React.FC = () => {
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     fetchPlans();

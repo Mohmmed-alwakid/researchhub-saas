@@ -2,6 +2,10 @@
 import express from 'express';
 import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
+import applicationsHandler from './api/applications.js';
+import studiesHandler from './api/studies.js';
+import studySessionsHandler from './api/study-sessions.js';
+import blocksHandler from './api/blocks.js';
 
 const app = express();
 const PORT = 3001;
@@ -288,6 +292,41 @@ app.all('/api/admin-setup', async (req, res) => {
       message: error.message
     });
   }
+});
+
+// Applications endpoints
+app.all('/api/applications*', async (req, res) => {
+  console.log(`=== APPLICATIONS API: ${req.method} ${req.url} ===`);
+  return await applicationsHandler(req, res);
+});
+
+// Studies endpoints
+app.all('/api/studies*', async (req, res) => {
+  console.log(`=== STUDIES API: ${req.method} ${req.url} ===`);
+  return await studiesHandler(req, res);
+});
+
+// Study Sessions endpoints
+app.all('/api/study-sessions*', async (req, res) => {
+  console.log(`=== STUDY SESSIONS API: ${req.method} ${req.url} ===`);
+  return await studySessionsHandler(req, res);
+});
+
+// Blocks endpoints (for study blocks and templates)
+app.all('/api/blocks*', async (req, res) => {
+  console.log(`=== BLOCKS API: ${req.method} ${req.url} ===`);
+  return await blocksHandler(req, res);
+});
+
+// Legacy study-blocks endpoint (redirect to blocks)
+app.all('/api/study-blocks*', async (req, res) => {
+  console.log(`=== LEGACY STUDY-BLOCKS API (redirecting): ${req.method} ${req.url} ===`);
+  // Transform legacy query to new format
+  const studyId = req.query.studyId;
+  if (studyId) {
+    req.query.action = 'study';
+  }
+  return await blocksHandler(req, res);
 });
 
 // Start server

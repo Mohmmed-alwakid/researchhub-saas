@@ -9,7 +9,6 @@ import {
   AlertCircle, 
   Info, 
   AlertTriangle,
-  ChevronLeft,
   ChevronRight,
   Clock,
   Check,
@@ -614,8 +613,7 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   title,
   children,
-  size = 'md',
-  closeOnOverlayClick = true
+  size = 'md'
 }) => {
   if (!isOpen) return null;
   

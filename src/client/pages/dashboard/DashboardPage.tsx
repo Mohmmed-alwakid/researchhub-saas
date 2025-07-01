@@ -10,6 +10,8 @@ import {
   ArrowDownRight,
   Eye,
   Filter,
+  MessageSquare,
+  Settings,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { Link, useNavigate } from 'react-router-dom';
@@ -17,13 +19,16 @@ import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
-// Removed SimplifiedStudyCreationModal - now using new StudyCreationWizard via direct navigation
+import { CollaborationDashboard } from '../../components/collaboration/CollaborationDashboard';
+import { useAuthStore } from '../../stores/authStore';
+import type { WorkspaceRole } from '../../../shared/types';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [dashboardData, setDashboardData] = useState<DashboardAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
-  // Removed showMazeModal state - now using direct navigation to StudyCreationWizard
+  const [activeTab, setActiveTab] = useState<'overview' | 'collaboration' | 'analytics' | 'settings'>('overview');
 
   // Fetch real dashboard data on component mount
   useEffect(() => {
@@ -197,8 +202,39 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Enhanced Stats */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        {/* Tab Navigation */}
+        <div className="border-b border-gray-200 mb-8">
+          <nav className="flex space-x-8">
+            {[
+              { id: 'overview', name: 'Overview', icon: BarChart3 },
+              { id: 'collaboration', name: 'Team', icon: Users },
+              { id: 'analytics', name: 'Analytics', icon: Activity },
+              { id: 'settings', name: 'Settings', icon: Settings }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 mr-2" />
+                  {tab.name}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <>
+            {/* Enhanced Stats */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {stats.map((item, index) => {
             const Icon = item.icon;
             const isPositive = item.changeType === 'increase';
@@ -379,7 +415,61 @@ const DashboardPage = () => {
               </div>
             </div>
           </CardContent>
-        </Card>        {/* Removed SimplifiedStudyCreationModal - now using direct navigation to StudyCreationWizard */}
+        </Card>
+          </>
+        )}
+
+        {/* Collaboration Tab */}
+        {activeTab === 'collaboration' && (
+          <div className="space-y-6">
+            {user && (
+              <CollaborationDashboard
+                currentUser={{
+                  id: user.id,
+                  name: `${user.firstName} ${user.lastName}`.trim() || user.email,
+                  email: user.email,
+                  avatar: undefined,
+                  role: (user.role as WorkspaceRole) || 'viewer'
+                }}
+                workspaceId="workspace-1"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            <Card variant="elevated">
+              <CardHeader title="Global Analytics" subtitle="System-wide metrics and insights" />
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>Global analytics dashboard coming soon</p>
+                  <p className="text-sm">For study-specific analytics, visit individual study pages</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div className="space-y-6">
+            <Card variant="elevated">
+              <CardHeader title="Workspace Settings" subtitle="Configure your research workspace" />
+              <CardContent>
+                <div className="text-center py-8 text-gray-500">
+                  <Settings className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>Workspace settings coming soon</p>
+                  <p className="text-sm">Visit the main settings page for user preferences</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Removed SimplifiedStudyCreationModal - now using direct navigation to StudyCreationWizard */}
       </div>
     </div>
   );

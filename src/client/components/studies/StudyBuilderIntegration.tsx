@@ -48,6 +48,8 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
   const [studyTypes, setStudyTypes] = useState<StudyType[]>([]);
   const [taskTemplates, setTaskTemplates] = useState<TaskTemplate[]>([]);
   const [currentTasks, setCurrentTasks] = useState<StudyBuilderTask[]>(initialTasks);
+  const [editingTask, setEditingTask] = useState<StudyBuilderTask | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showTaskLibrary, setShowTaskLibrary] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -225,7 +227,10 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {/* TODO: Implement edit */}}
+                    onClick={() => {
+                      setEditingTask(task);
+                      setShowEditModal(true);
+                    }}
                   >
                     <Edit className="h-3 w-3" />
                   </Button>

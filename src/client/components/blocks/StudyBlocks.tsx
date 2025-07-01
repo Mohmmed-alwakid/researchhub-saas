@@ -13,9 +13,55 @@ interface StudyBlock {
   settings: Record<string, string | number | boolean | string[] | Record<string, string>>;
 }
 
+// Helper function to safely render settings as ReactNode
+const renderSetting = (value: string | number | boolean | string[] | Record<string, string>): React.ReactNode => {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'boolean') {
+    return value.toString();
+  }
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  return JSON.stringify(value);
+};
+
+// Helper function to safely get string value from settings
+const getStringSetting = (value: string | number | boolean | string[] | Record<string, string>, fallback = ''): string => {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return value.toString();
+  if (typeof value === 'boolean') return value.toString();
+  return fallback;
+};
+
+// Helper function to safely get number value from settings
+const getNumberSetting = (value: string | number | boolean | string[] | Record<string, string>, fallback = 0): number => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? fallback : parsed;
+  }
+  return fallback;
+};
+
+// Helper function to safely get array from settings
+const getArraySetting = (value: string | number | boolean | string[] | Record<string, string>): string[] => {
+  if (Array.isArray(value)) return value;
+  return [];
+};
+
+// Helper function to safely get object from settings
+const getObjectSetting = (value: string | number | boolean | string[] | Record<string, string>): Record<string, string> => {
+  if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+    return value as Record<string, string>;
+  }
+  return {};
+};
+
 interface BlockProps {
   block: StudyBlock;
-  onComplete: (response: Record<string, any>) => void;
+  onComplete: (response: Record<string, unknown>) => void;
   onNext: () => void;
   isLastBlock: boolean;
 }
@@ -37,7 +83,7 @@ export const WelcomeBlock: React.FC<BlockProps> = ({ block, onComplete, onNext, 
       </CardHeader>
       <CardContent className="text-center space-y-6">
         <div className="text-lg text-gray-700 leading-relaxed">
-          {block.settings.message}
+          {typeof block.settings.message === 'string' ? block.settings.message : ''}
         </div>
         <Button 
           onClick={handleContinue}
@@ -67,11 +113,11 @@ export const ContextScreenBlock: React.FC<BlockProps> = ({ block, onComplete, on
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-          {block.settings.content}
+          {renderSetting(block.settings.content)}
         </div>
         {block.settings.duration && (
           <div className="text-sm text-gray-500 italic">
-            {block.settings.duration}
+            {renderSetting(block.settings.duration)}
           </div>
         )}
         <div className="flex justify-center">
@@ -124,11 +170,11 @@ export const MultipleChoiceBlock: React.FC<BlockProps> = ({ block, onComplete, o
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-lg font-medium text-gray-800">
-          {block.settings.question}
+          {renderSetting(block.settings.question)}
         </div>
         
         <div className="space-y-3">
-          {block.settings.options.map((option: string, index: number) => (
+          {getArraySetting(block.settings.options).map((option: string, index: number) => (
             <label
               key={index}
               className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
@@ -173,7 +219,7 @@ export const OpenQuestionBlock: React.FC<BlockProps> = ({ block, onComplete, onN
     if (!isLastBlock) onNext();
   };
 
-  const canSubmit = response.length >= (block.settings.minLength || 1);
+  const canSubmit = response.length >= getNumberSetting(block.settings.minLength, 1);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -185,19 +231,19 @@ export const OpenQuestionBlock: React.FC<BlockProps> = ({ block, onComplete, onN
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-lg font-medium text-gray-800">
-          {block.settings.question}
+          {renderSetting(block.settings.question)}
         </div>
         
         <textarea
           value={response}
           onChange={(e) => setResponse(e.target.value)}
-          placeholder={block.settings.placeholder || "Please share your thoughts..."}
+          placeholder={getStringSetting(block.settings.placeholder, "Please share your thoughts...")}
           className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
         />
 
-        {block.settings.minLength && (
+        {getNumberSetting(block.settings.minLength) > 0 && (
           <div className="text-sm text-gray-500">
-            Minimum {block.settings.minLength} characters 
+            Minimum {getNumberSetting(block.settings.minLength)} characters 
             {response.length > 0 && ` (${response.length} characters entered)`}
           </div>
         )}
@@ -234,7 +280,7 @@ export const OpinionScaleBlock: React.FC<BlockProps> = ({ block, onComplete, onN
 
   const renderStarRating = () => (
     <div className="flex justify-center space-x-2">
-      {Array.from({ length: block.settings.maxValue }, (_, index) => {
+      {Array.from({ length: getNumberSetting(block.settings.maxValue, 5) }, (_, index) => {
         const starValue = index + 1;
         return (
           <button
@@ -253,26 +299,30 @@ export const OpinionScaleBlock: React.FC<BlockProps> = ({ block, onComplete, onN
     </div>
   );
 
-  const renderNumberScale = () => (
-    <div className="flex justify-center space-x-2">
-      {Array.from({ length: block.settings.maxValue - block.settings.minValue + 1 }, (_, index) => {
-        const value = block.settings.minValue + index;
-        return (
-          <button
-            key={value}
-            onClick={() => setRating(value)}
-            className={`w-12 h-12 rounded-full border-2 transition-colors ${
-              rating === value
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'
-            }`}
-          >
-            {value}
-          </button>
-        );
-      })}
-    </div>
-  );
+  const renderNumberScale = () => {
+    const maxValue = getNumberSetting(block.settings.maxValue, 10);
+    const minValue = getNumberSetting(block.settings.minValue, 1);
+    return (
+      <div className="flex justify-center space-x-2">
+        {Array.from({ length: maxValue - minValue + 1 }, (_, index) => {
+          const value = minValue + index;
+          return (
+            <button
+              key={value}
+              onClick={() => setRating(value)}
+              className={`w-12 h-12 rounded-full border-2 transition-colors ${
+                rating === value
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-300'
+              }`}
+            >
+              {value}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -284,7 +334,7 @@ export const OpinionScaleBlock: React.FC<BlockProps> = ({ block, onComplete, onN
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-lg font-medium text-gray-800 text-center">
-          {block.settings.question}
+          {renderSetting(block.settings.question)}
         </div>
 
         <div className="space-y-4">
@@ -292,8 +342,8 @@ export const OpinionScaleBlock: React.FC<BlockProps> = ({ block, onComplete, onN
           
           {block.settings.labels && (
             <div className="flex justify-between text-sm text-gray-500">
-              <span>{block.settings.labels.min}</span>
-              <span>{block.settings.labels.max}</span>
+              <span>{getObjectSetting(block.settings.labels)?.min || 'Minimum'}</span>
+              <span>{getObjectSetting(block.settings.labels)?.max || 'Maximum'}</span>
             </div>
           )}
         </div>
@@ -314,9 +364,8 @@ export const OpinionScaleBlock: React.FC<BlockProps> = ({ block, onComplete, onN
 
 // Live Website Test Block Component
 export const LiveWebsiteTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext, isLastBlock }) => {
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [completedTasks, setCompletedTasks] = useState<boolean[]>(
-    new Array(block.settings.tasks.length).fill(false)
+    new Array(getArraySetting(block.settings.tasks).length).fill(false)
   );
 
   const handleTaskComplete = (index: number) => {
@@ -328,7 +377,7 @@ export const LiveWebsiteTestBlock: React.FC<BlockProps> = ({ block, onComplete, 
   const handleFinish = () => {
     onComplete({ 
       completedTasks,
-      totalTasks: block.settings.tasks.length,
+      totalTasks: getArraySetting(block.settings.tasks).length,
       url: block.settings.url,
       timestamp: new Date().toISOString() 
     });
@@ -348,7 +397,7 @@ export const LiveWebsiteTestBlock: React.FC<BlockProps> = ({ block, onComplete, 
       <CardContent className="space-y-6">
         {block.settings.instructions && (
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <p className="text-blue-800">{block.settings.instructions}</p>
+            <p className="text-blue-800">{renderSetting(block.settings.instructions)}</p>
           </div>
         )}
 
@@ -357,7 +406,7 @@ export const LiveWebsiteTestBlock: React.FC<BlockProps> = ({ block, onComplete, 
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800">Tasks to Complete:</h3>
             <div className="space-y-2">
-              {block.settings.tasks.map((task: string, index: number) => (
+              {getArraySetting(block.settings.tasks).map((task: string, index: number) => (
                 <div
                   key={index}
                   className={`flex items-center space-x-3 p-3 rounded-lg border ${
@@ -389,14 +438,14 @@ export const LiveWebsiteTestBlock: React.FC<BlockProps> = ({ block, onComplete, 
             <h3 className="text-lg font-semibold text-gray-800">Website:</h3>
             <div className="border rounded-lg overflow-hidden">
               <iframe
-                src={block.settings.url}
+                src={getStringSetting(block.settings.url)}
                 className="w-full h-96"
                 title="Website Test"
                 sandbox="allow-same-origin allow-scripts allow-forms"
               />
             </div>
             <a
-              href={block.settings.url}
+              href={getStringSetting(block.settings.url)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-indigo-600 hover:text-indigo-800 text-sm"
@@ -439,13 +488,13 @@ export const ThankYouBlock: React.FC<BlockProps> = ({ block, onComplete }) => {
       </CardHeader>
       <CardContent className="text-center space-y-6">
         <div className="text-lg text-gray-700 leading-relaxed">
-          {block.settings.message}
+          {renderSetting(block.settings.message)}
         </div>
         
         {block.settings.showCompensation && (
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
             <h3 className="text-lg font-semibold text-green-800 mb-2">Compensation</h3>
-            <p className="text-green-700">{block.settings.nextSteps}</p>
+            <p className="text-green-700">{renderSetting(block.settings.nextSteps)}</p>
           </div>
         )}
 

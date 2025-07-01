@@ -78,8 +78,6 @@ export const CollaborativeStudyBuilder: React.FC<CollaborativeStudyBuilderProps>
   showCollaborationPanel = true,
   onStudyUpdate,
   onAddBlock,
-  onUpdateBlock, // eslint-disable-line @typescript-eslint/no-unused-vars
-  onDeleteBlock, // eslint-disable-line @typescript-eslint/no-unused-vars
   onReorderBlocks,
   onAddComment,
   onUpdateComment,
@@ -99,7 +97,6 @@ export const CollaborativeStudyBuilder: React.FC<CollaborativeStudyBuilderProps>
   const [conflicts] = useState<CollaborationChange[]>([]);
   const [draggedBlock, setDraggedBlock] = useState<BaseBlock | null>(null);
   const builderRef = useRef<HTMLDivElement>(null);
-  const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
 
   // Get study blocks (assuming they exist in the study object)
   const blocks = (study as IStudy & { blocks?: BaseBlock[] }).blocks || [];
@@ -134,7 +131,6 @@ export const CollaborativeStudyBuilder: React.FC<CollaborativeStudyBuilderProps>
         const rect = builderRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        setCursorPosition({ x, y });
         
         // Throttle cursor updates
         onCursorMove({

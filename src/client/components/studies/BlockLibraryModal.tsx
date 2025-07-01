@@ -165,7 +165,7 @@ export const BlockLibraryModal: React.FC<BlockLibraryModalProps> = ({
       description: 'Measure opinion with a rating scale',
       category: 'Survey',
       blockType: 'opinion_scale',
-      defaultSettings: { min: 1, max: 5, labels: ['Poor', 'Excellent'] },
+      defaultSettings: { min: 1, max: 5, labels: { left: 'Poor', right: 'Excellent' } },
       metadata: {
         category: 'Survey',
         complexity: 'beginner',
@@ -294,7 +294,9 @@ export const BlockLibraryModal: React.FC<BlockLibraryModalProps> = ({
       screener: '🔍',
       prototype_test: '📱',
       live_website_test: '🌐',
-      thank_you: '🙏'
+      thank_you: '🙏',
+      image_upload: '📸',
+      file_upload: '📎'
     };
     return iconMap[blockType] || '📋';
   };

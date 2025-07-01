@@ -11,6 +11,12 @@ import {
   CheckCircle
 } from 'lucide-react';
 
+// Import new dashboard widgets
+import SystemHealthWidget from './dashboard/SystemHealthWidget';
+import QuickActionsPanel from './dashboard/QuickActionsPanel';
+import AdminReportsWidget from './dashboard/AdminReportsWidget';
+import AlertCenter from './dashboard/AlertCenter';
+
 interface AdminStats {
   totalUsers: number;
   activeStudies: number;
@@ -251,67 +257,36 @@ const AdminOverview: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200">
-              Create New Admin User
-            </button>
-            <button className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50 rounded-md border border-green-200">
-              Send Platform Announcement
-            </button>
-            <button className="w-full text-left px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 rounded-md border border-purple-200">
-              Generate Monthly Report
-            </button>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">System Health</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Database</span>
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">API Services</span>
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Payment Gateway</span>
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Email Service</span>
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Platform Stats</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Uptime</span>
-              <span className="text-sm font-medium text-green-600">99.9%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Avg Response Time</span>
-              <span className="text-sm font-medium text-blue-600">142ms</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Storage Used</span>
-              <span className="text-sm font-medium text-purple-600">2.4GB</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Active Sessions</span>
-              <span className="text-sm font-medium text-orange-600">47</span>
-            </div>
-          </div>
-        </div>
+      {/* Enhanced Dashboard Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* System Health Monitoring */}
+        <SystemHealthWidget />
+        
+        {/* Alert Center */}
+        <AlertCenter onAlertAction={(alertId, action) => {
+          console.log(`Alert ${alertId} ${action}ed`);
+          // Handle alert actions
+        }} />
       </div>
+
+      {/* Administrative Reports */}
+      <AdminReportsWidget />
+
+      {/* Quick Actions Panel */}
+      <QuickActionsPanel 
+        onUserAction={(action, data) => {
+          console.log('User action:', action, data);
+          // Handle user management actions
+        }}
+        onStudyAction={(action, data) => {
+          console.log('Study action:', action, data);
+          // Handle study management actions
+        }}
+        onSystemAction={(action, data) => {
+          console.log('System action:', action, data);
+          // Handle system maintenance actions
+        }}
+      />
     </div>
   );
 };

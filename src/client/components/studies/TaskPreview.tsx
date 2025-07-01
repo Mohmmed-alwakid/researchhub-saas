@@ -7,18 +7,35 @@ interface TaskPreviewProps {
   task: StudyTask;
 }
 
+// Helper function to safely check and render configuration properties
+const hasConfigProperty = (config: unknown, property: string): boolean => {
+  return config !== null && 
+         typeof config === 'object' && 
+         property in config && 
+         Boolean((config as Record<string, unknown>)[property]);
+};
+
+const getConfigValue = (config: unknown, property: string): string => {
+  if (hasConfigProperty(config, property)) {
+    const value = (config as Record<string, unknown>)[property];
+    return String(value);
+  }
+  return '';
+};
+
 export const TaskPreview: React.FC<TaskPreviewProps> = ({ task }) => {
   const renderTaskTypeSpecificPreview = () => {
     switch (task.type) {
       case 'navigation':
         return (
           <div className="space-y-3">
-            {task.configuration?.targetUrl && (
+            {task.configuration && typeof task.configuration === 'object' && 
+             'targetUrl' in task.configuration && task.configuration.targetUrl && (
               <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
                 <ExternalLink className="w-4 h-4 text-blue-600" />
                 <div>
                   <div className="text-sm font-medium text-blue-900">Target URL</div>
-                  <div className="text-sm text-blue-700">{task.configuration.targetUrl as string}</div>
+                  <div className="text-sm text-blue-700">{String(task.configuration.targetUrl)}</div>
                 </div>
               </div>
             )}

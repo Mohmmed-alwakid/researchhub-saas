@@ -227,13 +227,24 @@ const SupportCenter: React.FC = () => {
     }
   };
 
-  const refreshStats = () => {
+  const refreshStats = async () => {
     setIsLoading(true);
-    // TODO: Fetch fresh stats from API
-    setTimeout(() => {
-      setStats({ ...stats }); // Trigger re-render
+    try {
+      const response = await fetch('/api/admin/support/stats');
+      if (response.ok) {
+        const freshStats = await response.json();
+        setStats(freshStats);
+      } else {
+        // Fallback to current stats if API fails
+        setStats(prev => ({ ...prev }));
+      }
+    } catch (error) {
+      console.error('Failed to refresh stats:', error);
+      // Fallback to current stats on error
+      setStats(prev => ({ ...prev }));
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const updateTicketStatus = async (ticketId: string, newStatus: SupportTicket['status']) => {

@@ -97,14 +97,16 @@ const StudyDiscoveryPage: React.FC = () => {
             <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg p-6 shadow-sm">
-                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                </div>
+                <Card key={i}>
+                  <CardContent className="p-6">
+                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
@@ -125,8 +127,9 @@ const StudyDiscoveryPage: React.FC = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+        <Card>
+          <CardContent className="p-6">
+            <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -160,7 +163,8 @@ const StudyDiscoveryPage: React.FC = () => {
               </Button>
             </div>
           </form>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Results */}
         {studies.length === 0 ? (
@@ -183,7 +187,7 @@ const StudyDiscoveryPage: React.FC = () => {
             {/* Study Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {studies.map((study) => (
-                <Card key={study._id} variant="elevated" className="hover:shadow-lg transition-shadow">
+                <Card key={study.id} variant="elevated" className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-3">
                       <span className="text-2xl">{getTypeIcon(study.type)}</span>
@@ -252,7 +256,7 @@ const StudyDiscoveryPage: React.FC = () => {
 
                     {/* Apply Button */}
                     <Link
-                      to={`/app/studies/${study._id}/apply`}
+                      to={`/app/studies/${study.id}/apply`}
                       className="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
                     >
                       Apply to Study

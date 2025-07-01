@@ -1,15 +1,15 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign, FileText } from 'lucide-react';
 
 // Admin Sidebar - keep this loaded immediately
 import AdminSidebar from '../../components/admin/AdminSidebar';
 
 // Lazy load admin components for better bundle splitting
-const UserManagement = lazy(() => import('../../components/admin/UserManagement'));
+const AdvancedUserManagement = lazy(() => import('../../components/admin/users/AdvancedUserManagement'));
+const UserAnalyticsDashboard = lazy(() => import('../../components/admin/analytics/UserAnalyticsDashboard'));
 const SubscriptionManager = lazy(() => import('../../components/admin/SubscriptionManager'));
 const SystemAnalytics = lazy(() => import('../../components/admin/SystemAnalytics'));
-const StudyOversight = lazy(() => import('../../components/admin/StudyOversight'));
 const RolePermissionManager = lazy(() => import('../../components/admin/RolePermissionManager'));
 const SystemSettings = lazy(() => import('../../components/admin/SystemSettings'));
 const SupportCenter = lazy(() => import('../../components/admin/SupportCenter'));
@@ -17,6 +17,7 @@ const AdminOverview = lazy(() => import('../../components/admin/AdminOverview'))
 const PaymentManagement = lazy(() => import('../../components/admin/PaymentManagement'));
 const AnalyticsDashboard = lazy(() => import('../../components/admin/AnalyticsDashboard'));
 const FinancialDashboard = lazy(() => import('../../components/admin/FinancialDashboard'));
+const TemplateManagement = lazy(() => import('../../components/admin/templates/TemplateManagement'));
 
 // Loading component for lazy-loaded components
 const AdminLoadingSpinner = () => (
@@ -39,11 +40,31 @@ interface AdminRoute {
 }
 
 // Helper function to check permissions
-const hasPermission = (user: { role: string } | null): boolean => {
+const hasPermission = (user: { role: string; permissions?: string[] } | null): boolean => {
   if (!user) return false;
-  if (user.role === 'admin' || user.role === 'super_admin') return true;
-  // TODO: Implement proper permission checking with user permissions array
-  return true; // Allow all admin users for now
+  
+  // Super admin has all permissions
+  if (user.role === 'super_admin') return true;
+  
+  // Admin role has most permissions
+  if (user.role === 'admin') return true;
+  
+  // For other roles, check specific permissions
+  const requiredPermissions = [
+    'admin:read',
+    'users:manage',
+    'studies:manage',
+    'analytics:read'
+  ];
+  
+  if (user.permissions) {
+    return requiredPermissions.some(permission => 
+      user.permissions!.includes(permission)
+    );
+  }
+  
+  // Default to false for security
+  return false;
 };
 
 const adminRoutes: AdminRoute[] = [
@@ -59,9 +80,25 @@ const adminRoutes: AdminRoute[] = [
     path: '/app/admin/users',
     label: 'User Management',
     icon: Users,
-    component: UserManagement,
+    component: AdvancedUserManagement,
     permission: 'USER_MANAGE_ROLES',
     description: 'Manage users, roles, and access'
+  },
+  {
+    path: '/app/admin/user-analytics',
+    label: 'User Analytics',
+    icon: BarChart3,
+    component: UserAnalyticsDashboard,
+    permission: 'SYSTEM_MONITOR',
+    description: 'User behavior and engagement analytics'
+  },
+  {
+    path: '/app/admin/templates',
+    label: 'Template Management',
+    icon: FileText,
+    component: TemplateManagement,
+    permission: 'TEMPLATE_MANAGE',
+    description: 'Create and manage study templates'
   },  {
     path: '/app/admin/subscriptions',
     label: 'Subscriptions',
@@ -96,7 +133,7 @@ const adminRoutes: AdminRoute[] = [
     path: '/app/admin/studies',
     label: 'Study Oversight',
     icon: Database,
-    component: StudyOversight,
+    component: () => <div className="p-6"><p>Study oversight coming soon...</p></div>,
     permission: 'STUDY_VIEW_ALL',
     description: 'Monitor all platform studies'
   },

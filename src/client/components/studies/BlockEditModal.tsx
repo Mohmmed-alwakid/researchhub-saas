@@ -103,7 +103,9 @@ export const BlockEditModal: React.FC<BlockEditModalProps> = ({
       screener: 'Screener',
       prototype_test: 'Prototype Test',
       live_website_test: 'Live Website Test',
-      thank_you: 'Thank You'
+      thank_you: 'Thank You',
+      image_upload: 'Image Upload',
+      file_upload: 'File Upload'
     };
     
     return labelMap[blockType] || 'Unknown Block';
@@ -123,7 +125,9 @@ export const BlockEditModal: React.FC<BlockEditModalProps> = ({
       screener: '🔍',
       prototype_test: '📱',
       live_website_test: '🌐',
-      thank_you: '🙏'
+      thank_you: '🙏',
+      image_upload: '📸',
+      file_upload: '📎'
     };
     return iconMap[blockType] || '📋';
   };

@@ -2153,40 +2153,28 @@ app.get('/api/admin/system-performance', async (req, res) => {
   }
 });
 
-// Participant Applications endpoints
-app.all('/api/participant-applications*', async (req, res) => {
+// Consolidated Applications endpoints (NEW - supports all application operations)
+app.all('/api/applications*', async (req, res) => {
+  console.log('🔍 Applications API request received:', {
+    method: req.method,
+    url: req.url,
+    query: req.query,
+    hasAuth: !!req.headers.authorization,
+    timestamp: new Date().toISOString()
+  });
+  
   try {
-    // Import the participant applications handler
-    const participantApplicationsModule = await import('./api/participant-applications.js');
-    const handler = participantApplicationsModule.default;
+    // Import the consolidated applications handler
+    const applicationsModule = await import('./api/applications.js');
+    const handler = applicationsModule.default;
     
-    // Call the handler with req and res
     await handler(req, res);
   } catch (error) {
-    console.error('❌ Participant Applications API Error:', error);
+    console.error('❌ Consolidated Applications API Error:', error);
     res.status(500).json({
       success: false,
-      error: 'Participant applications operation failed',
-      message: error.message
-    });
-  }
-});
-
-// Researcher Applications endpoints
-app.all('/api/researcher-applications*', async (req, res) => {
-  try {
-    // Import the researcher applications handler
-    const researcherApplicationsModule = await import('./api/researcher-applications.js');
-    const handler = researcherApplicationsModule.default;
-    
-    // Call the handler with req and res
-    await handler(req, res);
-  } catch (error) {
-    console.error('❌ Researcher Applications API Error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Researcher applications operation failed',
-      message: error.message
+      error: 'Applications operation failed',
+      details: error.message
     });
   }
 });
@@ -2622,23 +2610,23 @@ app.all('/api/study-sessions*', async (req, res) => {
 });
 
 // Study Blocks endpoints
-app.all('/api/study-blocks*', async (req, res) => {
+app.all('/api/blocks*', async (req, res) => {
   try {
-    console.log(`🧪 Study Blocks API Request: ${req.method} ${req.url}`);
+    console.log(`🧪 Blocks API Request: ${req.method} ${req.url}`);
     
-    // Import the study blocks handler
-    const studyBlocksModule = await import('./api/study-blocks.js');
-    const handler = studyBlocksModule.default;
+    // Import the consolidated blocks handler
+    const blocksModule = await import('./api/blocks.js');
+    const handler = blocksModule.default;
     
-    // Call the handler with req and res
-    await handler(req, res);
+    if (typeof handler === 'function') {
+      return await handler(req, res);
+    } else {
+      console.error('❌ Blocks handler is not a function:', typeof handler);
+      return res.status(500).json({ error: 'Invalid blocks handler' });
+    }
   } catch (error) {
-    console.error('❌ Study Blocks API Error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Study blocks operation failed',
-      message: error.message
-    });
+    console.error('❌ Blocks API Error:', error);
+    return res.status(500).json({ error: 'Blocks API handler failed' });
   }
 });
 

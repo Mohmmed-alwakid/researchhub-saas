@@ -5,7 +5,6 @@ import {
   Home,
   FileText,
   Users,
-  Users2,
   Settings,
   HelpCircle,
   Bell,
@@ -15,6 +14,7 @@ import {
   LogOut,
   Compass,
   BookOpen,
+  Building,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
@@ -43,8 +43,8 @@ const AppLayout = () => {
   const navigation = [
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Studies', href: '/app/studies', icon: FileText },
+    { name: 'Organizations', href: '/app/organizations', icon: Building },
     { name: 'Participants', href: '/app/participants', icon: Users },
-    { name: 'Collaboration', href: '/app/collaboration', icon: Users2 },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/app/settings', icon: Settings },
   ];

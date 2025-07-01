@@ -61,7 +61,13 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
       yes_no: '✅',
       five_second_test: '⏱️',
       card_sort: '🗂️',
-      tree_test: '🌳'
+      tree_test: '🌳',
+      screener: '🔍',
+      prototype_test: '📱',
+      live_website_test: '🌐',
+      thank_you: '🙏',
+      image_upload: '📸',
+      file_upload: '📎'
     };
     
     return iconMap[block.type] || '📋';
@@ -78,7 +84,13 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
       yes_no: 'Yes/No',
       five_second_test: '5-Second Test',
       card_sort: 'Card Sort',
-      tree_test: 'Tree Test'
+      tree_test: 'Tree Test',
+      screener: 'Screener',
+      prototype_test: 'Prototype Test',
+      live_website_test: 'Live Website Test',
+      thank_you: 'Thank You',
+      image_upload: 'Image Upload',
+      file_upload: 'File Upload'
     };
     
     return labelMap[blockType] || 'Unknown Block';

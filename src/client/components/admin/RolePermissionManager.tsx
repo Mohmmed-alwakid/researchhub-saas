@@ -299,8 +299,6 @@ const RolePermissionManager: React.FC = () => {
           <p className="text-gray-600">Configure roles and manage access permissions</p>
         </div>        <button
           onClick={() => {
-            // TODO: Implement create role functionality
-            console.log('Create role feature coming soon');
             setShowCreateRole(true);
           }}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -379,8 +377,6 @@ const RolePermissionManager: React.FC = () => {
                   </div>
                   {!selectedRole.isSystemRole && (                    <button
                       onClick={() => {
-                        // TODO: Implement edit role functionality
-                        console.log('Edit role feature coming soon');
                         setEditingRole(selectedRole);
                       }}
                       className="flex items-center px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

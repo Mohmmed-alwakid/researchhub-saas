@@ -22,7 +22,9 @@ export const getBlockDisplayName = (blockType: BlockType): string => {
     'screener': 'Screener',
     'prototype_test': 'Prototype Test',
     'live_website_test': 'Live Website Test',
-    'thank_you': 'Thank You!'
+    'thank_you': 'Thank You!',
+    'image_upload': 'Image Upload',
+    'file_upload': 'File Upload'
   };
   return displayNames[blockType] || blockType;
 };
@@ -45,7 +47,9 @@ export const getDefaultBlockDescription = (blockType: BlockType): string => {
     'screener': 'Filter out participants with preliminary questions',
     'prototype_test': 'Create a usability task for your testers',
     'live_website_test': 'Capture user interactions on websites using code snippet',
-    'thank_you': 'Thank you message and study completion'
+    'thank_you': 'Thank you message and study completion',
+    'image_upload': 'Allow participants to upload images',
+    'file_upload': 'Allow participants to upload files and documents'
   };
   return descriptions[blockType] || 'Custom block';
 };
@@ -74,6 +78,20 @@ export const getDefaultBlockSettings = (blockType: BlockType): Record<string, un
       redirectUrl: '',
       customMessage: '',
       allowModification: true
+    },
+    'image_upload': {
+      instructions: 'Please upload an image',
+      maxFiles: 1,
+      maxSizeBytes: 5242880, // 5MB
+      allowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+      required: true
+    },
+    'file_upload': {
+      instructions: 'Please upload a file',
+      maxFiles: 1,
+      maxSizeBytes: 10485760, // 10MB
+      allowedFormats: ['pdf', 'doc', 'docx', 'txt', 'csv', 'xlsx'],
+      required: true
     }
   };
   return defaultSettings[blockType] || {};
@@ -129,25 +147,28 @@ export const validateBlock = (block: {
 
   // Type-specific validation
   switch (block.type) {
-    case 'multiple_choice':
+    case 'multiple_choice': {
       const options = block.settings?.options as unknown[];
       if (!Array.isArray(options) || options.length < 2) {
         errors.push('Multiple choice questions must have at least 2 options');
       }
       break;
-    case 'opinion_scale':
+    }
+    case 'opinion_scale': {
       const min = block.settings?.min as number;
       const max = block.settings?.max as number;
       if (!min || !max || max <= min) {
         errors.push('Opinion scale must have valid min and max values');
       }
       break;
-    case 'five_second_test':
+    }
+    case 'five_second_test': {
       const duration = block.settings?.duration as number;
       if (!duration || duration < 1) {
         errors.push('Five second test must have a duration of at least 1 second');
       }
       break;
+    }
   }
 
   return {

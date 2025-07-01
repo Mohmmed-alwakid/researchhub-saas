@@ -54,7 +54,7 @@ export const researcherApplicationsService = {
     });
 
     const queryString = params.toString();
-    const baseUrl = `researcher-applications?endpoint=study/${studyId}/applications`;
+    const baseUrl = `applications?endpoint=study/${studyId}/applications`;
     const url = queryString ? `${baseUrl}&${queryString}` : baseUrl;
     
     return apiService.get<ResearcherApplicationsResponse>(url);
@@ -68,7 +68,7 @@ export const researcherApplicationsService = {
     data: ResearcherApplication;
     message: string;
   }> {
-    return apiService.patch(`researcher-applications?endpoint=applications/${applicationId}/review`, review);
+    return apiService.patch(`applications?endpoint=applications/${applicationId}/review`, review);
   }
 };
 

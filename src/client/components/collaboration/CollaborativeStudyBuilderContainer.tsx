@@ -5,14 +5,15 @@ import { commentsService } from '../../services/commentsService';
 import { CollaborationHeader } from './CollaborationHeader';
 import { CollaborationIndicators } from './CollaborationIndicators';
 import { CommentSystem } from './CommentSystem';
-import { ActivityFeed } from './ActivityFeed';
+import ActivityFeed from './ActivityFeed';
 import { Button } from '../ui/Button';
 import { Tabs } from '../ui/Tabs';
 import { 
   IStudyComment, 
   CollaboratorPresence,
   EditingStatus,
-  CollaborationActivity
+  CollaborationActivity,
+  WorkspaceRole
 } from '../../../shared/types';
 import { MessageCircle, Activity, Users, Eye, EyeOff } from 'lucide-react';
 
@@ -87,7 +88,7 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
             name: data.user?.name || 'Unknown User',
             email: data.user?.email || '',
             avatar: data.user?.avatar || '',
-            role: (data.user?.role as any) || undefined,
+            role: (data.user?.role as WorkspaceRole) || 'viewer',
             status: 'active' as const,
             lastActive: new Date(),
             currentLocation: {

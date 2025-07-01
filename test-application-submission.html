@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Application Submission API</title>
+</head>
+<body>
+    <h1>Testing Application Submission API</h1>
+    <div>
+        <button onclick="loginParticipant()">1. Login as Participant</button>
+        <button onclick="testApplicationSubmission()">2. Test Application Submission</button>
+        <button onclick="checkApplicationStatus()">3. Check Application Status</button>
+    </div>
+    <div id="output"></div>
+    
+    <script>
+let authToken = null;
+const output = document.getElementById('output');
+
+function log(message) {
+    output.innerHTML += `<p>${message}</p>`;
+    console.log(message);
+}
+
+async function loginParticipant() {
+    log('🔐 Logging in as participant...');
+    
+    try {
+        const response = await fetch('http://localhost:3003/api/auth?action=login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: 'abwanwr77+participant@gmail.com',
+                password: 'Testtest123'
+            })
+        });
+        
+        const data = await response.json();
+        log(`Login response: ${JSON.stringify(data, null, 2)}`);
+        
+        if (data.success && data.user) {
+            authToken = data.user.token;
+            log(`✅ Login successful! Token obtained: ${authToken.substring(0, 20)}...`);
+        } else {
+            log(`❌ Login failed: ${data.error}`);
+        }
+    } catch (error) {
+        log(`❌ Login error: ${error}`);
+    }
+}
+
+async function testApplicationSubmission() {
+    if (!authToken) {
+        log('❌ Please login first!');
+        return;
+    }
+    
+    log('📝 Testing application submission...');
+    
+    const studyId = '2fd69681-3a09-49c5-b110-a06d8834aee8'; // Test New Application Study
+    
+    try {
+        const response = await fetch(`http://localhost:3003/api/applications?endpoint=studies/${studyId}/apply`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                screeningResponses: []
+            })
+        });
+        
+        const data = await response.json();
+        log(`Application submission response (${response.status}):`);
+        log(`${JSON.stringify(data, null, 2)}`);
+        
+        if (data.success) {
+            log('✅ Application submitted successfully!');
+        } else {
+            log(`❌ Application submission failed: ${data.error}`);
+            if (data.details) {
+                log(`Details: ${data.details}`);
+            }
+        }
+    } catch (error) {
+        log(`❌ Application submission error: ${error}`);
+    }
+}
+
+async function checkApplicationStatus() {
+    if (!authToken) {
+        log('❌ Please login first!');
+        return;
+    }
+    
+    log('🔍 Checking application status...');
+    
+    const studyId = '2fd69681-3a09-49c5-b110-a06d8834aee8'; // Test New Application Study
+    
+    try {
+        const response = await fetch(`http://localhost:3003/api/applications?endpoint=applications/status/${studyId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        
+        const data = await response.json();
+        log(`Application status response (${response.status}):`);
+        log(`${JSON.stringify(data, null, 2)}`);
+    } catch (error) {
+        log(`❌ Application status check error: ${error}`);
+    }
+}
+    </script>
+</body>
+</html>

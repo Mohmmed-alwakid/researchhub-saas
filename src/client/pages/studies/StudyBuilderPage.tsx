@@ -11,6 +11,7 @@ import {
 // Import new extracted components
 import { StudyMetadataForm, StudyFormData } from '../../components/studies/StudyMetadataForm';
 import { StudyBlocksManager, StudyBuilderBlock } from '../../components/studies/StudyBlocksManager';
+import { Card, CardContent } from '../../components/ui/Card';
 
 // Local interface for study builder blocks (simpler than the full StudyBlock union)
 interface ValidationError {
@@ -512,8 +513,9 @@ const StudyBuilderPage: React.FC = () => {
             } : undefined}
           />
         ) : (
-          <div className="bg-white rounded-lg shadow-sm">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6">
+          <Card>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-6">
               {/* Header */}
               <div className="border-b border-gray-200 pb-6">
                 <div className="flex items-center justify-between">
@@ -668,7 +670,8 @@ const StudyBuilderPage: React.FC = () => {
               </button>
             </div>
           </form>
-        </div>
+            </CardContent>
+          </Card>
         )}
       </div>
 

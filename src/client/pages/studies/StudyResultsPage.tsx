@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
 import { IStudy } from '../../../shared/types';
+import { Card, CardContent } from '../../components/ui/Card';
 
 interface ParticipantResponse {
   participantId: string;
@@ -283,8 +284,9 @@ const StudyResultsPage: React.FC = () => {
       {activeTab === 'results' && (
         <div className="space-y-6">
           {blockResults.map((block) => (
-            <div key={block.blockId} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
+            <Card key={block.blockId}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <span className="text-2xl mr-3">{getBlockTypeIcon(block.blockType)}</span>
                   <div>
@@ -314,7 +316,8 @@ const StudyResultsPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
@@ -339,7 +342,8 @@ const StudyResultsPage: React.FC = () => {
           {/* Participants List */}
           <div className="space-y-4">
             {filteredParticipants.map((participant) => (
-              <div key={participant.participantId} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <Card key={participant.participantId}>
+                <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
                     <span className="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full text-lg font-bold mr-4">
@@ -369,7 +373,8 @@ const StudyResultsPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>

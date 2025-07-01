@@ -90,7 +90,13 @@ export const DragDropBlockList: React.FC<DragDropBlockListProps> = ({
       yes_no: '✅',
       five_second_test: '⏱️',
       card_sort: '🗂️',
-      tree_test: '🌳'
+      tree_test: '🌳',
+      screener: '🔍',
+      prototype_test: '📱',
+      live_website_test: '🌐',
+      thank_you: '🙏',
+      image_upload: '📸',
+      file_upload: '📎'
     };
     return iconMap[blockType] || '📋';
   };

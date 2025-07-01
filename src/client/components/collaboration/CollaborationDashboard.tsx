@@ -114,7 +114,7 @@ export const CollaborationDashboard: React.FC<CollaborationDashboardProps> = ({
       // Mock data for demonstration - in real app this would come from APIs
       setStats({
         activeCollaborators: 5,
-        pendingApprovals: approvals.items?.length || 0,
+        pendingApprovals: approvals.count || 0,
         unreadComments: 3,
         myStudies: 8,
         sharedStudies: 12,
@@ -373,8 +373,6 @@ export const CollaborationDashboard: React.FC<CollaborationDashboardProps> = ({
               <ActivityFeed
                 activities={[]} // This would be loaded from the API
                 currentUser={currentUser}
-                groupByTime={true}
-                showUserMentions={true}
               />
             </TabsContent>
           </Tabs>
