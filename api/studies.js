@@ -113,6 +113,31 @@ export default async function handler(req, res) {
       return await handleStudyTemplates(req, res, supabase);
     }
     
+    // Consolidated actions from other files
+    if (action === 'collaboration') {
+      return await handleCollaboration(req, res, supabase, currentUser);
+    }
+    
+    if (action === 'comments') {
+      return await handleComments(req, res, supabase, currentUser);
+    }
+    
+    if (action === 'recordings') {
+      return await handleRecordings(req, res, supabase, currentUser);
+    }
+    
+    if (action === 'interactions') {
+      return await handleInteractions(req, res, supabase, currentUser);
+    }
+    
+    if (action === 'marketplace') {
+      return await handleTemplateMarketplace(req, res, supabase, currentUser);
+    }
+    
+    if (action === 'sessions') {
+      return await handleStudySessions(req, res, supabase, currentUser);
+    }
+    
     if (req.method === 'GET') {
       // Check if we're getting a specific study by ID
       const urlParts = req.url.split('?')[0].split('/');
@@ -228,6 +253,7 @@ export default async function handler(req, res) {
         // Return sample data if no studies table exists yet
         const sampleStudies = [
           {
+            _id: '1',
             id: '1',
             title: 'Website Navigation Study',
             status: 'active',
@@ -236,6 +262,7 @@ export default async function handler(req, res) {
             createdAt: new Date().toISOString()
           },
           {
+            _id: '2',
             id: '2', 
             title: 'Mobile App Usability Test',
             status: 'draft',
@@ -262,12 +289,20 @@ export default async function handler(req, res) {
         }
         
         return {
-          _id: studyId,
+          _id: studyId,  // Use _id for frontend compatibility
+          id: studyId,   // Also include id for API consistency
           title: study.title,
           description: study.description || '',
           type: study.settings?.type || study.study_type_id || 'usability',
           status: study.status,
           createdBy: study.researcher_id,
+          duration: study.settings?.duration || 30,
+          compensation: study.settings?.compensation || 25,
+          maxParticipants: study.target_participants || study.settings?.maxParticipants || 10,
+          currentParticipants: 0, // TODO: fetch actual participants count
+          tags: [], // TODO: fetch actual tags
+          requirements: [], // TODO: fetch actual requirements
+          applicationDeadline: study.end_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // Default 30 days from now
           tasks: study.settings?.tasks || [],
           participants: [], // TODO: fetch actual participants
           settings: {
@@ -318,6 +353,7 @@ export default async function handler(req, res) {
           tasks: tasks || []
         },
         status: status || 'draft', // Use provided status or default to 'draft'
+        is_public: status === 'active' || status === 'published', // Make active studies public
         target_participants: settings?.maxParticipants || 10,
         researcher_id: currentUserId
       };      console.log('Creating study with data:', studyData);
@@ -340,6 +376,7 @@ export default async function handler(req, res) {
       // Transform the new study to match frontend expectations
       const transformedStudy = {
         _id: newStudy.id,
+        id: newStudy.id, // Add both _id and id for compatibility
         title: newStudy.title,
         description: newStudy.description || '',
         type: newStudy.settings?.type || 'usability',
@@ -703,4 +740,393 @@ async function handleStudyTemplates(req, res, supabase) {
   }
 
   return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// Collaboration Handler
+async function handleCollaboration(req, res, supabase, currentUser) {
+  if (!currentUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+
+  const { studyId, action, userId } = req.body;
+
+  if (req.method === 'POST') {
+    // Add collaborator
+    if (action === 'add' && userId) {
+      try {
+        const { data, error } = await supabase
+          .from('study_collaborators')
+          .insert({
+            study_id: studyId,
+            user_id: userId,
+            role: 'collaborator',
+            created_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        return res.status(201).json({ success: true, data });
+      } catch (error) {
+        console.error('Error adding collaborator:', error);
+        return res.status(500).json({ success: false, error: 'Failed to add collaborator' });
+      }
+    } else {
+      return res.status(400).json({ success: false, error: 'Invalid action or missing user ID' });
+    }
+  } else if (req.method === 'GET') {
+    // Get study collaborators
+    try {
+      const { data, error } = await supabase
+        .from('study_collaborators')
+        .select('user_id, role, created_at')
+        .eq('study_id', studyId);
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error('Error fetching collaborators:', error);
+      return res.status(500).json({ success: false, error: 'Failed to fetch collaborators' });
+    }
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// Comments Handler
+async function handleComments(req, res, supabase, currentUser) {
+  if (!currentUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+
+  const { studyId, comment } = req.body;
+
+  if (req.method === 'POST') {
+    // Add comment
+    try {
+      const { data, error } = await supabase
+        .from('study_comments')
+        .insert({
+          study_id: studyId,
+          user_id: currentUser.id,
+          comment,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(201).json({ success: true, data });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      return res.status(500).json({ success: false, error: 'Failed to add comment' });
+    }
+  } else if (req.method === 'GET') {
+    // Get comments for a study
+    try {
+      const { data, error } = await supabase
+        .from('study_comments')
+        .select('user_id, comment, created_at')
+        .eq('study_id', studyId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      return res.status(500).json({ success: false, error: 'Failed to fetch comments' });
+    }
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// Recordings Handler
+async function handleRecordings(req, res, supabase, currentUser) {
+  if (!currentUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+
+  const { studyId, recordingUrl } = req.body;
+
+  if (req.method === 'POST') {
+    // Add recording
+    try {
+      const { data, error } = await supabase
+        .from('study_recordings')
+        .insert({
+          study_id: studyId,
+          user_id: currentUser.id,
+          recording_url: recordingUrl,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(201).json({ success: true, data });
+    } catch (error) {
+      console.error('Error adding recording:', error);
+      return res.status(500).json({ success: false, error: 'Failed to add recording' });
+    }
+  } else if (req.method === 'GET') {
+    // Get recordings for a study
+    try {
+      const { data, error } = await supabase
+        .from('study_recordings')
+        .select('user_id, recording_url, created_at')
+        .eq('study_id', studyId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error('Error fetching recordings:', error);
+      return res.status(500).json({ success: false, error: 'Failed to fetch recordings' });
+    }
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// Interactions Handler
+async function handleInteractions(req, res, supabase, currentUser) {
+  if (!currentUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+
+  const { studyId, interactionType, data } = req.body;
+
+  if (req.method === 'POST') {
+    // Log interaction
+    try {
+      const { data: interactionData, error } = await supabase
+        .from('study_interactions')
+        .insert({
+          study_id: studyId,
+          user_id: currentUser.id,
+          interaction_type: interactionType,
+          data,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(201).json({ success: true, data: interactionData });
+    } catch (error) {
+      console.error('Error logging interaction:', error);
+      return res.status(500).json({ success: false, error: 'Failed to log interaction' });
+    }
+  } else if (req.method === 'GET') {
+    // Get interactions for a study
+    try {
+      const { data, error } = await supabase
+        .from('study_interactions')
+        .select('user_id, interaction_type, data, created_at')
+        .eq('study_id', studyId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error('Error fetching interactions:', error);
+      return res.status(500).json({ success: false, error: 'Failed to fetch interactions' });
+    }
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// Marketplace Handler
+async function handleTemplateMarketplace(req, res, supabase, currentUser) {
+  if (!currentUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+
+  if (req.method === 'GET') {
+    // Get available templates from the marketplace
+    try {
+      const { data, error } = await supabase
+        .from('template_marketplace')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return res.status(500).json({ success: false, error: 'Failed to fetch templates' });
+    }
+  } else if (req.method === 'POST') {
+    // Purchase a template
+    const { templateId } = req.body;
+
+    try {
+      // Check if the template exists and is available for purchase
+      const { data: template, error: templateError } = await supabase
+        .from('template_marketplace')
+        .select('*')
+        .eq('id', templateId)
+        .single();
+
+      if (templateError || !template) {
+        return res.status(404).json({ success: false, error: 'Template not found' });
+      }
+
+      // Create a record in the user's purchased templates
+      const { data, error } = await supabase
+        .from('user_templates')
+        .insert({
+          user_id: currentUser.id,
+          template_id: templateId,
+          purchased_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(201).json({ success: true, data });
+    } catch (error) {
+      console.error('Error purchasing template:', error);
+      return res.status(500).json({ success: false, error: 'Failed to purchase template' });
+    }
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+/**
+ * Handle Study Sessions - consolidated from study-sessions.js
+ */
+async function handleStudySessions(req, res, supabase, currentUser) {
+  if (!currentUser) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+
+  try {
+    const { sessionId } = req.query;
+    const urlParts = req.url.split('?')[0].split('/');
+    const sessionIdFromUrl = urlParts[urlParts.length - 1];
+    const finalSessionId = sessionId || sessionIdFromUrl;
+
+    if (req.method === 'POST' && !finalSessionId) {
+      // Create new study session
+      const { studyId } = req.body;
+      
+      if (!studyId) {
+        return res.status(400).json({ success: false, error: 'studyId is required' });
+      }
+
+      // Verify participant has approved application
+      const { data: application } = await supabase
+        .from('study_applications')
+        .select('status')
+        .eq('study_id', studyId)
+        .eq('participant_id', currentUser.id)
+        .eq('status', 'approved')
+        .single();
+
+      if (!application) {
+        return res.status(403).json({
+          success: false,
+          error: 'No approved application found for this study'
+        });
+      }
+
+      // Create session
+      const { data: session, error } = await supabase
+        .from('study_sessions')
+        .insert({
+          study_id: studyId,
+          participant_id: currentUser.id,
+          status: 'in_progress',
+          started_at: new Date().toISOString(),
+          current_block: 0,
+          responses: {}
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return res.status(201).json({ success: true, data: session });
+    }
+
+    if (req.method === 'GET' && finalSessionId) {
+      // Get session details
+      const { data: session, error } = await supabase
+        .from('study_sessions')
+        .select('*')
+        .eq('id', finalSessionId)
+        .eq('participant_id', currentUser.id)
+        .single();
+
+      if (error || !session) {
+        return res.status(404).json({ success: false, error: 'Session not found' });
+      }
+
+      return res.status(200).json({ success: true, data: session });
+    }
+
+    if (req.method === 'PATCH' && finalSessionId) {
+      // Update session progress
+      const { currentBlock, responses, status } = req.body;
+      const updates = {};
+      
+      if (currentBlock !== undefined) updates.current_block = currentBlock;
+      if (responses) updates.responses = responses;
+      if (status) updates.status = status;
+      if (status === 'completed') updates.completed_at = new Date().toISOString();
+      
+      updates.updated_at = new Date().toISOString();
+
+      const { data: session, error } = await supabase
+        .from('study_sessions')
+        .update(updates)
+        .eq('id', finalSessionId)
+        .eq('participant_id', currentUser.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return res.status(200).json({ success: true, data: session });
+    }
+
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  } catch (error) {
+    console.error('Study sessions error:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
 }

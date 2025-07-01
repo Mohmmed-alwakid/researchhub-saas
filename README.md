@@ -5,14 +5,26 @@
 [![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> **🎉 MAJOR MILESTONE**: Collaboration features fully integrated into Study Builder!  
-> **Last Updated**: June 27, 2025  
-> **Build Status**: ✅ 0 TypeScript errors, Real-time collaboration system complete  
-> **Production Testing**: Study Builder with collaboration features ready for deployment
+> **💼 PROFESSIONAL PRODUCT MANAGEMENT**: Complete product management system implemented!  
+> **Last Updated**: June 29, 2025  
+> **Documentation**: Organized in `/product-manager/` folder  
+> **Current Focus**: Participant Experience completion (Block Session Rendering)
+
+## 📋 QUICK START
+
+### For Developers
+- **Complete Documentation**: See [`/product-manager/MASTER_CONTEXT.md`](product-manager/MASTER_CONTEXT.md)
+- **Current Sprint**: See [`/product-manager/roadmap/CURRENT_SPRINT.md`](product-manager/roadmap/CURRENT_SPRINT.md)
+- **Development Setup**: Run `npm run dev:fullstack` for local development
+
+### For Product Management
+- **Central Hub**: [`/product-manager/README.md`](product-manager/README.md)
+- **Requirements Process**: [`/product-manager/requirements/templates/`](product-manager/requirements/templates/)
+- **Strategic Roadmap**: [`/product-manager/roadmap/STRATEGIC_ROADMAP.md`](product-manager/roadmap/STRATEGIC_ROADMAP.md)
 
 ## 🎯 Project Overview
 
-ResearchHub is a modern SaaS platform for conducting user research studies, built with React, TypeScript, and Supabase. The participant workflow has been successfully implemented and tested in production.
+ResearchHub is a **SaaS platform for user testing research** that allows researchers to create, manage, and analyze user experience studies. We provide professional study building tools, collaboration features, and comprehensive analytics.
 
 ### ✅ Operational Features (Production Verified)
 
