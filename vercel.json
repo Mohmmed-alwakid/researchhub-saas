@@ -1,34 +1,63 @@
 {
   "version": 2,
-  "name": "researchhub-saas",
   "alias": ["researchhub-saas.vercel.app"],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
-  "routes": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "source": "/((?!api|_next|.*\\.).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)\\.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
     },
     {
-      "src": "/js/(.*)",
-      "dest": "/js/$1"
+      "source": "/(.*)\\.css",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css"
+        }
+      ]
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "dest": "/$1"
+      "source": "/(.*)\\.svg",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/svg+xml"
+        }
+      ]
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VITE_APP_NAME": "ResearchHub",
+    "VITE_API_URL": "https://researchhub-saas.vercel.app/api"
   },
   "functions": {
     "api/auth.js": { "maxDuration": 30 },
@@ -41,5 +70,7 @@
     "api/admin-consolidated.js": { "maxDuration": 30 },
     "api/payments-consolidated.js": { "maxDuration": 30 },
     "api/health.js": { "maxDuration": 10 }
-  }
+  },
+  "regions": ["iad1"],
+  "framework": "vite"
 }
