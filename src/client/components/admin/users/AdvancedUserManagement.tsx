@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import UserDetailView from './UserDetailView';
+import { adminService } from '../../../services';
 
 interface User {
   id: string;
@@ -67,29 +68,41 @@ const AdvancedUserManagement: React.FC<AdvancedUserManagementProps> = ({
     subscription: 'all',
     engagement: 'all'
   });
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showUserActionMenu, setShowUserActionMenu] = useState<string | null>(null);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: currentPage.toString(),
-        search: searchQuery,
-        sort: `${sortField}:${sortDirection}`,
-        ...Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== 'all'))
-      });
-
-      const response = await fetch(`/api/admin/users/search?${queryParams}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch users');
-      }
-
-      const data = await response.json();
-      if (data.success) {
-        setUsers(data.data.users);
-        setTotalPages(data.data.totalPages);
+      
+      const response = await adminService.getAllUsers({});
+      
+      if (response.success && response.data) {
+        // Transform the data to match expected User interface
+        const rawUsers = response.data.data || response.data || [];
+        const transformedUsers = rawUsers.map((user: Record<string, unknown>) => ({
+          id: (user._id || user.id) as string,
+          email: user.email as string,
+          first_name: (user.name as string)?.split(' ')[0] || '',
+          last_name: (user.name as string)?.split(' ').slice(1).join(' ') || '',
+          role: (user.role as 'admin' | 'researcher' | 'participant') || 'participant',
+          status: (user.isActive ? 'active' : 'inactive') as 'active' | 'inactive' | 'suspended',
+          created_at: user.createdAt as string,
+          last_login: user.lastLoginAt as string | null,
+          study_count: (user.studiesCreated as number) || 0,
+          engagement_score: 0, // Default value
+          subscription_status: (user.subscription === 'free' ? 'active' : (user.subscription as 'active' | 'cancelled' | 'expired')) || 'active',
+          phone: (user.phone as string) || '',
+          location: (user.location as string) || '',
+          tags: (user.tags as string[]) || []
+        }));
+        
+        setUsers(transformedUsers);
+        setTotalPages(Math.ceil((response.data?.pagination?.totalCount || transformedUsers.length) / 10));
         setError(null);
       } else {
-        throw new Error(data.error || 'Failed to fetch users');
+        throw new Error(response.error || 'Failed to fetch users');
       }
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -97,7 +110,7 @@ const AdvancedUserManagement: React.FC<AdvancedUserManagementProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchQuery, sortField, sortDirection, filters]);
+  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -148,7 +161,7 @@ const AdvancedUserManagement: React.FC<AdvancedUserManagementProps> = ({
         ...Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== 'all'))
       });
 
-      const response = await fetch(`/api/admin/users/export?${queryParams}`);
+      const response = await fetch(`/api/admin/users-export?${queryParams}`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -197,6 +210,113 @@ const AdvancedUserManagement: React.FC<AdvancedUserManagementProps> = ({
     return <XCircle className="w-4 h-4 text-red-600" />;
   };
 
+  // Handle individual user actions
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await adminService.deleteUser(userId);
+
+      if (response.success) {
+        // Refresh user list
+        await fetchUsers();
+        alert('User deleted successfully');
+      } else {
+        alert(`Failed to delete user: ${response.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user');
+    }
+  };
+
+  const handleToggleUserStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    
+    try {
+      const response = await adminService.updateUser(userId, {
+        isActive: newStatus === 'active'
+      });
+
+      if (response.success) {
+        await fetchUsers();
+        alert(`User ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`);
+      } else {
+        alert(`Failed to update user status: ${response.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      alert('Failed to update user status');
+    }
+  };
+
+  const handleUpdateUser = async (userId: string, updates: Partial<User>) => {
+    try {
+      const response = await adminService.updateUser(userId, {
+        name: `${updates.first_name} ${updates.last_name}`.trim(),
+        role: updates.role,
+        email: updates.email
+      });
+
+      if (response.success) {
+        await fetchUsers();
+        setEditingUser(null);
+        alert('User updated successfully');
+      } else {
+        alert(`Failed to update user: ${response.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('Failed to update user');
+    }
+  };
+
+  const handleCreateUser = async (userData: { email: string; password: string; firstName: string; lastName: string; role: string }) => {
+    try {
+      const response = await adminService.createUser({
+        email: userData.email,
+        password: userData.password,
+        name: `${userData.firstName} ${userData.lastName}`.trim(),
+        role: userData.role
+      });
+
+      if (response.success) {
+        await fetchUsers();
+        setShowCreateUserModal(false);
+        alert('User created successfully');
+      } else {
+        alert(`Failed to create user: ${response.error}`);
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert('Failed to create user');
+    }
+  };
+
+  // Close user action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-user-action-menu]')) {
+        setShowUserActionMenu(null);
+      }
+    };
+
+    if (showUserActionMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserActionMenu]);
+
   if (error) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -234,7 +354,10 @@ const AdvancedUserManagement: React.FC<AdvancedUserManagementProps> = ({
             <Upload className="w-4 h-4" />
             <span>Import</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowCreateUserModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <UserPlus className="w-4 h-4" />
             <span>Add User</span>
           </button>
@@ -502,17 +625,55 @@ const AdvancedUserManagement: React.FC<AdvancedUserManagementProps> = ({
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
+                          onClick={() => handleEditUser(user)}
                           className="text-gray-600 hover:text-gray-900 transition-colors"
                           title="Edit User"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          className="text-gray-600 hover:text-gray-900 transition-colors"
-                          title="More Actions"
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="text-red-600 hover:text-red-900 transition-colors"
+                          title="Delete User"
                         >
-                          <MoreHorizontal className="w-4 h-4" />
+                          <XCircle className="w-4 h-4" />
                         </button>
+                        <div className="relative">
+                          <button
+                            onClick={() => setShowUserActionMenu(showUserActionMenu === user.id ? null : user.id)}
+                            className="text-gray-600 hover:text-gray-900 transition-colors"
+                            title="More Actions"
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </button>
+                          {showUserActionMenu === user.id && (
+                            <div 
+                              data-user-action-menu
+                              className="absolute right-0 z-10 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200"
+                            >
+                              <div className="py-1">
+                                <button
+                                  onClick={() => {
+                                    handleToggleUserStatus(user.id, user.status);
+                                    setShowUserActionMenu(null);
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                  {user.status === 'active' ? 'Deactivate' : 'Activate'} User
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    handleEditUser(user);
+                                    setShowUserActionMenu(null);
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-sm text-blue-700 hover:bg-blue-50"
+                                >
+                                  Edit Details
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -586,6 +747,176 @@ const AdvancedUserManagement: React.FC<AdvancedUserManagementProps> = ({
             setSelectedUserForDetail(null);
           }}
         />
+      )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Edit User</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                handleUpdateUser(editingUser.id, {
+                  first_name: formData.get('firstName') as string,
+                  last_name: formData.get('lastName') as string,
+                  email: formData.get('email') as string,
+                  role: formData.get('role') as 'admin' | 'researcher' | 'participant'
+                });
+              }}
+            >
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    defaultValue={editingUser.first_name}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    defaultValue={editingUser.last_name}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    defaultValue={editingUser.email}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <select
+                    name="role"
+                    defaultValue={editingUser.role}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="participant">Participant</option>
+                    <option value="researcher">Researcher</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create User Modal */}
+      {showCreateUserModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Create New User</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                handleCreateUser({
+                  firstName: formData.get('firstName') as string,
+                  lastName: formData.get('lastName') as string,
+                  email: formData.get('email') as string,
+                  password: formData.get('password') as string,
+                  role: formData.get('role') as string
+                });
+              }}
+            >
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <select
+                    name="role"
+                    defaultValue="participant"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="participant">Participant</option>
+                    <option value="researcher">Researcher</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateUserModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                >
+                  Create User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

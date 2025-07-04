@@ -55,6 +55,7 @@ const SubscriptionManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPlans();
@@ -81,29 +82,43 @@ const SubscriptionManager: React.FC = () => {
     );
   }
 
+  const getAuthToken = () => {
+    let token = '';
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        const { state } = JSON.parse(authStorage);
+        token = state?.token || '';
+      } catch (e) {
+        // fallback: token remains ''
+      }
+    }
+    return token;
+  };
+
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      setError(null);
+      const token = getAuthToken();
       const response = await fetch('/api/subscriptions?action=plans', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) {
-        throw new Error('Failed to fetch plans');
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || 'Failed to fetch plans');
       }
-
       const result = await response.json();
       if (result.success) {
-        setPlans(result.data);
+        setPlans(result.plans || []);
       } else {
         throw new Error(result.error || 'Failed to fetch plans');
       }
-    } catch (error) {
-      console.error('Failed to fetch plans:', error);
+    } catch (error: any) {
+      setError(error.message || 'Failed to fetch plans');
       // Keep mock data as fallback
       const mockPlans: SubscriptionPlan[] = [
         {
@@ -160,27 +175,26 @@ const SubscriptionManager: React.FC = () => {
 
   const fetchSubscriptions = async () => {
     try {
-      const token = localStorage.getItem('token');
+      setError(null);
+      const token = getAuthToken();
       const response = await fetch('/api/subscriptions?action=subscriptions', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) {
-        throw new Error('Failed to fetch subscriptions');
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || 'Failed to fetch subscriptions');
       }
-
       const result = await response.json();
       if (result.success) {
-        setSubscriptions(result.data);
+        setSubscriptions(result.subscriptions || []);
       } else {
         throw new Error(result.error || 'Failed to fetch subscriptions');
       }
-    } catch (error) {
-      console.error('Failed to fetch subscriptions:', error);
-      // Keep empty array as fallback
+    } catch (error: any) {
+      setError(error.message || 'Failed to fetch subscriptions');
       setSubscriptions([]);
     }
   };
@@ -189,7 +203,7 @@ const SubscriptionManager: React.FC = () => {
     if (!editingPlan) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       const isNewPlan = !editingPlan.id || editingPlan.id.startsWith('new_');
       
       const url = isNewPlan 
@@ -241,7 +255,7 @@ const SubscriptionManager: React.FC = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       const response = await fetch(`/api/subscriptions?action=plan&id=${planId}`, {
         method: 'DELETE',
         headers: {
@@ -655,6 +669,12 @@ const SubscriptionManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
       {/* Tab Navigation */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">

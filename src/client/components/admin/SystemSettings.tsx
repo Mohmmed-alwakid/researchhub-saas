@@ -117,30 +117,6 @@ const SystemSettings: React.FC = () => {
     { id: 'billing', label: 'Billing', icon: Settings }
   ];
 
-  useEffect(() => {
-    loadConfiguration();
-  }, []);
-
-  // Show Coming Soon if advanced admin settings are disabled
-  if (!ENABLE_ADVANCED_ADMIN_SETTINGS) {
-    return (
-      <ComingSoon
-        variant="card"
-        title="System Settings"
-        description="Configure platform settings, email, storage, security, and advanced features for your research platform."
-        features={[
-          "Platform configuration and maintenance mode",
-          "Email provider settings and notifications",
-          "Storage configuration and file management",
-          "Security settings and access controls",
-          "Feature toggles and permissions",
-          "Billing and subscription settings"
-        ]}
-        expectedRelease="Q4 2024"
-      />
-    );
-  }
-
   const loadConfiguration = async () => {
     setIsLoading(true);
     try {
@@ -169,6 +145,30 @@ const SystemSettings: React.FC = () => {
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
   };
+
+  useEffect(() => {
+    loadConfiguration();
+  }, []);
+
+  // Show Coming Soon if advanced admin settings are disabled
+  if (!ENABLE_ADVANCED_ADMIN_SETTINGS) {
+    return (
+      <ComingSoon
+        variant="card"
+        title="System Settings"
+        description="Configure platform settings, email, storage, security, and advanced features for your research platform."
+        features={[
+          "Platform configuration and maintenance mode",
+          "Email provider settings and notifications",
+          "Storage configuration and file management",
+          "Security settings and access controls",
+          "Feature toggles and permissions",
+          "Billing and subscription settings"
+        ]}
+        expectedRelease="Q4 2024"
+      />
+    );
+  }
 
   const updateConfig = (section: keyof SystemConfiguration, field: string, value: string | number | boolean) => {
     setConfig(prev => ({

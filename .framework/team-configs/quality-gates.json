@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "gates": {
+    "typescript": {
+      "enabled": true,
+      "blocking": true,
+      "description": "TypeScript compilation must pass with 0 errors"
+    },
+    "frameworkValidation": {
+      "enabled": true,
+      "blocking": true,
+      "description": "All framework validators must pass"
+    },
+    "completionTracking": {
+      "enabled": true,
+      "blocking": false,
+      "description": "Completion tracking must be active"
+    },
+    "codeReview": {
+      "enabled": true,
+      "blocking": true,
+      "description": "Code review must be completed"
+    }
+  },
+  "deployment": {
+    "allowIncomplete": false,
+    "requireAllCriteria": true,
+    "notifyOnBlock": true
+  },
+  "notifications": {
+    "slack": {
+      "enabled": false,
+      "webhook": ""
+    },
+    "email": {
+      "enabled": false,
+      "recipients": []
+    }
+  }
+}

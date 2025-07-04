@@ -1,10 +1,17 @@
 // Consolidated Admin endpoint - handles all admin operations
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+// Service role key for admin operations (should be set in environment variables)
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Validate required environment variables for production
+if (!supabaseServiceKey && process.env.NODE_ENV === 'production') {
+  console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY not set. Admin functions may be limited.');
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseKey);
 
 // Predefined test accounts for admin setup
 const TEST_ACCOUNTS = {
@@ -14,7 +21,7 @@ const TEST_ACCOUNTS = {
     role: 'participant'
   },
   researcher: {
-    email: 'abwanwr77+Researcher@gmail.com', 
+    email: 'abwanwr77+researcher@gmail.com', // lowercase - matches database
     password: 'Testtest123',
     role: 'researcher'
   },
@@ -33,18 +40,34 @@ async function verifyAdmin(req) {
     throw new Error('No token provided');
   }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  // Create authenticated Supabase client with user token
+  const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  });
+
+  const { data: { user }, error: authError } = await authenticatedSupabase.auth.getUser(token);
   if (authError || !user) {
     throw new Error('Invalid token');
   }
 
-  const { data: profile } = await supabase
+  // Check admin role from user metadata first (faster and avoids RLS)
+  const userRole = user.user_metadata?.role;
+  if (userRole === 'admin' || userRole === 'super_admin') {
+    return user;
+  }
+
+  // Fallback to profile check if metadata doesn't have role
+  const { data: profile } = await authenticatedSupabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'admin') {
+  if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
     throw new Error('Access denied. Admin role required.');
   }
 
@@ -124,10 +147,13 @@ export default async function handler(req, res) {
       case 'cache':
         return await handleCacheStatus(req, res);
       
+      case 'fix-researcher-profile':
+        return await handleFixResearcherProfile(req, res);
+      
       default:
         return res.status(400).json({ 
           success: false, 
-          error: 'Invalid action. Supported actions: users, user-actions, users-bulk, overview, analytics, financial, activity, user-behavior, studies, organizations, performance, security, cache' 
+          error: 'Invalid action. Supported actions: users, user-actions, users-bulk, overview, analytics, financial, activity, user-behavior, studies, organizations, performance, security, cache, fix-researcher-profile' 
         });
     }
   } catch (error) {
@@ -396,13 +422,24 @@ async function handleUsers(req, res) {
   }
 
   try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    // Create authenticated Supabase client with user token for RLS
+    const authenticatedSupabase = createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    });
+
     // Get all users from auth.users (admin only)
     const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
     
     if (authError) {
       console.error('Error fetching auth users:', authError);
-      // Fallback to profiles table if auth.admin fails
-      const { data: profiles, error: profileError } = await supabase
+      // Fallback to profiles table using authenticated client (respects RLS)
+      const { data: profiles, error: profileError } = await authenticatedSupabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
@@ -433,8 +470,8 @@ async function handleUsers(req, res) {
       });
     }
 
-    // Get profiles for additional user data
-    const { data: profiles } = await supabase
+    // Get profiles for additional user data using authenticated client (respects RLS)
+    const { data: profiles } = await authenticatedSupabase
       .from('profiles')
       .select('*');
 
@@ -1202,14 +1239,20 @@ async function handleStudies(req, res) {
         updated_at,
         creator_id,
         profiles!inner(first_name, last_name, email)
-      `)      .order('created_at', { ascending: false });
+      `)
+      .order('created_at', { ascending: false });
 
-    return res.status(200).json({ success: true, data: performanceMetrics });
+    if (error) {
+      console.error('Studies query error:', error);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+
+    return res.status(200).json({ success: true, data: studies || [] });
   } catch (error) {
-    console.error('System performance error:', error);
+    console.error('Studies management error:', error);
     return res.status(500).json({
       success: false,
-      error: 'Failed to fetch system performance data',
+      error: 'Failed to fetch studies data',
       details: error.message
     });
   }
@@ -1636,5 +1679,98 @@ async function getCacheHealth(req, res) {
   } catch (error) {
     console.error('Cache health error:', error);
     return res.status(500).json({ success: false, error: 'Failed to get cache health' });
+  }
+}
+
+/**
+ * Fix missing researcher profile by creating it with service role
+ */
+async function handleFixResearcherProfile(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    console.log('=== FIX RESEARCHER PROFILE ===');
+    
+    // Use service role Supabase client to bypass RLS
+    const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    const researcherEmail = 'abwanwr77+Researcher@gmail.com';
+    
+    // First check if profile already exists
+    const { data: existingProfile, error: checkError } = await serviceSupabase
+      .from('profiles')
+      .select('*')
+      .eq('email', researcherEmail)
+      .single();
+    
+    if (existingProfile) {
+      console.log('Researcher profile already exists');
+      return res.status(200).json({
+        success: true,
+        message: 'Researcher profile already exists',
+        profile: existingProfile
+      });
+    }
+    
+    // Check if user exists in auth system
+    const { data: { users }, error: authListError } = await serviceSupabase.auth.admin.listUsers();
+    if (authListError) {
+      console.error('Failed to list auth users:', authListError);
+      return res.status(500).json({ success: false, error: 'Failed to check auth users' });
+    }
+    
+    const researcherAuthUser = users.find(u => u.email === researcherEmail);
+    if (!researcherAuthUser) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Researcher user not found in auth system' 
+      });
+    }
+    
+    console.log('Found researcher in auth:', researcherAuthUser.id);
+    
+    // Create the missing profile
+    const profileData = {
+      id: researcherAuthUser.id,
+      email: researcherEmail,
+      first_name: researcherAuthUser.user_metadata?.first_name || 'Researcher',
+      last_name: researcherAuthUser.user_metadata?.last_name || 'User',
+      role: 'researcher',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    console.log('Creating profile with data:', profileData);
+    
+    const { data: newProfile, error: insertError } = await serviceSupabase
+      .from('profiles')
+      .insert([profileData])
+      .select()
+      .single();
+    
+    if (insertError) {
+      console.error('Failed to create profile:', insertError);
+      return res.status(500).json({ 
+        success: false, 
+        error: `Failed to create profile: ${insertError.message}` 
+      });
+    }
+    
+    console.log('Successfully created researcher profile:', newProfile);
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Researcher profile created successfully',
+      profile: newProfile
+    });
+    
+  } catch (error) {
+    console.error('Fix researcher profile error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: `Failed to fix researcher profile: ${error.message}` 
+    });
   }
 }

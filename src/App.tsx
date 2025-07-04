@@ -1,35 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 
-// Import pages
-import LandingPage from './client/pages/LandingPage'; // Primary landing page (formerly enhanced)
-import LoginPage from './client/pages/auth/LoginPage'; // Primary login page (formerly enhanced)
-import RegisterPage from './client/pages/auth/RegisterPage';
-import ForgotPasswordPage from './client/pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from './client/pages/auth/ResetPasswordPage';
-import DashboardPage from './client/pages/dashboard/DashboardPage';
-import StudiesPage from './client/pages/studies/StudiesPage';
-import StudyDetailPage from './client/pages/studies/StudyDetailPage';
-import InterviewBuilderPage from './client/pages/studies/InterviewBuilderPage'; // Interview creation page
-import StudyResultsPage from './client/pages/studies/StudyResultsPage';
-import StudyDiscoveryPage from './client/pages/studies/StudyDiscoveryPage';
-import StudyApplicationPage from './client/pages/studies/StudyApplicationPage';
-import StudyApplicationsManagementPage from './client/pages/studies/StudyApplicationsManagementPage';
-import StudySessionPage from './client/pages/studies/StudySessionPage';
-import ParticipantDashboardPage from './client/pages/studies/ParticipantDashboardPage';
-import ParticipantsPage from './client/pages/participants/ParticipantsPage';
-import AnalyticsPage from './client/pages/analytics/AnalyticsPage';
-import BillingSettingsPage from './client/pages/settings/BillingSettingsPage';
-import SettingsPage from './client/pages/settings/SettingsPage';
-import AdminDashboard from './client/pages/admin/AdminDashboard';
-import ManualPaymentPage from './client/pages/payments/ManualPaymentPage';
-import { CreativeJourneyPage } from './client/pages/journey/CreativeJourneyPage';
-import { StudyBuilderPage as ProfessionalStudyBuilderPage } from './client/pages/study-builder/StudyBuilderPage';
-import OrganizationDashboard from './client/pages/organization/OrganizationDashboard';
-
-// Import layouts
+// Import layouts and core components directly (needed immediately)
 import AppLayout from './client/components/common/AppLayout';
 import AuthGuard from './client/components/auth/AuthGuard';
 import ProtectedRoute from './client/components/auth/ProtectedRoute';
@@ -37,6 +11,33 @@ import { ErrorBoundary } from './client/components/ErrorBoundary';
 import { PerformanceMonitor } from './client/components/PerformanceMonitor';
 import FloatingReportButton from './client/components/performance/FloatingReportButton';
 import { useAuthStore } from './client/stores/authStore';
+import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
+
+// Lazy load pages for better performance
+const LandingPage = lazy(() => import('./client/pages/LandingPage'));
+const LoginPage = lazy(() => import('./client/pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('./client/pages/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./client/pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./client/pages/auth/ResetPasswordPage'));
+const DashboardPage = lazy(() => import('./client/pages/dashboard/DashboardPage'));
+const StudiesPage = lazy(() => import('./client/pages/studies/StudiesPage'));
+const StudyDetailPage = lazy(() => import('./client/pages/studies/StudyDetailPage'));
+const InterviewBuilderPage = lazy(() => import('./client/pages/studies/InterviewBuilderPage'));
+const StudyResultsPage = lazy(() => import('./client/pages/studies/StudyResultsPage'));
+const StudyDiscoveryPage = lazy(() => import('./client/pages/studies/StudyDiscoveryPage'));
+const StudyApplicationPage = lazy(() => import('./client/pages/studies/StudyApplicationPage'));
+const StudyApplicationsManagementPage = lazy(() => import('./client/pages/studies/StudyApplicationsManagementPage'));
+const StudySessionPage = lazy(() => import('./client/pages/studies/StudySessionPage'));
+const ParticipantDashboardPage = lazy(() => import('./client/pages/studies/ParticipantDashboardPage'));
+const ParticipantsPage = lazy(() => import('./client/pages/participants/ParticipantsPage'));
+const AnalyticsPage = lazy(() => import('./client/pages/analytics/AnalyticsPage'));
+const BillingSettingsPage = lazy(() => import('./client/pages/settings/BillingSettingsPage'));
+const SettingsPage = lazy(() => import('./client/pages/settings/SettingsPage'));
+const AdminDashboard = lazy(() => import('./client/pages/admin/AdminDashboard'));
+const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPaymentPage'));
+const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage').then(module => ({ default: module.CreativeJourneyPage })));
+const ProfessionalStudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage').then(module => ({ default: module.StudyBuilderPage })));
+const OrganizationDashboard = lazy(() => import('./client/pages/organization/OrganizationDashboard'));
 
 // Create a client
 const queryClient = new QueryClient({
@@ -116,7 +117,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Router>
           <div className="min-h-screen bg-gray-50">
-            <Routes>
+            <Suspense fallback={<RouteLoadingSpinner />}>
+              <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -124,9 +126,18 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             
-            {/* Protected routes */}
+            {/* Admin Dashboard Routes - Separate from AppLayout */}
+            <Route path="/app/admin/*" element={
+              <AuthGuard>
+                <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              </AuthGuard>
+            } />
+
+            {/* Protected routes with AppLayout (Researcher/Participant routes) */}
             <Route
-              path="/app"
+              path="/app/*"
               element={
                 <AuthGuard>
                   <AppLayout />
@@ -135,91 +146,84 @@ function App() {
             >
               <Route index element={<RoleBasedRedirect />} />
               
-              {/* Researcher/Admin routes */}
+              {/* Researcher routes */}
               <Route path="dashboard" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <DashboardPage />
                 </ProtectedRoute>
               } />
               <Route path="studies" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <StudiesPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <StudyDetailPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/create" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <ProfessionalStudyBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="study-builder" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <ProfessionalStudyBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/creative-journey" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <CreativeJourneyPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/create-interview" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <InterviewBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id/edit" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <ProfessionalStudyBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id/results" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <StudyResultsPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:studyId/applications" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <StudyApplicationsManagementPage />
                 </ProtectedRoute>
               } />
               <Route path="participants" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <ParticipantsPage />
                 </ProtectedRoute>
               } />
               <Route path="analytics" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <AnalyticsPage />
                 </ProtectedRoute>
               } />
               
               {/* Organization Routes */}
               <Route path="organizations" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <OrganizationDashboard />
                 </ProtectedRoute>
               } />
               
               <Route path="settings" element={<SettingsPage />} />
               <Route path="settings/billing" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <BillingSettingsPage />
                 </ProtectedRoute>
               } />
               <Route path="payments/manual" element={
-                <ProtectedRoute allowedRoles={['researcher', 'admin', 'super_admin']}>
+                <ProtectedRoute allowedRoles={['researcher']}>
                   <ManualPaymentPage />
-                </ProtectedRoute>
-              } />
-              
-              {/* Admin Dashboard Routes */}
-              <Route path="admin/*" element={
-                <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-                  <AdminDashboard />
                 </ProtectedRoute>
               } />
               
@@ -251,6 +255,7 @@ function App() {
               } />
             </Route>
           </Routes>
+            </Suspense>
           <Toaster position="top-right" />
           <PerformanceMonitor showMetrics={process.env.NODE_ENV === 'development'} />
           <FloatingReportButton />

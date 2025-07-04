@@ -53,28 +53,28 @@ export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
 
 // Environment-based feature flags
 export const getFeatureFlags = (): FeatureFlags => {
-  const env = process.env.NODE_ENV || 'development';
+  const env = import.meta.env.MODE || 'development';
     // In development, allow enabling features via environment variables
   if (env === 'development') {
     return {
-      ENABLE_ADVANCED_ANALYTICS: process.env.VITE_ENABLE_ADVANCED_ANALYTICS === 'true',
-      ENABLE_HEATMAP_ANALYTICS: process.env.VITE_ENABLE_HEATMAP_ANALYTICS === 'true',
-      ENABLE_SESSION_REPLAY: process.env.VITE_ENABLE_SESSION_REPLAY === 'true',
-      ENABLE_REAL_TIME_ANALYTICS: process.env.VITE_ENABLE_REAL_TIME_ANALYTICS === 'true',
+      ENABLE_ADVANCED_ANALYTICS: import.meta.env.VITE_ENABLE_ADVANCED_ANALYTICS === 'true',
+      ENABLE_HEATMAP_ANALYTICS: import.meta.env.VITE_ENABLE_HEATMAP_ANALYTICS === 'true',
+      ENABLE_SESSION_REPLAY: import.meta.env.VITE_ENABLE_SESSION_REPLAY === 'true',
+      ENABLE_REAL_TIME_ANALYTICS: import.meta.env.VITE_ENABLE_REAL_TIME_ANALYTICS === 'true',
       
-      ENABLE_PAYMENT_FEATURES: process.env.VITE_ENABLE_PAYMENT_FEATURES === 'true' || true, // Enable by default for admin testing
-      ENABLE_SUBSCRIPTION_MANAGEMENT: process.env.VITE_ENABLE_SUBSCRIPTION_MANAGEMENT === 'true' || true, // Enable by default for admin testing
-      ENABLE_BILLING_ANALYTICS: process.env.VITE_ENABLE_BILLING_ANALYTICS === 'true' || true, // Enable by default for admin testing
+      ENABLE_PAYMENT_FEATURES: import.meta.env.VITE_ENABLE_PAYMENT_FEATURES === 'true' || true, // Enable by default for admin testing
+      ENABLE_SUBSCRIPTION_MANAGEMENT: import.meta.env.VITE_ENABLE_SUBSCRIPTION_MANAGEMENT === 'true' || true, // Enable by default for admin testing
+      ENABLE_BILLING_ANALYTICS: import.meta.env.VITE_ENABLE_BILLING_ANALYTICS === 'true' || true, // Enable by default for admin testing
       
-      ENABLE_SCREEN_RECORDING: process.env.VITE_ENABLE_SCREEN_RECORDING === 'true',
-      ENABLE_VIDEO_PROCESSING: process.env.VITE_ENABLE_VIDEO_PROCESSING === 'true',
+      ENABLE_SCREEN_RECORDING: import.meta.env.VITE_ENABLE_SCREEN_RECORDING === 'true',
+      ENABLE_VIDEO_PROCESSING: import.meta.env.VITE_ENABLE_VIDEO_PROCESSING === 'true',
       
-      ENABLE_ADVANCED_ADMIN_SETTINGS: process.env.VITE_ENABLE_ADVANCED_ADMIN_SETTINGS === 'true',
-      ENABLE_SYSTEM_ANALYTICS: process.env.VITE_ENABLE_SYSTEM_ANALYTICS === 'true',
-      ENABLE_ROLE_PERMISSION_MANAGER: process.env.VITE_ENABLE_ROLE_PERMISSION_MANAGER === 'true',
+      ENABLE_ADVANCED_ADMIN_SETTINGS: import.meta.env.VITE_ENABLE_ADVANCED_ADMIN_SETTINGS === 'true',
+      ENABLE_SYSTEM_ANALYTICS: import.meta.env.VITE_ENABLE_SYSTEM_ANALYTICS === 'true',
+      ENABLE_ROLE_PERMISSION_MANAGER: import.meta.env.VITE_ENABLE_ROLE_PERMISSION_MANAGER === 'true',
       
-      ENABLE_REAL_TIME_FEATURES: process.env.VITE_ENABLE_REAL_TIME_FEATURES === 'true',
-      ENABLE_LIVE_MONITORING: process.env.VITE_ENABLE_LIVE_MONITORING === 'true',
+      ENABLE_REAL_TIME_FEATURES: import.meta.env.VITE_ENABLE_REAL_TIME_FEATURES === 'true',
+      ENABLE_LIVE_MONITORING: import.meta.env.VITE_ENABLE_LIVE_MONITORING === 'true',
     };
   }
   

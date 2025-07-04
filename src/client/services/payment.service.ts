@@ -1,5 +1,47 @@
 import { apiService } from './api.service';
 
+export interface PaymentIntent {
+  id: string;
+  client_secret: string;
+  amount: number;
+  currency: string;
+  status: string;
+}
+
+export interface PaymentHistoryItem {
+  _id: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  planType: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'verified' | 'rejected';
+  paymentMethod: string;
+  requestedAt: string;
+  processedAt?: string;
+}
+
+export interface WithdrawalHistoryItem {
+  _id: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  amount: number;
+  fees: number;
+  netAmount: number;
+  paymentMethod: 'paypal' | 'bank_transfer';
+  status: 'pending' | 'approved' | 'rejected';
+  requestedAt: string;
+  processedAt?: string;
+}
+
 export interface PointsBalance {
   userId: string;
   currentBalance: number;
@@ -176,6 +218,89 @@ export const pointsService = {
       currentBalance,
       shortfall: sufficient ? 0 : requiredAmount - currentBalance
     };
+  },
+
+  // NEW REAL MONEY INTEGRATION METHODS
+
+  /**
+   * Get conversion rates for points to dollars
+   */
+  async getConversionRates(): Promise<{
+    success: boolean;
+    data?: {
+      pointsPerDollar: number;
+      minimumPurchase: number;
+      minimumWithdrawal: number;
+      purchaseFee: { percent: number; fixed: number };
+      withdrawalFee: { percent: number; fixed: number };
+    };
+  }> {
+    return apiService.get('payments?action=conversion-rates');
+  },
+
+  /**
+   * Create a Stripe payment intent for purchasing points
+   */
+  async createPaymentIntent(amount: number, points: number): Promise<{
+    success: boolean;
+    data?: {
+      paymentIntent: PaymentIntent;
+      points: number;
+      fees: { percent: number; fixed: number; total: number };
+    };
+    error?: string;
+  }> {
+    return apiService.post('payments?action=create-payment-intent', {
+      amount,
+      currency: 'usd',
+      points
+    });
+  },
+
+  /**
+   * Request a withdrawal (for participants)
+   */
+  async requestWithdrawal(withdrawalData: {
+    amount: number;
+    paymentMethod: 'paypal' | 'bank_transfer';
+    paymentDetails: {
+      email?: string;
+      accountNumber?: string;
+      routingNumber?: string;
+    };
+  }): Promise<{
+    success: boolean;
+    data?: {
+      withdrawalId: string;
+      amount: number;
+      fees: number;
+      netAmount: number;
+      status: string;
+      estimatedProcessingTime: string;
+    };
+    error?: string;
+  }> {
+    return apiService.post('payments?action=request-withdrawal', withdrawalData);
+  },
+
+  /**
+   * Get payment history
+   */
+  async getPaymentHistory(): Promise<{
+    success: boolean;
+    data?: PaymentHistoryItem[];
+  }> {
+    return apiService.get('payments?action=history');
+  },
+
+  /**
+   * Get withdrawal history
+   */
+  async getWithdrawalHistory(): Promise<{
+    success: boolean;
+    data?: WithdrawalHistoryItem[];
+  }> {
+    return apiService.get('payments?action=withdrawals');
   }
 };
 

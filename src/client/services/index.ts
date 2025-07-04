@@ -4,6 +4,7 @@ export { studiesService, default as studies } from './studies.service';
 export { pointsService, default as points } from './payment.service';
 export { participantsService, default as participants } from './participants.service';
 export { sessionsService, default as sessions } from './sessions.service';
+export { adminService } from './admin.service';
 
 // Re-export types for convenience
 export type {

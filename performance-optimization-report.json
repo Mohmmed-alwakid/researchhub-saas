@@ -1,0 +1,112 @@
+{
+  "summary": {
+    "performanceScore": 54,
+    "bundleSize": {
+      "current": 850,
+      "target": 500,
+      "status": "needs_optimization"
+    },
+    "coreWebVitals": {
+      "lcp": {
+        "current": 3200,
+        "target": 2500,
+        "status": "needs_improvement"
+      },
+      "fid": {
+        "current": 85,
+        "target": 100,
+        "status": "good"
+      },
+      "cls": {
+        "current": 0.08,
+        "target": 0.1,
+        "status": "good"
+      }
+    },
+    "optimizations": {
+      "lazyLoading": false,
+      "codeSplitting": false,
+      "imageOptimization": false,
+      "caching": true
+    },
+    "timestamp": "2025-07-02T02:17:13.322Z"
+  },
+  "recommendations": [
+    "Implement code splitting for vendor libraries",
+    "Add lazy loading for non-critical components",
+    "Optimize images and assets",
+    "Remove unused dependencies",
+    "Optimize images and use next-gen formats (WebP, AVIF)",
+    "Implement critical CSS inlining",
+    "Add resource hints (preload, prefetch)",
+    "Optimize server response times"
+  ],
+  "optimizationPlan": {
+    "immediate": [
+      {
+        "task": "Implement React.lazy() for route components",
+        "impact": "High",
+        "effort": "Low",
+        "description": "Split routes into separate chunks loaded on demand"
+      },
+      {
+        "task": "Optimize images and implement responsive images",
+        "impact": "High",
+        "effort": "Medium",
+        "description": "Use WebP format, proper sizing, and responsive image techniques"
+      }
+    ],
+    "shortTerm": [
+      {
+        "task": "Implement advanced code splitting",
+        "impact": "High",
+        "effort": "Medium",
+        "description": "Split vendor libraries and implement dynamic imports"
+      }
+    ],
+    "longTerm": [
+      {
+        "task": "Implement Progressive Web App features",
+        "impact": "Medium",
+        "effort": "High",
+        "description": "Service worker, offline support, app manifest"
+      },
+      {
+        "task": "Set up performance monitoring",
+        "impact": "Medium",
+        "effort": "Medium",
+        "description": "Real User Monitoring (RUM) and Core Web Vitals tracking"
+      }
+    ]
+  },
+  "metrics": {
+    "bundleSize": {
+      "current": 850,
+      "target": 500,
+      "status": "needs_optimization"
+    },
+    "coreWebVitals": {
+      "lcp": {
+        "current": 3200,
+        "target": 2500,
+        "status": "needs_improvement"
+      },
+      "fid": {
+        "current": 85,
+        "target": 100,
+        "status": "good"
+      },
+      "cls": {
+        "current": 0.08,
+        "target": 0.1,
+        "status": "good"
+      }
+    },
+    "optimization": {
+      "lazyLoading": false,
+      "codeSplitting": false,
+      "imageOptimization": false,
+      "caching": true
+    }
+  }
+}

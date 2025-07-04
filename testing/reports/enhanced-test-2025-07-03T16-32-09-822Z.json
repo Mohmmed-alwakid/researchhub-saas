@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-07-03T16:32:09.823Z",
+  "summary": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "duration": 1482
+  },
+  "tests": [
+    {
+      "name": "Researcher Authentication",
+      "status": "PASS",
+      "details": "User: abwanwr77+researcher@gmail.com, Role: researcher",
+      "duration": 1253,
+      "timestamp": "2025-07-03T16:32:11.099Z"
+    },
+    {
+      "name": "Database Performance",
+      "status": "FAIL",
+      "details": "Slow response: 228ms",
+      "duration": 228,
+      "timestamp": "2025-07-03T16:32:11.327Z"
+    }
+  ]
+}

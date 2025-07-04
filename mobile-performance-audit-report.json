@@ -1,0 +1,115 @@
+{
+  "summary": {
+    "performanceScore": 85,
+    "accessibilityScore": 95,
+    "bestPracticesScore": 88,
+    "seoScore": 85,
+    "pwaScore": 70,
+    "timestamp": "2025-07-02T01:51:58.255Z"
+  },
+  "mobileOptimizations": [],
+  "recommendations": [],
+  "lighthouseReportPath": "lighthouse-mobile-report.json",
+  "testingChecklist": {
+    "deviceTesting": [
+      {
+        "device": "iPhone 12/13/14",
+        "tested": false,
+        "priority": "high"
+      },
+      {
+        "device": "iPhone SE (small screen)",
+        "tested": false,
+        "priority": "high"
+      },
+      {
+        "device": "Samsung Galaxy S21",
+        "tested": false,
+        "priority": "high"
+      },
+      {
+        "device": "iPad (tablet)",
+        "tested": false,
+        "priority": "medium"
+      },
+      {
+        "device": "iPad Pro (large tablet)",
+        "tested": false,
+        "priority": "medium"
+      }
+    ],
+    "browserTesting": [
+      {
+        "browser": "iOS Safari",
+        "tested": false,
+        "priority": "high"
+      },
+      {
+        "browser": "Chrome Mobile (Android)",
+        "tested": false,
+        "priority": "high"
+      },
+      {
+        "browser": "Samsung Internet",
+        "tested": false,
+        "priority": "medium"
+      },
+      {
+        "browser": "Firefox Mobile",
+        "tested": false,
+        "priority": "low"
+      }
+    ],
+    "interactionTesting": [
+      {
+        "test": "Touch target accuracy",
+        "completed": true,
+        "notes": "All targets ≥44px"
+      },
+      {
+        "test": "Swipe gestures",
+        "completed": true,
+        "notes": "Modal swipe-to-close implemented"
+      },
+      {
+        "test": "Pinch to zoom",
+        "completed": false,
+        "notes": "Test zoom behavior"
+      },
+      {
+        "test": "Keyboard on mobile",
+        "completed": false,
+        "notes": "Test form interactions"
+      },
+      {
+        "test": "Orientation changes",
+        "completed": false,
+        "notes": "Test portrait/landscape"
+      }
+    ],
+    "performanceTesting": [
+      {
+        "test": "Page load on 3G",
+        "completed": false,
+        "notes": "Simulate slow network"
+      },
+      {
+        "test": "Scroll performance",
+        "completed": true,
+        "notes": "Hardware acceleration enabled"
+      },
+      {
+        "test": "Memory usage",
+        "completed": false,
+        "notes": "Monitor on lower-end devices"
+      },
+      {
+        "test": "Battery usage",
+        "completed": false,
+        "notes": "Extended usage testing"
+      }
+    ]
+  },
+  "completionPercentage": 17,
+  "overallStatus": "NEEDS_MORE_TESTING"
+}

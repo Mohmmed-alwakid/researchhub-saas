@@ -1,0 +1,151 @@
+{
+  "summary": {
+    "score": 68,
+    "totalTests": 19,
+    "passed": 13,
+    "failed": 6,
+    "timestamp": "2025-07-02T01:34:49.761Z"
+  },
+  "results": {
+    "aria": {
+      "passed": 6,
+      "failed": 2,
+      "issues": [
+        {
+          "element": "<button\r\n        ref={ref}\r\n        className={cn(accessibleButtonVariants({ variant, size, fullWidth, className }))}\r\n        disabled={disabled || loading}\r\n        aria-describedby={loading ? loadingId : undefined}\r\n        aria-busy={loading}\r\n        {...props}\r\n      >",
+          "issue": "Buttons should have accessible labels",
+          "severity": "error"
+        },
+        {
+          "element": "<button\r\n        ref={ref}\r\n        className={cn(buttonVariants({ variant, size, fullWidth, className }))}\r\n        disabled={disabled || loading}\r\n        {...props}\r\n      >",
+          "issue": "Buttons should have accessible labels",
+          "severity": "error"
+        }
+      ]
+    },
+    "colorContrast": {
+      "passed": 1,
+      "failed": 4,
+      "issues": [
+        {
+          "background": "#f8f9fa",
+          "foreground": "#6c757d",
+          "ratio": "2.04",
+          "required": "4.5",
+          "severity": "warning"
+        },
+        {
+          "background": "#007bff",
+          "foreground": "#ffffff",
+          "ratio": "2.35",
+          "required": "4.5",
+          "severity": "warning"
+        },
+        {
+          "background": "#28a745",
+          "foreground": "#ffffff",
+          "ratio": "2.05",
+          "required": "4.5",
+          "severity": "warning"
+        },
+        {
+          "background": "#dc3545",
+          "foreground": "#ffffff",
+          "ratio": "2.28",
+          "required": "4.5",
+          "severity": "warning"
+        }
+      ]
+    },
+    "keyboard": {
+      "passed": 2,
+      "failed": 0,
+      "issues": []
+    },
+    "semantics": {
+      "passed": 4,
+      "failed": 0,
+      "issues": []
+    }
+  },
+  "recommendations": [
+    {
+      "type": "keyboard",
+      "message": "Disabled buttons should not be focusable",
+      "count": 1
+    },
+    {
+      "type": "keyboard",
+      "message": "Disabled buttons should not be focusable",
+      "count": 1
+    }
+  ],
+  "screenReaderGuide": {
+    "testingSteps": [
+      {
+        "step": 1,
+        "title": "Enable Screen Reader",
+        "instructions": [
+          "Windows: Enable Narrator (Windows + Ctrl + Enter)",
+          "Mac: Enable VoiceOver (Cmd + F5)",
+          "Test with NVDA (free) or JAWS (commercial)"
+        ]
+      },
+      {
+        "step": 2,
+        "title": "Navigation Testing",
+        "instructions": [
+          "Tab through all interactive elements",
+          "Use arrow keys to navigate content",
+          "Test heading navigation (H key in NVDA/JAWS)",
+          "Test landmark navigation (D key for main, N for nav)"
+        ]
+      },
+      {
+        "step": 3,
+        "title": "Content Testing",
+        "instructions": [
+          "Verify all content is announced",
+          "Check form labels are read correctly",
+          "Test error messages are announced",
+          "Verify button purposes are clear"
+        ]
+      },
+      {
+        "step": 4,
+        "title": "Interaction Testing",
+        "instructions": [
+          "Test all buttons with Enter/Space",
+          "Verify focus indicators are visible",
+          "Test modal/dialog announcements",
+          "Check dynamic content updates are announced"
+        ]
+      }
+    ],
+    "commonIssues": [
+      "Missing or inadequate alt text",
+      "Unlabeled form controls",
+      "Poor focus management",
+      "Missing landmark roles",
+      "Inadequate error messaging",
+      "Dynamic content not announced"
+    ],
+    "testingChecklist": [
+      "All interactive elements are keyboard accessible",
+      "Focus indicators are clearly visible",
+      "Screen reader announces all content appropriately",
+      "Form validation errors are announced",
+      "Modal dialogs trap focus correctly",
+      "Skip links work properly",
+      "Heading structure is logical",
+      "Images have appropriate alt text"
+    ]
+  },
+  "nextSteps": [
+    "Address critical accessibility issues first",
+    "Implement basic ARIA labels",
+    "Fix color contrast problems",
+    "Add keyboard event handlers",
+    "Use semantic HTML elements"
+  ]
+}

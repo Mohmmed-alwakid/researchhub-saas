@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   CheckCircle, 
   XCircle, 
@@ -13,6 +13,8 @@ import {
 import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { useAuthStore } from '../../stores/authStore';
+import { getPaymentRequests, getEnhancedFinancialOverview } from '../../services/admin.service';
 
 interface PaymentRequest {
   _id: string;
@@ -38,6 +40,17 @@ interface PaymentRequest {
   };
 }
 
+interface FinancialOverviewResponse {
+  data: {
+    totalPayments: number;
+    pendingPayments: number;
+    completedPayments: number;
+    rejectedPayments: number;
+    totalRevenue: number;
+    monthlyRevenue: number;
+  };
+}
+
 interface PaymentStats {
   totalRequests: number;
   pendingRequests: number;
@@ -48,6 +61,7 @@ interface PaymentStats {
 }
 
 const PaymentManagement: React.FC = () => {
+  const { token } = useAuthStore();
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
   const [stats, setStats] = useState<PaymentStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,25 +79,31 @@ const PaymentManagement: React.FC = () => {
     expiresAt: ''
   });
 
-  useEffect(() => {
-    loadPaymentData();
-  }, []);
-  const loadPaymentData = async () => {
+  const loadPaymentData = useCallback(async () => {
     setLoading(true);
     try {
-      const [requestsRes, statsRes] = await Promise.all([
-        fetch('/api/admin/payments/requests'),
-        fetch('/api/admin/payments/analytics')
+      // Use new admin service methods
+      const [requestsData, statsData] = await Promise.all([
+        getPaymentRequests(),
+        getEnhancedFinancialOverview()
       ]);
 
-      if (requestsRes.ok) {
-        const requestsData = await requestsRes.json();
-        setPaymentRequests(requestsData.data || []);
+      if (requestsData) {
+        setPaymentRequests(requestsData);
       }
 
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStats(statsData.data || null);
+      if (statsData && (statsData as FinancialOverviewResponse).data) {
+        // Transform enhanced financial data to match existing interface
+        const data = (statsData as FinancialOverviewResponse).data;
+        const transformedStats: PaymentStats = {
+          totalRequests: data.totalPayments || 0,
+          pendingRequests: data.pendingPayments || 0,
+          verifiedRequests: data.completedPayments || 0,
+          rejectedRequests: data.rejectedPayments || 0,
+          totalRevenue: data.totalRevenue || 0,
+          thisMonthRevenue: data.monthlyRevenue || 0
+        };
+        setStats(transformedStats);
       }
     } catch (error) {
       console.error('Error loading payment data:', error);
@@ -91,13 +111,25 @@ const PaymentManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      loadPaymentData();
+    }
+  }, [loadPaymentData, token]);
 
   const handleVerifyPayment = async (requestId: string, approve: boolean) => {
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
     try {
       const response = await fetch(`/api/admin/payments/requests/${requestId}/${approve ? 'verify' : 'reject'}`, {
         method: 'PUT',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -120,10 +152,16 @@ const PaymentManagement: React.FC = () => {
   };
 
   const handleAddCredits = async () => {
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
     try {
       const response = await fetch('/api/admin/payments/credits/add', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(addCreditsForm)

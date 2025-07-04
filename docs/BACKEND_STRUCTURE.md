@@ -114,7 +114,7 @@ export default router;
 ├── POST   /                # Create new study
 ├── GET    /:id             # Get specific study
 ├── PATCH  /:id             # Update study
-├── DELETE /:id             # Delete study
+├── DELETE /:id             # Delete user
 └── GET    /:id/participants # Get study participants
 
 /api/admin/
@@ -122,7 +122,13 @@ export default router;
 ├── PATCH  /users/:id       # Update user
 ├── DELETE /users/:id       # Delete user
 ├── GET    /analytics       # System analytics
-└── GET    /health          # System health check
+├── GET    /health          # System health check
+└── payments/               # Payment management (✅ IMPLEMENTED)
+    ├── GET    /requests    # List payment requests
+    ├── GET    /analytics   # Payment analytics
+    ├── PUT    /requests/:id/verify  # Verify payment
+    ├── PUT    /requests/:id/reject  # Reject payment
+    └── POST   /credits/add # Add credits to user
 ```
 
 ---
@@ -1086,3 +1092,506 @@ tests/
 ---
 
 *This backend structure documentation serves as the definitive guide for backend development patterns and practices in the ResearchHub platform.*
+
+---
+
+## 💳 Payment Management System
+
+### Overview
+The payment management system provides comprehensive admin tools for handling payment requests, processing verifications, and managing user credits. **Status: ✅ PRODUCTION READY (July 2025)**
+
+### Database Schema
+```sql
+-- Payment requests table
+CREATE TABLE payment_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    plan_type VARCHAR(50) NOT NULL DEFAULT 'basic',
+    amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    currency VARCHAR(3) NOT NULL DEFAULT 'USD',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'rejected')),
+    payment_method VARCHAR(100),
+    payment_proof_url TEXT,
+    admin_notes TEXT,
+    requested_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    processed_at TIMESTAMP WITH TIME ZONE,
+    processed_by UUID REFERENCES profiles(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### API Endpoints
+
+#### GET /api/admin/payments/requests
+**Purpose:** Retrieve all payment requests with user details  
+**Authentication:** Admin role required  
+**Response:** List of payment requests with user information
+
+```typescript
+interface PaymentRequest {
+  _id: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  planType: 'basic' | 'pro' | 'enterprise';
+  amount: number;
+  currency: string;
+  status: 'pending' | 'verified' | 'rejected';
+  paymentMethod: string;
+  paymentProofUrl?: string;
+  adminNotes?: string;
+  requestedAt: string;
+  processedAt?: string;
+  processedBy?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+}
+```
+
+#### GET /api/admin/payments/analytics
+**Purpose:** Get payment analytics and statistics  
+**Authentication:** Admin role required  
+**Response:** Payment analytics summary
+
+```typescript
+interface PaymentAnalytics {
+  totalRequests: number;
+  pendingRequests: number;
+  verifiedRequests: number;
+  rejectedRequests: number;
+  totalRevenue: number;
+  thisMonthRevenue: number;
+}
+```
+
+#### PUT /api/admin/payments/requests/:id/verify
+**Purpose:** Verify a payment request  
+**Authentication:** Admin role required  
+**Body:** `{ adminNotes?: string }`  
+**Response:** Updated payment request status
+
+#### PUT /api/admin/payments/requests/:id/reject
+**Purpose:** Reject a payment request  
+**Authentication:** Admin role required  
+**Body:** `{ adminNotes?: string }`  
+**Response:** Updated payment request status
+
+#### POST /api/admin/payments/credits/add
+**Purpose:** Manually add credits to a user account  
+**Authentication:** Admin role required  
+**Body:** `{ email: string, credits: number, planType?: string, expiresAt?: string }`  
+**Response:** Credit addition confirmation
+
+### Security Features
+- **JWT Authentication:** All endpoints require valid admin tokens
+- **Role-Based Access:** Only admin users can access payment endpoints
+- **Row Level Security:** Database policies enforce admin-only data access
+- **Audit Trail:** All payment actions are logged with admin ID and timestamps
+- **Input Validation:** Server-side validation for all payment operations
+
+### Implementation Status
+- ✅ **Database Schema:** Complete with RLS policies
+- ✅ **API Endpoints:** All 5 endpoints fully implemented
+- ✅ **Real Data Integration:** No mock data, all operations use database
+- ✅ **Authentication:** JWT token validation with admin role checking
+- ✅ **Error Handling:** Comprehensive error handling and logging
+- ✅ **Frontend Integration:** Admin UI fully connected to backend
+- ✅ **Testing:** Complete test interface available
+
+### Usage Example
+```typescript
+// Verify a payment request
+const response = await fetch('/api/admin/payments/requests/123/verify', {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${adminToken}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    adminNotes: 'Payment verified successfully'
+  })
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log('Payment verified:', result.data);
+}
+```
+
+---
+
+## 🎯 Points Management System
+
+### Points System Overview
+
+The Points Management System is a comprehensive admin-controlled credit system that replaces traditional payment processing. It provides researchers with a flexible, secure way to manage study creation costs while giving administrators full control over point distribution and usage. **Status: ✅ ENHANCED PRODUCTION READY (January 2025)**
+
+### Points System Features
+
+- **Admin-Controlled Point Assignment**: Administrators can assign points to researchers with expiration dates
+- **Dynamic Cost Calculation**: Automatic calculation of study creation costs based on blocks and participants
+- **Comprehensive Transaction Tracking**: Full audit trail of all point operations
+- **Balance Management**: Real-time balance tracking with automatic updates
+- **Point Expiration**: Automatic expiration of unused points with configurable timeouts
+- **Usage Analytics**: Detailed statistics and reporting for administrators
+- **Security First**: Row-level security policies and proper access controls
+
+### Points Database Schema
+
+#### Points Balance Table
+
+```sql
+-- Core balance tracking table
+CREATE TABLE points_balance (
+    user_id UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+    total_points INTEGER NOT NULL DEFAULT 0,
+    available_points INTEGER NOT NULL DEFAULT 0,
+    used_points INTEGER NOT NULL DEFAULT 0,
+    expired_points INTEGER NOT NULL DEFAULT 0,
+    last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Constraints for data integrity
+    CONSTRAINT chk_points_balance_non_negative 
+        CHECK (total_points >= 0 AND available_points >= 0 AND used_points >= 0 AND expired_points >= 0),
+    CONSTRAINT chk_points_balance_consistency 
+        CHECK (total_points = available_points + used_points + expired_points)
+);
+```
+
+#### Points Transactions Table
+```sql
+-- Transaction audit trail table
+CREATE TABLE points_transactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL CHECK (type IN ('assigned', 'consumed', 'earned', 'spent', 'expired', 'refunded', 'admin_assigned', 'admin_deducted')),
+    amount INTEGER NOT NULL CHECK (amount != 0),
+    balance INTEGER NOT NULL,
+    reason TEXT NOT NULL,
+    study_id UUID REFERENCES studies(id) ON DELETE SET NULL,
+    assigned_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    expires_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### Database Indexes
+```sql
+-- Performance optimization indexes
+CREATE INDEX idx_points_balance_user_id ON points_balance(user_id);
+CREATE INDEX idx_points_balance_available_points ON points_balance(available_points);
+CREATE INDEX idx_points_transactions_user_id ON points_transactions(user_id);
+CREATE INDEX idx_points_transactions_type ON points_transactions(type);
+CREATE INDEX idx_points_transactions_created_at ON points_transactions(created_at);
+CREATE INDEX idx_points_transactions_user_type_created ON points_transactions(user_id, type, created_at DESC);
+```
+
+### API Endpoints
+
+#### Core User Endpoints
+
+**GET /api/points?action=balance**
+- **Purpose**: Get current user's points balance
+- **Authentication**: User token required
+- **Response**: User balance with current, earned, and spent points
+
+```typescript
+interface PointsBalanceResponse {
+  success: boolean;
+  balance: {
+    userId: string;
+    currentBalance: number;
+    totalEarned: number;
+    totalSpent: number;
+    lastUpdated: string;
+  };
+}
+```
+
+**POST /api/points?action=calculate-cost**
+- **Purpose**: Calculate cost for creating a study
+- **Authentication**: User token required
+- **Body**: `{ blockCount: number, participantCount: number }`
+- **Response**: Detailed cost breakdown
+
+```typescript
+interface StudyCostResponse {
+  success: boolean;
+  cost: {
+    blockCount: number;
+    participantCount: number;
+    baseCost: number;
+    blockCost: number;
+    participantCost: number;
+    totalCost: number;
+  };
+}
+```
+
+**POST /api/points?action=spend**
+- **Purpose**: Spend points for study creation (enhanced version of consume)
+- **Authentication**: User token required
+- **Body**: `{ amount: number, reason: string, studyId?: string, blockCount?: number, participantCount?: number }`
+- **Response**: Transaction confirmation and new balance
+
+**POST /api/points?action=consume**
+- **Purpose**: Consume points for any operation
+- **Authentication**: User token required
+- **Body**: `{ amount: number, reason: string, studyId?: string }`
+- **Response**: Transaction confirmation and new balance
+
+**GET /api/points?action=history**
+- **Purpose**: Get user's transaction history
+- **Authentication**: User token required
+- **Query Parameters**: `limit`, `offset`
+- **Response**: Paginated transaction history
+
+**GET /api/points?action=stats**
+- **Purpose**: Get user's usage statistics
+- **Authentication**: User token required
+- **Response**: Usage analytics summary
+
+```typescript
+interface UsageStatsResponse {
+  success: boolean;
+  stats: {
+    studiesCreated: number;
+    pointsSpent: number;
+    pointsEarned: number;
+    averageCostPerStudy: number;
+  };
+}
+```
+
+#### Administrative Endpoints
+
+**POST /api/points?action=assign**
+- **Purpose**: Assign points to a user
+- **Authentication**: Admin role required
+- **Body**: `{ targetUserId?: string, userEmail?: string, amount: number, reason: string, expiresInDays?: number }`
+- **Response**: Assignment confirmation
+
+**GET /api/points?action=admin-balances**
+- **Purpose**: Get all user balances for admin overview
+- **Authentication**: Admin role required
+- **Response**: List of all user balances with user details
+
+**GET /api/points?action=admin-transactions**
+- **Purpose**: Get all transactions for admin monitoring
+- **Authentication**: Admin role required
+- **Query Parameters**: `limit`, `offset`
+- **Response**: Paginated transaction history for all users
+
+**POST /api/points?action=expire-points**
+- **Purpose**: Manually expire points for a user
+- **Authentication**: Admin role required
+- **Body**: `{ userId: string, amount: number, reason: string }`
+- **Response**: Expiration confirmation
+
+### Security Features
+
+#### Row Level Security (RLS)
+- **Points Balance**: Users can only access their own balance; admins can access all
+- **Transactions**: Users can only view their own transactions; admins can view all
+- **Insert Permissions**: Users can only create transactions for themselves; admins can create for any user
+
+#### Authentication & Authorization
+- **JWT Token Validation**: All endpoints require valid authentication tokens
+- **Role-Based Access Control**: Admin-only endpoints properly protected
+- **Input Validation**: Server-side validation for all parameters
+- **SQL Injection Prevention**: Parameterized queries throughout
+
+#### Data Integrity
+- **Database Constraints**: Prevent negative balances and inconsistent data
+- **Atomic Transactions**: All operations use database transactions
+- **Audit Trail**: Complete transaction history maintained
+- **Balance Reconciliation**: Automatic balance updates via triggers
+
+### Cost Calculation Logic
+
+#### Default Pricing Structure
+```typescript
+const POINTS_CONFIG = {
+  STUDY_BASE_COST: 10,           // Base cost per study
+  COST_PER_BLOCK: 2,             // Cost per block after free blocks
+  COST_PER_PARTICIPANT: 1,       // Cost per participant after free participants
+  MAX_BLOCKS_FREE: 5,            // Free blocks included
+  MAX_PARTICIPANTS_FREE: 10,     // Free participants included
+  EXPIRATION_DAYS_DEFAULT: 365   // Default expiration period
+};
+```
+
+#### Cost Calculation Formula
+```typescript
+const calculateStudyCost = (blockCount, participantCount) => {
+  const baseCost = POINTS_CONFIG.STUDY_BASE_COST;
+  const blockCost = Math.max(0, blockCount - POINTS_CONFIG.MAX_BLOCKS_FREE) * POINTS_CONFIG.COST_PER_BLOCK;
+  const participantCost = Math.max(0, participantCount - POINTS_CONFIG.MAX_PARTICIPANTS_FREE) * POINTS_CONFIG.COST_PER_PARTICIPANT;
+  const totalCost = baseCost + blockCost + participantCost;
+  
+  return { baseCost, blockCost, participantCost, totalCost };
+};
+```
+
+### Implementation Status
+
+#### ✅ Completed Features
+- **Core API Endpoints**: All 10 endpoints fully implemented and tested
+- **Database Schema**: Complete with RLS policies, constraints, and indexes
+- **Authentication System**: JWT validation with role-based access control
+- **Transaction Management**: Atomic operations with audit trail
+- **Cost Calculation**: Dynamic pricing with configurable parameters
+- **Usage Analytics**: Comprehensive statistics and reporting
+- **Admin Interface**: Complete administrative control panel
+- **Frontend Integration**: Service layer with proper error handling
+- **Security Measures**: RLS policies, input validation, and access controls
+- **Database Optimization**: Indexes, constraints, and performance tuning
+
+#### 🔄 Enhanced Features (January 2025)
+- **API-Frontend Contract Alignment**: Fixed data structure mismatches
+- **Missing Endpoint Implementation**: Added calculate-cost, spend, stats, admin-transactions
+- **Transaction Type Consistency**: Standardized transaction types across system
+- **Point Expiration Management**: Complete expiration handling with automated cleanup
+- **Advanced Analytics**: Enhanced usage statistics and admin reporting
+- **Database Triggers**: Automatic balance updates and consistency checks
+- **Stored Procedures**: Common operations optimized for performance
+
+#### 🚀 Advanced Features (Future Roadmap)
+- **Real-time Updates**: WebSocket integration for live balance updates
+- **Point Transfers**: User-to-user point transfers
+- **Bulk Operations**: Admin bulk point assignment and management
+- **Advanced Analytics**: Detailed reporting and trend analysis
+- **API Rate Limiting**: Enhanced security with request throttling
+- **Point Rewards**: Automated point earning for user actions
+
+### Usage Examples
+
+#### Frontend Service Integration
+```typescript
+// Check balance before study creation
+const balanceResponse = await pointsService.getBalance();
+if (!balanceResponse.success) {
+  throw new Error('Failed to fetch balance');
+}
+
+// Calculate study cost
+const costResponse = await pointsService.calculateStudyCost(8, 25);
+if (!costResponse.success) {
+  throw new Error('Failed to calculate cost');
+}
+
+// Check if user has sufficient points
+const sufficientPoints = await pointsService.checkSufficientPoints(costResponse.cost.totalCost);
+if (!sufficientPoints.sufficient) {
+  throw new Error(`Insufficient points. Need ${sufficientPoints.shortfall} more points.`);
+}
+
+// Spend points for study creation
+const spendResponse = await pointsService.spendPoints(
+  costResponse.cost.totalCost,
+  'Study creation',
+  studyId
+);
+```
+
+#### Admin Point Assignment
+```typescript
+// Admin assigns points to researcher
+const response = await fetch('/api/points?action=assign', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${adminToken}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    userEmail: 'researcher@example.com',
+    amount: 100,
+    reason: 'Monthly point allocation',
+    expiresInDays: 30
+  })
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log('Points assigned successfully:', result.message);
+}
+```
+
+#### Database Query Examples
+```sql
+-- Get user's current balance
+SELECT * FROM get_user_points_balance('user-uuid-here');
+
+-- Check if user has sufficient points
+SELECT check_sufficient_points('user-uuid-here', 25);
+
+-- Get recent transactions for all users (admin view)
+SELECT * FROM recent_points_transactions LIMIT 50;
+
+-- Get points summary for all users
+SELECT * FROM user_points_summary ORDER BY available_points DESC;
+```
+
+### Migration and Deployment
+
+#### Database Migration
+```sql
+-- Apply the enhanced points system migration
+-- File: database/migrations/points-system-enhancement.sql
+\i database/migrations/points-system-enhancement.sql;
+```
+
+#### API Deployment
+```bash
+# Deploy the enhanced points API
+# File: api/points-improved.js
+# Replace the existing api/points.js with api/points-improved.js
+
+# Verify deployment
+curl -X GET "https://your-domain.com/api/points?action=balance" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### Testing and Validation
+
+#### Test Coverage
+- **Unit Tests**: All API endpoints tested with various scenarios
+- **Integration Tests**: Database operations and transaction consistency
+- **Security Tests**: Authentication, authorization, and RLS policies
+- **Performance Tests**: Load testing with concurrent operations
+- **Error Handling**: Edge cases and error scenarios
+
+#### Test Data Setup
+```sql
+-- Create test users with different point balances
+INSERT INTO points_balance (user_id, total_points, available_points, used_points, expired_points)
+VALUES 
+  ('test-user-1', 100, 75, 20, 5),
+  ('test-user-2', 50, 50, 0, 0),
+  ('test-user-3', 200, 150, 40, 10);
+```
+
+### Monitoring and Maintenance
+
+#### Key Metrics
+- **Total Points in System**: Sum of all user balances
+- **Active Users**: Users with non-zero balances
+- **Transaction Volume**: Daily/weekly/monthly transaction counts
+- **Average Study Cost**: Cost trends over time
+- **Point Utilization**: Percentage of assigned points used
+
+#### Maintenance Tasks
+- **Point Expiration**: Automated cleanup of expired points
+- **Balance Reconciliation**: Regular balance verification
+- **Transaction Audit**: Monthly transaction reviews
+- **Performance Monitoring**: Query performance and optimization
+- **Security Audits**: Regular security policy reviews
+
+This comprehensive points system provides a robust, secure, and scalable foundation for managing study creation costs while maintaining full administrative control and detailed audit trails.

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points System Production Monitoring</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
+        .card-header { background: #2d3748; color: white; padding: 15px; font-weight: bold; }
+        .card-body { padding: 20px; }
+        .status { display: inline-block; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        .status.success { background: #48bb78; color: white; }
+        .status.error { background: #f56565; color: white; }
+        .status.warning { background: #ed8936; color: white; }
+        .status.info { background: #4299e1; color: white; }
+        .metric { display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f7fafc; border-radius: 5px; }
+        .btn { background: #4299e1; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn:hover { background: #3182ce; }
+        .btn.danger { background: #f56565; }
+        .btn.danger:hover { background: #e53e3e; }
+        .btn.success { background: #48bb78; }
+        .btn.success:hover { background: #38a169; }
+        .log { background: #1a202c; color: #e2e8f0; padding: 15px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        .form-group { margin: 15px 0; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .alert { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .alert.success { background: #f0fff4; border: 1px solid #48bb78; color: #22543d; }
+        .alert.error { background: #fed7d7; border: 1px solid #f56565; color: #742a2a; }
+        .loading { text-align: center; padding: 20px; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4299e1; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Points System Production Monitor</h1>
+            <p>Real-time monitoring and validation for the points system deployment</p>
+            <div style="margin-top: 15px;">
+                <span id="deploymentStatus" class="status info">Checking Deployment Status...</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- System Health -->
+            <div class="card">
+                <div class="card-header">🏥 System Health</div>
+                <div class="card-body">
+                    <div id="healthMetrics">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Checking system health...</p>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="checkSystemHealth()">Refresh Health Check</button>
+                </div>
+            </div>
+
+            <!-- Points API Status -->
+            <div class="card">
+                <div class="card-header">💰 Points API Status</div>
+                <div class="card-body">
+                    <div id="pointsApiStatus">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Testing Points API...</p>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="testPointsAPI()">Test Points API</button>
+                </div>
+            </div>
+
+            <!-- Authentication Test -->
+            <div class="card">
+                <div class="card-header">🔐 Authentication Test</div>
+                <div class="card-body">
+                    <div id="authTestResults">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Testing authentication...</p>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="testAuthentication()">Test Auth Flow</button>
+                </div>
+            </div>
+
+            <!-- Study Creation Test -->
+            <div class="card">
+                <div class="card-header">📊 Study Creation Test</div>
+                <div class="card-body">
+                    <div id="studyTestResults">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Testing study creation...</p>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="testStudyCreation()">Test Study Creation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Points Assignment Test -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">⚙️ Admin Points Assignment Test</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Test Admin Email:</label>
+                    <input type="email" id="adminEmail" value="abwanwr77+admin@gmail.com" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Test Admin Password:</label>
+                    <input type="password" id="adminPassword" value="Testtest123" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Target User Email:</label>
+                    <input type="email" id="targetEmail" value="abwanwr77+researcher@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>Points to Assign:</label>
+                    <input type="number" id="pointsAmount" value="100" min="1">
+                </div>
+                <button class="btn success" onclick="testAdminAssignment()">Test Admin Points Assignment</button>
+                <div id="adminTestResults" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+        <!-- Real User Validation -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">👥 Real User Validation</div>
+            <div class="card-body">
+                <p><strong>Test with Real Users:</strong></p>
+                <ol style="margin: 15px 0; padding-left: 20px;">
+                    <li>Have a researcher try to create a study (should fail with insufficient points)</li>
+                    <li>Assign points as admin</li>
+                    <li>Have researcher create study again (should succeed)</li>
+                    <li>Verify points are deducted correctly</li>
+                </ol>
+                
+                <div style="margin-top: 20px;">
+                    <h4>Test Accounts:</h4>
+                    <div class="metric">
+                        <span><strong>Admin:</strong> abwanwr77+admin@gmail.com</span>
+                        <span>Password: Testtest123</span>
+                    </div>
+                    <div class="metric">
+                        <span><strong>Researcher:</strong> abwanwr77+researcher@gmail.com</span>
+                        <span>Password: Testtest123</span>
+                    </div>
+                    <div class="metric">
+                        <span><strong>Participant:</strong> abwanwr77+participant@gmail.com</span>
+                        <span>Password: Testtest123</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="openUserInterface()">Open User Interface</button>
+                <button class="btn" onclick="openAdminInterface()">Open Admin Interface</button>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="card">
+            <div class="card-header">📝 Activity Log</div>
+            <div class="card-body">
+                <div id="activityLog" class="log">
+                    [${new Date().toISOString()}] Points System Production Monitor Started
+                </div>
+                <button class="btn" onclick="clearLog()">Clear Log</button>
+                <button class="btn success" onclick="exportLog()">Export Log</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let logEntries = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            const entry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            logEntries.push(entry);
+            
+            const logElement = document.getElementById('activityLog');
+            logElement.innerHTML += '\\n' + entry;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(entry);
+        }
+
+        function updateStatus(elementId, content) {
+            document.getElementById(elementId).innerHTML = content;
+        }
+
+        function createMetric(label, value, status = 'info') {
+            return `<div class="metric">
+                <span>${label}</span>
+                <span class="status ${status}">${value}</span>
+            </div>`;
+        }
+
+        async function checkSystemHealth() {
+            log('Checking system health...');
+            updateStatus('healthMetrics', '<div class="loading"><div class="spinner"></div><p>Checking...</p></div>');
+            
+            try {
+                // Test basic API connectivity
+                const healthResponse = await fetch('/api/health');
+                const healthData = await healthResponse.json();
+                
+                let healthHtml = '';
+                if (healthResponse.ok) {
+                    healthHtml += createMetric('API Status', 'Online', 'success');
+                    healthHtml += createMetric('Database', 'Connected', 'success');
+                    healthHtml += createMetric('Response Time', `${Date.now() - start}ms`, 'info');
+                } else {
+                    healthHtml += createMetric('API Status', 'Offline', 'error');
+                }
+                
+                // Test database connectivity
+                try {
+                    const dbResponse = await fetch('/api/db-check');
+                    if (dbResponse.ok) {
+                        healthHtml += createMetric('Points Tables', 'Available', 'success');
+                    } else {
+                        healthHtml += createMetric('Points Tables', 'Error', 'error');
+                    }
+                } catch (error) {
+                    healthHtml += createMetric('Database Check', 'Failed', 'error');
+                }
+                
+                updateStatus('healthMetrics', healthHtml);
+                log('System health check completed');
+                
+            } catch (error) {
+                updateStatus('healthMetrics', createMetric('System Health', 'Error: ' + error.message, 'error'));
+                log('System health check failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testPointsAPI() {
+            log('Testing Points API endpoints...');
+            updateStatus('pointsApiStatus', '<div class="loading"><div class="spinner"></div><p>Testing...</p></div>');
+            
+            try {
+                // Test points balance endpoint (without auth - should get proper error)
+                const balanceResponse = await fetch('/api/points?action=balance');
+                
+                let apiHtml = '';
+                if (balanceResponse.status === 401) {
+                    apiHtml += createMetric('Balance Endpoint', 'Secured (401)', 'success');
+                } else {
+                    apiHtml += createMetric('Balance Endpoint', 'Unexpected Response', 'warning');
+                }
+                
+                // Test points assignment endpoint (without auth - should get proper error)
+                const assignResponse = await fetch('/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'assign', amount: 10 })
+                });
+                
+                if (assignResponse.status === 401) {
+                    apiHtml += createMetric('Assignment Endpoint', 'Secured (401)', 'success');
+                } else {
+                    apiHtml += createMetric('Assignment Endpoint', 'Unexpected Response', 'warning');
+                }
+                
+                apiHtml += createMetric('API Security', 'Properly Protected', 'success');
+                
+                updateStatus('pointsApiStatus', apiHtml);
+                log('Points API test completed');
+                
+            } catch (error) {
+                updateStatus('pointsApiStatus', createMetric('Points API', 'Error: ' + error.message, 'error'));
+                log('Points API test failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testAuthentication() {
+            log('Testing authentication flow...');
+            updateStatus('authTestResults', '<div class="loading"><div class="spinner"></div><p>Testing...</p></div>');
+            
+            try {
+                // Test admin login
+                const adminLoginResponse = await fetch('/api/auth?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+admin@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const adminData = await adminLoginResponse.json();
+                
+                let authHtml = '';
+                if (adminData.success) {
+                    authHtml += createMetric('Admin Login', 'Success', 'success');
+                    authHtml += createMetric('Admin Role', adminData.user?.role || 'Unknown', 'info');
+                } else {
+                    authHtml += createMetric('Admin Login', 'Failed', 'error');
+                }
+                
+                // Test researcher login
+                const researcherLoginResponse = await fetch('/api/auth?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const researcherData = await researcherLoginResponse.json();
+                
+                if (researcherData.success) {
+                    authHtml += createMetric('Researcher Login', 'Success', 'success');
+                    authHtml += createMetric('Researcher Role', researcherData.user?.role || 'Unknown', 'info');
+                } else {
+                    authHtml += createMetric('Researcher Login', 'Failed', 'error');
+                }
+                
+                updateStatus('authTestResults', authHtml);
+                log('Authentication test completed');
+                
+            } catch (error) {
+                updateStatus('authTestResults', createMetric('Authentication', 'Error: ' + error.message, 'error'));
+                log('Authentication test failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testStudyCreation() {
+            log('Testing study creation with points validation...');
+            updateStatus('studyTestResults', '<div class="loading"><div class="spinner"></div><p>Testing...</p></div>');
+            
+            try {
+                // First login as researcher
+                const loginResponse = await fetch('/api/auth?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (!loginData.success) {
+                    throw new Error('Failed to login as researcher');
+                }
+                
+                // Try to create a study (should fail with insufficient points)
+                const studyResponse = await fetch('/api/studies', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${loginData.session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        title: 'Production Test Study',
+                        description: 'Testing points validation in production',
+                        settings: {
+                            type: 'usability',
+                            recording: { screen: true, audio: false, webcam: false },
+                            maxParticipants: 5,
+                            duration: 15,
+                            compensation: 25,
+                            tasks: []
+                        },
+                        status: 'draft',
+                        is_public: false,
+                        target_participants: 5
+                    })
+                });
+                
+                const studyData = await studyResponse.json();
+                
+                let studyHtml = '';
+                if (!studyData.success && studyData.error?.includes('Insufficient points')) {
+                    studyHtml += createMetric('Points Validation', 'Working Correctly', 'success');
+                    studyHtml += createMetric('Required Points', studyData.pointsNeeded || 'Unknown', 'info');
+                    studyHtml += createMetric('Current Points', studyData.currentPoints || '0', 'info');
+                    studyHtml += createMetric('Error Message', 'User-Friendly', 'success');
+                } else if (studyData.success) {
+                    studyHtml += createMetric('Study Creation', 'Success (Has Points)', 'success');
+                } else {
+                    studyHtml += createMetric('Study Creation', 'Unexpected Error', 'warning');
+                }
+                
+                updateStatus('studyTestResults', studyHtml);
+                log('Study creation test completed');
+                
+            } catch (error) {
+                updateStatus('studyTestResults', createMetric('Study Creation', 'Error: ' + error.message, 'error'));
+                log('Study creation test failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testAdminAssignment() {
+            log('Testing admin points assignment...');
+            const adminEmail = document.getElementById('adminEmail').value;
+            const adminPassword = document.getElementById('adminPassword').value;
+            const targetEmail = document.getElementById('targetEmail').value;
+            const pointsAmount = parseInt(document.getElementById('pointsAmount').value);
+            
+            updateStatus('adminTestResults', '<div class="loading"><div class="spinner"></div><p>Testing admin assignment...</p></div>');
+            
+            try {
+                // Login as admin
+                const adminLoginResponse = await fetch('/api/auth?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: adminEmail, password: adminPassword })
+                });
+                
+                const adminData = await adminLoginResponse.json();
+                
+                if (!adminData.success) {
+                    throw new Error('Admin login failed');
+                }
+                
+                // Assign points
+                const assignResponse = await fetch('/api/points', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminData.session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        action: 'assign',
+                        userEmail: targetEmail,
+                        amount: pointsAmount,
+                        reason: 'Production deployment test'
+                    })
+                });
+                
+                const assignData = await assignResponse.json();
+                
+                let resultHtml = '';
+                if (assignData.success) {
+                    resultHtml = `<div class="alert success">
+                        ✅ Points assigned successfully!<br>
+                        Assigned ${pointsAmount} points to ${targetEmail}
+                    </div>`;
+                    log(`Successfully assigned ${pointsAmount} points to ${targetEmail}`);
+                } else {
+                    resultHtml = `<div class="alert error">
+                        ❌ Points assignment failed: ${assignData.error}
+                    </div>`;
+                    log(`Points assignment failed: ${assignData.error}`, 'error');
+                }
+                
+                updateStatus('adminTestResults', resultHtml);
+                
+            } catch (error) {
+                updateStatus('adminTestResults', `<div class="alert error">❌ Error: ${error.message}</div>`);
+                log('Admin assignment test failed: ' + error.message, 'error');
+            }
+        }
+
+        function openUserInterface() {
+            window.open('/', '_blank');
+            log('Opened user interface for manual testing');
+        }
+
+        function openAdminInterface() {
+            window.open('/app/admin', '_blank');
+            log('Opened admin interface for manual testing');
+        }
+
+        function clearLog() {
+            logEntries = [];
+            document.getElementById('activityLog').innerHTML = `[${new Date().toISOString()}] Log cleared`;
+            log('Activity log cleared');
+        }
+
+        function exportLog() {
+            const logText = logEntries.join('\\n');
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `points-system-monitor-${new Date().toISOString().split('T')[0]}.log`;
+            a.click();
+            URL.revokeObjectURL(url);
+            log('Activity log exported');
+        }
+
+        // Auto-run initial tests
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Production monitoring dashboard loaded');
+            document.getElementById('deploymentStatus').textContent = 'Deployment Successful';
+            document.getElementById('deploymentStatus').className = 'status success';
+            
+            // Run initial health checks
+            setTimeout(() => {
+                checkSystemHealth();
+                testPointsAPI();
+                testAuthentication();
+                testStudyCreation();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

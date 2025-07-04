@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Analytics Test - ResearchHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .auth-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .analytics-section {
+            margin-top: 30px;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+        .metric-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .metric-value {
+            font-size: 24px;
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .error {
+            color: #f44336;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .success {
+            color: #4caf50;
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .study-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .study-table th, .study-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .study-table th {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+        .profit-positive {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .profit-negative {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .json-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 12px 24px;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab-button.active {
+            background: #2196F3;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Admin Analytics Test - ResearchHub</h1>
+        
+        <!-- Authentication Section -->
+        <div class="auth-section">
+            <h2>🔐 Authentication</h2>
+            <input type="email" id="email" placeholder="Admin Email" value="abwanwr77+admin@gmail.com">
+            <input type="password" id="password" placeholder="Password" value="Testtest123">
+            <button onclick="login()">Login as Admin</button>
+            <button onclick="logout()">Logout</button>
+            <div id="authStatus"></div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="analytics-section">
+            <h2>📊 Admin Analytics Dashboard</h2>
+            
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('overview')">Overview</button>
+                <button class="tab-button" onclick="showTab('studies')">Study Economics</button>
+                <button class="tab-button" onclick="showTab('participants')">Participant Earnings</button>
+                <button class="tab-button" onclick="showTab('settings')">Platform Settings</button>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">Loading analytics...</div>
+            <div id="error" class="error" style="display: none;"></div>
+
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <h3>📈 Revenue Overview</h3>
+                <div id="overviewMetrics"></div>
+            </div>
+
+            <!-- Studies Tab -->
+            <div id="studies" class="tab-content">
+                <h3>📚 Study Economics</h3>
+                <button onclick="loadStudyEconomics()">Load Study Economics</button>
+                <div id="studyEconomics"></div>
+            </div>
+
+            <!-- Participants Tab -->
+            <div id="participants" class="tab-content">
+                <h3>👥 Participant Earnings</h3>
+                <button onclick="loadParticipantEarnings()">Load Participant Earnings</button>
+                <div id="participantEarnings"></div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <h3>⚙️ Platform Settings</h3>
+                <button onclick="loadPlatformSettings()">Load Settings</button>
+                <button onclick="testSettingsUpdate()">Test Settings Update</button>
+                <div id="platformSettings"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let currentToken = null;
+        let currentUser = null;
+
+        // Authentication Functions
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentToken = data.token;
+                    currentUser = data.user;
+                    document.getElementById('authStatus').innerHTML = `
+                        <div class="success">
+                            ✅ Logged in as: ${data.user.email} (${data.user.role})
+                        </div>
+                    `;
+                    loadAnalytics();
+                } else {
+                    document.getElementById('authStatus').innerHTML = `
+                        <div class="error">❌ Login failed: ${data.error}</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML = `
+                    <div class="error">❌ Login error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function logout() {
+            try {
+                if (currentToken) {
+                    await fetch(`${API_BASE}/auth?action=logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${currentToken}`,
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                }
+                
+                currentToken = null;
+                currentUser = null;
+                document.getElementById('authStatus').innerHTML = `
+                    <div class="success">✅ Logged out successfully</div>
+                `;
+                clearAnalytics();
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML = `
+                    <div class="error">❌ Logout error: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Analytics Functions
+        async function loadAnalytics() {
+            if (!currentToken) {
+                showError('Please login first');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE}/admin/analytics?action=overview`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayOverview(data.data);
+                    hideLoading();
+                } else {
+                    showError(data.error || 'Failed to load analytics');
+                }
+            } catch (error) {
+                showError(`Analytics error: ${error.message}`);
+            }
+        }
+
+        async function loadStudyEconomics() {
+            if (!currentToken) {
+                showError('Please login first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/analytics?action=study-economics`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayStudyEconomics(data.data);
+                } else {
+                    showError(data.error || 'Failed to load study economics');
+                }
+            } catch (error) {
+                showError(`Study economics error: ${error.message}`);
+            }
+        }
+
+        async function loadParticipantEarnings() {
+            if (!currentToken) {
+                showError('Please login first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/analytics?action=participant-earnings`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayParticipantEarnings(data.data);
+                } else {
+                    showError(data.error || 'Failed to load participant earnings');
+                }
+            } catch (error) {
+                showError(`Participant earnings error: ${error.message}`);
+            }
+        }
+
+        async function loadPlatformSettings() {
+            if (!currentToken) {
+                showError('Please login first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/analytics?action=platform-settings`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayPlatformSettings(data.data);
+                } else {
+                    showError(data.error || 'Failed to load platform settings');
+                }
+            } catch (error) {
+                showError(`Platform settings error: ${error.message}`);
+            }
+        }
+
+        async function testSettingsUpdate() {
+            if (!currentToken) {
+                showError('Please login first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/analytics?action=update-settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        key: 'withdrawal_fee_percent',
+                        value: 2.5,
+                        description: 'Test update from admin interface'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('Settings updated successfully');
+                    loadPlatformSettings();
+                } else {
+                    showError(data.error || 'Failed to update settings');
+                }
+            } catch (error) {
+                showError(`Settings update error: ${error.message}`);
+            }
+        }
+
+        // Display Functions
+        function displayOverview(data) {
+            const html = `
+                <div class="metric-card">
+                    <div class="metric-title">Total Platform Revenue</div>
+                    <div class="metric-value">$${data.totalRevenue || '0.00'}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Researcher Spending</div>
+                    <div class="metric-value">$${data.researcherSpending || '0.00'}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Participant Earnings</div>
+                    <div class="metric-value">$${data.participantEarnings || '0.00'}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Platform Profit</div>
+                    <div class="metric-value profit-positive">$${data.platformProfit || '0.00'}</div>
+                </div>
+            `;
+            document.getElementById('overviewMetrics').innerHTML = html;
+        }
+
+        function displayStudyEconomics(data) {
+            if (!data.studies || data.studies.length === 0) {
+                document.getElementById('studyEconomics').innerHTML = '<p>No study data available</p>';
+                return;
+            }
+
+            let html = `
+                <table class="study-table">
+                    <thead>
+                        <tr>
+                            <th>Study Title</th>
+                            <th>Researcher Cost</th>
+                            <th>Participant Earnings</th>
+                            <th>Platform Profit</th>
+                            <th>Profit Margin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.studies.forEach(study => {
+                const profitClass = study.platformProfit > 0 ? 'profit-positive' : 'profit-negative';
+                html += `
+                    <tr>
+                        <td>${study.title}</td>
+                        <td>$${study.researcherCost}</td>
+                        <td>$${study.participantEarnings}</td>
+                        <td class="${profitClass}">$${study.platformProfit}</td>
+                        <td>${study.profitMargin}%</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('studyEconomics').innerHTML = html;
+        }
+
+        function displayParticipantEarnings(data) {
+            const html = `
+                <div class="json-display">${JSON.stringify(data, null, 2)}</div>
+            `;
+            document.getElementById('participantEarnings').innerHTML = html;
+        }
+
+        function displayPlatformSettings(data) {
+            const html = `
+                <div class="json-display">${JSON.stringify(data, null, 2)}</div>
+            `;
+            document.getElementById('platformSettings').innerHTML = html;
+        }
+
+        // UI Helper Functions
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            document.getElementById('authStatus').innerHTML = `
+                <div class="success">✅ ${message}</div>
+            `;
+        }
+
+        function clearAnalytics() {
+            document.getElementById('overviewMetrics').innerHTML = '';
+            document.getElementById('studyEconomics').innerHTML = '';
+            document.getElementById('participantEarnings').innerHTML = '';
+            document.getElementById('platformSettings').innerHTML = '';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Admin Analytics Test Interface Ready');
+        });
+    </script>
+</body>
+</html>

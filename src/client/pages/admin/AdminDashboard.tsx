@@ -1,15 +1,15 @@
 import React, { useState, Suspense, lazy } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign, FileText } from 'lucide-react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign, FileText, LogOut, Bell, Search } from 'lucide-react';
 
 // Admin Sidebar - keep this loaded immediately
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import { useAuthStore } from '../../stores/authStore';
 
 // Lazy load admin components for better bundle splitting
 const AdvancedUserManagement = lazy(() => import('../../components/admin/users/AdvancedUserManagement'));
 const UserAnalyticsDashboard = lazy(() => import('../../components/admin/analytics/UserAnalyticsDashboard'));
 const SubscriptionManager = lazy(() => import('../../components/admin/SubscriptionManager'));
-const SystemAnalytics = lazy(() => import('../../components/admin/SystemAnalytics'));
 const RolePermissionManager = lazy(() => import('../../components/admin/RolePermissionManager'));
 const SystemSettings = lazy(() => import('../../components/admin/SystemSettings'));
 const SupportCenter = lazy(() => import('../../components/admin/SupportCenter'));
@@ -27,8 +27,102 @@ const AdminLoadingSpinner = () => (
   </div>
 );
 
-// Hooks and utilities
-import { useAuthStore } from '../../stores/authStore';
+// Admin Header Component
+const AdminHeader: React.FC = () => {
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  // Close profile menu when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-profile-menu]')) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileMenu]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  return (
+    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <p className="text-sm text-gray-600">Manage your platform and users</p>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          {/* Notifications */}
+          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <Bell className="w-5 h-5" />
+          </button>
+          
+          {/* Search */}
+          <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <Search className="w-5 h-5" />
+          </button>
+          
+          {/* User Profile */}
+          <div className="relative" data-profile-menu>
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center space-x-3 text-sm"
+            >
+              <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-medium">
+                  {user?.firstName?.charAt(0) || 'A'}{user?.lastName?.charAt(0) || 'D'}
+                </span>
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-gray-900">
+                  {user?.firstName || 'Admin'} {user?.lastName || 'User'}
+                </p>
+                <p className="text-xs text-gray-500">{user?.role || 'Administrator'}</p>
+              </div>
+            </button>
+            
+            {/* Profile Dropdown */}
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Profile Settings
+                </a>
+                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Admin Preferences
+                </a>
+                <div className="border-t border-gray-100"></div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
 
 interface AdminRoute {
   path: string;
@@ -191,11 +285,14 @@ const AdminDashboard: React.FC = () => {
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      {/* Main Content Area - no header, use the AppLayout header */}
+      {/* Main Content Area with Admin Header */}
       <div className={`flex-1 transition-all duration-300 ${
         isSidebarCollapsed ? 'ml-16' : 'ml-64'
       }`}>
-        {/* Route Content - no separate header */}
+        {/* Admin Header */}
+        <AdminHeader />
+        
+        {/* Route Content */}
         <main className="p-6">
           <Suspense fallback={<AdminLoadingSpinner />}>
             <Routes>

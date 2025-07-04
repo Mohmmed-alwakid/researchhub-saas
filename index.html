@@ -5,11 +5,48 @@
     <link rel="icon" type="image/svg+xml" href="/afkar-icon.svg" />
     <link rel="apple-touch-icon" href="/afkar-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Critical resource preloading for LCP optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://api.supabase.co">
+    <link rel="preload" href="/afkar-icon.svg" as="image" type="image/svg+xml">
+    
+    <!-- Font optimization for better LCP -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <title>Afkar - User Testing Research Platform</title>
     <meta name="description" content="Afkar helps research teams gather valuable insights through user testing and feedback collection." />
+    
+    <!-- Inline critical CSS for immediate render -->
+    <style>
+      /* Critical above-the-fold styles */
+      #root { min-height: 100vh; }
+      .loading-screen { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        min-height: 100vh; 
+        background: #f9fafb; 
+      }
+      .loading-spinner { 
+        animation: spin 1s linear infinite; 
+        width: 32px; 
+        height: 32px; 
+        border: 2px solid #e5e7eb; 
+        border-top: 2px solid #3b82f6; 
+        border-radius: 50%; 
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Loading screen for better LCP perception -->
+      <div class="loading-screen">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

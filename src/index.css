@@ -121,4 +121,209 @@
   .status-error {
     @apply inline-block w-2 h-2 rounded-full bg-error-500;
   }
+  
+  /* Mobile-First Optimizations */
+  /* Mobile-optimized touch targets */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] touch-manipulation;
+  }
+  
+  .touch-target-comfortable {
+    @apply min-h-[48px] min-w-[48px] touch-manipulation;
+  }
+  
+  .touch-target-large {
+    @apply min-h-[52px] min-w-[52px] touch-manipulation;
+  }
+  
+  /* Mobile-optimized buttons */
+  .btn-mobile {
+    @apply touch-target-comfortable px-6 py-3 text-base font-medium rounded-lg transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95;
+  }
+  
+  .btn-mobile-primary {
+    @apply btn-mobile bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white focus:ring-blue-500;
+  }
+  
+  .btn-mobile-secondary {
+    @apply btn-mobile bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-900 focus:ring-gray-500;
+  }
+  
+  /* Mobile-optimized inputs */
+  .input-mobile {
+    @apply w-full min-h-[48px] px-4 py-3 border border-gray-300 rounded-lg text-base leading-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation;
+  }
+  
+  /* Mobile navigation */
+  .nav-mobile {
+    @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 safe-area-inset-bottom;
+  }
+  
+  .nav-item-mobile {
+    @apply touch-target-comfortable flex flex-col items-center justify-center text-xs font-medium text-gray-600 hover:text-blue-600 transition-colors;
+  }
+  
+  /* Mobile-optimized modals */
+  .modal-mobile {
+    @apply fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black bg-opacity-50;
+  }
+  
+  .modal-content-mobile {
+    @apply bg-white rounded-t-lg sm:rounded-lg max-h-[90vh] overflow-y-auto touch-manipulation w-full sm:max-w-md mx-4;
+  }
+  
+  /* Safe area support for iOS */
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-inset-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .safe-area-inset-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Mobile-specific responsive utilities */
+@layer utilities {
+  /* Prevent horizontal scroll on mobile */
+  .no-horizontal-scroll {
+    overflow-x: hidden;
+  }
+  
+  /* iOS-specific touch optimizations */
+  .ios-scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent text selection on touch targets */
+  .touch-callout-none {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Performance optimizations */
+  .hardware-accelerated {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  
+  /* Mobile typography optimizations */
+  .text-mobile-optimized {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    line-height: 1.5;
+  }
+}
+
+/* Mobile-first responsive breakpoints */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary {
+    @apply min-h-[48px] px-4 py-3 text-base;
+  }
+  
+  .input-field {
+    @apply min-h-[48px] text-base;
+  }
+  
+  .card {
+    @apply mx-4 rounded-xl;
+  }
+  
+  /* Increase tap targets on mobile */
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    @apply min-h-[44px];
+  }
+  
+  /* Mobile spacing adjustments */
+  .section-padding {
+    @apply py-8 px-4;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small mobile optimizations */
+  .btn-primary,
+  .btn-secondary {
+    @apply w-full text-center;
+  }
+  
+  .card {
+    @apply mx-2 rounded-lg;
+  }
+  
+  .section-padding {
+    @apply py-6 px-3;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .touch-target {
+    @apply min-h-[48px] min-w-[48px];
+  }
+}
+
+/* Performance optimizations for LCP */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Hardware acceleration for smooth animations */
+.hardware-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Critical layout styles for LCP */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image optimization */
+img {
+  max-width: 100%;
+  height: auto;
+  loading: lazy;
+}
+
+img[data-priority="true"] {
+  loading: eager;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+  .high-contrast {
+    border: 2px solid currentColor;
+  }
 }

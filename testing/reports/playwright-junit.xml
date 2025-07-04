@@ -1,0 +1,323 @@
+<testsuites id="" name="" tests="8" failures="2" skipped="0" errors="0" time="116.23947899999999">
+<testsuite name="researcher-participant-workflow.spec.js" timestamp="2025-07-04T05:57:43.815Z" hostname="chromium" tests="2" failures="0" skipped="0" time="21.021" errors="0">
+<testcase name="Complete Researcher → Participant Workflow › Full workflow: Create study → Participant completes → View results" classname="researcher-participant-workflow.spec.js" time="16.158">
+<system-out>
+<![CDATA[🚀 Starting complete researcher-participant workflow test...
+📝 Step 1: Researcher Authentication
+✅ Researcher authentication result: {
+  success: [33mtrue[39m,
+  user: {
+    id: [32m'4c3d798b-2975-4ec4-b9e2-c6f128b8a066'[39m,
+    email: [32m'abwanwr77+researcher@gmail.com'[39m,
+    role: [32m'researcher'[39m,
+    firstName: [32m'Researcher'[39m,
+    lastName: [32m'tester'[39m
+  }
+}
+📚 Step 2: Create New Study
+🔄 Navigating directly to study creation page...
+✏️ Step 3: Fill Study Details
+🧩 Step 4: Add Study Blocks
+💾 Step 5: Save and Publish Study
+🔍 Step 6: Get Study ID
+📋 Study ID: null
+📋 Study Title: Test Study - 2025-07-04T05:57
+👤 Step 7: Switch to Participant
+✅ Participant authentication result: {
+  success: [33mtrue[39m,
+  user: {
+    id: [32m'9876c870-79e9-4106-99d6-9080049ec2aa'[39m,
+    email: [32m'abwanwr77+participant@gmail.com'[39m,
+    role: [32m'participant'[39m,
+    firstName: [32m'participant'[39m,
+    lastName: [32m'tester'[39m
+  }
+}
+📝 Step 8: Participant Applies to Study
+✅ Step 9: Participant Completes Study
+📊 Step 10: Researcher Views Results
+🎯 Final Validation
+🎉 Complete researcher-participant workflow test completed successfully!
+📊 Generated screenshots show the full user journey
+✅ All major workflow steps validated
+]]>
+</system-out>
+</testcase>
+<testcase name="Complete Researcher → Participant Workflow › API-based workflow validation" classname="researcher-participant-workflow.spec.js" time="4.863">
+<system-out>
+<![CDATA[🔧 Running API-based workflow validation...
+🔍 API Test Results: {
+  health: {
+    success: [33mtrue[39m,
+    message: [32m'Local development server is running'[39m,
+    timestamp: [32m'2025-07-04T05:57:48.512Z'[39m,
+    version: [32m'1.0.0-local'[39m,
+    status: [32m'operational'[39m
+  },
+  auth: {
+    success: [33mtrue[39m,
+    message: [32m'Login successful'[39m,
+    user: {
+      id: [32m'4c3d798b-2975-4ec4-b9e2-c6f128b8a066'[39m,
+      email: [32m'abwanwr77+researcher@gmail.com'[39m,
+      role: [32m'researcher'[39m,
+      firstName: [32m'Researcher'[39m,
+      lastName: [32m'tester'[39m
+    },
+    session: {
+      accessToken: [32m'eyJhbGciOiJIUzI1NiIsImtpZCI6ImtNTk9JUFUzZGs1VUZiSzAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3d4cHd4emRnZHZpbmxidG5iZ2RmLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUxNjEyMjY5LCJpYXQiOjE3NTE2MDg2NjksImVtYWlsIjoiYWJ3YW53cjc3K3Jlc2VhcmNoZXJAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImFid2Fud3I3NytyZXNlYXJjaGVyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmVzZWFyY2hlciIsImxhc3RfbmFtZSI6InRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6InJlc2VhcmNoZXIiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MTYwODY2OX1dLCJzZXNzaW9uX2lkIjoiODhhNDlhNzEtM2YyNS00ZGJiLWI0YTctYjE3MGQzOGU1MTBhIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.hWJ3bEHhk5at2gy3rRKLqVF4N4uSH52KovkRagCSFiA'[39m,
+      refreshToken: [32m'm46v5vmn5qw2'[39m,
+      expiresAt: [33m1751612269[39m
+    }
+  }
+}
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="researcher-participant-workflow.spec.js" timestamp="2025-07-04T05:57:43.815Z" hostname="firefox" tests="2" failures="1" skipped="0" time="114.088" errors="0">
+<testcase name="Complete Researcher → Participant Workflow › Full workflow: Create study → Participant completes → View results" classname="researcher-participant-workflow.spec.js" time="104.705">
+<failure message="researcher-participant-workflow.spec.js:50:3 Full workflow: Create study → Participant completes → View results" type="FAILURE">
+<![CDATA[  [firefox] › researcher-participant-workflow.spec.js:50:3 › Complete Researcher → Participant Workflow › Full workflow: Create study → Participant completes → View results 
+
+    Error: page.waitForTimeout: Target page, context or browser has been closed
+
+      355 |     await page.goto(`${FRONTEND_BASE}/app/studies`);
+      356 |     await page.waitForLoadState('networkidle');
+    > 357 |     await page.waitForTimeout(2000);
+          |                ^
+      358 |     
+      359 |     await page.screenshot({ 
+      360 |       path: 'testing/playwright-mcp/screenshots/05-participant-studies-page.png',
+        at D:\MAMP\AfakarM\testing\playwright-mcp\researcher-participant-workflow.spec.js:357:16
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\researcher-participant-wor-b9720-nt-completes-→-View-results-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[🚀 Starting complete researcher-participant workflow test...
+📝 Step 1: Researcher Authentication
+✅ Researcher authentication result: {
+  success: [33mtrue[39m,
+  user: {
+    id: [32m'4c3d798b-2975-4ec4-b9e2-c6f128b8a066'[39m,
+    email: [32m'abwanwr77+researcher@gmail.com'[39m,
+    role: [32m'researcher'[39m,
+    firstName: [32m'Researcher'[39m,
+    lastName: [32m'tester'[39m
+  }
+}
+📚 Step 2: Create New Study
+🔄 Navigating directly to study creation page...
+✏️ Step 3: Fill Study Details
+🧩 Step 4: Add Study Blocks
+💾 Step 5: Save and Publish Study
+🔍 Step 6: Get Study ID
+📋 Study ID: null
+📋 Study Title: Test Study - 2025-07-04T05:59
+👤 Step 7: Switch to Participant
+✅ Participant authentication result: {
+  success: [33mtrue[39m,
+  user: {
+    id: [32m'9876c870-79e9-4106-99d6-9080049ec2aa'[39m,
+    email: [32m'abwanwr77+participant@gmail.com'[39m,
+    role: [32m'participant'[39m,
+    firstName: [32m'participant'[39m,
+    lastName: [32m'tester'[39m
+  }
+}
+📝 Step 8: Participant Applies to Study
+
+[[ATTACHMENT|..\..\test-results\researcher-participant-wor-b9720-nt-completes-→-View-results-firefox\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Complete Researcher → Participant Workflow › API-based workflow validation" classname="researcher-participant-workflow.spec.js" time="9.383">
+<system-out>
+<![CDATA[🔧 Running API-based workflow validation...
+🔍 API Test Results: {
+  health: {
+    success: [33mtrue[39m,
+    message: [32m'Local development server is running'[39m,
+    timestamp: [32m'2025-07-04T05:57:56.032Z'[39m,
+    version: [32m'1.0.0-local'[39m,
+    status: [32m'operational'[39m
+  },
+  auth: {
+    success: [33mtrue[39m,
+    message: [32m'Login successful'[39m,
+    user: {
+      id: [32m'4c3d798b-2975-4ec4-b9e2-c6f128b8a066'[39m,
+      email: [32m'abwanwr77+researcher@gmail.com'[39m,
+      role: [32m'researcher'[39m,
+      firstName: [32m'Researcher'[39m,
+      lastName: [32m'tester'[39m
+    },
+    session: {
+      accessToken: [32m'eyJhbGciOiJIUzI1NiIsImtpZCI6ImtNTk9JUFUzZGs1VUZiSzAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3d4cHd4emRnZHZpbmxidG5iZ2RmLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUxNjEyMjc2LCJpYXQiOjE3NTE2MDg2NzYsImVtYWlsIjoiYWJ3YW53cjc3K3Jlc2VhcmNoZXJAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImFid2Fud3I3NytyZXNlYXJjaGVyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmVzZWFyY2hlciIsImxhc3RfbmFtZSI6InRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6InJlc2VhcmNoZXIiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MTYwODY3Nn1dLCJzZXNzaW9uX2lkIjoiM2QwMzIwMzYtZTU3NC00NGE5LTk5ZDYtMzM3OTMzNTdlN2EzIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.im0nWCGPAv5MpW3xqkYL19WnX96nVYF_d5fJyHDSFcI'[39m,
+      refreshToken: [32m'y7ou62ncna3t'[39m,
+      expiresAt: [33m1751612276[39m
+    }
+  }
+}
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="researcher-participant-workflow.spec.js" timestamp="2025-07-04T05:57:43.815Z" hostname="webkit" tests="2" failures="0" skipped="0" time="34.306" errors="0">
+<testcase name="Complete Researcher → Participant Workflow › Full workflow: Create study → Participant completes → View results" classname="researcher-participant-workflow.spec.js" time="25.744">
+<system-out>
+<![CDATA[🚀 Starting complete researcher-participant workflow test...
+📝 Step 1: Researcher Authentication
+✅ Researcher authentication result: {
+  success: [33mtrue[39m,
+  user: {
+    id: [32m'4c3d798b-2975-4ec4-b9e2-c6f128b8a066'[39m,
+    email: [32m'abwanwr77+researcher@gmail.com'[39m,
+    role: [32m'researcher'[39m,
+    firstName: [32m'Researcher'[39m,
+    lastName: [32m'tester'[39m
+  }
+}
+📚 Step 2: Create New Study
+🔄 Navigating directly to study creation page...
+✏️ Step 3: Fill Study Details
+🧩 Step 4: Add Study Blocks
+💾 Step 5: Save and Publish Study
+🔍 Step 6: Get Study ID
+📋 Study ID: null
+📋 Study Title: Test Study - 2025-07-04T05:58
+👤 Step 7: Switch to Participant
+✅ Participant authentication result: {
+  success: [33mtrue[39m,
+  user: {
+    id: [32m'9876c870-79e9-4106-99d6-9080049ec2aa'[39m,
+    email: [32m'abwanwr77+participant@gmail.com'[39m,
+    role: [32m'participant'[39m,
+    firstName: [32m'participant'[39m,
+    lastName: [32m'tester'[39m
+  }
+}
+📝 Step 8: Participant Applies to Study
+✅ Step 9: Participant Completes Study
+📊 Step 10: Researcher Views Results
+🎯 Final Validation
+🎉 Complete researcher-participant workflow test completed successfully!
+📊 Generated screenshots show the full user journey
+✅ All major workflow steps validated
+]]>
+</system-out>
+</testcase>
+<testcase name="Complete Researcher → Participant Workflow › API-based workflow validation" classname="researcher-participant-workflow.spec.js" time="8.562">
+<system-out>
+<![CDATA[🔧 Running API-based workflow validation...
+🔍 API Test Results: {
+  health: {
+    success: [33mtrue[39m,
+    message: [32m'Local development server is running'[39m,
+    timestamp: [32m'2025-07-04T05:57:51.164Z'[39m,
+    version: [32m'1.0.0-local'[39m,
+    status: [32m'operational'[39m
+  },
+  auth: {
+    success: [33mtrue[39m,
+    message: [32m'Login successful'[39m,
+    user: {
+      id: [32m'4c3d798b-2975-4ec4-b9e2-c6f128b8a066'[39m,
+      email: [32m'abwanwr77+researcher@gmail.com'[39m,
+      role: [32m'researcher'[39m,
+      firstName: [32m'Researcher'[39m,
+      lastName: [32m'tester'[39m
+    },
+    session: {
+      accessToken: [32m'eyJhbGciOiJIUzI1NiIsImtpZCI6ImtNTk9JUFUzZGs1VUZiSzAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3d4cHd4emRnZHZpbmxidG5iZ2RmLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUxNjEyMjcxLCJpYXQiOjE3NTE2MDg2NzEsImVtYWlsIjoiYWJ3YW53cjc3K3Jlc2VhcmNoZXJAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImFid2Fud3I3NytyZXNlYXJjaGVyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmVzZWFyY2hlciIsImxhc3RfbmFtZSI6InRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6InJlc2VhcmNoZXIiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MTYwODY3MX1dLCJzZXNzaW9uX2lkIjoiMDU0YTRjMTItOThiMC00MjM3LTgwZjQtMGQzYjA3NWIyNGU0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.LoypkBNDF4tkkon1qW3_VV-St0Jt_lRDTYyYUJ8JwoA'[39m,
+      refreshToken: [32m'2ot6ltpds2py'[39m,
+      expiresAt: [33m1751612271[39m
+    }
+  }
+}
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="researcher-participant-workflow.spec.js" timestamp="2025-07-04T05:57:43.815Z" hostname="mobile-chrome" tests="2" failures="1" skipped="0" time="119.128" errors="0">
+<testcase name="Complete Researcher → Participant Workflow › Full workflow: Create study → Participant completes → View results" classname="researcher-participant-workflow.spec.js" time="114.266">
+<failure message="researcher-participant-workflow.spec.js:50:3 Full workflow: Create study → Participant completes → View results" type="FAILURE">
+<![CDATA[  [mobile-chrome] › researcher-participant-workflow.spec.js:50:3 › Complete Researcher → Participant Workflow › Full workflow: Create study → Participant completes → View results 
+
+    Error: page.click: Target page, context or browser has been closed
+    Call log:
+      - waiting for locator('text=Sign in')
+        - locator resolved to <a href="/login" data-discover="true" class="text-base font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">Sign in</a>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not visible
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is not visible
+        - retrying click action
+          - waiting 100ms
+        205 × waiting for element to be visible, enabled and stable
+            - element is not visible
+          - retrying click action
+            - waiting 500ms
+
+
+      55 |     
+      56 |     // Navigate to login page
+    > 57 |     await page.click('text=Sign in');
+         |                ^
+      58 |     await page.waitForLoadState('networkidle');
+      59 |     
+      60 |     // Fill login form
+        at D:\MAMP\AfakarM\testing\playwright-mcp\researcher-participant-workflow.spec.js:57:16
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\researcher-participant-wor-b9720-nt-completes-→-View-results-mobile-chrome\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[🚀 Starting complete researcher-participant workflow test...
+📝 Step 1: Researcher Authentication
+
+[[ATTACHMENT|..\..\test-results\researcher-participant-wor-b9720-nt-completes-→-View-results-mobile-chrome\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Complete Researcher → Participant Workflow › API-based workflow validation" classname="researcher-participant-workflow.spec.js" time="4.862">
+<system-out>
+<![CDATA[🔧 Running API-based workflow validation...
+🔍 API Test Results: {
+  health: {
+    success: [33mtrue[39m,
+    message: [32m'Local development server is running'[39m,
+    timestamp: [32m'2025-07-04T05:57:48.475Z'[39m,
+    version: [32m'1.0.0-local'[39m,
+    status: [32m'operational'[39m
+  },
+  auth: {
+    success: [33mtrue[39m,
+    message: [32m'Login successful'[39m,
+    user: {
+      id: [32m'4c3d798b-2975-4ec4-b9e2-c6f128b8a066'[39m,
+      email: [32m'abwanwr77+researcher@gmail.com'[39m,
+      role: [32m'researcher'[39m,
+      firstName: [32m'Researcher'[39m,
+      lastName: [32m'tester'[39m
+    },
+    session: {
+      accessToken: [32m'eyJhbGciOiJIUzI1NiIsImtpZCI6ImtNTk9JUFUzZGs1VUZiSzAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3d4cHd4emRnZHZpbmxidG5iZ2RmLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUxNjEyMjY5LCJpYXQiOjE3NTE2MDg2NjksImVtYWlsIjoiYWJ3YW53cjc3K3Jlc2VhcmNoZXJAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImFid2Fud3I3NytyZXNlYXJjaGVyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmVzZWFyY2hlciIsImxhc3RfbmFtZSI6InRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6InJlc2VhcmNoZXIiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MTYwODY2OX1dLCJzZXNzaW9uX2lkIjoiMTY5NjExOWItOTJiMi00MTY5LWJlMmYtMjE1NTJmMmNhMWZmIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.yAdezfEAivkqnb2bWi_7NYPWaNSlvXCOCWcHCPPdy1U'[39m,
+      refreshToken: [32m'4pfeln44webp'[39m,
+      expiresAt: [33m1751612269[39m
+    }
+  }
+}
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

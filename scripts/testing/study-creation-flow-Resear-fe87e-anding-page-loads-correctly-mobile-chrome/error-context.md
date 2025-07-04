@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - link "Afkar":
+    - /url: /
+    - img "Afkar"
+- text: AI-Powered Research Platform
+- heading "User research made simple & powerful" [level=1]
+- paragraph: Conduct user testing, gather feedback, and analyze behavior with our comprehensive research platform. Screen recording, heatmaps, and analytics powered by AI.
+- button "Start Free Trial"
+- button "Watch Demo"
+- text: No credit card required 14-day free trial
+- heading "Live Dashboard" [level=3]
+- text: Live Completion Rate
+- paragraph: 94%
+- text: Active Users
+- paragraph: 2,847
+- text: Study Progress 87% Powerful Features
+- heading "Everything you need for user research" [level=2]
+- paragraph: Comprehensive tools to conduct, manage, and analyze user research studies with AI-powered insights
+- heading "HD Screen Recording" [level=3]
+- paragraph: Capture crystal-clear user interactions with advanced screen recording technology. No downloads required.
+- heading "AI-Powered Analytics" [level=3]
+- paragraph: Get actionable insights with heatmaps, conversion funnels, and behavioral analysis powered by machine learning.
+- heading "Smart Participant Management" [level=3]
+- paragraph: Recruit, screen, and manage participants with built-in tools, automated compensation, and CRM integration.
+- heading "Enterprise Security" [level=3]
+- paragraph: Bank-grade security with SOC 2 compliance, GDPR ready, and end-to-end encryption for all data.
+- heading "Real-time Collaboration" [level=3]
+- paragraph: Work together with your team in real-time. Share insights, tag moments, and collaborate on analysis.
+- heading "Advanced Integrations" [level=3]
+- paragraph: Connect with 50+ tools including Slack, Figma, Notion, and your favorite design and project management tools.
+- heading "Ready to transform your user research?" [level=2]
+- paragraph: Join thousands of researchers who trust Afkar for their user testing needs.
+- button "Start Free Trial"
+- button "Watch Demo"
+- heading "Performance" [level=4]
+- text: Load Time 0ms Render Time 0.0ms Memory 12.1MB API Calls 0
+- button "Report an issue or bug"
+- text: Report a bug or issue
+```

@@ -118,7 +118,31 @@ export const getAllUsers = async (params: {
     }
   });
   
-  return apiService.get<any>(`/api/admin?action=users&${queryParams.toString()}`);
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch(`/api/admin/users?${queryParams.toString()}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
 };
 
 export const updateUser = async (userId: string, data: {
@@ -126,8 +150,33 @@ export const updateUser = async (userId: string, data: {
   isActive?: boolean;
   name?: string;
   email?: string;
-}): Promise<AdminUser> => {
-  return apiService.put<{ data: AdminUser }>(`/api/admin?action=user-actions&userId=${userId}`, data).then(response => response.data);
+}): Promise<any> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch(`/api/admin/user-actions?userId=${userId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
 };
 
 export const createUser = async (data: {
@@ -135,13 +184,61 @@ export const createUser = async (data: {
   email: string;
   password: string;
   role: string;
-  isActive: boolean;
-}): Promise<AdminUser> => {
-  return apiService.post<{ data: AdminUser }>('/api/admin?action=user-actions', data).then(response => response.data);
+}): Promise<any> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch('/api/admin/user-actions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
 };
 
-export const deleteUser = async (userId: string): Promise<void> => {
-  return apiService.delete(`/api/admin?action=user-actions&userId=${userId}`);
+export const deleteUser = async (userId: string): Promise<any> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch(`/api/admin/user-actions?userId=${userId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
 };
 
 export const bulkUpdateUsers = async (data: {
@@ -149,7 +246,7 @@ export const bulkUpdateUsers = async (data: {
   action: 'activate' | 'deactivate' | 'changeRole';
   value?: string;
 }): Promise<{ modifiedCount: number; matchedCount: number }> => {
-  return apiService.put<{ data: { modifiedCount: number; matchedCount: number } }>('/api/admin?action=users-bulk', data).then(response => response.data);
+  return apiService.put<{ data: { modifiedCount: number; matchedCount: number } }>('/api/admin/users/bulk', data).then(response => response.data);
 };
 
 // System Analytics
@@ -173,7 +270,7 @@ export const getAllStudies = async (params: {
     }
   });
   
-  return apiService.get<{ data: PaginatedResponse<AdminStudy> }>(`/api/admin?action=studies&${queryParams.toString()}`).then(response => response.data);
+  return apiService.get<{ data: PaginatedResponse<AdminStudy> }>(`/api/admin/studies?${queryParams.toString()}`).then(response => response.data);
 };
 
 export const updateStudyStatus = async (studyId: string, data: {
@@ -188,9 +285,61 @@ export const getRecentActivity = async (limit: number = 20): Promise<AdminActivi
   return apiService.get<{ data: AdminActivity[] }>(`/api/admin?action=activity&limit=${limit}`).then(response => response.data);
 };
 
-// Financial Reporting
+// Financial Reporting - UPDATED FOR NEW REAL MONEY INTEGRATION
 export const getFinancialReport = async (timeframe: '7d' | '30d' | '90d' | '1y' = '30d'): Promise<FinancialReport> => {
-  return apiService.get<{ data: FinancialReport }>(`/api/admin?action=financial&timeframe=${timeframe}`).then(response => response.data);
+  // Use new payments API endpoint
+  return apiService.get<{ data: FinancialReport }>(`/api/payments?action=financial-overview&timeframe=${timeframe}`).then(response => response.data);
+};
+
+// NEW REAL MONEY INTEGRATION ADMIN FUNCTIONS
+
+export interface WithdrawalRequest {
+  _id: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  amount: number;
+  fees: number;
+  netAmount: number;
+  paymentMethod: 'paypal' | 'bank_transfer';
+  paymentDetails: Record<string, string>;
+  status: 'pending' | 'approved' | 'rejected';
+  requestedAt: string;
+  processedAt?: string;
+  adminNotes?: string;
+}
+
+/**
+ * Get all withdrawal requests for admin review
+ */
+export const getWithdrawalRequests = async (): Promise<WithdrawalRequest[]> => {
+  return apiService.get<{ data: WithdrawalRequest[] }>('/api/payments?action=withdrawals').then(response => response.data);
+};
+
+/**
+ * Process a withdrawal request (approve or reject)
+ */
+export const processWithdrawal = async (
+  withdrawalId: string, 
+  action: 'approve' | 'reject', 
+  adminNotes?: string
+): Promise<{ success: boolean; data?: WithdrawalRequest; error?: string }> => {
+  return apiService.post('/api/payments?action=process-withdrawal', {
+    withdrawalId,
+    action,
+    adminNotes
+  });
+};
+
+/**
+ * Get enhanced financial overview with real money data
+ */
+export const getEnhancedFinancialOverview = async () => {
+  const response = await apiService.get('/api/payments?action=financial-overview');
+  return response;
 };
 
 // User Behavior Analytics
@@ -243,3 +392,227 @@ export interface SystemPerformance {
 export const getSystemPerformance = async (timeframe: '1h' | '24h' | '7d' | '30d' = '24h'): Promise<SystemPerformance> => {
   return apiService.get<{ data: SystemPerformance }>(`/api/admin/system-performance?timeframe=${timeframe}`).then(response => response.data);
 };
+
+// Payment Management
+export interface PaymentRequest {
+  _id: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  planType: 'basic' | 'pro' | 'enterprise';
+  amount: number;
+  currency: string;
+  status: 'pending' | 'verified' | 'rejected';
+  paymentMethod: string;
+  paymentProofUrl?: string;
+  adminNotes?: string;
+  requestedAt: string;
+  processedAt?: string;
+  processedBy?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+}
+
+export interface PaymentStats {
+  totalRequests: number;
+  pendingRequests: number;
+  verifiedRequests: number;
+  rejectedRequests: number;
+  totalRevenue: number;
+  thisMonthRevenue: number;
+}
+
+export const getPaymentRequests = async (): Promise<PaymentRequest[]> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch('/api/admin/payments/requests', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const result = await response.json();
+  return result.data;
+};
+
+export const getPaymentAnalytics = async (): Promise<PaymentStats> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch('/api/admin/payments/analytics', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const result = await response.json();
+  return result.data;
+};
+
+export const verifyPayment = async (requestId: string, adminNotes?: string): Promise<PaymentRequest> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch(`/api/admin/payments/requests/${requestId}/verify`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ adminNotes })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const result = await response.json();
+  return result.data;
+};
+
+export const rejectPayment = async (requestId: string, adminNotes?: string): Promise<PaymentRequest> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch(`/api/admin/payments/requests/${requestId}/reject`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ adminNotes })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const result = await response.json();
+  return result.data;
+};
+
+export const addCreditsManually = async (data: {
+  email: string;
+  credits: number;
+  planType?: 'basic' | 'pro' | 'enterprise';
+  expiresAt?: string;
+}): Promise<{
+  message: string;
+  user: { id: string; email: string; name: string };
+  creditsAdded: number;
+  planType: string;
+  expiresAt: string | null;
+  addedAt: string;
+  addedBy: string;
+}> => {
+  // Get token from localStorage
+  const authStorage = localStorage.getItem('auth-storage');
+  let token = '';
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      token = state?.token || '';
+    } catch (error) {
+      console.warn('Failed to parse auth storage:', error);
+    }
+  }
+  
+  const response = await fetch('/api/admin/payments/credits/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const result = await response.json();
+  return result.data;
+};
+
+
+// Export as default service object
+export const adminService = {
+  getPlatformOverview,
+  getAllUsers,
+  updateUser,
+  createUser,
+  deleteUser,
+  bulkUpdateUsers,
+  getSystemAnalytics,
+  getAllStudies,
+  updateStudyStatus,
+  getRecentActivity,
+  getFinancialReport,
+  getUserBehaviorAnalytics,
+  getSystemPerformance,
+  getPaymentRequests,
+  getPaymentAnalytics,
+  verifyPayment,
+  rejectPayment,
+  addCreditsManually,
+  // NEW REAL MONEY INTEGRATION
+  getWithdrawalRequests,
+  processWithdrawal,
+  getEnhancedFinancialOverview
+};
+
+export default adminService;

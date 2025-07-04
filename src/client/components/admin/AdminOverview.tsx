@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, 
   Calendar,
@@ -16,6 +16,7 @@ import SystemHealthWidget from './dashboard/SystemHealthWidget';
 import QuickActionsPanel from './dashboard/QuickActionsPanel';
 import AdminReportsWidget from './dashboard/AdminReportsWidget';
 import AlertCenter from './dashboard/AlertCenter';
+import { useAuthStore } from '../../stores/authStore';
 
 interface AdminStats {
   totalUsers: number;
@@ -35,6 +36,7 @@ interface AdminStats {
 }
 
 const AdminOverview: React.FC = () => {
+  const { token } = useAuthStore();
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
     activeStudies: 0,
@@ -47,13 +49,9 @@ const AdminOverview: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAdminStats();
-  }, []);
-  const fetchAdminStats = async () => {
+  const fetchAdminStats = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('supabase.auth.token');
       const response = await fetch('/api/admin/analytics-overview', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -86,7 +84,13 @@ const AdminOverview: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchAdminStats();
+    }
+  }, [fetchAdminStats, token]);
 
   const getActivityIcon = (type: string) => {
     switch (type) {

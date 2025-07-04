@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "teamSettings": {
+    "qualityGates": {
+      "typeScriptCompilation": true,
+      "automatedValidation": true,
+      "manualReview": true,
+      "documentationUpdate": true
+    },
+    "validators": {
+      "uiUx": true,
+      "accessibility": true,
+      "mobile": true,
+      "performance": true
+    },
+    "notifications": {
+      "completionAlerts": true,
+      "qualityGateFailures": true,
+      "progressUpdates": false
+    }
+  },
+  "integrations": {
+    "github": true,
+    "slack": false,
+    "email": false
+  }
+}

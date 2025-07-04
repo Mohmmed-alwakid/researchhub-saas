@@ -7,7 +7,7 @@ import {
   Download,
   AlertCircle
 } from 'lucide-react';
-import { getFinancialReport, type FinancialReport } from '../../services/admin.service';
+import { getEnhancedFinancialOverview, type FinancialReport } from '../../services/admin.service';
 
 interface FinancialDashboardProps {
   className?: string;
@@ -23,7 +23,7 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({ classNam
     try {
       setLoading(true);
       setError(null);
-      const data = await getFinancialReport(timeframe);
+      const data = await getEnhancedFinancialOverview();
       setFinancial(data);
     } catch (err) {
       console.error('Failed to fetch financial data:', err);
@@ -31,7 +31,7 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({ classNam
     } finally {
       setLoading(false);
     }
-  }, [timeframe]);
+  }, []);
 
   useEffect(() => {
     fetchFinancialData();

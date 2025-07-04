@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchHub - Future Solution UI Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar-transition {
+            transition: all 0.3s ease;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .recording-indicator {
+            animation: pulse 2s infinite;
+        }
+        .heatmap-overlay {
+            background: linear-gradient(45deg, 
+                rgba(255,0,0,0.3) 0%, 
+                rgba(255,255,0,0.2) 50%, 
+                rgba(0,255,0,0.1) 100%);
+        }
+        .live-indicator {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        .study-block {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
+        }
+        .study-block:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .study-block.dragging {
+            transform: rotate(5deg);
+            opacity: 0.8;
+        }
+        .mock-screen {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .analytics-chart {
+            height: 200px;
+        }
+        .point-animation {
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold text-blue-600">ResearchHub</h1>
+                    <div class="hidden md:flex space-x-6">
+                        <button class="tab-btn active text-blue-600 font-medium" data-tab="dashboard">Dashboard</button>
+                        <button class="tab-btn text-gray-600 hover:text-blue-600" data-tab="studies">Studies</button>
+                        <button class="tab-btn text-gray-600 hover:text-blue-600" data-tab="analytics">Analytics</button>
+                        <button class="tab-btn text-gray-600 hover:text-blue-600" data-tab="admin">Admin Panel</button>
+                        <button class="tab-btn text-gray-600 hover:text-blue-600" data-tab="recording">Live Recording</button>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="live-indicator bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        🔴 Live Monitoring
+                    </div>
+                    <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                        💰 1,247 Points
+                    </div>
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-sm h-screen sticky top-16 sidebar-transition">
+            <div class="p-6">
+                <div class="space-y-2">
+                    <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-blue-900">Active Studies</span>
+                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">12</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-green-900">Participants</span>
+                            <span class="bg-green-600 text-white text-xs px-2 py-1 rounded-full">247</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-purple-900">Recordings</span>
+                            <span class="bg-purple-600 text-white text-xs px-2 py-1 rounded-full">89</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button class="w-full text-left p-3 rounded-lg hover:bg-gray-50 flex items-center">
+                            <i data-lucide="plus" class="w-4 h-4 mr-3 text-gray-500"></i>
+                            <span class="text-sm">Create Study</span>
+                        </button>
+                        <button class="w-full text-left p-3 rounded-lg hover:bg-gray-50 flex items-center">
+                            <i data-lucide="play" class="w-4 h-4 mr-3 text-gray-500"></i>
+                            <span class="text-sm">Start Recording</span>
+                        </button>
+                        <button class="w-full text-left p-3 rounded-lg hover:bg-gray-50 flex items-center">
+                            <i data-lucide="bar-chart" class="w-4 h-4 mr-3 text-gray-500"></i>
+                            <span class="text-sm">View Analytics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Dashboard</h2>
+                    <p class="text-gray-600">Real-time overview of your research platform</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-gray-500">Total Participants</h3>
+                                <p class="text-2xl font-bold text-gray-900">1,247</p>
+                                <p class="text-sm text-green-600">↗ +12% from last month</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="play-circle" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-gray-500">Active Studies</h3>
+                                <p class="text-2xl font-bold text-gray-900">47</p>
+                                <p class="text-sm text-green-600">↗ +8% from last week</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="video" class="w-6 h-6 text-purple-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-gray-500">Recordings Today</h3>
+                                <p class="text-2xl font-bold text-gray-900">23</p>
+                                <p class="text-sm text-blue-600">↗ +156% from yesterday</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="coins" class="w-6 h-6 text-orange-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-gray-500">Points Distributed</h3>
+                                <p class="text-2xl font-bold text-gray-900">15,890</p>
+                                <p class="text-sm text-green-600">↗ +23% from last month</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Activity -->
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Live Activity Feed</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Sarah completed "Mobile App Usability Study"</p>
+                                    <p class="text-xs text-gray-500">2 minutes ago • +50 points earned</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">New recording started for "E-commerce Flow Test"</p>
+                                    <p class="text-xs text-gray-500">5 minutes ago • Screen recording active</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                                <div class="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Alex joined "Design Feedback Session"</p>
+                                    <p class="text-xs text-gray-500">7 minutes ago • Interview in progress</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold mb-4">Study Completion Rates</h3>
+                        <div class="analytics-chart">
+                            <canvas id="completionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Studies Tab -->
+            <div id="studies" class="tab-content hidden">
+                <div class="mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900">Study Builder</h2>
+                            <p class="text-gray-600">Create and manage user research studies</p>
+                        </div>
+                        <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2 inline"></i>
+                            Create New Study
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Study Builder Interface -->
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">Study: Mobile App Onboarding Research</h3>
+                        <div class="flex items-center mt-2 space-x-4">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Active</span>
+                            <span class="text-sm text-gray-500">Created 2 hours ago</span>
+                            <span class="text-sm text-gray-500">23 participants</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="flex space-x-6">
+                            <!-- Block Library -->
+                            <div class="w-64 bg-gray-50 rounded-lg p-4">
+                                <h4 class="font-medium mb-4">Block Library</h4>
+                                <div class="space-y-2">
+                                    <div class="study-block bg-white p-3 rounded-lg cursor-pointer">
+                                        <div class="flex items-center">
+                                            <i data-lucide="play-circle" class="w-4 h-4 mr-2 text-blue-600"></i>
+                                            <span class="text-sm font-medium">Welcome Screen</span>
+                                        </div>
+                                    </div>
+                                    <div class="study-block bg-white p-3 rounded-lg cursor-pointer">
+                                        <div class="flex items-center">
+                                            <i data-lucide="message-square" class="w-4 h-4 mr-2 text-green-600"></i>
+                                            <span class="text-sm font-medium">Open Question</span>
+                                        </div>
+                                    </div>
+                                    <div class="study-block bg-white p-3 rounded-lg cursor-pointer">
+                                        <div class="flex items-center">
+                                            <i data-lucide="star" class="w-4 h-4 mr-2 text-yellow-600"></i>
+                                            <span class="text-sm font-medium">Rating Scale</span>
+                                        </div>
+                                    </div>
+                                    <div class="study-block bg-white p-3 rounded-lg cursor-pointer">
+                                        <div class="flex items-center">
+                                            <i data-lucide="video" class="w-4 h-4 mr-2 text-red-600"></i>
+                                            <span class="text-sm font-medium">Screen Recording</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Study Flow -->
+                            <div class="flex-1">
+                                <h4 class="font-medium mb-4">Study Flow</h4>
+                                <div class="space-y-4">
+                                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i data-lucide="play-circle" class="w-5 h-5 mr-3 text-blue-600"></i>
+                                                <div>
+                                                    <h5 class="font-medium">Welcome Screen</h5>
+                                                    <p class="text-sm text-gray-600">Introduce participants to the study</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <button class="p-2 hover:bg-blue-100 rounded">
+                                                    <i data-lucide="edit" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="p-2 hover:bg-blue-100 rounded">
+                                                    <i data-lucide="trash" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i data-lucide="video" class="w-5 h-5 mr-3 text-red-600"></i>
+                                                <div>
+                                                    <h5 class="font-medium">Screen Recording Block</h5>
+                                                    <p class="text-sm text-gray-600">Record user interactions with prototype</p>
+                                                </div>
+                                            </div>
+                                            <div class="recording-indicator bg-red-500 text-white px-2 py-1 rounded text-xs">
+                                                REC
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i data-lucide="message-square" class="w-5 h-5 mr-3 text-green-600"></i>
+                                                <div>
+                                                    <h5 class="font-medium">Post-Task Interview</h5>
+                                                    <p class="text-sm text-gray-600">Gather qualitative feedback</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <button class="p-2 hover:bg-green-100 rounded">
+                                                    <i data-lucide="edit" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="p-2 hover:bg-green-100 rounded">
+                                                    <i data-lucide="trash" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-2 border-dashed border-gray-300 p-8 rounded-lg text-center">
+                                        <i data-lucide="plus" class="w-8 h-8 mx-auto text-gray-400 mb-2"></i>
+                                        <p class="text-gray-500">Drop blocks here or click to add</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics" class="tab-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Real-Time Analytics</h2>
+                    <p class="text-gray-600">Deep insights into user behavior and study performance</p>
+                </div>
+
+                <!-- Analytics Dashboard -->
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Heatmap Visualization -->
+                    <div class="bg-white rounded-lg shadow-sm border">
+                        <div class="p-6 border-b">
+                            <h3 class="text-lg font-semibold">Interactive Heatmap</h3>
+                            <p class="text-sm text-gray-600">Click and scroll patterns from 156 sessions</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="mock-screen relative h-64 rounded-lg overflow-hidden">
+                                <div class="absolute inset-0 flex items-center justify-center text-white">
+                                    <i data-lucide="smartphone" class="w-16 h-16"></i>
+                                </div>
+                                <!-- Heatmap Overlay -->
+                                <div class="heatmap-overlay absolute inset-4 rounded opacity-60"></div>
+                                <div class="absolute top-8 left-8 w-12 h-8 bg-red-400 rounded opacity-80"></div>
+                                <div class="absolute top-20 right-8 w-8 h-8 bg-yellow-400 rounded-full opacity-70"></div>
+                                <div class="absolute bottom-12 left-1/2 w-16 h-6 bg-green-400 rounded opacity-60"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Journey -->
+                    <div class="bg-white rounded-lg shadow-sm border">
+                        <div class="p-6 border-b">
+                            <h3 class="text-lg font-semibold">User Journey Analysis</h3>
+                            <p class="text-sm text-gray-600">Average completion flow and drop-off points</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full mr-4"></div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm font-medium">Welcome Screen</span>
+                                            <span class="text-sm text-green-600">98% completion</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: 98%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-yellow-500 rounded-full mr-4"></div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm font-medium">Task Instructions</span>
+                                            <span class="text-sm text-yellow-600">87% completion</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 87%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-orange-500 rounded-full mr-4"></div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm font-medium">Interactive Prototype</span>
+                                            <span class="text-sm text-orange-600">73% completion</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                            <div class="bg-orange-500 h-2 rounded-full" style="width: 73%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-red-500 rounded-full mr-4"></div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm font-medium">Post-Task Survey</span>
+                                            <span class="text-sm text-red-600">45% completion</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                            <div class="bg-red-500 h-2 rounded-full" style="width: 45%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Analytics -->
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <h3 class="text-lg font-semibold mb-4">Session Recordings</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center p-3 border rounded-lg">
+                                <div class="w-12 h-8 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                                    <i data-lucide="play" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Session #247</p>
+                                    <p class="text-xs text-gray-500">12:34 duration</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 border rounded-lg">
+                                <div class="w-12 h-8 bg-gray-200 rounded mr-3 flex items-center justify-center">
+                                    <i data-lucide="play" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Session #246</p>
+                                    <p class="text-xs text-gray-500">8:56 duration</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <h3 class="text-lg font-semibold mb-4">Key Metrics</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Average Task Time</span>
+                                    <span class="text-sm font-medium">4:32</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Success Rate</span>
+                                    <span class="text-sm font-medium text-green-600">87%</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Error Rate</span>
+                                    <span class="text-sm font-medium text-red-600">13%</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Satisfaction Score</span>
+                                    <span class="text-sm font-medium">4.2/5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border p-6">
+                        <h3 class="text-lg font-semibold mb-4">Recent Insights</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-blue-50 rounded-lg">
+                                <p class="text-sm font-medium text-blue-900">High drop-off at step 4</p>
+                                <p class="text-xs text-blue-700">Consider simplifying the form</p>
+                            </div>
+                            <div class="p-3 bg-green-50 rounded-lg">
+                                <p class="text-sm font-medium text-green-900">Mobile users complete faster</p>
+                                <p class="text-xs text-green-700">Mobile UX optimization working</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel Tab -->
+            <div id="admin" class="tab-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Enhanced Admin Panel</h2>
+                    <p class="text-gray-600">Advanced platform management and point system analytics</p>
+                </div>
+
+                <!-- Admin Stats -->
+                <div class="grid lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500">Total Users</h3>
+                                <p class="text-2xl font-bold text-gray-900">2,847</p>
+                            </div>
+                            <i data-lucide="users" class="w-8 h-8 text-blue-600"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500">Points Distributed</h3>
+                                <p class="text-2xl font-bold text-gray-900">125,890</p>
+                            </div>
+                            <i data-lucide="coins" class="w-8 h-8 text-yellow-600"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500">System Health</h3>
+                                <p class="text-2xl font-bold text-green-600">99.9%</p>
+                            </div>
+                            <i data-lucide="activity" class="w-8 h-8 text-green-600"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500">Storage Used</h3>
+                                <p class="text-2xl font-bold text-gray-900">67.2 GB</p>
+                            </div>
+                            <i data-lucide="hard-drive" class="w-8 h-8 text-purple-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Point System Management -->
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white rounded-lg shadow-sm border">
+                        <div class="p-6 border-b">
+                            <h3 class="text-lg font-semibold">Point System Analytics</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-green-900">Study Completion</h4>
+                                        <p class="text-sm text-green-700">50 points per completed study</p>
+                                    </div>
+                                    <div class="point-animation text-2xl">💰</div>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-blue-900">Interview Participation</h4>
+                                        <p class="text-sm text-blue-700">100 points per interview session</p>
+                                    </div>
+                                    <div class="point-animation text-2xl">🎯</div>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-purple-900">Feedback Quality</h4>
+                                        <p class="text-sm text-purple-700">Bonus points for detailed feedback</p>
+                                    </div>
+                                    <div class="point-animation text-2xl">⭐</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border">
+                        <div class="p-6 border-b">
+                            <h3 class="text-lg font-semibold">Recent Admin Actions</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                <div class="flex items-center p-3 border-l-4 border-blue-500 bg-blue-50">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">Study approved: "Mobile Banking UX"</p>
+                                        <p class="text-xs text-gray-500">Admin: John Doe • 10 minutes ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 border-l-4 border-green-500 bg-green-50">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">Points awarded: 2,500 points to 50 users</p>
+                                        <p class="text-xs text-gray-500">Admin: Jane Smith • 1 hour ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 border-l-4 border-yellow-500 bg-yellow-50">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">System maintenance scheduled</p>
+                                        <p class="text-xs text-gray-500">Admin: System • 2 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Management -->
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">User Management</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Studies</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                                <span class="text-sm font-medium text-blue-600">SA</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium">Sarah Anderson</p>
+                                                <p class="text-xs text-gray-500">sarah@email.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Participant</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">1,247</td>
+                                    <td class="px-6 py-4 text-sm">23</td>
+                                    <td class="px-6 py-4">
+                                        <button class="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                                <span class="text-sm font-medium text-purple-600">MJ</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium">Mike Johnson</p>
+                                                <p class="text-xs text-gray-500">mike@email.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Researcher</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">-</td>
+                                    <td class="px-6 py-4 text-sm">12</td>
+                                    <td class="px-6 py-4">
+                                        <button class="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Recording Tab -->
+            <div id="recording" class="tab-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Live Recording Session</h2>
+                    <p class="text-gray-600">Real-time screen recording and session monitoring</p>
+                </div>
+
+                <!-- Recording Interface -->
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Screen Preview -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-lg shadow-sm border">
+                            <div class="p-4 border-b flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="recording-indicator bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium mr-4">
+                                        🔴 RECORDING
+                                    </div>
+                                    <span class="text-sm text-gray-600">Session #248 • 00:04:32</span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                                        <i data-lucide="square" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                                        <i data-lucide="pause" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="mock-screen h-96 rounded-lg relative overflow-hidden">
+                                    <div class="absolute inset-0 flex items-center justify-center text-white">
+                                        <div class="text-center">
+                                            <i data-lucide="monitor" class="w-20 h-20 mx-auto mb-4"></i>
+                                            <p class="text-lg font-medium">Participant Screen</p>
+                                            <p class="text-sm opacity-75">Real-time recording in progress</p>
+                                        </div>
+                                    </div>
+                                    <!-- Cursor simulation -->
+                                    <div class="absolute top-20 left-32 w-4 h-4 bg-white rounded-full opacity-80 animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recording Controls & Info -->
+                    <div class="space-y-6">
+                        <!-- Session Info -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="font-semibold mb-4">Session Information</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm text-gray-600">Participant:</span>
+                                    <p class="font-medium">Alex Thompson</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600">Study:</span>
+                                    <p class="font-medium">E-commerce Checkout Flow</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600">Started:</span>
+                                    <p class="font-medium">2:34 PM</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-600">Quality:</span>
+                                    <p class="font-medium text-green-600">1080p • 30fps</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Analytics -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="font-semibold mb-4">Live Analytics</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Mouse Clicks</span>
+                                    <span class="font-medium">47</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Page Views</span>
+                                    <span class="font-medium">12</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Scroll Events</span>
+                                    <span class="font-medium">89</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Form Inputs</span>
+                                    <span class="font-medium">8</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recording Settings -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="font-semibold mb-4">Recording Settings</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-2">
+                                    <span class="text-sm">Record audio</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-2">
+                                    <span class="text-sm">Track mouse movements</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2">
+                                    <span class="text-sm">Record webcam</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-2">
+                                    <span class="text-sm">Auto-save session</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(tab => {
+                    tab.classList.remove('active', 'text-blue-600', 'font-medium');
+                    tab.classList.add('text-gray-600');
+                });
+                
+                // Add active class to clicked tab
+                btn.classList.add('active', 'text-blue-600', 'font-medium');
+                btn.classList.remove('text-gray-600');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Show selected tab content
+                const tabId = btn.dataset.tab;
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+
+        // Initialize Chart.js
+        const ctx = document.getElementById('completionChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Completion Rate',
+                        data: [65, 72, 80, 78, 85, 88, 92],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            // Update live activity feed
+            const activities = document.querySelectorAll('#dashboard .space-y-4 > div');
+            if (activities.length > 0) {
+                // Add subtle animation to simulate real-time updates
+                activities[0].style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    activities[0].style.transform = 'scale(1)';
+                }, 200);
+            }
+        }, 5000);
+
+        // Drag and drop for study blocks (simulation)
+        document.querySelectorAll('.study-block').forEach(block => {
+            block.addEventListener('dragstart', () => {
+                block.classList.add('dragging');
+            });
+            
+            block.addEventListener('dragend', () => {
+                block.classList.remove('dragging');
+            });
+        });
+    </script>
+</body>
+</html>
