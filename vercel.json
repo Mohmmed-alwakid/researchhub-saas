@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "name": "researchhub-saas",
+  "alias": ["researchhub-saas.vercel.app"],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
