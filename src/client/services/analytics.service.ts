@@ -81,7 +81,7 @@ export const analyticsService = {
    * Get study analytics for a specific study
    */
   async getStudyAnalytics(studyId: string, timeframe: string = '7d'): Promise<StudyAnalyticsData> {
-    const response = await apiService.get<{ data: StudyAnalyticsData }>(`/api/studies?action=analytics&studyId=${studyId}&timeframe=${timeframe}`);
+    const response = await apiService.get<{ data: StudyAnalyticsData }>(`/studies?action=analytics&studyId=${studyId}&timeframe=${timeframe}`);
     return response.data;
   },
 
@@ -101,13 +101,13 @@ export const analyticsService = {
     }
     
     // Otherwise get platform-wide analytics
-    const response = await apiService.get<{ data: StudyAnalyticsData }>(`/api/analytics?timeframe=${timeframe}&refresh=${refreshInterval}`);
+    const response = await apiService.get<{ data: StudyAnalyticsData }>(`/analytics?timeframe=${timeframe}&refresh=${refreshInterval}`);
     return response.data;
   },  /**
    * Get dashboard analytics summary
    */
   async getDashboardAnalytics(): Promise<DashboardAnalytics> {
-    const response = await apiService.get<{ data: DashboardAnalytics }>('/api/dashboard/analytics');
+    const response = await apiService.get<{ data: DashboardAnalytics }>('/dashboard/analytics');
     return response.data;
   },
 
@@ -115,7 +115,7 @@ export const analyticsService = {
    * Get real-time analytics updates
    */
   async getRealTimeMetrics(): Promise<RealTimeMetrics> {
-    const response = await apiService.get<{ data: RealTimeMetrics }>('/api/analytics/realtime');
+    const response = await apiService.get<{ data: RealTimeMetrics }>('/analytics/realtime');
     return response.data;
   }
 };
