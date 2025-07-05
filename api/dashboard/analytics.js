@@ -21,19 +21,37 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get Authorization header
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    // Get Authorization header (handle multiple formats and case variations)
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+    console.log('🔍 Dashboard Analytics - Headers:', {
+      authorization: req.headers.authorization,
+      Authorization: req.headers.Authorization,
+      allHeaders: Object.keys(req.headers)
+    });
     
-    if (!token) {
+    if (!authHeader) {
+      console.log('❌ No authorization header found');
       return res.status(401).json({ success: false, error: 'No token provided' });
     }
+    
+    const token = authHeader.replace('Bearer ', '');
+    
+    if (!token || token === authHeader) {
+      console.log('❌ Invalid token format');
+      return res.status(401).json({ success: false, error: 'Invalid token format' });
+    }
+
+    console.log('🔍 Dashboard Analytics - Token received:', token.substring(0, 50) + '...');
 
     // Verify user authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
+      console.log('❌ Auth error:', authError?.message);
       return res.status(401).json({ success: false, error: 'Invalid token' });
     }
+
+    console.log('✅ User authenticated:', user.email);
 
     // Get user profile to determine role
     const { data: profile, error: profileError } = await supabase

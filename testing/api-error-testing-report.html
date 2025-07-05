@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Error Testing Report - ResearchHub</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .test-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status.success { background: #d1fae5; color: #065f46; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .status.warning { background: #fef3c7; color: #92400e; }
+        .status.loading { background: #dbeafe; color: #1e40af; }
+        .endpoint-list {
+            display: grid;
+            gap: 10px;
+        }
+        .endpoint {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+            border-left: 4px solid #e5e7eb;
+        }
+        .endpoint.success { border-left-color: #10b981; }
+        .endpoint.error { border-left-color: #ef4444; }
+        .endpoint.warning { border-left-color: #f59e0b; }
+        .endpoint-url {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            color: #374151;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover { background: #2563eb; }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .summary-card {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🔍 API Error Testing Report</h1>
+            <p class="subtitle">Comprehensive testing of all ResearchHub API endpoints and page errors</p>
+            <p class="subtitle">Generated: <span id="timestamp"></span></p>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary">
+            <div class="summary-card">
+                <div class="summary-number" id="total-endpoints">0</div>
+                <div class="summary-label">Total Endpoints</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="working-endpoints">0</div>
+                <div class="summary-label">Working</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="error-endpoints">0</div>
+                <div class="summary-label">Errors</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="auth-endpoints">0</div>
+                <div class="summary-label">Auth Required</div>
+            </div>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="test-section">
+            <h2 class="test-title">🔐 Authentication Test</h2>
+            <button class="test-button" onclick="testAuthentication()">Test Login</button>
+            <div id="auth-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- API Endpoints Test -->
+        <div class="test-section">
+            <h2 class="test-title">🌐 API Endpoints Test</h2>
+            <button class="test-button" onclick="testAllEndpoints()">Test All Endpoints</button>
+            <button class="test-button" onclick="testAuthenticatedEndpoints()">Test with Auth</button>
+            <div id="endpoint-results" class="endpoint-list"></div>
+        </div>
+
+        <!-- Page Loading Test -->
+        <div class="test-section">
+            <h2 class="test-title">📄 Page Loading Test</h2>
+            <button class="test-button" onclick="testPageLoading()">Test All Pages</button>
+            <div id="page-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Detailed Error Log -->
+        <div class="test-section">
+            <h2 class="test-title">📋 Detailed Error Log</h2>
+            <div id="error-log" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'https://researchhub-saas.vercel.app/api';
+        const APP_BASE = 'https://researchhub-saas.vercel.app/app';
+        
+        // Test accounts
+        const TEST_ACCOUNTS = {
+            admin: { email: 'abwanwr77+admin@gmail.com', password: 'Testtest123' },
+            researcher: { email: 'abwanwr77+researcher@gmail.com', password: 'Testtest123' },
+            participant: { email: 'abwanwr77+participant@gmail.com', password: 'Testtest123' }
+        };
+
+        // API endpoints to test
+        const ENDPOINTS = [
+            // Public endpoints
+            { url: '/health', auth: false, method: 'GET' },
+            { url: '/auth?action=register', auth: false, method: 'POST' },
+            { url: '/auth?action=login', auth: false, method: 'POST' },
+            
+            // Authenticated endpoints
+            { url: '/auth?action=profile', auth: true, method: 'GET' },
+            { url: '/auth?action=refresh', auth: true, method: 'POST' },
+            { url: '/studies', auth: true, method: 'GET' },
+            { url: '/applications', auth: true, method: 'GET' },
+            { url: '/blocks', auth: true, method: 'GET' },
+            { url: '/profile', auth: true, method: 'GET' },
+            { url: '/subscriptions', auth: true, method: 'GET' },
+            { url: '/dashboard/analytics', auth: true, method: 'GET' },
+            
+            // Admin endpoints
+            { url: '/admin?action=users', auth: true, method: 'GET', role: 'admin' },
+            { url: '/admin?action=analytics-overview', auth: true, method: 'GET', role: 'admin' },
+            { url: '/admin?action=studies', auth: true, method: 'GET', role: 'admin' },
+        ];
+
+        // Pages to test
+        const PAGES = [
+            '/app/dashboard',
+            '/app/studies',
+            '/app/organizations', 
+            '/app/participants',
+            '/app/analytics',
+            '/app/settings',
+            '/login',
+            '/register'
+        ];
+
+        let authToken = null;
+        let testResults = {
+            total: 0,
+            working: 0,
+            errors: 0,
+            authRequired: 0
+        };
+
+        // Initialize
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+        // Authentication test
+        async function testAuthentication() {
+            const results = document.getElementById('auth-results');
+            results.style.display = 'block';
+            results.textContent = 'Testing authentication...\n\n';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(TEST_ACCOUNTS.researcher)
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    results.textContent += `✅ Authentication successful\n`;
+                    results.textContent += `Token: ${authToken.substring(0, 30)}...\n`;
+                    results.textContent += `User: ${data.user?.email}\n`;
+                    results.textContent += `Role: ${data.user?.role}\n\n`;
+                } else {
+                    results.textContent += `❌ Authentication failed: ${data.error}\n`;
+                }
+            } catch (error) {
+                results.textContent += `❌ Authentication error: ${error.message}\n`;
+            }
+        }
+
+        // Test individual endpoint
+        async function testEndpoint(endpoint) {
+            const url = `${API_BASE}${endpoint.url}`;
+            
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (endpoint.auth && authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const options = {
+                    method: endpoint.method,
+                    headers
+                };
+
+                if (endpoint.method === 'POST' && endpoint.url.includes('login')) {
+                    options.body = JSON.stringify(TEST_ACCOUNTS.researcher);
+                }
+
+                const response = await fetch(url, options);
+                const contentType = response.headers.get('content-type');
+                
+                let data;
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = { text: await response.text() };
+                }
+
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    data: data,
+                    contentType
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    ok: false,
+                    error: error.message
+                };
+            }
+        }
+
+        // Test all endpoints
+        async function testAllEndpoints() {
+            const resultsContainer = document.getElementById('endpoint-results');
+            resultsContainer.innerHTML = '<p>Testing endpoints...</p>';
+            
+            testResults = { total: 0, working: 0, errors: 0, authRequired: 0 };
+
+            for (const endpoint of ENDPOINTS) {
+                testResults.total++;
+                
+                const result = await testEndpoint(endpoint);
+                const div = document.createElement('div');
+                div.className = 'endpoint';
+                
+                let statusClass = 'error';
+                let statusText = `${result.status} Error`;
+                
+                if (result.ok) {
+                    statusClass = 'success';
+                    statusText = `${result.status} OK`;
+                    testResults.working++;
+                } else if (result.status === 401) {
+                    statusClass = 'warning';
+                    statusText = '401 Auth Required';
+                    testResults.authRequired++;
+                } else {
+                    testResults.errors++;
+                }
+
+                div.className += ` ${statusClass}`;
+                div.innerHTML = `
+                    <span class="endpoint-url">${endpoint.method} ${endpoint.url}</span>
+                    <span class="status ${statusClass}">${statusText}</span>
+                `;
+                
+                resultsContainer.appendChild(div);
+            }
+
+            updateSummary();
+        }
+
+        // Test authenticated endpoints
+        async function testAuthenticatedEndpoints() {
+            if (!authToken) {
+                alert('Please run authentication test first');
+                return;
+            }
+            await testAllEndpoints();
+        }
+
+        // Test page loading
+        async function testPageLoading() {
+            const results = document.getElementById('page-results');
+            results.style.display = 'block';
+            results.textContent = 'Testing page loading...\n\n';
+
+            for (const page of PAGES) {
+                try {
+                    const response = await fetch(`https://researchhub-saas.vercel.app${page}`);
+                    const status = response.ok ? '✅' : '❌';
+                    results.textContent += `${status} ${page} - ${response.status}\n`;
+                } catch (error) {
+                    results.textContent += `❌ ${page} - Error: ${error.message}\n`;
+                }
+            }
+        }
+
+        // Update summary
+        function updateSummary() {
+            document.getElementById('total-endpoints').textContent = testResults.total;
+            document.getElementById('working-endpoints').textContent = testResults.working;
+            document.getElementById('error-endpoints').textContent = testResults.errors;
+            document.getElementById('auth-endpoints').textContent = testResults.authRequired;
+        }
+
+        // Log errors
+        function logError(message) {
+            const errorLog = document.getElementById('error-log');
+            const timestamp = new Date().toLocaleTimeString();
+            errorLog.textContent += `[${timestamp}] ${message}\n`;
+        }
+
+        // Auto-run basic tests on load
+        window.addEventListener('load', async () => {
+            await testAuthentication();
+            setTimeout(testAllEndpoints, 1000);
+        });
+    </script>
+</body>
+</html>
