@@ -52,6 +52,8 @@
     "errors:validate": "npm run errors:test && echo '✅ Error handling system validated'",
     "dev-tools:test": "node scripts/testing/test-dev-tools.mjs",
     "dev-tools:validate": "npm run dev-tools:test && echo '✅ Development tools integration validated'",
+    "jobs:test": "node scripts/testing/test-job-system.mjs",
+    "jobs:validate": "npm run jobs:test && echo '✅ Background job management system validated'",
     "errors:demo": "node scripts/testing/test-error-handling.mjs && echo '📚 See error handling examples above'",
     "test:playwright": "npx playwright test",
     "test:playwright:ui": "npx playwright test --ui",
