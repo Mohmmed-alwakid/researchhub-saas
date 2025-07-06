@@ -112,7 +112,13 @@
     "notifications:validate": "npm run notifications:test && npm run type-check",
     "notifications:demo": "npm run notifications:test && echo '📡 Notification system examples available in docs/vibe-coder/examples/'",
     "sse:test": "npm run notifications:test",
-    "realtime:test": "npm run notifications:test"
+    "realtime:test": "npm run notifications:test",
+    "testing:framework": "node scripts/testing/test-advanced-testing-framework.mjs",
+    "testing:integration": "node scripts/testing/test-advanced-testing-integration.mjs",
+    "testing:validate": "npm run testing:framework && npm run testing:integration",
+    "test:advanced": "npm run testing:framework",
+    "test:framework:integration": "npm run testing:integration",
+    "test:framework:all": "npm run testing:validate && npm run type-check"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

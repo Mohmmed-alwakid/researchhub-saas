@@ -1,0 +1,47 @@
+{
+  "total": 5,
+  "passed": 5,
+  "failed": 0,
+  "skipped": 0,
+  "startTime": 1751813795664,
+  "tests": [
+    {
+      "name": "AdvancedTestRunner Basic Functionality",
+      "status": "passed",
+      "duration": 26.107699999999994,
+      "error": null,
+      "timestamp": "2025-07-06T14:56:35.692Z"
+    },
+    {
+      "name": "TestSuiteBuilder Basic Functionality",
+      "status": "passed",
+      "duration": 0.2301999999999964,
+      "error": null,
+      "timestamp": "2025-07-06T14:56:35.692Z"
+    },
+    {
+      "name": "TestReporting Basic Functionality",
+      "status": "passed",
+      "duration": 0.6148000000000025,
+      "error": null,
+      "timestamp": "2025-07-06T14:56:35.693Z"
+    },
+    {
+      "name": "Integration Testing",
+      "status": "passed",
+      "duration": 43.33970000000001,
+      "error": null,
+      "timestamp": "2025-07-06T14:56:35.737Z"
+    },
+    {
+      "name": "ResearchHub Specific Workflows",
+      "status": "passed",
+      "duration": 0.3657000000000039,
+      "error": null,
+      "timestamp": "2025-07-06T14:56:35.737Z"
+    }
+  ],
+  "endTime": 1751813795738,
+  "totalDuration": 74,
+  "successRate": "100.00"
+}

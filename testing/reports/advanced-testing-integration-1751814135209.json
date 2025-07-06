@@ -1,0 +1,106 @@
+{
+  "total": 6,
+  "passed": 3,
+  "failed": 3,
+  "skipped": 0,
+  "startTime": 1751814135198,
+  "tests": [
+    {
+      "name": "TypeScript Compilation Check",
+      "status": "passed",
+      "duration": 0.8511999999999986,
+      "error": null,
+      "metadata": {
+        "filesChecked": 3
+      },
+      "timestamp": "2025-07-06T15:02:15.201Z"
+    },
+    {
+      "name": "Module Structure Validation",
+      "status": "failed",
+      "duration": 1.0551999999999992,
+      "error": "Module structure test failed: Missing export in TestReporting: export class TestReporting",
+      "metadata": {},
+      "timestamp": "2025-07-06T15:02:15.202Z"
+    },
+    {
+      "name": "Interface Compatibility",
+      "status": "failed",
+      "duration": 0.4540000000000006,
+      "error": "Interface compatibility test failed: Property config missing from interface TestSuite",
+      "metadata": {},
+      "timestamp": "2025-07-06T15:02:15.203Z"
+    },
+    {
+      "name": "Method Signatures",
+      "status": "failed",
+      "duration": 1.4140999999999977,
+      "error": "Method signature test failed: Method setParallel not found in TestSuiteBuilder",
+      "metadata": {},
+      "timestamp": "2025-07-06T15:02:15.205Z"
+    },
+    {
+      "name": "System Integration",
+      "status": "passed",
+      "duration": 0.7713999999999999,
+      "error": null,
+      "metadata": {
+        "jobSystemFound": true,
+        "notificationSystemFound": true,
+        "errorSystemFound": true,
+        "hasJobIntegration": false,
+        "hasNotificationIntegration": true
+      },
+      "timestamp": "2025-07-06T15:02:15.206Z"
+    },
+    {
+      "name": "Configuration Setup",
+      "status": "passed",
+      "duration": 1.0351,
+      "error": null,
+      "metadata": {
+        "testingDirsCreated": 3,
+        "npmScriptsFound": 3,
+        "missingScripts": []
+      },
+      "timestamp": "2025-07-06T15:02:15.207Z"
+    }
+  ],
+  "integration": {
+    "typeScriptCompilation": true,
+    "moduleImports": false,
+    "classInstantiation": false,
+    "methodExecution": false,
+    "errorHandling": true
+  },
+  "endTime": 1751814135207,
+  "totalDuration": 9,
+  "successRate": "50.00",
+  "integrationScore": "40.00",
+  "testResults": {
+    "TypeScript Compilation Check": {
+      "filesChecked": 3
+    },
+    "Module Structure Validation": {
+      "error": "Module structure test failed: Missing export in TestReporting: export class TestReporting"
+    },
+    "Interface Compatibility": {
+      "error": "Interface compatibility test failed: Property config missing from interface TestSuite"
+    },
+    "Method Signatures": {
+      "error": "Method signature test failed: Method setParallel not found in TestSuiteBuilder"
+    },
+    "System Integration": {
+      "jobSystemFound": true,
+      "notificationSystemFound": true,
+      "errorSystemFound": true,
+      "hasJobIntegration": false,
+      "hasNotificationIntegration": true
+    },
+    "Configuration Setup": {
+      "testingDirsCreated": 3,
+      "npmScriptsFound": 3,
+      "missingScripts": []
+    }
+  }
+}
