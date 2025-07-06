@@ -98,7 +98,9 @@
     "scripts:validate": "node scripts/utils/validate-scripts.mjs",
     "scripts:docs": "node scripts/utils/npm-scripts-helper.js docs",
     "help": "npm run scripts:help",
-    "health-check": "npm run dev:status && npm run type-check && npm run config:test"
+    "health-check": "npm run dev:status && npm run type-check && npm run config:test",
+    "blocks:test": "node scripts/testing/test-block-registry-simple.mjs",
+    "blocks:validate": "npm run blocks:test && npm run type-check"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
