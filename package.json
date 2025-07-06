@@ -107,7 +107,12 @@
     "help": "npm run scripts:help",
     "health-check": "npm run dev:status && npm run type-check && npm run config:test",
     "blocks:test": "node scripts/testing/test-block-registry-simple.mjs",
-    "blocks:validate": "npm run blocks:test && npm run type-check"
+    "blocks:validate": "npm run blocks:test && npm run type-check",
+    "notifications:test": "node scripts/testing/test-notification-system-simple.mjs",
+    "notifications:validate": "npm run notifications:test && npm run type-check",
+    "notifications:demo": "npm run notifications:test && echo '📡 Notification system examples available in docs/vibe-coder/examples/'",
+    "sse:test": "npm run notifications:test",
+    "realtime:test": "npm run notifications:test"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
