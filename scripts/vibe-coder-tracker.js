@@ -91,6 +91,11 @@ class VibeCoderTracker {
   markTaskComplete(taskId, notes = '') {
     const [phase, task] = taskId.split('.');
     
+    if (!TASKS[phase]) {
+      console.log(`❌ Phase ${phase} not found`);
+      return;
+    }
+    
     if (!this.progressData.phases[phase]) {
       this.progressData.phases[phase] = { tasks: {} };
     }
@@ -102,7 +107,7 @@ class VibeCoderTracker {
     };
     
     this.saveProgress();
-    console.log(`✅ Task ${taskId} marked complete: ${TASKS[phase].tasks[taskId]}`);
+    console.log(`✅ Task ${taskId} marked complete: ${TASKS[phase].tasks[task]}`);
     if (notes) console.log(`   Notes: ${notes}`);
   }
 
