@@ -93,7 +93,12 @@
     "vibe:complete": "node scripts/vibe-coder-tracker.js --complete",
     "vibe:report": "node scripts/vibe-coder-tracker.js --report",
     "config:test": "node scripts/testing/test-config.mjs",
-    "config:validate": "npm run config:test"
+    "config:validate": "npm run config:test",
+    "scripts:help": "node scripts/utils/simple-scripts-helper.mjs",
+    "scripts:validate": "node scripts/utils/validate-scripts.mjs",
+    "scripts:docs": "node scripts/utils/npm-scripts-helper.js docs",
+    "help": "npm run scripts:help",
+    "health-check": "npm run dev:status && npm run type-check && npm run config:test"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
