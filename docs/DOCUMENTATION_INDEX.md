@@ -6,8 +6,13 @@
 - **[README.md](README.md)** - Project introduction and quick start guide
 - **[PRD.md](PRD.md)** - Product Requirements Document
 - **[TECH_STACK.md](TECH_STACK.md)** - Technology stack and architecture overview
+- **[CHANGELOG.md](CHANGELOG.md)** - ⭐ **NEW** Complete project changelog with recent updates
 
 ## 🎯 Core Features & Systems
+
+### 💰 Wallet & Payment System ⭐ **NEW - JULY 2025**
+- **[WALLET_USD_SAR_INTEGRATION_COMPLETE_JULY_6_2025.md](reports/WALLET_USD_SAR_INTEGRATION_COMPLETE_JULY_6_2025.md)** - 🌍 Multi-currency wallet implementation (USD/SAR)
+- **[wallet.service.ts](../src/client/services/wallet.service.ts)** - Currency utilities and wallet API integration
 
 ### Study & Block System ⭐ **ENHANCED WITH COLLABORATION**
 - **[STUDY_BLOCKS_SYSTEM.md](STUDY_BLOCKS_SYSTEM.md)** - 📋 Complete study blocks architecture and implementation guide

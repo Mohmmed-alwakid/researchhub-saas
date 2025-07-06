@@ -6,8 +6,8 @@ import applicationsHandler from './api/applications.js';
 import studiesHandler from './api/studies.js';
 import blocksHandler from './api/blocks.js';
 import authHandler from './api/auth.js';
-import pointsHandler from './api/points.js';
-import performanceHandler from './api/performance.js';
+// import pointsHandler from './api/points.js'; // File doesn't exist
+// import performanceHandler from './api/performance.js'; // File doesn't exist
 
 const app = express();
 const PORT = 3001;
@@ -326,17 +326,17 @@ app.all('/api/auth*', async (req, res) => {
   return await authHandler(req, res);
 });
 
-// Points endpoints  
-app.all('/api/points*', async (req, res) => {
-  console.log(`=== POINTS API: ${req.method} ${req.url} ===`);
-  return await pointsHandler(req, res);
-});
+// Points endpoints - DISABLED: File doesn't exist
+// app.all('/api/points*', async (req, res) => {
+//   console.log(`=== POINTS API: ${req.method} ${req.url} ===`);
+//   return await pointsHandler(req, res);
+// });
 
-// Performance endpoints
-app.all('/api/performance*', async (req, res) => {
-  console.log(`=== PERFORMANCE API: ${req.method} ${req.url} ===`);
-  return await performanceHandler(req, res);
-});
+// Performance endpoints - DISABLED: File doesn't exist
+// app.all('/api/performance*', async (req, res) => {
+//   console.log(`=== PERFORMANCE API: ${req.method} ${req.url} ===`);
+//   return await performanceHandler(req, res);
+// });
 
 // Legacy study-blocks endpoint (redirect to blocks)
 app.all('/api/study-blocks*', async (req, res) => {

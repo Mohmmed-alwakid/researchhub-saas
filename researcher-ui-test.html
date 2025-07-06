@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Researcher Application Management Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover { background: #0056b3; }
+        .button:disabled { background: #6c757d; cursor: not-allowed; }
+        .approve { background: #28a745; }
+        .approve:hover { background: #1e7e34; }
+        .reject { background: #dc3545; }
+        .reject:hover { background: #c82333; }
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status.pending { background: #fff3cd; color: #856404; }
+        .status.accepted { background: #d4edda; color: #155724; }
+        .status.rejected { background: #f8d7da; color: #721c24; }
+        .application {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+        .hidden { display: none; }
+        .loading { color: #007bff; }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        pre { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Researcher Application Management Test</h1>
+        <p>Testing the complete researcher application approval workflow.</p>
+        
+        <div>
+            <button class="button" onclick="loginResearcher()">1. Login as Researcher</button>
+            <button class="button" onclick="fetchApplications()" id="fetchBtn" disabled>2. Fetch Applications</button>
+            <button class="button" onclick="refreshApplications()" id="refreshBtn" disabled>🔄 Refresh</button>
+        </div>
+        
+        <div id="loginStatus" class="container hidden">
+            <h3>Login Status</h3>
+            <div id="loginResult"></div>
+        </div>
+        
+        <div id="applicationsSection" class="container hidden">
+            <h3>Study Applications</h3>
+            <div>
+                <label>Filter by status: </label>
+                <select id="statusFilter" onchange="filterApplications()">
+                    <option value="all">All Applications</option>
+                    <option value="pending">Pending</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            <div id="applicationsContainer"></div>
+        </div>
+        
+        <div id="debugSection" class="container">
+            <h3>Debug Output</h3>
+            <pre id="debugOutput">Ready to test...</pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003';
+        let authToken = null;
+        let allApplications = [];
+        const studyId = '018793df-957b-460f-87de-373dc6afb962'; // Researcher Test Study
+
+        function log(message) {
+            const debugOutput = document.getElementById('debugOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            debugOutput.textContent += `[${timestamp}] ${message}\n`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+        }
+
+        async function loginResearcher() {
+            log('🔐 Logging in as researcher...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const result = await response.json();
+                log(`Login response: ${JSON.stringify(result, null, 2)}`);
+
+                if (result.success) {
+                    authToken = result.session.access_token;
+                    document.getElementById('loginStatus').classList.remove('hidden');
+                    document.getElementById('loginResult').innerHTML = `
+                        <div class="success">✅ Login successful!</div>
+                        <p><strong>User ID:</strong> ${result.user.id}</p>
+                        <p><strong>Email:</strong> ${result.user.email}</p>
+                        <p><strong>Role:</strong> ${result.user.user_metadata?.role || 'N/A'}</p>
+                    `;
+                    document.getElementById('fetchBtn').disabled = false;
+                    log('✅ Researcher logged in successfully');
+                } else {
+                    document.getElementById('loginResult').innerHTML = `
+                        <div class="error">❌ Login failed: ${result.error}</div>
+                    `;
+                    log(`❌ Login failed: ${result.error}`);
+                }
+            } catch (error) {
+                log(`❌ Login error: ${error.message}`);
+                document.getElementById('loginResult').innerHTML = `
+                    <div class="error">❌ Login error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function fetchApplications() {
+            if (!authToken) {
+                log('❌ No auth token available');
+                return;
+            }
+
+            log('📋 Fetching applications...');
+            document.getElementById('applicationsSection').classList.remove('hidden');
+            document.getElementById('applicationsContainer').innerHTML = '<div class="loading">Loading applications...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/applications?endpoint=study/${studyId}/applications`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                log(`Applications response: ${JSON.stringify(result, null, 2)}`);
+
+                if (result.success) {
+                    allApplications = result.data?.applications || [];
+                    renderApplications(allApplications);
+                    document.getElementById('refreshBtn').disabled = false;
+                    log(`✅ Found ${allApplications.length} applications`);
+                } else {
+                    document.getElementById('applicationsContainer').innerHTML = `
+                        <div class="error">❌ Failed to fetch applications: ${result.error}</div>
+                    `;
+                    log(`❌ Failed to fetch applications: ${result.error}`);
+                }
+            } catch (error) {
+                log(`❌ Fetch error: ${error.message}`);
+                document.getElementById('applicationsContainer').innerHTML = `
+                    <div class="error">❌ Fetch error: ${error.message}</div>
+                `;
+            }
+        }
+
+        function renderApplications(applications) {
+            const container = document.getElementById('applicationsContainer');
+            
+            if (applications.length === 0) {
+                container.innerHTML = '<div>No applications found.</div>';
+                return;
+            }
+
+            container.innerHTML = applications.map(app => `
+                <div class="application">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4>👤 ${app.participant.name}</h4>
+                            <p>📧 ${app.participant.email}</p>
+                            <p>📅 Applied: ${new Date(app.appliedAt).toLocaleDateString()}</p>
+                            ${app.reviewedAt ? `<p>✅ Reviewed: ${new Date(app.reviewedAt).toLocaleDateString()}</p>` : ''}
+                            ${app.notes ? `<p>📝 Notes: ${app.notes}</p>` : ''}
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="status ${app.status}">${app.status.toUpperCase()}</div>
+                            <div style="margin-top: 10px;">
+                                <button class="button approve" onclick="approveApplication('${app.id}')" ${app.status === 'accepted' ? 'disabled' : ''}>
+                                    ✅ Approve
+                                </button>
+                                <button class="button reject" onclick="rejectApplication('${app.id}')" ${app.status === 'rejected' ? 'disabled' : ''}>
+                                    ❌ Reject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function approveApplication(applicationId) {
+            log(`✅ Approving application: ${applicationId}`);
+            await reviewApplication(applicationId, 'approve_application', 'Approved via UI test');
+        }
+
+        async function rejectApplication(applicationId) {
+            log(`❌ Rejecting application: ${applicationId}`);
+            await reviewApplication(applicationId, 'reject_application', 'Rejected via UI test');
+        }
+
+        async function reviewApplication(applicationId, action, notes) {
+            if (!authToken) {
+                log('❌ No auth token available');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/applications?action=${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        application_id: applicationId,
+                        notes: notes
+                    })
+                });
+
+                const result = await response.json();
+                log(`Review response: ${JSON.stringify(result, null, 2)}`);
+
+                if (result.success) {
+                    log(`✅ Application ${action} successful`);
+                    // Refresh applications to show updated status
+                    await fetchApplications();
+                } else {
+                    log(`❌ Application ${action} failed: ${result.error}`);
+                }
+            } catch (error) {
+                log(`❌ Review error: ${error.message}`);
+            }
+        }
+
+        async function refreshApplications() {
+            await fetchApplications();
+        }
+
+        function filterApplications() {
+            const filter = document.getElementById('statusFilter').value;
+            let filteredApplications = allApplications;
+            
+            if (filter !== 'all') {
+                filteredApplications = allApplications.filter(app => app.status === filter);
+            }
+            
+            renderApplications(filteredApplications);
+            log(`🔍 Filtered to ${filter}: ${filteredApplications.length} applications`);
+        }
+
+        // Initialize
+        log('🚀 Researcher Application Management Test Ready!');
+        log(`Target Study ID: ${studyId}`);
+    </script>
+</body>
+</html>

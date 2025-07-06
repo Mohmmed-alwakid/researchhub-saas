@@ -15,7 +15,7 @@ const FRONTEND_PORT = 5175;
 
 // Middleware
 app.use(cors({
-  origin: [`http://localhost:${FRONTEND_PORT}`, 'http://localhost:3000', 'http://127.0.0.1:5173'],
+  origin: true, // Allow all origins in development
   credentials: true
 }));
 app.use(express.json());
@@ -389,10 +389,16 @@ app.all('/api/profile', async (req, res) => {
 
 // Studies endpoints - import the actual handler
 import studiesHandler from './api/studies.js';
+import walletsHandler from './api/wallets.js';
 
 app.all('/api/studies*', async (req, res) => {
   // Use the actual studies.js handler which has proper data transformation
   await studiesHandler(req, res);
+});
+
+// Wallets endpoints - participant wallet and withdrawal management (PRODUCTION)
+app.all('/api/wallets*', async (req, res) => {
+  await walletsHandler(req, res);
 });
 
 // Redirect study-builder endpoints to studies API with action=build

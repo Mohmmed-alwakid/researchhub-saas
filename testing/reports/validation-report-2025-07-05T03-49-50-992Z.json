@@ -1,0 +1,60 @@
+{
+  "timestamp": "2025-07-05T03:49:50.993Z",
+  "summary": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "duration": 1888
+  },
+  "tests": [
+    {
+      "name": "Server Health Check",
+      "status": "PASS",
+      "details": "Status: operational",
+      "duration": 23,
+      "timestamp": "2025-07-05T03:49:51.040Z"
+    },
+    {
+      "name": "Database Connection",
+      "status": "PASS",
+      "details": "Connected to: Supabase",
+      "duration": 655,
+      "timestamp": "2025-07-05T03:49:51.697Z"
+    },
+    {
+      "name": "Auth Endpoint Responsive",
+      "status": "PASS",
+      "details": "Endpoint responding correctly",
+      "duration": 665,
+      "timestamp": "2025-07-05T03:49:52.363Z"
+    },
+    {
+      "name": "Frontend Accessible",
+      "status": "FAIL",
+      "details": "",
+      "duration": 3,
+      "timestamp": "2025-07-05T03:49:52.366Z"
+    },
+    {
+      "name": "API Performance /api/health",
+      "status": "PASS",
+      "details": "Response time: 2ms",
+      "duration": 2,
+      "timestamp": "2025-07-05T03:49:52.368Z"
+    },
+    {
+      "name": "API Performance /api/db-check",
+      "status": "PASS",
+      "details": "Response time: 535ms",
+      "duration": 535,
+      "timestamp": "2025-07-05T03:49:52.903Z"
+    },
+    {
+      "name": "Overall API Performance",
+      "status": "PASS",
+      "details": "Average: 269ms",
+      "duration": 269,
+      "timestamp": "2025-07-05T03:49:52.904Z"
+    }
+  ]
+}

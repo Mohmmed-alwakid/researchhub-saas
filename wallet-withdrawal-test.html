@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participant Wallet & Withdrawal Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #2563eb;
+        }
+        .auth-section {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .wallet-section {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .admin-section {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        button.admin {
+            background: #dc2626;
+        }
+        button.admin:hover {
+            background: #b91c1c;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #374151;
+        }
+        pre {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #166534;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #dc2626;
+            color: #991b1b;
+        }
+        .wallet-display {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .balance {
+            font-size: 2em;
+            font-weight: bold;
+            color: #10b981;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .withdrawal-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        .withdrawal-item {
+            background: #f9fafb;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 4px solid #2563eb;
+        }
+        .withdrawal-item.pending {
+            border-left-color: #f59e0b;
+        }
+        .withdrawal-item.approved {
+            border-left-color: #10b981;
+        }
+        .withdrawal-item.rejected {
+            border-left-color: #dc2626;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 Participant Wallet & Withdrawal System Test</h1>
+        <p><strong>Status:</strong> Testing DodoPayments integration with participant wallet and withdrawal workflow</p>
+        
+        <!-- Workflow Explanation -->
+        <div style="background: #f0f9ff; border: 2px solid #3b82f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>💡 Complete Workflow Overview</h3>
+            <div class="grid">
+                <div>
+                    <h4>🎯 Participant Journey:</h4>
+                    <ol>
+                        <li><strong>Complete Studies</strong> → Earn money (added to wallet)</li>
+                        <li><strong>Request Withdrawal</strong> → Submit withdrawal request</li>
+                        <li><strong>Wait for Approval</strong> → Admin reviews request</li>
+                        <li><strong>Receive Money</strong> → Outside system handles payout</li>
+                    </ol>
+                </div>
+                <div>
+                    <h4>⚙️ Admin Journey:</h4>
+                    <ol>
+                        <li><strong>Monitor Requests</strong> → View all withdrawal requests</li>
+                        <li><strong>Review Details</strong> → Check participant wallet & history</li>
+                        <li><strong>Approve/Reject</strong> → Process withdrawal decision</li>
+                        <li><strong>Update System</strong> → Wallet balance updated automatically</li>
+                    </ol>
+                </div>
+            </div>
+            <p style="margin-top: 15px;"><strong>Key Point:</strong> Our system manages the wallet balance and approval workflow. The actual money transfer (payout) is handled by an outside payment system.</p>
+        </div>
+        
+        <!-- Authentication Section -->
+        <div class="auth-section">
+            <h2>🔐 Authentication</h2>
+            <div class="form-group">
+                <label for="userType">User Type:</label>
+                <select id="userType">
+                    <option value="participant">Participant (has wallet)</option>
+                    <option value="admin">Admin (can approve withdrawals)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" value="abwanwr77+participant@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" value="Testtest123">
+            </div>
+            <button onclick="login()">🔑 Login</button>
+            <button onclick="logout()">🚪 Logout</button>
+            <div id="authStatus"></div>
+        </div>
+
+        <!-- Participant Wallet Section -->
+        <div class="wallet-section">
+            <h2>💰 Participant Wallet</h2>
+            <div id="walletInfo"></div>
+            
+            <div class="grid">
+                <div>
+                    <h3>Request Withdrawal</h3>
+                    <div class="form-group">
+                        <label for="withdrawAmount">Amount ($):</label>
+                        <input type="number" id="withdrawAmount" step="0.01" min="0.01" placeholder="10.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method:</label>
+                        <select id="paymentMethod">
+                            <option value="paypal">PayPal</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentDetails">Payment Details (JSON):</label>
+                        <textarea id="paymentDetails" rows="3" placeholder='{"email": "user@example.com"}'></textarea>
+                    </div>
+                    <button onclick="requestWithdrawal()">💸 Request Withdrawal</button>
+                </div>
+                
+                <div>
+                    <h3>Actions</h3>
+                    <button onclick="getWallet()">🔄 Refresh Wallet</button>
+                    <button onclick="getWithdrawals()">📋 Get My Withdrawals</button>
+                    <button onclick="getTransactions()">💳 Get Transactions</button>
+                    <button onclick="simulateEarning()">💰 Simulate Earning $5</button>
+                </div>
+            </div>
+            
+            <div id="withdrawalsList"></div>
+        </div>
+
+        <!-- Study Completion Section -->
+        <div class="container" style="background: #f0f9ff; border: 2px solid #0ea5e9;">
+            <h2>🎯 Study Completion Simulation</h2>
+            <p><strong>Workflow:</strong> When a participant completes a study, they earn money that's added to their wallet.</p>
+            
+            <div class="grid">
+                <div>
+                    <h3>Simulate Study Completion</h3>
+                    <div class="form-group">
+                        <label for="studyEarning">Earning Amount ($):</label>
+                        <input type="number" id="studyEarning" value="5.00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="studyTitle">Study Title:</label>
+                        <input type="text" id="studyTitle" value="User Experience Survey - Test Study">
+                    </div>
+                    <button onclick="simulateCustomEarning()">💰 Complete Study & Earn Money</button>
+                </div>
+                
+                <div>
+                    <h3>Quick Actions</h3>
+                    <button onclick="simulateEarning()">⚡ Quick $5 Earning</button>
+                    <button onclick="simulateCustomEarning(10)">💵 Simulate $10 Study</button>
+                    <button onclick="simulateCustomEarning(25)">💎 Simulate $25 Study</button>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">
+                        💡 <strong>Note:</strong> In the real app, this happens automatically when participants complete studies.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div class="admin-section">
+            <h2>⚙️ Admin Panel</h2>
+            <div class="grid">
+                <div>
+                    <h3>Withdrawal Management</h3>
+                    <button class="admin" onclick="getAllWithdrawals()">📋 Get All Withdrawals</button>
+                    <button class="admin" onclick="getAllWallets()">💰 Get All Wallets</button>
+                </div>
+                
+                <div>
+                    <h3>Process Withdrawal</h3>
+                    <div class="form-group">
+                        <label for="withdrawalId">Withdrawal ID:</label>
+                        <input type="text" id="withdrawalId" placeholder="withdrawal-uuid">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminAction">Action:</label>
+                        <select id="adminAction">
+                            <option value="approve">Approve</option>
+                            <option value="reject">Reject</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminNotes">Admin Notes:</label>
+                        <textarea id="adminNotes" rows="2" placeholder="Optional notes..."></textarea>
+                    </div>
+                    <button class="admin" onclick="processWithdrawal()">✅ Process Withdrawal</button>
+                </div>
+            </div>
+            
+            <div id="adminData"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="container">
+            <h2>📊 Results</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        let currentUser = null;
+
+        // Update email based on user type
+        document.getElementById('userType').addEventListener('change', function() {
+            const userType = this.value;
+            const emailInput = document.getElementById('email');
+            
+            if (userType === 'participant') {
+                emailInput.value = 'abwanwr77+participant@gmail.com';
+            } else if (userType === 'admin') {
+                emailInput.value = 'abwanwr77+admin@gmail.com';
+            }
+        });
+
+        // Set default payment details based on method
+        document.getElementById('paymentMethod').addEventListener('change', function() {
+            const method = this.value;
+            const detailsInput = document.getElementById('paymentDetails');
+            
+            if (method === 'paypal') {
+                detailsInput.value = '{"email": "participant@example.com"}';
+            } else if (method === 'bank_transfer') {
+                detailsInput.value = '{"account_number": "1234567890", "routing_number": "021000021", "bank_name": "Example Bank"}';
+            }
+        });
+
+        // Set default payment details
+        document.getElementById('paymentDetails').value = '{"email": "participant@example.com"}';
+
+        async function apiCall(endpoint, options = {}) {
+            const baseUrl = window.location.origin;
+            const url = `${baseUrl}/api/${endpoint}`;
+            
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(currentToken && { 'Authorization': `Bearer ${currentToken}` })
+                }
+            };
+
+            const response = await fetch(url, { ...defaultOptions, ...options });
+            const data = await response.json();
+            
+            logResult(`${options.method || 'GET'} ${endpoint}`, data);
+            return data;
+        }
+
+        function logResult(action, data) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.innerHTML = `
+                <h3>${timestamp} - ${action}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            
+            results.insertBefore(resultDiv, results.firstChild);
+        }
+
+        function showStatus(message, type = 'success') {
+            const authStatus = document.getElementById('authStatus');
+            authStatus.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await apiCall('auth?action=login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.success) {
+                    currentToken = response.token;
+                    currentUser = response.user;
+                    showStatus(`✅ Logged in as ${email}`, 'success');
+                    
+                    // Auto-load wallet if participant
+                    if (email.includes('participant')) {
+                        await getWallet();
+                    }
+                } else {
+                    showStatus(`❌ Login failed: ${response.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        function logout() {
+            currentToken = null;
+            currentUser = null;
+            showStatus('👋 Logged out');
+            document.getElementById('walletInfo').innerHTML = '';
+            document.getElementById('withdrawalsList').innerHTML = '';
+            document.getElementById('adminData').innerHTML = '';
+        }
+
+        async function getWallet() {
+            if (!currentToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+
+            const response = await apiCall('wallets?action=get');
+            
+            if (response.success && response.data) {
+                const wallet = response.data;
+                document.getElementById('walletInfo').innerHTML = `
+                    <div class="wallet-display">
+                        <h3>💰 Your Wallet</h3>
+                        <div class="balance">$${wallet.balance}</div>
+                        <p>Total Earned: $${wallet.total_earned}</p>
+                        <p>Total Withdrawn: $${wallet.total_withdrawn}</p>
+                        <p>Currency: ${wallet.currency}</p>
+                        <p>Created: ${new Date(wallet.created_at).toLocaleDateString()}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function requestWithdrawal() {
+            if (!currentToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const payment_method = document.getElementById('paymentMethod').value;
+            const payment_details = document.getElementById('paymentDetails').value;
+
+            if (!amount || amount <= 0) {
+                showStatus('❌ Please enter a valid amount', 'error');
+                return;
+            }
+
+            let parsedDetails;
+            try {
+                parsedDetails = JSON.parse(payment_details);
+            } catch (e) {
+                showStatus('❌ Invalid payment details JSON', 'error');
+                return;
+            }
+
+            const response = await apiCall('wallets?action=request-withdrawal', {
+                method: 'POST',
+                body: JSON.stringify({
+                    amount,
+                    payment_method,
+                    payment_details: parsedDetails
+                })
+            });
+
+            if (response.success) {
+                showStatus(`✅ Withdrawal request submitted for $${amount}`, 'success');
+                await getWithdrawals();
+                await getWallet(); // Refresh wallet
+            } else {
+                showStatus(`❌ Withdrawal failed: ${response.error}`, 'error');
+            }
+        }
+
+        async function getWithdrawals() {
+            if (!currentToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+
+            const response = await apiCall('wallets?action=withdrawals');
+            
+            if (response.success && response.data) {
+                const withdrawals = response.data;
+                const withdrawalsList = document.getElementById('withdrawalsList');
+                
+                withdrawalsList.innerHTML = `
+                    <h3>📋 My Withdrawal Requests</h3>
+                    <div class="withdrawal-list">
+                        ${withdrawals.map(w => `
+                            <div class="withdrawal-item ${w.status}">
+                                <strong>$${w.amount}</strong> - ${w.status.toUpperCase()}
+                                <br>Method: ${w.payment_method}
+                                <br>Requested: ${new Date(w.requested_at).toLocaleDateString()}
+                                ${w.processed_at ? `<br>Processed: ${new Date(w.processed_at).toLocaleDateString()}` : ''}
+                                ${w.admin_notes ? `<br>Notes: ${w.admin_notes}` : ''}
+                                <br><small>ID: ${w.id}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        async function getTransactions() {
+            if (!currentToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+
+            await apiCall('wallets?action=transactions');
+        }
+
+        async function simulateEarning() {
+            if (!currentUser || !currentToken) {
+                showStatus('❌ Please login as participant first', 'error');
+                return;
+            }
+
+            // Simulate study completion earning
+            const earningData = {
+                participant_id: currentUser.id,
+                amount: 5.00,
+                study_id: 'study-' + Date.now(),
+                study_title: 'User Experience Survey - Test Study'
+            };
+
+            try {
+                const response = await apiCall('wallets?action=add-earnings', {
+                    method: 'POST',
+                    body: JSON.stringify(earningData)
+                });
+
+                if (response.success) {
+                    showStatus(`✅ Successfully added $5.00 to wallet! New balance: $${response.data.new_balance.toFixed(2)}`, 'success');
+                    logResult('Study Completion Earning', response.data);
+                    
+                    // Refresh wallet display
+                    getWallet();
+                } else {
+                    showStatus(`❌ Failed to add earnings: ${response.error}`, 'error');
+                    logResult('Study Completion Earning Error', response);
+                }
+            } catch (error) {
+                showStatus(`❌ Error adding earnings: ${error.message}`, 'error');
+                logResult('Study Completion Earning Error', { error: error.message });
+            }
+        }
+
+        async function getAllWithdrawals() {
+            if (!currentToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+
+            const response = await apiCall('wallets?action=admin-withdrawals');
+            
+            if (response.success && response.data) {
+                const withdrawals = response.data;
+                document.getElementById('adminData').innerHTML = `
+                    <h3>📋 All Withdrawal Requests</h3>
+                    <div class="withdrawal-list">
+                        ${withdrawals.map(w => `
+                            <div class="withdrawal-item ${w.status}">
+                                <strong>${w.participant.name}</strong> - $${w.amount} - ${w.status.toUpperCase()}
+                                <br>Email: ${w.participant.email}
+                                <br>Method: ${w.payment_method}
+                                <br>Requested: ${new Date(w.requested_at).toLocaleDateString()}
+                                ${w.processed_at ? `<br>Processed: ${new Date(w.processed_at).toLocaleDateString()}` : ''}
+                                ${w.admin_notes ? `<br>Notes: ${w.admin_notes}` : ''}
+                                <br><small>ID: ${w.id}</small>
+                                ${w.status === 'pending' ? `<br><button onclick="document.getElementById('withdrawalId').value='${w.id}'">Use This ID</button>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        async function getAllWallets() {
+            if (!currentToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+
+            await apiCall('wallets?action=admin-wallets');
+        }
+
+        async function processWithdrawal() {
+            if (!currentToken) {
+                showStatus('❌ Please login first', 'error');
+                return;
+            }
+
+            const withdrawal_id = document.getElementById('withdrawalId').value;
+            const action = document.getElementById('adminAction').value;
+            const admin_notes = document.getElementById('adminNotes').value;
+
+            if (!withdrawal_id) {
+                showStatus('❌ Please enter a withdrawal ID', 'error');
+                return;
+            }
+
+            const response = await apiCall('wallets?action=process-withdrawal', {
+                method: 'POST',
+                body: JSON.stringify({
+                    withdrawal_id,
+                    action,
+                    admin_notes
+                })
+            });
+
+            if (response.success) {
+                showStatus(`✅ Withdrawal ${action}d successfully`, 'success');
+                await getAllWithdrawals(); // Refresh list
+            } else {
+                showStatus(`❌ Process failed: ${response.error}`, 'error');
+            }
+        }
+
+        async function simulateCustomEarning(presetAmount = null) {
+            if (!currentUser || !currentToken) {
+                showStatus('❌ Please login as participant first', 'error');
+                return;
+            }
+
+            // Use preset amount or form values
+            const amount = presetAmount || parseFloat(document.getElementById('studyEarning').value);
+            const title = presetAmount ? 
+                `High-Value Study (Preset $${presetAmount})` : 
+                document.getElementById('studyTitle').value;
+
+            if (!amount || amount <= 0) {
+                showStatus('❌ Please enter a valid earning amount', 'error');
+                return;
+            }
+
+            // Simulate study completion earning
+            const earningData = {
+                participant_id: currentUser.id,
+                amount: amount,
+                study_id: 'study-' + Date.now(),
+                study_title: title
+            };
+
+            try {
+                const response = await apiCall('wallets?action=add-earnings', {
+                    method: 'POST',
+                    body: JSON.stringify(earningData)
+                });
+
+                if (response.success) {
+                    showStatus(`✅ Study completed! Earned $${amount.toFixed(2)}. New balance: $${response.data.new_balance.toFixed(2)}`, 'success');
+                    logResult('Custom Study Completion', response.data);
+                    
+                    // Refresh wallet display
+                    getWallet();
+                } else {
+                    showStatus(`❌ Failed to add earnings: ${response.error}`, 'error');
+                    logResult('Custom Study Completion Error', response);
+                }
+            } catch (error) {
+                showStatus(`❌ Error adding earnings: ${error.message}`, 'error');
+                logResult('Custom Study Completion Error', { error: error.message });
+            }
+        }
+
+        // Auto-login on page load for convenience
+        window.addEventListener('load', function() {
+            showStatus('Ready to test wallet & withdrawal system 🚀');
+        });
+    </script>
+</body>
+</html>

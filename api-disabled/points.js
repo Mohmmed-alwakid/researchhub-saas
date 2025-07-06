@@ -1,5 +1,5 @@
 /**
- * Points Management API - Replace Stripe with Admin-Controlled Points System
+ * Points Management API - Replace DodoPayments with Admin-Controlled Points System
  * 
  * Endpoints:
  * - GET /api/points?action=balance - Get user's points balance

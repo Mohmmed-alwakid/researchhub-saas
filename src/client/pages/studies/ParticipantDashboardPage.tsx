@@ -8,20 +8,28 @@ import {
   Eye,
   Trash2,
   Search,
-  Filter,
   Calendar,
   DollarSign,
   AlertCircle,
   FileText,
-  ExternalLink,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Wallet
 } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge.tsx';
 import { participantApplicationsService } from '../../services/participantApplications.service';
 import type { IParticipantApplication } from '../../../shared/types';
+import { WalletOverview } from '../../components/wallet/WalletOverview';
+import { EnhancedWithdrawalForm } from '../../components/wallet/EnhancedWithdrawalForm';
+import { WithdrawalHistory } from '../../components/wallet/WithdrawalHistory';
+import { EnhancedTransactionHistory } from '../../components/wallet/EnhancedTransactionHistory';
+import { WithdrawalFormData } from '../../components/wallet/WithdrawalForm';
+import { useEnhancedWallet } from '../../hooks/useEnhancedWallet';
+import WalletErrorBoundary from '../../components/wallet/WalletErrorBoundary';
+import { WalletSkeleton } from '../../components/wallet/WalletSkeletons';
+import { walletToasts } from '../../utils/walletToasts';
 
 interface EnhancedApplication extends Omit<IParticipantApplication, 'studyId'> {
   studyId: {
@@ -57,13 +65,56 @@ const ParticipantDashboardPage: React.FC = () => {
     withdrawn: 0
   });
 
+  // View state - applications or wallet
+  const [currentView, setCurrentView] = useState<'applications' | 'wallet'>('applications');
+
   // Filters and search
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  
   // Actions
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
+  const [showWithdrawalForm, setShowWithdrawalForm] = useState(false);
+
+  // Wallet hook
+  const {
+    wallet,
+    transactions,
+    withdrawals,
+    loading: walletLoading,
+    refreshWallet,
+    createWithdrawal
+  } = useEnhancedWallet();
+
+  // Withdrawal handling
+  const handleWithdrawalSubmit = async (data: WithdrawalFormData) => {
+    try {
+      const result = await createWithdrawal({
+        amount: data.amount,
+        payment_method: data.payment_method,
+        payment_details: data.payment_details
+      });
+      
+      if (result.success) {
+        walletToasts.withdrawalSubmitted(data.amount, wallet?.currency);
+        setShowWithdrawalForm(false);
+      } else {
+        walletToasts.withdrawalFailed(result.error);
+      }
+    } catch (error) {
+      console.error('Failed to submit withdrawal:', error);
+      walletToasts.withdrawalFailed();
+    }
+  };
+
+  const handleWithdrawalCancel = () => {
+    setShowWithdrawalForm(false);
+  };
+
+  const handleRequestWithdrawal = () => {
+    setShowWithdrawalForm(true);
+  };
 
   const fetchApplications = useCallback(async (page = 1, refresh = false) => {
     try {
@@ -83,29 +134,29 @@ const ParticipantDashboardPage: React.FC = () => {
       if (response.success) {
         const apps = response.data.applications as unknown as EnhancedApplication[];
         console.log('🐛 Debug - Received applications data:', apps);
-        console.log('🐛 Debug - First application structure:', apps[0]);
-        console.log('🐛 Debug - First application study structure:', apps[0]?.study);
+
         setApplications(apps);
         setCurrentPage(response.data.pagination.current);
-        setTotalPages(response.data.pagination.pages);
 
         // Calculate stats
         const newStats = apps.reduce((acc, app) => {
-          acc.total = response.data.pagination.total;
-          // Map accepted status to approved for display
-          const displayStatus = app.status === 'accepted' ? 'approved' : app.status;
-          acc[displayStatus as keyof ApplicationStats]++;
+          acc.total += 1;
+          acc[app.status as keyof ApplicationStats] = (acc[app.status as keyof ApplicationStats] as number) + 1;
           return acc;
-        }, { total: 0, pending: 0, approved: 0, rejected: 0, withdrawn: 0 });
-
+        }, {
+          total: 0,
+          pending: 0,
+          approved: 0,
+          rejected: 0,
+          withdrawn: 0
+        });
         setStats(newStats);
+      } else {
+        toast.error('Failed to fetch applications');
       }
     } catch (error: unknown) {
-      console.error('Failed to fetch applications:', error);
-      const message = error && typeof error === 'object' && 'response' in error && 
-                     error.response && typeof error.response === 'object' && 'data' in error.response &&
-                     error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
-                     ? String(error.response.data.message) : 'Failed to fetch applications';
+      console.error('Error fetching applications:', error);
+      const message = error instanceof Error ? error.message : 'Failed to fetch applications';
       toast.error(message);
     } finally {
       setLoading(false);
@@ -114,20 +165,18 @@ const ParticipantDashboardPage: React.FC = () => {
   }, [statusFilter]);
 
   const handleWithdrawApplication = async (applicationId: string) => {
-    if (!confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) {
-      return;
-    }
-
     try {
       setWithdrawingId(applicationId);
-      await participantApplicationsService.withdrawApplication(applicationId);
-      toast.success('Application withdrawn successfully');
-      await fetchApplications(currentPage, true);    } catch (error: unknown) {
-      console.error('Failed to withdraw application:', error);
-      const message = error && typeof error === 'object' && 'response' in error && 
-                     error.response && typeof error.response === 'object' && 'data' in error.response &&
-                     error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
-                     ? String(error.response.data.message) : 'Failed to withdraw application';
+      const response = await participantApplicationsService.withdrawApplication(applicationId);
+      if (response.success) {
+        toast.success('Application withdrawn successfully');
+        await fetchApplications(currentPage, true);
+      } else {
+        toast.error(response.message || 'Failed to withdraw application');
+      }
+    } catch (error: unknown) {
+      console.error('Error withdrawing application:', error);
+      const message = error instanceof Error ? error.message : 'Failed to withdraw application';
       toast.error(message);
     } finally {
       setWithdrawingId(null);
@@ -137,16 +186,15 @@ const ParticipantDashboardPage: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Clock className="w-4 h-4 text-yellow-600" />;
+        return <Clock className="h-4 w-4 text-yellow-500" />;
       case 'approved':
-      case 'accepted': // Handle both approved and accepted status
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'rejected':
-        return <XCircle className="w-4 h-4 text-red-600" />;
+        return <XCircle className="h-4 w-4 text-red-500" />;
       case 'withdrawn':
-        return <AlertCircle className="w-4 h-4 text-gray-600" />;
+        return <AlertCircle className="h-4 w-4 text-gray-500" />;
       default:
-        return null;
+        return <Clock className="h-4 w-4 text-gray-400" />;
     }
   };
 
@@ -155,369 +203,413 @@ const ParticipantDashboardPage: React.FC = () => {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'approved':
-      case 'accepted': // Handle both approved and accepted status
         return 'bg-green-100 text-green-800 border-green-200';
       case 'rejected':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'withdrawn':
         return 'bg-gray-100 text-gray-800 border-gray-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-100 text-gray-600 border-gray-200';
     }
   };
 
-  const filteredApplications = applications.filter(app => {
-    // Handle both study and studyId structures for compatibility
-    const study = (app as any).study || (app as any).studyId;
-    if (!study) return false;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
+    // Support for USD and SAR currencies
+    const currencyCode = currency === 'SAR' ? 'SAR' : 'USD';
+    const locale = currency === 'SAR' ? 'ar-SA' : 'en-US';
     
-    const title = study.title || '';
-    const description = study.description || '';
-    
-    return title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           description.toLowerCase().includes(searchTerm.toLowerCase());
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
+
+interface StudyType {
+  _id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  configuration: {
+    duration: number;
+    compensation: number;
+  };
+}
+
+  const getStudyTitle = (app: EnhancedApplication): string => {
+    const study = (app as unknown as {study?: StudyType; studyId?: StudyType}).study || (app as unknown as {study?: StudyType; studyId?: StudyType}).studyId;
+    if (!study) return 'Unknown Study';
+    if (typeof study === 'string') return study;
+    if (typeof study === 'object' && study.title) return study.title;
+    return 'Unknown Study';
+  };
+
+  const getStudyId = (app: EnhancedApplication): string => {
+    return (app as {study?: StudyType; studyId?: StudyType}).study?._id || (app as {study?: StudyType; studyId?: StudyType}).studyId?._id || '';
+  };
+
+  const filteredApplications = (applications || []).filter(app => {
+    const matchesSearch = getStudyTitle(app).toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
-  // Helper function to get study data from application (handles both study and studyId properties)
-  const getStudyFromApplication = (app: any) => {
-    return app.study || app.studyId;
-  };
   useEffect(() => {
     fetchApplications();
-  }, [statusFilter, fetchApplications]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
-              <span className="text-gray-600">Loading your applications...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [fetchApplications]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Applications</h1>
-              <p className="text-gray-600 mt-2">
-                Track and manage your study applications
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button
-                onClick={() => fetchApplications(currentPage, true)}
-                disabled={refreshing}
-                variant="outline"
-                className="flex items-center"
+          <h1 className="text-3xl font-bold text-gray-900">Participant Dashboard</h1>
+          <p className="mt-2 text-gray-600">
+            Manage your study applications and track your earnings
+          </p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="mb-8">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setCurrentView('applications')}
+                className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${
+                  currentView === 'applications'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
-                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Link to="/app/study-discovery">
-                <Button className="flex items-center">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Browse Studies
-                </Button>
-              </Link>
-            </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Applications
+                </div>
+              </button>
+              <button
+                onClick={() => setCurrentView('wallet')}
+                className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${
+                  currentView === 'wallet'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Wallet className="h-4 w-4" />
+                  Wallet
+                </div>
+              </button>
+            </nav>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Applications</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                </div>
-                <FileText className="w-8 h-8 text-gray-400" />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Applications View */}
+        {currentView === 'applications' && (
+          <>
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <FileText className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500">Total Applications</p>
+                      <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Pending</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-                </div>
-                <Clock className="w-8 h-8 text-yellow-400" />
-              </div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <Clock className="h-8 w-8 text-yellow-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500">Pending</p>
+                      <p className="text-2xl font-semibold text-gray-900">{stats.pending}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Approved</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
-                </div>
-                <CheckCircle className="w-8 h-8 text-green-400" />
-              </div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <CheckCircle className="h-8 w-8 text-green-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500">Approved</p>
+                      <p className="text-2xl font-semibold text-gray-900">{stats.approved}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Rejected</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
-                </div>
-                <XCircle className="w-8 h-8 text-red-400" />
-              </div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <XCircle className="h-8 w-8 text-red-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500">Rejected</p>
+                      <p className="text-2xl font-semibold text-gray-900">{stats.rejected}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Withdrawn</p>
-                  <p className="text-2xl font-bold text-gray-600">{stats.withdrawn}</p>
-                </div>
-                <AlertCircle className="w-8 h-8 text-gray-400" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <AlertCircle className="h-8 w-8 text-gray-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500">Withdrawn</p>
+                      <p className="text-2xl font-semibold text-gray-900">{stats.withdrawn}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-        {/* Filters and Search */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* Controls */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     placeholder="Search studies..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Filter className="w-4 h-4 text-gray-500" />
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="withdrawn">Withdrawn</option>
-                  </select>
-                </div>
+              
+              <div className="flex gap-2">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="withdrawn">Withdrawn</option>
+                </select>
+
+                <Button
+                  onClick={() => fetchApplications(currentPage, true)}
+                  disabled={refreshing}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Applications List */}
-        {filteredApplications.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {applications.length === 0 ? 'No applications yet' : 'No matching applications'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {applications.length === 0 
-                  ? 'You haven\'t applied to any studies yet. Browse available studies to get started.'
-                  : 'Try adjusting your search or filters to find applications.'
-                }
-              </p>
-              {applications.length === 0 && (
-                <Link to="/app/study-discovery">
-                  <Button>
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Browse Studies
-                  </Button>
-                </Link>
-              )}
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-6">
-            {filteredApplications.map((application) => (
-              <Card key={application._id} variant="elevated">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {getStudyFromApplication(application)?.title || 'Unknown Study'}
-                        </h3>
-                        <Badge className={getStatusColor(application.status)}>
-                          <div className="flex items-center space-x-1">
-                            {getStatusIcon(application.status)}
-                            <span className="capitalize">{application.status === 'accepted' ? 'Approved' : application.status}</span>
-                          </div>
-                        </Badge>
-                      </div>
-
-                      <p className="text-gray-600 mb-4 line-clamp-2">
-                        {getStudyFromApplication(application)?.description || 'No description available'}
-                      </p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Duration</p>
-                            <p className="text-sm font-medium">
-                              {getStudyFromApplication(application)?.configuration?.duration || 30} minutes
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Compensation</p>
-                            <p className="text-sm font-medium">
-                              ${getStudyFromApplication(application)?.configuration?.compensation || 0}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <FileText className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Type</p>
-                            <p className="text-sm font-medium capitalize">
-                              {getStudyFromApplication(application)?.type?.replace('-', ' ') || 'Usability Study'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span>
-                          Applied {new Date(application.appliedAt).toLocaleDateString()}
-                        </span>
-                        {application.reviewedAt && (
-                          <span>
-                            Reviewed {new Date(application.reviewedAt).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Rejection Reason */}
-                      {application.status === 'rejected' && application.rejectionReason && (
-                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <p className="text-xs font-medium text-red-800 mb-1">Rejection Reason:</p>
-                          <p className="text-sm text-red-700">{application.rejectionReason}</p>
-                        </div>
-                      )}
-
-                      {/* Notes */}
-                      {application.notes && (
-                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <p className="text-xs font-medium text-blue-800 mb-1">Notes:</p>
-                          <p className="text-sm text-blue-700">{application.notes}</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center space-x-2 ml-4">
-                      {(application.status === 'approved' || application.status === 'accepted') && (
-                        <Link to={`/app/studies/${getStudyFromApplication(application)?._id || getStudyFromApplication(application)?.id}/session`}>
-                          <Button 
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Start Study
-                          </Button>
-                        </Link>
-                      )}
-                      
-                      {application.status === 'pending' && (
-                        <Button
-                          onClick={() => handleWithdrawApplication(application._id)}
-                          disabled={withdrawingId === application._id}
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 border-red-300 hover:bg-red-50"
-                        >
-                          {withdrawingId === application._id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
-                        </Button>
-                      )}
-                      
-                      <Link to={`/app/study-discovery/${getStudyFromApplication(application)?._id || getStudyFromApplication(application)?.id}`}>
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
+            {/* Applications List */}
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                <span className="ml-2 text-gray-600">Loading applications...</span>
+              </div>
+            ) : filteredApplications.length === 0 ? (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No applications found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {searchTerm || statusFilter !== 'all' 
+                      ? 'Try adjusting your search or filters.'
+                      : 'You haven\'t applied to any studies yet.'}
+                  </p>
+                  <Link to="/studies">
+                    <Button>Browse Studies</Button>
+                  </Link>
                 </CardContent>
               </Card>
-            ))}
+            ) : (
+              <div className="space-y-4">
+                {filteredApplications.map((application) => (
+                  <Card key={application._id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {getStudyTitle(application)}
+                            </h3>
+                            <Badge className={`border ${getStatusColor(application.status)}`}>
+                              <div className="flex items-center gap-1">
+                                {getStatusIcon(application.status)}
+                                <span className="capitalize">{application.status}</span>
+                              </div>
+                            </Badge>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                            <div className="flex items-center text-sm text-gray-600">
+                              <Calendar className="h-4 w-4 mr-2" />
+                              Applied: {formatDate(application.appliedAt?.toString() || '')}
+                            </div>
+                            <div className="flex items-center text-sm text-gray-600">
+                              <DollarSign className="h-4 w-4 mr-2" />
+                              Compensation: {formatCurrency(application.studyId?.configuration?.compensation || 0, 'USD')}
+                            </div>
+                            <div className="flex items-center text-sm text-gray-600">
+                              <Clock className="h-4 w-4 mr-2" />
+                              Duration: {application.studyId?.configuration?.duration || 'N/A'} min
+                            </div>
+                          </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center space-x-2 mt-8">
-                <Button
-                  onClick={() => fetchApplications(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="sm"
-                >
-                  Previous
-                </Button>
-                
-                <div className="flex items-center space-x-2">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                    return (
-                      <Button
-                        key={pageNum}
-                        onClick={() => fetchApplications(pageNum)}
-                        variant={currentPage === pageNum ? 'primary' : 'outline'}
-                        size="sm"
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-                
-                <Button
-                  onClick={() => fetchApplications(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  variant="outline"
-                  size="sm"
-                >
-                  Next
-                </Button>
+                          {application.notes && (
+                            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                              <p className="text-sm text-gray-700">
+                                <span className="font-medium">Notes:</span> {application.notes}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 ml-4">
+                          <Link to={`/studies/${getStudyId(application)}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Study
+                            </Button>
+                          </Link>
+                          
+                          {application.status === 'pending' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleWithdrawApplication(application._id)}
+                              disabled={withdrawingId === application._id}
+                              className="text-red-600 hover:bg-red-50 border-red-200"
+                            >
+                              {withdrawingId === application._id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4 mr-1" />
+                              )}
+                              Withdraw
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
-          </div>
+          </>
+        )}
+
+        {/* Wallet View */}
+        {currentView === 'wallet' && (
+          <WalletErrorBoundary>
+            <div className="space-y-6">
+              {/* Wallet Loading State */}
+              {walletLoading && !wallet ? (
+                <WalletSkeleton />
+              ) : !wallet ? (
+                <div className="text-center p-8">
+                  <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Wallet Unavailable</h3>
+                  <p className="text-gray-600 mb-4">Unable to load your wallet information.</p>
+                  <Button onClick={refreshWallet} variant="outline">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Try Again
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {/* Wallet Overview with Refresh */}
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Wallet Overview</h2>
+                    <Button 
+                      onClick={async () => {
+                        await refreshWallet();
+                        walletToasts.walletRefreshed();
+                      }} 
+                      variant="outline" 
+                      size="sm"
+                      disabled={walletLoading}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${walletLoading ? 'animate-spin' : ''}`} />
+                      Refresh
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Wallet Overview */}
+                    <div className="lg:col-span-2">
+                      <WalletOverview 
+                        wallet={wallet}
+                        onRequestWithdrawal={handleRequestWithdrawal}
+                        loading={walletLoading}
+                      />
+                    </div>
+
+                    {/* Enhanced Withdrawal Form */}
+                    {showWithdrawalForm && (
+                      <div className="lg:col-span-1">
+                        <EnhancedWithdrawalForm 
+                          wallet={wallet}
+                          onSubmit={handleWithdrawalSubmit}
+                          onCancel={handleWithdrawalCancel}
+                          loading={walletLoading}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Enhanced Transaction and Withdrawal History */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <EnhancedTransactionHistory 
+                        transactions={transactions}
+                        loading={walletLoading}
+                        currency={wallet?.currency || 'USD'}
+                      />
+                    </div>
+
+                    <div>
+                      <WithdrawalHistory 
+                        withdrawals={withdrawals}
+                        loading={walletLoading}
+                        currency={wallet?.currency || 'USD'}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </WalletErrorBoundary>
         )}
       </div>
     </div>
@@ -525,4 +617,3 @@ const ParticipantDashboardPage: React.FC = () => {
 };
 
 export default ParticipantDashboardPage;
-   

@@ -34,8 +34,11 @@
     "start-improvement": "node .framework/start-improvement.js",
     "team-dashboard": "node .framework/team-dashboard.js",
     "validate-framework": "node .framework/simplified-validator.js",
-    "track-progress": "node scripts/simple-completion-tracker.js report",
+    "track-progress": "node scripts/vibe-coder-tracker.js report",
     "update-progress": "node scripts/simple-completion-tracker.js update",
+    "vibe-tracker": "node scripts/vibe-coder-tracker.js",
+    "vibe-progress": "node scripts/vibe-coder-tracker.js report",
+    "vibe-current": "node scripts/vibe-coder-tracker.js current",
     "quality-gates": "npm run validate-framework && npm run track-progress",
     "pre-deploy": "npm run quality-gates && echo '🚀 Ready for deployment!'",
     "framework-setup": "node scripts/team-integration-setup.js",
@@ -73,7 +76,13 @@
     "test:data:load": "node testing/data/test-data-manager.js load",
     "test:data:reset": "node testing/data/test-data-manager.js reset",
     "test:ci": "npm run test:deployment",
-    "test:dev": "npm run test:smoke && npm run test:performance"
+    "test:dev": "npm run test:smoke && npm run test:performance",
+    "setup": "node scripts/setup.js",
+    "validate:typescript": "tsc --noEmit && echo 'TypeScript validation passed'",
+    "validate:tests": "npm run test:quick && echo 'Tests passed'",
+    "validate:build": "npm run build && echo 'Build successful'",
+    "pre-commit": "npm run validate:typescript",
+    "dev:enhanced": "npm run setup && npm run dev:fullstack"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

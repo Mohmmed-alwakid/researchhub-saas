@@ -17,6 +17,7 @@ import { createClient } from '@supabase/supabase-js';
 // Use environment variables for security
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.I_4j2vgcu2aR9Pw1d-QG2hpKunbmNKD8tWg3Psl0GNc';
 
 // Add basic logging utility
 const logger = {
@@ -117,13 +118,24 @@ export default async function handler(req, res) {
       return await handleGetBlockResponses(req, res, supabase);
     }
     
+    // Study Session functionality (for participants)
+    else if (action === 'getStudySession') {
+      // Validate authentication for session access
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return createErrorResponse(res, 401, 'Authorization header required');
+      }
+      
+      return await handleGetStudySession(req, res, supabase);
+    }
+    
     // Analytics functionality
     else if (action === 'analytics') {
       return await handleAnalytics(req, res, supabase);
     }
     
     else {
-      return createErrorResponse(res, 400, 'Invalid action. Use: templates, study, response, responses, or analytics');
+      return createErrorResponse(res, 400, 'Invalid action. Use: templates, study, response, responses, analytics, or getStudySession');
     }
   } catch (error) {
     logger.error('Blocks API error', error);
@@ -675,6 +687,190 @@ async function handleGetBlockResponses(req, res, supabase) {
     success: true,
     data: responses || []
   });
+}
+
+// Study Session handler
+async function handleGetStudySession(req, res, supabase) {
+  const { studyId } = req.body;
+
+  if (!studyId) {
+    return createErrorResponse(res, 400, 'studyId is required');
+  }
+
+  try {
+    // Get user from JWT token
+    const authHeader = req.headers.authorization;
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return createErrorResponse(res, 401, 'Invalid authentication token');
+    }
+
+    logger.info('Starting study session', { studyId, userId: user.id });
+
+    // Create service role client for RLS bypass
+    const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Check if participant has approved application for this study
+    // Use service role for this query to bypass RLS if needed
+    const { data: application, error: appError } = await serviceSupabase
+      .from('study_applications')
+      .select('*')
+      .eq('study_id', studyId)
+      .eq('participant_id', user.id)
+      .in('status', ['approved', 'accepted']) // Accept both approved and accepted status
+      .single();
+    
+    if (appError || !application) {
+      logger.error('No approved/accepted application found', { 
+        studyId, 
+        userId: user.id, 
+        error: appError?.message || 'Application not found',
+        errorCode: appError?.code
+      });
+      return createErrorResponse(res, 403, 'No approved application found for this study');
+    }
+    
+    logger.info('Found approved application', { 
+      applicationId: application.id, 
+      status: application.status,
+      studyId,
+      userId: user.id 
+    });
+
+    // Check if session already exists (use service role to bypass RLS)
+    let session;
+    const { data: existingSession, error: sessionCheckError } = await serviceSupabase
+      .from('study_sessions')
+      .select('*')
+      .eq('study_id', studyId)
+      .eq('participant_id', user.id)
+      .single();
+    if (existingSession && !sessionCheckError) {
+      session = existingSession;
+      logger.info('Found existing session', { sessionId: session.id });
+    } else {
+      // Create new session with minimal required fields (use service role to bypass RLS)
+      const { data: newSession, error: createError } = await serviceSupabase
+        .from('study_sessions')
+        .insert({
+          study_id: studyId,
+          participant_id: user.id,
+          started_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      if (createError) {
+        logger.error('Failed to create session', createError);
+        return createErrorResponse(res, 500, 'Failed to create study session');
+      }
+      session = newSession;
+      logger.info('Created new session', { sessionId: session.id });
+    }
+
+    // Get study details with blocks
+    const { data: study, error: studyError } = await supabase
+      .from('studies')
+      .select('id, title, description, settings')
+      .eq('id', studyId)
+      .single();
+    if (studyError || !study) {
+      logger.error('Study not found', { studyId, error: studyError });
+      return createErrorResponse(res, 404, 'Study not found');
+    }
+
+    // Get study blocks (if using study_blocks table) or use tasks from study settings
+    let blocks = [];
+    const { data: studyBlocks, error: blocksError } = await supabase
+      .from('study_blocks')
+      .select('*')
+      .eq('study_id', studyId)
+      .order('order_index');
+    if (studyBlocks && studyBlocks.length > 0) {
+      blocks = studyBlocks.map(block => ({
+        id: block.id,
+        type: block.type,
+        title: block.title,
+        description: block.description,
+        settings: block.settings || {},
+        order: block.order_index
+      }));
+    } else {
+      // Fallback: use blocks from study settings or create default blocks
+      if (study.settings && study.settings.blocks && Array.isArray(study.settings.blocks)) {
+        blocks = study.settings.blocks.map((block, index) => ({
+          id: block.id || `block_${index}`,
+          type: block.type || 'welcome_screen',
+          title: block.title || `Block ${index + 1}`,
+          description: block.description || '',
+          settings: block.settings || block,
+          order: index
+        }));
+      } else {
+        // Default welcome block if no blocks
+        blocks = [{
+          id: 'welcome',
+          type: 'welcome_screen',
+          title: study.title || 'Welcome',
+          description: study.description || 'Welcome to the study',
+          settings: {
+            continueButtonText: 'Start Study'
+          },
+          order: 0
+        }];
+      }
+    }
+
+    // Add a thank you block at the end if not present
+    const hasThankYou = blocks.some(block => block.type === 'thank_you');
+    if (!hasThankYou) {
+      blocks.push({
+        id: 'thank_you_final',
+        type: 'thank_you',
+        title: 'Thank You!',
+        description: 'Thank you for participating in this study.',
+        settings: {
+          message: 'Your responses have been recorded. Thank you for your time!',
+          showStudyInfo: true
+        },
+        order: blocks.length
+      });
+    }
+
+    // Create the session response
+    const sessionResponse = {
+      sessionId: session.id,
+      studyId: session.study_id,
+      participantId: session.participant_id,
+      status: session.status || 'in_progress',
+      currentBlock: session.current_block || 0,
+      startedAt: session.started_at,
+      study: {
+        id: study.id,
+        title: study.title,
+        description: study.description,
+        settings: study.settings || {}
+      },
+      blocks: blocks,
+      totalBlocks: blocks.length,
+      responses: session.responses || {}
+    };
+
+    logger.info('Study session created successfully', { 
+      sessionId: session.id, 
+      studyId: studyId, 
+      blocksCount: blocks.length 
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: sessionResponse
+    });
+
+  } catch (error) {
+    logger.error('Study session error', error);
+    return createErrorResponse(res, 500, 'Internal server error', error.message);
+  }
 }
 
 // Handle block analytics

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participant Application Test - AfakarM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .test-data {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .study-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .apply-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .apply-btn:hover { background: #218838; }
+        .apply-btn:disabled { background: #6c757d; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Participant Application Process Test</h1>
+    <div id="statusContainer"></div>
+
+    <!-- Test Account Login -->
+    <div class="test-section">
+        <h2>1. Participant Login Test</h2>
+        <button onclick="loginAsParticipant()">Login as Participant</button>
+        <button onclick="logoutUser()">Logout</button>
+        <div id="loginStatus"></div>
+    </div>
+
+    <!-- Discover Studies -->
+    <div class="test-section">
+        <h2>2. Discover Studies Test</h2>
+        <button onclick="fetchPublicStudies()">Fetch Public Studies</button>
+        <div id="studiesStatus"></div>
+        <div id="studiesList"></div>
+    </div>
+
+    <!-- Application Process -->
+    <div class="test-section">
+        <h2>3. Application Process Test</h2>
+        <button onclick="testApplicationProcess()">Test Full Application Process</button>
+        <div id="applicationStatus"></div>
+    </div>
+
+    <!-- Participant Dashboard -->
+    <div class="test-section">
+        <h2>4. Participant Dashboard Test</h2>
+        <button onclick="checkParticipantDashboard()">Check Participant Dashboard</button>
+        <div id="dashboardStatus"></div>
+    </div>
+
+    <!-- Study Session Simulation -->
+    <div class="test-section">
+        <h2>5. Study Session Test</h2>
+        <button onclick="testStudySession()">Test Study Session Flow</button>
+        <div id="sessionStatus"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let currentUser = null;
+        let authToken = null;
+        let availableStudies = [];
+
+        // Test accounts
+        const TEST_ACCOUNTS = {
+            participant: {
+                email: 'abwanwr77+participant@gmail.com',
+                password: 'Testtest123'
+            },
+            researcher: {
+                email: 'abwanwr77+Researcher@gmail.com',
+                password: 'Testtest123'
+            }
+        };
+
+        function updateStatus(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = `${new Date().toLocaleTimeString()}: ${message}`;
+            container.appendChild(statusDiv);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function makeRequest(endpoint, options = {}) {
+            const url = `${API_BASE}${endpoint}`;
+            const defaultHeaders = {
+                'Content-Type': 'application/json'
+            };
+
+            if (authToken) {
+                defaultHeaders['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            const config = {
+                headers: defaultHeaders,
+                ...options
+            };
+
+            try {
+                console.log(`Making request to: ${url}`, config);
+                const response = await fetch(url, config);
+                const data = await response.json();
+                
+                console.log(`Response from ${endpoint}:`, data);
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return data;
+            } catch (error) {
+                console.error(`Request failed for ${endpoint}:`, error);
+                throw error;
+            }
+        }
+
+        async function loginAsParticipant() {
+            try {
+                updateStatus('loginStatus', 'Attempting to login as participant...', 'info');
+                
+                const response = await makeRequest('/auth?action=login', {
+                    method: 'POST',
+                    body: JSON.stringify(TEST_ACCOUNTS.participant)
+                });
+
+                console.log('Full login response:', response);
+
+                if (response.success && response.user) {
+                    currentUser = response.user;
+                    // Check different possible token fields
+                    authToken = response.token || response.access_token || response.session?.access_token || response.session?.token;
+                    
+                    console.log('Extracted token:', authToken);
+                    
+                    if (!authToken) {
+                        console.warn('No token found in response. Response keys:', Object.keys(response));
+                        console.warn('Session object:', response.session);
+                    }
+                    
+                    updateStatus('loginStatus', `✅ Login successful! User: ${response.user.email}, Role: ${response.user.role}`, 'success');
+                    
+                    // Store token for subsequent requests
+                    if (authToken) {
+                        localStorage.setItem('authToken', authToken);
+                    }
+                    
+                    return true;
+                } else {
+                    throw new Error('Login failed: ' + (response.error || 'Unknown error'));
+                }
+            } catch (error) {
+                updateStatus('loginStatus', `❌ Login failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function logoutUser() {
+            currentUser = null;
+            authToken = null;
+            localStorage.removeItem('authToken');
+            updateStatus('loginStatus', '👋 Logged out successfully', 'info');
+        }
+
+        async function fetchPublicStudies() {
+            try {
+                updateStatus('studiesStatus', 'Fetching public studies...', 'info');
+                
+                const response = await makeRequest('/applications?endpoint=studies/public');
+                
+                if (response.success && response.data) {
+                    availableStudies = response.data.studies || response.data;
+                    updateStatus('studiesStatus', `✅ Found ${availableStudies.length} public studies`, 'success');
+                    
+                    // Display studies
+                    displayStudies(availableStudies);
+                    
+                    return availableStudies;
+                } else {
+                    throw new Error('Failed to fetch studies: ' + (response.error || 'Unknown error'));
+                }
+            } catch (error) {
+                updateStatus('studiesStatus', `❌ Failed to fetch studies: ${error.message}`, 'error');
+                return [];
+            }
+        }
+
+        function displayStudies(studies) {
+            const container = document.getElementById('studiesList');
+            container.innerHTML = '';
+            
+            if (studies.length === 0) {
+                container.innerHTML = '<div class="warning">No public studies available</div>';
+                return;
+            }
+
+            studies.forEach(study => {
+                const studyCard = document.createElement('div');
+                studyCard.className = 'study-card';
+                studyCard.innerHTML = `
+                    <h4>${study.title}</h4>
+                    <p><strong>Description:</strong> ${study.description || 'No description'}</p>
+                    <p><strong>Researcher:</strong> ${study.researcher?.name || 'Researcher'}</p>
+                    <p><strong>Duration:</strong> ${study.configuration?.duration || study.settings?.duration || 'Not specified'} minutes</p>
+                    <p><strong>Compensation:</strong> $${study.configuration?.compensation || study.settings?.compensation || 'Not specified'}</p>
+                    <p><strong>Participants:</strong> ${study.participants?.enrolled || 0} / ${study.configuration?.maxParticipants || study.target_participants || 'Unknown'}</p>
+                    <p><strong>Type:</strong> ${study.type || study.settings?.type || 'General'}</p>
+                    <button class="apply-btn" onclick="applyToStudy('${study.id}', '${study.title}')">
+                        Apply to This Study
+                    </button>
+                `;
+                container.appendChild(studyCard);
+            });
+        }
+
+        async function applyToStudy(studyId, studyTitle) {
+            try {
+                if (!currentUser) {
+                    updateStatus('applicationStatus', '❌ Please login first', 'error');
+                    return;
+                }
+
+                updateStatus('applicationStatus', `Applying to study: ${studyTitle}...`, 'info');
+                
+                const response = await makeRequest(`/applications?endpoint=studies/${studyId}/apply`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        screeningResponses: []
+                    })
+                });
+
+                if (response.success) {
+                    updateStatus('applicationStatus', `✅ Successfully applied to study: ${studyTitle}`, 'success');
+                    return true;
+                } else {
+                    throw new Error('Application failed: ' + (response.error || 'Unknown error'));
+                }
+            } catch (error) {
+                updateStatus('applicationStatus', `❌ Application failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testApplicationProcess() {
+            try {
+                updateStatus('applicationStatus', 'Starting full application process test...', 'info');
+                
+                // 1. Ensure user is logged in
+                if (!currentUser) {
+                    const loginSuccess = await loginAsParticipant();
+                    if (!loginSuccess) {
+                        throw new Error('Login failed');
+                    }
+                }
+
+                // 2. Fetch available studies
+                const studies = await fetchPublicStudies();
+                if (studies.length === 0) {
+                    throw new Error('No studies available to apply to');
+                }
+
+                // 3. Apply to the first available study
+                const firstStudy = studies[0];
+                const applicationSuccess = await applyToStudy(firstStudy.id, firstStudy.title);
+                
+                if (applicationSuccess) {
+                    updateStatus('applicationStatus', '✅ Full application process completed successfully!', 'success');
+                    
+                    // 4. Check if application appears in dashboard
+                    setTimeout(() => checkParticipantDashboard(), 1000);
+                } else {
+                    throw new Error('Application submission failed');
+                }
+                
+            } catch (error) {
+                updateStatus('applicationStatus', `❌ Application process failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkParticipantDashboard() {
+            try {
+                if (!currentUser) {
+                    updateStatus('dashboardStatus', '❌ Please login first', 'error');
+                    return;
+                }
+
+                updateStatus('dashboardStatus', 'Checking participant dashboard...', 'info');
+                
+                const response = await makeRequest('/applications?endpoint=applications/my-applications');
+                
+                if (response.success) {
+                    const applications = response.data || [];
+                    updateStatus('dashboardStatus', `✅ Dashboard loaded: ${applications.length} applications found`, 'success');
+                    
+                    if (applications.length > 0) {
+                        const container = document.getElementById('dashboardStatus');
+                        const applicationsDiv = document.createElement('div');
+                        applicationsDiv.className = 'test-data';
+                        applicationsDiv.innerHTML = `Recent Applications:\n${JSON.stringify(applications, null, 2)}`;
+                        container.appendChild(applicationsDiv);
+                    }
+                    
+                    return applications;
+                } else {
+                    throw new Error('Dashboard check failed: ' + (response.error || 'Unknown error'));
+                }
+            } catch (error) {
+                updateStatus('dashboardStatus', `❌ Dashboard check failed: ${error.message}`, 'error');
+                return [];
+            }
+        }
+
+        async function testStudySession() {
+            try {
+                updateStatus('sessionStatus', 'Testing study session flow...', 'info');
+                
+                if (!currentUser) {
+                    throw new Error('Please login first');
+                }
+
+                // First check if user has any approved applications
+                const applications = await checkParticipantDashboard();
+                const approvedApplications = applications.filter(app => app.status === 'approved');
+                
+                if (approvedApplications.length === 0) {
+                    updateStatus('sessionStatus', '⚠️ No approved applications found. Cannot test study session.', 'warning');
+                    return;
+                }
+
+                const firstApproved = approvedApplications[0];
+                updateStatus('sessionStatus', `Found approved application for study: ${firstApproved.study_title}`, 'info');
+                
+                // Test starting a study session
+                const sessionResponse = await makeRequest('/blocks?action=getStudySession', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        studyId: firstApproved.study_id
+                    })
+                });
+
+                if (sessionResponse.success) {
+                    updateStatus('sessionStatus', '✅ Study session started successfully!', 'success');
+                    
+                    const container = document.getElementById('sessionStatus');
+                    const sessionDiv = document.createElement('div');
+                    sessionDiv.className = 'test-data';
+                    sessionDiv.innerHTML = `Session Data:\n${JSON.stringify(sessionResponse.data, null, 2)}`;
+                    container.appendChild(sessionDiv);
+                } else {
+                    throw new Error('Session start failed: ' + (sessionResponse.error || 'Unknown error'));
+                }
+                
+            } catch (error) {
+                updateStatus('sessionStatus', `❌ Study session test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize test
+        window.onload = function() {
+            updateStatus('statusContainer', '🚀 Participant Application Test Interface Loaded', 'info');
+            
+            // Try to restore auth token if available
+            const savedToken = localStorage.getItem('authToken');
+            if (savedToken) {
+                authToken = savedToken;
+                updateStatus('statusContainer', '🔑 Found saved auth token', 'info');
+            }
+        };
+    </script>
+</body>
+</html>

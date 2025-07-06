@@ -183,8 +183,10 @@ SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Optional for full features
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PUBLISHABLE_KEY=pk_live_...
+# DodoPayments (Required for researcher payments)
+DODOPAYMENTS_API_KEY=your_api_key
+DODOPAYMENTS_SECRET_KEY=your_secret_key
+DODOPAYMENTS_WEBHOOK_SECRET=your_webhook_secret
 ```
 
 ## 🛠️ Maintenance

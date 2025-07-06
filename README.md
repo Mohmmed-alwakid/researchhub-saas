@@ -5,10 +5,10 @@
 [![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> **💼 PROFESSIONAL PRODUCT MANAGEMENT**: Complete product management system implemented!  
-> **Last Updated**: June 29, 2025  
-> **Documentation**: Organized in `/product-manager/` folder  
-> **Current Focus**: Participant Experience completion (Block Session Rendering)
+> **🎉 WALLET INTEGRATION COMPLETE**: USD/SAR multi-currency support implemented!  
+> **Last Updated**: July 6, 2025  
+> **New Feature**: Professional wallet system with real-time currency conversion  
+> **Current Status**: Production-ready participant dashboard with comprehensive testing
 
 ## 📋 QUICK START
 
@@ -28,6 +28,7 @@ ResearchHub is a **SaaS platform for user testing research** that allows researc
 
 ### ✅ Operational Features (Production Verified)
 
+- **🎉 NEW: Multi-Currency Wallet System**: Complete USD/SAR support with real-time conversion
 - **Participant Workflow**: Complete end-to-end participant journey operational
 - **Study Discovery**: Participants can browse and apply to studies
 - **Authentication System**: Complete JWT-based auth with role management
@@ -38,6 +39,7 @@ ResearchHub is a **SaaS platform for user testing research** that allows researc
 - **Database Integration**: Supabase with RLS security properly configured
 - **API Endpoints**: All participant and collaboration endpoints working with proper security
 - **Real-time Features**: Live collaboration indicators and team presence
+- **Professional Testing Framework**: AI-powered automated testing with 0 human testers required
 
 ### 🚧 In Development
 
@@ -45,10 +47,11 @@ ResearchHub is a **SaaS platform for user testing research** that allows researc
 - **Screen Recording**: UI implemented, backend integration pending
 - **Analytics Dashboard**: Mock data, needs real analytics implementation
 - **Session Replay**: Frontend ready, video processing needed
-- **Payment Processing**: Points-based system with admin-controlled allocation
+- **Payment Processing**: Multi-currency payment integration for researchers
 
 ### ❌ Not Yet Implemented
 
+- Advanced block session rendering
 - Real-time collaboration features
 - Advanced reporting and insights
 - Mobile application
@@ -58,7 +61,7 @@ ResearchHub is a **SaaS platform for user testing research** that allows researc
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - Git
 
@@ -81,8 +84,8 @@ npm run dev:fullstack
 
 ### Development URLs
 
-- **Frontend**: http://localhost:5175
-- **Backend API**: http://localhost:3003
+- **Frontend**: <http://localhost:5175>
+- **Backend API**: <http://localhost:3003>
 - **Database**: Connected to Supabase
 
 ### Test Accounts
@@ -92,7 +95,7 @@ npm run dev:fullstack
 Email: abwanwr77+admin@gmail.com
 Password: Testtest123
 
-# Researcher  
+# Researcher
 Email: abwanwr77+Researcher@gmail.com
 Password: Testtest123
 

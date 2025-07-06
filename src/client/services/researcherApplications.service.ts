@@ -61,14 +61,19 @@ export const researcherApplicationsService = {
   },
 
   /**
-   * Review application (approve/reject)
+   * Review application (approve/reject) - Updated to use simple endpoints
    */
   async reviewApplication(applicationId: string, review: ApplicationReview): Promise<{
     success: boolean;
     data: ResearcherApplication;
     message: string;
   }> {
-    return apiService.patch(`applications?endpoint=applications/${applicationId}/review`, review);
+    const action = review.status === 'accepted' ? 'approve_application' : 'reject_application';
+    
+    return apiService.post(`applications?action=${action}`, {
+      application_id: applicationId,
+      notes: review.notes || `Application ${review.status} by researcher`
+    });
   }
 };
 

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Session Test - AfakarM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .session-container {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .block-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f9f9f9;
+        }
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .block-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .block-type {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            transition: width 0.3s ease;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover { background: #545b62; }
+        .status {
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #b8daff; }
+        .study-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .block-content {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        .response-area {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .likert-scale {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .likert-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .likert-option input[type="radio"] {
+            width: auto;
+            margin: 5px;
+        }
+        .session-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .session-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .session-description {
+            color: #666;
+            font-size: 16px;
+        }
+        .test-controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-controls">
+        <h3>🧪 Study Session Test Controls</h3>
+        <button onclick="loginAndStartSession()">Login & Start Session</button>
+        <button onclick="loadTestSession()">Load Test Session</button>
+        <button onclick="resetSession()">Reset Session</button>
+        <div id="testStatus"></div>
+    </div>
+
+    <div class="session-container" id="sessionContainer" style="display: none;">
+        <div class="session-header">
+            <h1 class="session-title" id="studyTitle">Loading Study...</h1>
+            <p class="session-description" id="studyDescription"></p>
+        </div>
+
+        <div class="study-info" id="studyInfo">
+            <div id="progressInfo"></div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+
+        <div id="currentBlockContainer">
+            <!-- Current block content will be rendered here -->
+        </div>
+
+        <div class="navigation">
+            <button class="btn-secondary" id="prevBtn" onclick="previousBlock()" disabled>Previous</button>
+            <button id="nextBtn" onclick="nextBlock()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+        let currentSession = null;
+        let currentBlockIndex = 0;
+        let responses = {};
+
+        // Test accounts
+        const TEST_ACCOUNTS = {
+            participant: {
+                email: 'abwanwr77+participant@gmail.com',
+                password: 'Testtest123'
+            }
+        };
+
+        function updateTestStatus(message, type = 'info') {
+            const container = document.getElementById('testStatus');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = `${new Date().toLocaleTimeString()}: ${message}`;
+            container.appendChild(statusDiv);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function makeRequest(endpoint, options = {}) {
+            const url = `${API_BASE}${endpoint}`;
+            const defaultHeaders = {
+                'Content-Type': 'application/json'
+            };
+
+            if (authToken) {
+                defaultHeaders['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            const config = {
+                headers: defaultHeaders,
+                ...options
+            };
+
+            try {
+                console.log(`Making request to: ${url}`, config);
+                const response = await fetch(url, config);
+                const data = await response.json();
+                
+                console.log(`Response from ${endpoint}:`, data);
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return data;
+            } catch (error) {
+                console.error(`Request failed for ${endpoint}:`, error);
+                throw error;
+            }
+        }
+
+        async function loginAsParticipant() {
+            try {
+                updateTestStatus('Logging in as participant...', 'info');
+                
+                const response = await makeRequest('/auth?action=login', {
+                    method: 'POST',
+                    body: JSON.stringify(TEST_ACCOUNTS.participant)
+                });
+
+                if (response.success && response.user) {
+                    authToken = response.token || response.access_token || response.session?.access_token || response.session?.token;
+                    updateTestStatus(`✅ Login successful! User: ${response.user.email}`, 'success');
+                    return true;
+                } else {
+                    throw new Error('Login failed: ' + (response.error || 'Unknown error'));
+                }
+            } catch (error) {
+                updateTestStatus(`❌ Login failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function getApprovedStudy() {
+            try {
+                updateTestStatus('Fetching approved applications...', 'info');
+                
+                const response = await makeRequest('/applications?endpoint=applications/my-applications');
+                
+                if (response.success && response.data) {
+                    const approvedApplications = response.data.filter(app => app.status === 'approved');
+                    
+                    if (approvedApplications.length > 0) {
+                        updateTestStatus(`✅ Found ${approvedApplications.length} approved applications`, 'success');
+                        return approvedApplications[0].study_id;
+                    } else {
+                        updateTestStatus('⚠️ No approved applications found', 'warning');
+                        return null;
+                    }
+                }
+            } catch (error) {
+                updateTestStatus(`❌ Failed to fetch applications: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        async function startStudySession(studyId) {
+            try {
+                updateTestStatus(`Starting study session for study: ${studyId}...`, 'info');
+                
+                const response = await makeRequest('/blocks?action=getStudySession', {
+                    method: 'POST',
+                    body: JSON.stringify({ studyId: studyId })
+                });
+
+                if (response.success && response.data) {
+                    currentSession = response.data;
+                    updateTestStatus('✅ Study session started successfully!', 'success');
+                    renderStudySession();
+                    return true;
+                } else {
+                    throw new Error('Session start failed: ' + (response.error || 'Unknown error'));
+                }
+            } catch (error) {
+                updateTestStatus(`❌ Study session start failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function loginAndStartSession() {
+            const loginSuccess = await loginAsParticipant();
+            if (!loginSuccess) return;
+
+            const studyId = await getApprovedStudy();
+            if (!studyId) {
+                updateTestStatus('❌ No approved study found to start session', 'error');
+                return;
+            }
+
+            await startStudySession(studyId);
+        }
+
+        async function loadTestSession() {
+            // Mock session data for testing UI
+            currentSession = {
+                sessionId: 'test-session-123',
+                studyId: 'test-study-456',
+                status: 'in_progress',
+                currentBlock: 0,
+                study: {
+                    title: 'E-commerce Website Usability Test',
+                    description: 'Help us understand how users navigate our online store',
+                    settings: {
+                        duration: 15,
+                        compensation: 25
+                    }
+                },
+                blocks: [
+                    {
+                        id: 'welcome',
+                        type: 'welcome_screen',
+                        title: 'Welcome to Our Study',
+                        description: 'Thank you for participating in our research.',
+                        settings: {
+                            continueButtonText: 'Get Started'
+                        },
+                        order: 0
+                    },
+                    {
+                        id: 'task1',
+                        type: 'open_question',
+                        title: 'First Impressions',
+                        description: 'What are your first thoughts about this website?',
+                        settings: {
+                            placeholder: 'Please share your thoughts...',
+                            maxLength: 500
+                        },
+                        order: 1
+                    },
+                    {
+                        id: 'task2',
+                        type: 'opinion_scale',
+                        title: 'Rate the Design',
+                        description: 'How would you rate the overall design of the website?',
+                        settings: {
+                            scale: 'numbers',
+                            min: 1,
+                            max: 5,
+                            labels: ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent']
+                        },
+                        order: 2
+                    },
+                    {
+                        id: 'thank_you',
+                        type: 'thank_you',
+                        title: 'Thank You!',
+                        description: 'Thank you for participating in this study.',
+                        settings: {
+                            message: 'Your responses have been recorded. Thank you for your time!'
+                        },
+                        order: 3
+                    }
+                ],
+                totalBlocks: 4,
+                responses: {}
+            };
+
+            currentBlockIndex = 0;
+            responses = {};
+            updateTestStatus('✅ Test session loaded successfully!', 'success');
+            renderStudySession();
+        }
+
+        function renderStudySession() {
+            if (!currentSession) return;
+
+            // Show session container
+            document.getElementById('sessionContainer').style.display = 'block';
+
+            // Update study info
+            document.getElementById('studyTitle').textContent = currentSession.study.title;
+            document.getElementById('studyDescription').textContent = currentSession.study.description;
+
+            // Update progress info
+            const progressInfo = document.getElementById('progressInfo');
+            progressInfo.innerHTML = `
+                <strong>Progress:</strong> Block ${currentBlockIndex + 1} of ${currentSession.totalBlocks}
+                <br><strong>Study ID:</strong> ${currentSession.studyId}
+                <br><strong>Session ID:</strong> ${currentSession.sessionId}
+            `;
+
+            // Update progress bar
+            const progress = ((currentBlockIndex + 1) / currentSession.totalBlocks) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            // Render current block
+            renderCurrentBlock();
+
+            // Update navigation buttons
+            updateNavigationButtons();
+        }
+
+        function renderCurrentBlock() {
+            const currentBlock = currentSession.blocks[currentBlockIndex];
+            const container = document.getElementById('currentBlockContainer');
+
+            let blockHTML = `
+                <div class="block-container">
+                    <div class="block-header">
+                        <div class="block-title">${currentBlock.title}</div>
+                        <div class="block-type">${currentBlock.type}</div>
+                    </div>
+                    <div class="block-content">
+                        ${currentBlock.description}
+                    </div>
+                    <div class="response-area">
+                        ${renderBlockContent(currentBlock)}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = blockHTML;
+        }
+
+        function renderBlockContent(block) {
+            switch (block.type) {
+                case 'welcome_screen':
+                    return `
+                        <p><strong>Welcome!</strong></p>
+                        <p>This study will take approximately ${currentSession.study.settings?.duration || 15} minutes to complete.</p>
+                        <p>You will be compensated $${currentSession.study.settings?.compensation || 25} for your participation.</p>
+                    `;
+
+                case 'open_question':
+                    return `
+                        <label for="response_${block.id}">Your Response:</label>
+                        <textarea 
+                            id="response_${block.id}" 
+                            placeholder="${block.settings?.placeholder || 'Please enter your response...'}"
+                            maxlength="${block.settings?.maxLength || 1000}"
+                            onchange="saveResponse('${block.id}', this.value)"
+                        >${responses[block.id] || ''}</textarea>
+                        <small>Character limit: ${block.settings?.maxLength || 1000}</small>
+                    `;
+
+                case 'opinion_scale':
+                    const scale = block.settings?.scale || 'numbers';
+                    const min = block.settings?.min || 1;
+                    const max = block.settings?.max || 5;
+                    const labels = block.settings?.labels || [];
+
+                    let scaleHTML = '<div class="likert-scale">';
+                    for (let i = min; i <= max; i++) {
+                        const label = labels[i - min] || i;
+                        const checked = responses[block.id] == i ? 'checked' : '';
+                        scaleHTML += `
+                            <div class="likert-option">
+                                <input type="radio" 
+                                       name="scale_${block.id}" 
+                                       value="${i}" 
+                                       ${checked}
+                                       onchange="saveResponse('${block.id}', this.value)">
+                                <label>${label}</label>
+                            </div>
+                        `;
+                    }
+                    scaleHTML += '</div>';
+                    return scaleHTML;
+
+                case 'multiple_choice':
+                    const options = block.settings?.options || [];
+                    let optionsHTML = '';
+                    options.forEach((option, index) => {
+                        const checked = responses[block.id] == option ? 'checked' : '';
+                        optionsHTML += `
+                            <div>
+                                <input type="radio" 
+                                       name="choice_${block.id}" 
+                                       value="${option}" 
+                                       ${checked}
+                                       onchange="saveResponse('${block.id}', this.value)">
+                                <label>${option}</label>
+                            </div>
+                        `;
+                    });
+                    return optionsHTML;
+
+                case 'simple_input':
+                    const inputType = block.settings?.inputType || 'text';
+                    return `
+                        <label for="input_${block.id}">Your Answer:</label>
+                        <input type="${inputType}" 
+                               id="input_${block.id}" 
+                               value="${responses[block.id] || ''}"
+                               onchange="saveResponse('${block.id}', this.value)">
+                    `;
+
+                case 'thank_you':
+                    return `
+                        <div style="text-align: center; padding: 20px;">
+                            <h3>🎉 ${block.settings?.message || 'Thank you for your participation!'}</h3>
+                            <p>Your responses have been recorded successfully.</p>
+                            <p><strong>Session completed!</strong></p>
+                        </div>
+                    `;
+
+                default:
+                    return `
+                        <div style="background: #f0f0f0; padding: 15px; border-radius: 4px;">
+                            <p><strong>Block Type:</strong> ${block.type}</p>
+                            <p><strong>Settings:</strong></p>
+                            <pre>${JSON.stringify(block.settings, null, 2)}</pre>
+                        </div>
+                    `;
+            }
+        }
+
+        function saveResponse(blockId, value) {
+            responses[blockId] = value;
+            console.log('Response saved:', { blockId, value });
+            updateTestStatus(`Response saved for block: ${blockId}`, 'info');
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.disabled = currentBlockIndex === 0;
+            
+            if (currentBlockIndex === currentSession.totalBlocks - 1) {
+                nextBtn.textContent = 'Complete Study';
+                nextBtn.onclick = completeStudy;
+            } else {
+                nextBtn.textContent = 'Next';
+                nextBtn.onclick = nextBlock;
+            }
+        }
+
+        function previousBlock() {
+            if (currentBlockIndex > 0) {
+                currentBlockIndex--;
+                renderStudySession();
+                updateTestStatus(`Moved to block ${currentBlockIndex + 1}`, 'info');
+            }
+        }
+
+        function nextBlock() {
+            const currentBlock = currentSession.blocks[currentBlockIndex];
+            
+            // Validate current block response if required
+            if (currentBlock.settings?.required && !responses[currentBlock.id]) {
+                updateTestStatus('Please complete the current block before proceeding', 'warning');
+                return;
+            }
+
+            if (currentBlockIndex < currentSession.totalBlocks - 1) {
+                currentBlockIndex++;
+                renderStudySession();
+                updateTestStatus(`Moved to block ${currentBlockIndex + 1}`, 'info');
+            }
+        }
+
+        async function completeStudy() {
+            try {
+                updateTestStatus('Completing study session...', 'info');
+                
+                // In a real implementation, this would save all responses and mark session as complete
+                console.log('Final responses:', responses);
+                
+                updateTestStatus('✅ Study completed successfully! Thank you for participating.', 'success');
+                
+                // Show completion message
+                document.getElementById('currentBlockContainer').innerHTML = `
+                    <div class="block-container" style="text-align: center; background: #d4edda;">
+                        <h2>🎉 Study Completed!</h2>
+                        <p>Thank you for your valuable participation.</p>
+                        <p>Your responses have been recorded and will help improve our research.</p>
+                        <button onclick="resetSession()">Start New Session</button>
+                    </div>
+                `;
+                
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('prevBtn').style.display = 'none';
+                
+            } catch (error) {
+                updateTestStatus(`❌ Error completing study: ${error.message}`, 'error');
+            }
+        }
+
+        function resetSession() {
+            currentSession = null;
+            currentBlockIndex = 0;
+            responses = {};
+            document.getElementById('sessionContainer').style.display = 'none';
+            document.getElementById('testStatus').innerHTML = '';
+            updateTestStatus('Session reset. Ready for new test.', 'info');
+        }
+
+        // Initialize
+        window.onload = function() {
+            updateTestStatus('🚀 Study Session Test Interface Loaded', 'info');
+            updateTestStatus('Click "Login & Start Session" to test with real data, or "Load Test Session" for UI testing', 'info');
+        };
+    </script>
+</body>
+</html>

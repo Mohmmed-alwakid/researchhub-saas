@@ -78,6 +78,45 @@ export interface PointsUsageStats {
   averageCostPerStudy: number;
 }
 
+export interface ParticipantWallet {
+  id: string;
+  participant_id: string;
+  balance: number;
+  total_earned: number;
+  total_withdrawn: number;
+  currency: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WithdrawalRequest {
+  id: string;
+  participant_id: string;
+  wallet_id: string;
+  amount: number;
+  status: 'pending' | 'approved' | 'rejected';
+  payment_method: string;
+  payment_details: any;
+  admin_notes?: string;
+  requested_at: string;
+  processed_at?: string;
+  processed_by?: string;
+}
+
+export interface WalletTransaction {
+  id: string;
+  wallet_id: string;
+  transaction_type: 'earning' | 'withdrawal' | 'adjustment';
+  amount: number;
+  balance_before: number;
+  balance_after: number;
+  reference_type?: string;
+  reference_id?: string;
+  description?: string;
+  created_by?: string;
+  created_at: string;
+}
+
 /**
  * Points management service - replaces Stripe payment system
  */
@@ -239,7 +278,7 @@ export const pointsService = {
   },
 
   /**
-   * Create a Stripe payment intent for purchasing points
+   * Create a DodoPayments payment intent for purchasing points
    */
   async createPaymentIntent(amount: number, points: number): Promise<{
     success: boolean;
@@ -301,6 +340,108 @@ export const pointsService = {
     data?: WithdrawalHistoryItem[];
   }> {
     return apiService.get('payments?action=withdrawals');
+  }
+};
+
+/**
+ * Participant wallet service - handles wallet balance and withdrawals
+ */
+export const walletService = {
+  /**
+   * Get participant wallet information
+   */
+  async getWallet(): Promise<{
+    success: boolean;
+    data?: ParticipantWallet;
+    error?: string;
+  }> {
+    return apiService.get('wallets?action=get');
+  },
+
+  /**
+   * Request a withdrawal
+   */
+  async requestWithdrawal(data: {
+    amount: number;
+    payment_method: string;
+    payment_details: any;
+  }): Promise<{
+    success: boolean;
+    data?: WithdrawalRequest;
+    error?: string;
+  }> {
+    return apiService.post('wallets?action=request-withdrawal', data);
+  },
+
+  /**
+   * Get withdrawal history for current participant
+   */
+  async getWithdrawals(): Promise<{
+    success: boolean;
+    data?: WithdrawalRequest[];
+    error?: string;
+  }> {
+    return apiService.get('wallets?action=withdrawals');
+  },
+
+  /**
+   * Get wallet transaction history
+   */
+  async getTransactions(): Promise<{
+    success: boolean;
+    data?: WalletTransaction[];
+    error?: string;
+  }> {
+    return apiService.get('wallets?action=transactions');
+  },
+
+  /**
+   * Admin: Get all withdrawal requests
+   */
+  async getAllWithdrawals(): Promise<{
+    success: boolean;
+    data?: (WithdrawalRequest & {
+      participant: {
+        id: string;
+        name: string;
+        email: string;
+      }
+    })[];
+    error?: string;
+  }> {
+    return apiService.get('wallets?action=admin-withdrawals');
+  },
+
+  /**
+   * Admin: Approve or reject withdrawal request
+   */
+  async processWithdrawal(withdrawalId: string, action: 'approve' | 'reject', adminNotes?: string): Promise<{
+    success: boolean;
+    data?: WithdrawalRequest;
+    error?: string;
+  }> {
+    return apiService.post('wallets?action=process-withdrawal', {
+      withdrawal_id: withdrawalId,
+      action,
+      admin_notes: adminNotes
+    });
+  },
+
+  /**
+   * Admin: Get all participant wallets
+   */
+  async getAllWallets(): Promise<{
+    success: boolean;
+    data?: (ParticipantWallet & {
+      participant: {
+        id: string;
+        name: string;
+        email: string;
+      }
+    })[];
+    error?: string;
+  }> {
+    return apiService.get('wallets?action=admin-wallets');
   }
 };
 

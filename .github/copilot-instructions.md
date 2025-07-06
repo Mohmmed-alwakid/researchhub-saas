@@ -65,7 +65,7 @@ ResearchHub is an **in-development** SaaS platform for user testing research. Re
 - **Block Analytics**: Usage patterns and effectiveness metrics
 - **Template Marketplace**: Community sharing and collaboration
 - **Screen Recording**: Video capture integration
-- **Payment Integration**: Stripe integration planned
+- **Payment Integration**: DodoPayments integration for researcher payments
 
 ## 🛠️ Tech Stack (Current)
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
@@ -262,9 +262,12 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-key
 
+# DodoPayments (Required for researcher payments)
+DODOPAYMENTS_API_KEY=your_api_key
+DODOPAYMENTS_SECRET_KEY=your_secret_key
+DODOPAYMENTS_WEBHOOK_SECRET=your_webhook_secret
+
 # Optional (for full features)
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PUBLISHABLE_KEY=pk_live_...
 ```
 
 ### Vercel Configuration

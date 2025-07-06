@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #e3f2fd;
+            border-color: #bbdefb;
+            color: #0d47a1;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .login-form {
+            display: grid;
+            gap: 10px;
+            max-width: 300px;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Wallet Integration Test</h1>
+        <p>Testing the wallet integration functionality with live API calls</p>
+        
+        <div id="authStatus" class="status info">
+            Authentication Status: Not logged in
+        </div>
+
+        <!-- Login Section -->
+        <div class="test-section">
+            <h2>🔐 Authentication</h2>
+            <div class="login-form">
+                <input type="email" id="email" placeholder="Email" value="abwanwr77+participant@gmail.com">
+                <input type="password" id="password" placeholder="Password" value="Testtest123">
+                <button onclick="login()">Login as Participant</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Wallet Tests Section -->
+        <div class="test-section">
+            <h2>💰 Wallet API Tests</h2>
+            <button onclick="testGetWallet()">Get Wallet</button>
+            <button onclick="testGetTransactions()">Get Transactions</button>
+            <button onclick="testGetWithdrawals()">Get Withdrawals</button>
+            <button onclick="testCreateWithdrawal()">Test Create Withdrawal</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="test-section">
+            <h2>📊 Test Results</h2>
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = localStorage.getItem('authToken');
+
+        // Update auth status
+        function updateAuthStatus() {
+            const statusEl = document.getElementById('authStatus');
+            if (authToken) {
+                statusEl.className = 'status success';
+                statusEl.textContent = 'Authentication Status: Logged in ✓';
+            } else {
+                statusEl.className = 'status info';
+                statusEl.textContent = 'Authentication Status: Not logged in';
+            }
+        }
+
+        // Login function
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data.token) {
+                    authToken = result.data.token;
+                    localStorage.setItem('authToken', authToken);
+                    addTestResult('Login', 'success', 'Successfully logged in', result);
+                    updateAuthStatus();
+                } else {
+                    addTestResult('Login', 'error', 'Login failed', result);
+                }
+            } catch (error) {
+                addTestResult('Login', 'error', 'Login error', error.message);
+            }
+        }
+
+        // Logout function
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            updateAuthStatus();
+            addTestResult('Logout', 'info', 'Logged out successfully');
+        }
+
+        // Test Get Wallet
+        async function testGetWallet() {
+            if (!authToken) {
+                addTestResult('Get Wallet', 'error', 'Not authenticated');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/wallets?action=wallet`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    addTestResult('Get Wallet', 'success', 'Wallet data retrieved', result.data);
+                } else {
+                    addTestResult('Get Wallet', 'error', 'Failed to get wallet', result);
+                }
+            } catch (error) {
+                addTestResult('Get Wallet', 'error', 'API Error', error.message);
+            }
+        }
+
+        // Test Get Transactions
+        async function testGetTransactions() {
+            if (!authToken) {
+                addTestResult('Get Transactions', 'error', 'Not authenticated');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/wallets?action=transactions`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    addTestResult('Get Transactions', 'success', `Retrieved ${result.data?.length || 0} transactions`, result.data);
+                } else {
+                    addTestResult('Get Transactions', 'error', 'Failed to get transactions', result);
+                }
+            } catch (error) {
+                addTestResult('Get Transactions', 'error', 'API Error', error.message);
+            }
+        }
+
+        // Test Get Withdrawals
+        async function testGetWithdrawals() {
+            if (!authToken) {
+                addTestResult('Get Withdrawals', 'error', 'Not authenticated');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/wallets?action=withdrawals`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    addTestResult('Get Withdrawals', 'success', `Retrieved ${result.data?.length || 0} withdrawals`, result.data);
+                } else {
+                    addTestResult('Get Withdrawals', 'error', 'Failed to get withdrawals', result);
+                }
+            } catch (error) {
+                addTestResult('Get Withdrawals', 'error', 'API Error', error.message);
+            }
+        }
+
+        // Test Create Withdrawal
+        async function testCreateWithdrawal() {
+            if (!authToken) {
+                addTestResult('Create Withdrawal', 'error', 'Not authenticated');
+                return;
+            }
+
+            const testWithdrawal = {
+                amount: 5.00,
+                payment_method: 'paypal',
+                payment_details: {
+                    email: 'test@example.com'
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/wallets?action=create-withdrawal`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testWithdrawal)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    addTestResult('Create Withdrawal', 'success', 'Withdrawal request created', result.data);
+                } else {
+                    addTestResult('Create Withdrawal', 'error', 'Failed to create withdrawal', result);
+                }
+            } catch (error) {
+                addTestResult('Create Withdrawal', 'error', 'API Error', error.message);
+            }
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            addTestResult('Test Suite', 'info', 'Running all wallet tests...');
+            
+            await testGetWallet();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testGetTransactions();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testGetWithdrawals();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Don't run create withdrawal in full test suite to avoid creating test data
+            addTestResult('Test Suite', 'success', 'All read tests completed');
+        }
+
+        // Add test result to display
+        function addTestResult(testName, type, message, data = null) {
+            const resultsEl = document.getElementById('testResults');
+            const resultEl = document.createElement('div');
+            resultEl.className = `result ${type}`;
+            
+            let content = `<strong>${testName}:</strong> ${message}`;
+            
+            if (data) {
+                content += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            
+            resultEl.innerHTML = content;
+            resultsEl.appendChild(resultEl);
+            
+            // Scroll to bottom
+            resultsEl.scrollTop = resultsEl.scrollHeight;
+        }
+
+        // Initialize
+        updateAuthStatus();
+        addTestResult('System', 'info', 'Wallet integration test interface loaded');
+    </script>
+</body>
+</html>

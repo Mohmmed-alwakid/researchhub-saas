@@ -3,7 +3,7 @@
  * Handles both admin panel and real payment processing
  * 
  * Features:
- * - Stripe integration for point purchases
+ * - DodoPayments integration for point purchases
  * - PayPal integration for participant payouts
  * - Real-time payment processing
  * - Admin payment management
@@ -23,8 +23,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseKey);
 
 // Payment configuration for real money integration
 const PAYMENT_CONFIG = {
-  STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_mock_key',
-  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || 'sk_test_mock_key',
+  DODOPAYMENTS_PUBLISHABLE_KEY: process.env.DODOPAYMENTS_PUBLISHABLE_KEY || 'pk_test_mock_key',
+  DODOPAYMENTS_SECRET_KEY: process.env.DODOPAYMENTS_SECRET_KEY || 'sk_test_mock_key',
   PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID || 'mock_paypal_client_id',
   PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET || 'mock_paypal_secret',
   
@@ -34,7 +34,7 @@ const PAYMENT_CONFIG = {
   MINIMUM_WITHDRAWAL: 5,   // $5 minimum withdrawal
   
   // Transaction fees
-  PURCHASE_FEE_PERCENT: 0.029,  // 2.9% Stripe fee
+  PURCHASE_FEE_PERCENT: 0.025,  // 2.5% DodoPayments fee
   PURCHASE_FEE_FIXED: 0.30,     // $0.30 fixed fee
   WITHDRAWAL_FEE_PERCENT: 0.025, // 2.5% withdrawal fee
   WITHDRAWAL_FEE_FIXED: 0.25,   // $0.25 fixed fee
@@ -44,11 +44,11 @@ const PAYMENT_CONFIG = {
  * Initialize payment providers (mock implementation for development)
  */
 function initializePaymentProviders() {
-  // In production, this would initialize actual Stripe and PayPal SDKs
+  // In production, this would initialize actual DodoPayments and PayPal SDKs
   return {
-    stripe: {
+    dodopayments: {
       createPaymentIntent: async (amount, currency = 'usd') => {
-        // Mock Stripe Payment Intent creation
+        // Mock DodoPayments Payment Intent creation
         return {
           id: `pi_mock_${Date.now()}`,
           client_secret: `pi_mock_${Date.now()}_secret`,
@@ -424,7 +424,7 @@ export default async function handler(req, res) {
             });
           }
           
-          const paymentIntent = await paymentProviders.stripe.createPaymentIntent(amount, currency);
+          const paymentIntent = await paymentProviders.dodopayments.createPaymentIntent(amount, currency);
           return res.status(200).json({
             success: true,
             data: {
@@ -605,7 +605,7 @@ export default async function handler(req, res) {
 
     // REAL MONEY INTEGRATION ENDPOINTS
     
-    // POST /api/payments/create-payment-intent - Create Stripe payment intent for point purchases
+    // POST /api/payments/create-payment-intent - Create DodoPayments payment intent for point purchases
     if (method === 'POST' && url.includes('/create-payment-intent')) {
       const { amount, currency = 'usd', userId } = req.body;
       
@@ -617,7 +617,7 @@ export default async function handler(req, res) {
       }
 
       try {
-        const paymentIntent = await paymentProviders.stripe.createPaymentIntent(amount, currency);
+        const paymentIntent = await paymentProviders.dodopayments.createPaymentIntent(amount, currency);
         
         // Log the payment intent creation (in production, store in database)
         console.log(`Payment intent created: ${paymentIntent.id} for $${amount}`);
@@ -655,8 +655,8 @@ export default async function handler(req, res) {
       }
 
       try {
-        // Confirm payment with Stripe
-        const confirmedPayment = await paymentProviders.stripe.confirmPayment(paymentIntentId);
+        // Confirm payment with DodoPayments
+        const confirmedPayment = await paymentProviders.dodopayments.confirmPayment(paymentIntentId);
         
         if (confirmedPayment.status === 'succeeded') {
           // Calculate points to assign
