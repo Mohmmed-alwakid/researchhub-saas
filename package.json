@@ -118,7 +118,16 @@
     "testing:validate": "npm run testing:framework && npm run testing:integration",
     "test:advanced": "npm run testing:framework",
     "test:framework:integration": "npm run testing:integration",
-    "test:framework:all": "npm run testing:validate && npm run type-check"
+    "test:framework:all": "npm run testing:validate && npm run type-check",
+    "performance:test": "node scripts/testing/test-performance-monitoring.mjs",
+    "performance:integration": "node scripts/testing/test-performance-integration.mjs",
+    "performance:validate": "npm run performance:test && npm run performance:integration",
+    "performance:all": "npm run performance:validate && npm run type-check",
+    "performance:check": "node scripts/testing/validate-performance-system.mjs",
+    "perf:test": "npm run performance:test",
+    "perf:integration": "npm run performance:integration",
+    "perf:validate": "npm run performance:validate",
+    "perf:check": "npm run performance:check"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
