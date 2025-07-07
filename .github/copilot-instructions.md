@@ -2,10 +2,36 @@
 
 <!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
 
-## ⚠️ Project Status: ACTIVE DEVELOPMENT - COMPREHENSIVE TESTING FRAMEWORK COMPLETE
-**Last Updated**: July 3, 2025  
-**Status**: 🚧 Early Development Stage - Professional Study Builder + Comprehensive Testing Framework Implemented  
-**Build Status**: ✅ 0 TypeScript errors, Production-Ready Testing Framework Active
+## 🚀 Quick Reference
+
+### Essential Commands
+```bash
+# Start local development
+npm run dev:fullstack
+
+# Run automated testing
+npm run test:quick
+
+# Clean up project structure
+npm run cleanup
+
+# Use development tools
+node scripts/development/vibe-coder-patterns.js analyze
+node scripts/development/vibe-coder-testing.js all
+node scripts/development/vibe-coder-docs.js all
+```
+
+### Key Sections
+- [Local Development Tools](#-local-vibe-coder-mcp-tools-usage-examples) - AI-powered development assistance
+- [Testing Strategy](#-comprehensive-testing-framework-new---july-3-2025) - Automated testing framework
+- [Development Rules](#-important-development-rules) - Mandatory development process
+- [Study Blocks System](#-study-blocks-system-architecture) - Core feature architecture
+- [MCP Tools](#-mcp-model-context-protocol-development-tools) - Available AI assistants
+
+## ⚠️ Project Status: PRODUCTION READY - VIBE-CODER-MCP IMPLEMENTATION COMPLETE
+**Last Updated**: July 7, 2025  
+**Status**: ✅ Production Ready - Comprehensive Enhancement System Implemented  
+**Build Status**: ✅ 0 TypeScript errors, Production-Ready with Advanced Monitoring
 
 ## 📋 Project Overview
 ResearchHub is an **in-development** SaaS platform for user testing research. Recent major progress includes a complete **Professional Study Builder** with enterprise-grade user experience, enhanced **Study Blocks System** with custom editing interfaces, comprehensive **Template Integration** with detailed previews, and **Interactive Study Preview** for researchers.
@@ -28,7 +54,19 @@ ResearchHub is an **in-development** SaaS platform for user testing research. Re
 - ✅ **Comprehensive Testing Framework**: AI-powered automated testing with 0 human testers required
 - 🚧 **Production Deployment**: Working but with Vercel function limits
 
-## ✅ Recent Major Achievements (July 3, 2025)
+## ✅ Recent Major Achievements (July 7, 2025)
+- **Vibe-Coder-MCP Implementation Complete**: Full implementation of advanced development enhancement system
+- **Production Monitoring System**: Comprehensive monitoring with ProductionMonitor, PerformanceMonitor, HealthCheckService, APMService
+- **Analytics & Business Intelligence**: Complete BI platform with KPI tracking, usage analytics, executive dashboards  
+- **Advanced Security Framework**: Multi-layer security with SecurityManager, ThreatDetection, and real-time monitoring
+- **API Optimization System**: High-performance API layer with caching, batching, circuit breaker patterns
+- **Real-time Notification System**: SSE-based notification system for instant communication
+- **Professional Testing Framework**: Zero-manual-testing automation with AI-powered test generation
+- **Complete Documentation Suite**: Technical documentation, user training, troubleshooting runbooks
+- **Project Cleanup & Organization**: Streamlined directory structure with archived legacy files
+- **Development Server Optimization**: Fixed import paths and optimized local development workflow
+
+## ✅ Previous Major Achievements (July 3, 2025)
 - **Comprehensive Testing Framework**: Complete AI-powered automated testing system implemented
 - **Professional Testing Infrastructure**: 0 human testers required, industry-standard quality gates
 - **Test Data Generation**: Smart synthetic data with 20+ users, 30+ studies, 75+ applications
@@ -125,69 +163,158 @@ ResearchHub is an **in-development** SaaS platform for user testing research. Re
   - Framework-specific guidance
 - **Use Cases**: Getting up-to-date documentation for React, TypeScript, Supabase, etc.
 
-### 🎯 How to Leverage MCP Tools
+### 🎯 Vibe-Coder-MCP Development Methodologies (Local Implementation)
+- **Purpose**: Development process improvements extracted from Vibe-Coder-MCP repository analysis
+- **Repository**: https://github.com/freshtechbro/Vibe-Coder-MCP (analyzed for methodologies, NOT connected as external MCP)
+- **Status**: ✅ Implemented as local scripts in `scripts/development/`
+- **Local Tools Available**:
+  - `scripts/development/vibe-coder-patterns.js` - Project structure analysis, task decomposition (RDD), code quality patterns
+  - `scripts/development/vibe-coder-testing.js` - Test strategy generation, AI test data, automation templates
+  - `scripts/development/vibe-coder-docs.js` - PRD generator, user stories, API docs, architecture documentation
+- **Usage**: Run `node scripts/development/vibe-coder-patterns.js analyze` for CLI options
+- **Benefits**: Enhanced development workflows, code quality improvement, automated testing, performance optimization
+
+### 🎯 Local Vibe-Coder-MCP Tools Usage Examples
+
+> **Note**: If any script doesn't respond, try the simplified version: `node scripts/development/vibe-coder-patterns-simple.js`
+
+#### Quick Usage
+```bash
+# Analyze project structure and get improvement suggestions
+node scripts/development/vibe-coder-patterns.js analyze
+
+# Generate test strategy for a new feature
+node scripts/development/vibe-coder-testing.js strategy "Study Builder Enhancement"
+
+# Generate PRD for a new feature
+node scripts/development/vibe-coder-docs.js prd "Advanced Block Types" "Enhanced study block system with AI integration"
+
+# Decompose complex task using RDD methodology
+node scripts/development/vibe-coder-patterns.js decompose "Implement real-time collaboration"
+
+# Generate realistic test data
+node scripts/development/vibe-coder-testing.js data studies 10
+```
+
+#### Available Commands by Tool
+
+**🔧 vibe-coder-patterns.js**
+- `analyze` - Analyze project structure and code quality
+- `decompose [task]` - Break down complex tasks using RDD methodology  
+- `performance` - Generate performance monitoring templates
+- `workflows` - Create workflow templates
+- `all` - Run all pattern extractions
+
+**🧪 vibe-coder-testing.js**
+- `strategy [feature]` - Generate comprehensive test strategy
+- `data [entity] [count]` - Generate realistic test data (users, studies, applications)
+- `automation [type] [component]` - Generate test automation (playwright, vitest, accessibility)
+- `performance` - Generate performance tests
+- `all` - Generate complete test suite
+
+**📚 vibe-coder-docs.js**
+- `prd [name] [description]` - Generate PRD templates
+- `stories [feature]` - Generate user stories for a feature
+- `api` - Generate API documentation templates
+- `architecture` - Generate technical architecture documentation
+- `all` - Generate complete documentation suite
+
+#### Integrated Development Workflow
+```bash
+# 🚀 Before starting a new feature
+node scripts/development/vibe-coder-patterns.js decompose "New Feature Name"
+node scripts/development/vibe-coder-testing.js strategy "New Feature Name"
+node scripts/development/vibe-coder-docs.js prd "New Feature Name" "Feature description"
+
+# 💻 During development
+node scripts/development/vibe-coder-patterns.js analyze
+node scripts/development/vibe-coder-testing.js data users 20
+
+# 🚀 Before deployment
+node scripts/development/vibe-coder-patterns.js performance
+node scripts/development/vibe-coder-testing.js performance
+```
+
+#### Generated Output Locations
+- **Patterns**: `scripts/development/` (performance checks, workflow templates)
+- **Testing**: `testing/data/` (test data), `testing/generated/` (test files)
+- **Documentation**: `docs/` (PRDs, architecture), `docs/api/` (API docs)
+
+### 🎯 How to Leverage Available MCP Tools
 1. **Automated Testing**: Use Playwright MCP for comprehensive E2E testing
 2. **Database Operations**: Use Supabase MCP for complex migrations and queries
 3. **Project Documentation**: Use Memory Bank MCP to track progress and decisions
 4. **Code Operations**: Use Desktop Commander MCP for file management tasks
 5. **Reference Lookup**: Use Context7 MCP for latest library documentation
+6. **Local Development Enhancement**: Use local Vibe-Coder-MCP tools for process improvement
 
-**These MCP tools provide AI-powered assistance for complex development tasks, making development more efficient and reducing manual work.**
+**These MCP tools plus local development tools provide AI-powered assistance for complex development tasks, making development more efficient and reducing manual work.**
 
-## 📁 File Organization (Current)
-- `/src/client` - React frontend components and pages
-- `/api` - Vercel serverless functions (consolidated)
-- `/src/shared` - Shared types and utilities
-- `/docs` - Comprehensive project documentation
-- `/local-*` - Local development environment files
-- `/testing` - **NEW**: Comprehensive automated testing framework
-- `/tests` - Legacy testing files and interfaces
+## 🎯 Complete Development Workflow Integration
 
-## 🔧 Development Environment
-
-### 🚀 LOCAL DEVELOPMENT (RECOMMENDED)
-**Full-stack local environment with real Supabase database connection:**
-
+### 🚀 Start-to-Finish Development Process
 ```bash
-# Start complete local development environment (RECOMMENDED)
+# 1. Initialize new feature development
+node scripts/development/vibe-coder-patterns.js decompose "New Feature Name"
+node scripts/development/vibe-coder-docs.js prd "New Feature Name" "Description"
+
+# 2. Set up development environment
 npm run dev:fullstack
-# This starts:
-# - Frontend (React/Vite): http://localhost:5175
-# - Backend (Express API): http://localhost:3003  
-# - Connected to: Real Supabase production database
-# - Hot reload: Enabled for both frontend and backend
+npm run cleanup  # Ensure clean project structure
+
+# 3. Generate comprehensive test strategy
+node scripts/development/vibe-coder-testing.js strategy "New Feature Name"
+node scripts/development/vibe-coder-testing.js data users 20
+
+# 4. During development - continuous quality checks
+node scripts/development/vibe-coder-patterns.js analyze
+npm run test:quick
+
+# 5. Pre-deployment validation
+node scripts/development/vibe-coder-patterns.js performance
+npm run test:deployment
+
+# 6. Generate documentation updates
+node scripts/development/vibe-coder-docs.js stories "New Feature Name"
+node scripts/development/vibe-coder-docs.js api
 ```
 
-### Port Configuration (Updated June 18, 2025)
-- **Local Frontend**: `http://localhost:5175` (Vite dev server)
-- **Local Backend API**: `http://localhost:3003` (Express API with real Supabase)
-- **Production Frontend**: `https://your-vercel-app.vercel.app`
-- **Production API**: `https://your-vercel-app.vercel.app/api/*`
+### 🎯 How Local Tools Integrate with MCP Tools
+1. **Planning Phase**: Local docs tools + Memory Bank MCP for requirements
+2. **Development Phase**: Local patterns tools + Desktop Commander MCP for coding
+3. **Testing Phase**: Local testing tools + Playwright MCP for validation
+4. **Database Phase**: Local performance tools + Supabase MCP for optimization
+5. **Documentation Phase**: Local docs tools + Context7 MCP for reference
 
-### Essential Commands
-```bash
-# Local Development (FASTEST - use this!)
-npm run dev:fullstack  # Complete local environment with real DB
+## 🛠️ Additional Development Methodology References (Optional)
 
-# Individual local servers
-npm run dev:client     # Frontend only (proxies to local backend)
-npm run dev:local      # Backend API only
+### 🎯 External Development Patterns from Vibe-Coder-MCP (For Future Extraction)
+For additional advanced development methodologies, developers can reference the external Vibe-Coder-MCP repository for more patterns and approaches that could be extracted in the future:
 
-# Legacy commands (slower)
-npm run dev           # Uses Vercel dev (slower)
-npm run dev:api       # Vercel functions locally
+**Development Methodologies Available for Future Extraction (not yet implemented locally):**
+- **Advanced Code Analysis**: Multi-language codebase analysis (35+ languages supported)  
+- **Advanced Task Management**: More sophisticated AI-native task management patterns
+- **Extended Documentation Standards**: Additional documentation automation patterns
+- **Advanced Testing Methodologies**: More comprehensive testing automation frameworks
+- **Performance Optimization**: Extended monitoring and optimization pattern libraries
+- **Advanced Workflow Automation**: Complex development workflow orchestration patterns
+- **Project Structure**: Additional project organization and file management standards
+- **Quality Assurance**: Extended code quality validation and improvement methodologies
 
-# Production build
-npm run build         # Build frontend for production
+**Future Implementation Approach:**
+1. **Identify Gaps**: Determine which methodologies would benefit ResearchHub development
+2. **Extract Methodologies**: Analyze repository for specific development patterns needed
+3. **Adapt to ResearchHub**: Implement patterns suitable for ResearchHub's architecture
+4. **Local Implementation**: Build additional tools and processes without external API dependencies
+5. **Continuous Improvement**: Refine processes based on ResearchHub's specific needs
 
-# TypeScript validation
-npx tsc --noEmit      # Should return 0 errors
-```
-
-### 🧪 Local Testing Tools
-- **Full-stack test interface**: `local-fullstack-test.html`
-- **Admin/auth test interface**: `local-admin-fix.html`
-- **API-only test interface**: `auth-test.html`
+**Potential Benefits for Future Development:**
+- **Extended Process Improvement**: More comprehensive development workflows and automation
+- **Advanced Code Quality**: Extended code analysis and validation methodologies  
+- **Enhanced Testing**: Additional testing patterns and automation frameworks
+- **Performance Optimization**: More sophisticated performance monitoring and optimization tools
+- **Documentation Standards**: Extended documentation and process improvement capabilities
+- **Team Productivity**: Additional streamlined development processes and workflow automation
 
 ## 💻 Code Conventions & Best Practices
 

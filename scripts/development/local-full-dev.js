@@ -388,8 +388,8 @@ app.all('/api/profile', async (req, res) => {
 });
 
 // Studies endpoints - import the actual handler
-import studiesHandler from './api/studies.js';
-import walletsHandler from './api/wallets.js';
+import studiesHandler from '../../api/studies.js';
+import walletsHandler from '../../api/wallets.js';
 
 app.all('/api/studies*', async (req, res) => {
   // Use the actual studies.js handler which has proper data transformation
