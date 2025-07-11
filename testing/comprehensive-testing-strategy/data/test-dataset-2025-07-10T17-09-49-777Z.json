@@ -1,0 +1,3849 @@
+{
+  "users": [
+    {
+      "id": "user_1752167389769_9352ed21",
+      "firstName": "Quinn",
+      "lastName": "Lopez",
+      "email": "quinn.lopez@gmail.com",
+      "role": "participant",
+      "createdAt": "2025-05-18T06:44:35.074Z",
+      "lastLogin": "2025-07-05T13:35:24.931Z",
+      "isActive": true,
+      "profile": {
+        "age": 23,
+        "location": "AU",
+        "experience": "advanced",
+        "interests": [
+          "travel",
+          "marketing",
+          "healthcare"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_ed20333f",
+      "firstName": "Finley",
+      "lastName": "Perez",
+      "email": "finley.perez@outlook.com",
+      "role": "participant",
+      "createdAt": "2025-05-16T15:24:28.762Z",
+      "lastLogin": "2025-07-09T06:10:10.586Z",
+      "isActive": true,
+      "profile": {
+        "age": 51,
+        "location": "AU",
+        "experience": "advanced",
+        "interests": [
+          "finance",
+          "entertainment",
+          "fitness",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_4d152aae",
+      "firstName": "Elliot",
+      "lastName": "Thomas",
+      "email": "elliot.thomas@gmail.com",
+      "role": "participant",
+      "createdAt": "2025-05-29T00:42:10.577Z",
+      "lastLogin": "2025-07-04T12:08:26.072Z",
+      "isActive": true,
+      "profile": {
+        "age": 55,
+        "location": "FR",
+        "experience": "beginner",
+        "interests": [
+          "healthcare",
+          "marketing"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_f598ecf9",
+      "firstName": "River",
+      "lastName": "Garcia",
+      "email": "river.garcia@outlook.com",
+      "role": "participant",
+      "createdAt": "2025-05-27T23:53:13.640Z",
+      "lastLogin": "2025-07-10T08:43:53.204Z",
+      "isActive": true,
+      "profile": {
+        "age": 48,
+        "location": "FR",
+        "experience": "advanced",
+        "interests": [
+          "fitness"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_cbd6404c",
+      "firstName": "Finley",
+      "lastName": "Anderson",
+      "email": "finley.anderson@gmail.com",
+      "role": "participant",
+      "createdAt": "2025-04-28T13:05:24.123Z",
+      "lastLogin": "2025-07-05T18:18:01.633Z",
+      "isActive": true,
+      "profile": {
+        "age": 26,
+        "location": "AU",
+        "experience": "intermediate",
+        "interests": [
+          "education"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_ea83ca8f",
+      "firstName": "Elliot",
+      "lastName": "Thomas",
+      "email": "elliot.thomas@yahoo.com",
+      "role": "participant",
+      "createdAt": "2025-05-27T23:10:07.114Z",
+      "lastLogin": "2025-07-10T02:30:35.263Z",
+      "isActive": true,
+      "profile": {
+        "age": 22,
+        "location": "AU",
+        "experience": "intermediate",
+        "interests": [
+          "education"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_3359c0cd",
+      "firstName": "Riley",
+      "lastName": "Jackson",
+      "email": "riley.jackson@outlook.com",
+      "role": "participant",
+      "createdAt": "2025-05-15T15:37:49.040Z",
+      "lastLogin": "2025-07-05T14:55:59.121Z",
+      "isActive": false,
+      "profile": {
+        "age": 52,
+        "location": "CA",
+        "experience": "advanced",
+        "interests": [
+          "fitness",
+          "healthcare"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_b04b0b55",
+      "firstName": "Parker",
+      "lastName": "Thompson",
+      "email": "parker.thompson@example.com",
+      "role": "participant",
+      "createdAt": "2025-07-05T03:53:56.583Z",
+      "lastLogin": "2025-07-08T15:59:02.543Z",
+      "isActive": true,
+      "profile": {
+        "age": 25,
+        "location": "FR",
+        "experience": "advanced",
+        "interests": [
+          "fitness",
+          "finance",
+          "entertainment"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_545924f8",
+      "firstName": "Riley",
+      "lastName": "Rodriguez",
+      "email": "riley.rodriguez@outlook.com",
+      "role": "participant",
+      "createdAt": "2025-04-20T10:22:31.922Z",
+      "lastLogin": "2025-07-07T17:33:14.146Z",
+      "isActive": true,
+      "profile": {
+        "age": 21,
+        "location": "DE",
+        "experience": "beginner",
+        "interests": [
+          "travel",
+          "food",
+          "technology"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_5a5ab1ad",
+      "firstName": "Blake",
+      "lastName": "Jones",
+      "email": "blake.jones@yahoo.com",
+      "role": "participant",
+      "createdAt": "2025-04-12T20:27:29.184Z",
+      "lastLogin": "2025-07-05T06:04:22.908Z",
+      "isActive": true,
+      "profile": {
+        "age": 45,
+        "location": "DE",
+        "experience": "advanced",
+        "interests": [
+          "entertainment",
+          "technology"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389770_6ca07991",
+      "firstName": "Jamie",
+      "lastName": "Moore",
+      "email": "jamie.moore@gmail.com",
+      "role": "participant",
+      "createdAt": "2025-05-14T20:32:40.361Z",
+      "lastLogin": "2025-07-09T09:15:13.615Z",
+      "isActive": true,
+      "profile": {
+        "age": 45,
+        "location": "CA",
+        "experience": "beginner",
+        "interests": [
+          "technology",
+          "fitness"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_913fc853",
+      "firstName": "Morgan",
+      "lastName": "Jones",
+      "email": "morgan.jones@example.com",
+      "role": "participant",
+      "createdAt": "2025-05-29T11:46:35.956Z",
+      "lastLogin": "2025-07-03T21:22:36.216Z",
+      "isActive": true,
+      "profile": {
+        "age": 27,
+        "location": "AU",
+        "experience": "intermediate",
+        "interests": [
+          "design",
+          "fitness",
+          "technology"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_635de06f",
+      "firstName": "Elliot",
+      "lastName": "Anderson",
+      "email": "elliot.anderson@outlook.com",
+      "role": "participant",
+      "createdAt": "2025-05-15T13:40:40.248Z",
+      "lastLogin": "2025-07-04T06:04:53.557Z",
+      "isActive": false,
+      "profile": {
+        "age": 47,
+        "location": "DE",
+        "experience": "beginner",
+        "interests": [
+          "travel",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_77e29544",
+      "firstName": "Riley",
+      "lastName": "Williams",
+      "email": "riley.williams@outlook.com",
+      "role": "participant",
+      "createdAt": "2025-05-12T22:33:23.207Z",
+      "lastLogin": "2025-07-09T23:25:01.562Z",
+      "isActive": true,
+      "profile": {
+        "age": 25,
+        "location": "DE",
+        "experience": "intermediate",
+        "interests": [
+          "fitness",
+          "marketing",
+          "healthcare",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_aae16502",
+      "firstName": "Alex",
+      "lastName": "Smith",
+      "email": "alex.smith@yahoo.com",
+      "role": "participant",
+      "createdAt": "2025-06-17T12:40:55.636Z",
+      "lastLogin": "2025-07-10T12:49:23.244Z",
+      "isActive": true,
+      "profile": {
+        "age": 26,
+        "location": "AU",
+        "experience": "intermediate",
+        "interests": [
+          "technology",
+          "education",
+          "finance",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_3f0cebd1",
+      "firstName": "Hayden",
+      "lastName": "Davis",
+      "email": "hayden.davis@example.com",
+      "role": "participant",
+      "createdAt": "2025-06-01T11:51:56.553Z",
+      "lastLogin": "2025-07-08T11:36:11.609Z",
+      "isActive": true,
+      "profile": {
+        "age": 28,
+        "location": "UK",
+        "experience": "beginner",
+        "interests": [
+          "finance",
+          "travel",
+          "marketing"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_17dd3b04",
+      "firstName": "Reese",
+      "lastName": "Lee",
+      "email": "reese.lee@example.com",
+      "role": "participant",
+      "createdAt": "2025-04-13T10:24:15.981Z",
+      "lastLogin": "2025-07-07T17:51:02.148Z",
+      "isActive": true,
+      "profile": {
+        "age": 19,
+        "location": "UK",
+        "experience": "advanced",
+        "interests": [
+          "technology",
+          "travel"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_96c6d2fe",
+      "firstName": "Morgan",
+      "lastName": "Lopez",
+      "email": "morgan.lopez@yahoo.com",
+      "role": "participant",
+      "createdAt": "2025-05-24T17:39:01.111Z",
+      "lastLogin": "2025-07-04T13:16:04.484Z",
+      "isActive": true,
+      "profile": {
+        "age": 26,
+        "location": "UK",
+        "experience": "intermediate",
+        "interests": [
+          "finance"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_18a18c97",
+      "firstName": "Sage",
+      "lastName": "Gonzalez",
+      "email": "sage.gonzalez@example.com",
+      "role": "participant",
+      "createdAt": "2025-06-09T12:48:12.178Z",
+      "lastLogin": "2025-07-05T22:29:27.850Z",
+      "isActive": true,
+      "profile": {
+        "age": 28,
+        "location": "FR",
+        "experience": "beginner",
+        "interests": [
+          "fitness",
+          "marketing",
+          "education"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_f2b7dbd6",
+      "firstName": "Dakota",
+      "lastName": "Garcia",
+      "email": "dakota.garcia@yahoo.com",
+      "role": "participant",
+      "createdAt": "2025-05-18T21:23:11.238Z",
+      "lastLogin": "2025-07-08T09:57:55.007Z",
+      "isActive": true,
+      "profile": {
+        "age": 30,
+        "location": "DE",
+        "experience": "beginner",
+        "interests": [
+          "technology",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_c9f559af",
+      "firstName": "Rowan",
+      "lastName": "Garcia",
+      "email": "rowan.garcia@gmail.com",
+      "role": "researcher",
+      "createdAt": "2025-05-02T01:07:20.931Z",
+      "lastLogin": "2025-07-10T08:45:20.085Z",
+      "isActive": true,
+      "profile": {
+        "age": 34,
+        "location": "US",
+        "experience": "intermediate",
+        "interests": [
+          "finance",
+          "healthcare"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_52e75ab6",
+      "firstName": "Phoenix",
+      "lastName": "Smith",
+      "email": "phoenix.smith@example.com",
+      "role": "researcher",
+      "createdAt": "2025-06-30T19:30:47.389Z",
+      "lastLogin": "2025-07-07T16:27:16.383Z",
+      "isActive": true,
+      "profile": {
+        "age": 55,
+        "location": "UK",
+        "experience": "intermediate",
+        "interests": [
+          "technology",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_de593881",
+      "firstName": "Dakota",
+      "lastName": "Hernandez",
+      "email": "dakota.hernandez@yahoo.com",
+      "role": "researcher",
+      "createdAt": "2025-07-03T07:21:22.535Z",
+      "lastLogin": "2025-07-06T16:07:06.127Z",
+      "isActive": true,
+      "profile": {
+        "age": 26,
+        "location": "DE",
+        "experience": "intermediate",
+        "interests": [
+          "entertainment",
+          "healthcare"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_e0ff1ecb",
+      "firstName": "Quinn",
+      "lastName": "Moore",
+      "email": "quinn.moore@yahoo.com",
+      "role": "researcher",
+      "createdAt": "2025-07-04T02:29:58.161Z",
+      "lastLogin": "2025-07-10T13:49:10.696Z",
+      "isActive": false,
+      "profile": {
+        "age": 26,
+        "location": "FR",
+        "experience": "advanced",
+        "interests": [
+          "technology"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_47f9600e",
+      "firstName": "Dakota",
+      "lastName": "Miller",
+      "email": "dakota.miller@yahoo.com",
+      "role": "researcher",
+      "createdAt": "2025-05-01T14:43:14.855Z",
+      "lastLogin": "2025-07-07T20:28:49.964Z",
+      "isActive": true,
+      "profile": {
+        "age": 44,
+        "location": "UK",
+        "experience": "beginner",
+        "interests": [
+          "education",
+          "entertainment",
+          "food",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_98af6626",
+      "firstName": "Sage",
+      "lastName": "Lee",
+      "email": "sage.lee@outlook.com",
+      "role": "admin",
+      "createdAt": "2025-04-12T09:52:22.033Z",
+      "lastLogin": "2025-07-05T10:28:26.692Z",
+      "isActive": true,
+      "profile": {
+        "age": 47,
+        "location": "US",
+        "experience": "intermediate",
+        "interests": [
+          "finance"
+        ]
+      }
+    },
+    {
+      "id": "user_1752167389771_5b7df5e0",
+      "firstName": "Finley",
+      "lastName": "Jackson",
+      "email": "finley.jackson@outlook.com",
+      "role": "admin",
+      "createdAt": "2025-04-17T20:13:04.700Z",
+      "lastLogin": "2025-07-05T12:43:39.767Z",
+      "isActive": true,
+      "profile": {
+        "age": 41,
+        "location": "US",
+        "experience": "intermediate",
+        "interests": [
+          "finance",
+          "travel",
+          "food",
+          "technology"
+        ]
+      }
+    }
+  ],
+  "studies": [
+    {
+      "id": "study_1752167389771_3f05052c",
+      "title": "Brand Perception and Recognition Study",
+      "description": "Evaluating the effectiveness and usability of voice-controlled interfaces",
+      "researcherId": "user_1752167389771_c9f559af",
+      "status": "active",
+      "createdAt": "2025-05-17T13:27:50.498Z",
+      "updatedAt": "2025-07-06T00:35:05.199Z",
+      "targetParticipants": 30,
+      "estimatedDuration": 34,
+      "compensation": 54,
+      "requirements": [
+        "Previous online shopping experience",
+        "Stable internet connection"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_cbb0cec1",
+          "type": "instruction",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_4ee8a399",
+          "type": "question",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_9d81bc96",
+          "type": "question",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389772_1878ad5d",
+          "type": "welcome",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389772_8504af09",
+          "type": "task",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389772_89abfff3",
+          "type": "welcome",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_cbf8358f",
+      "title": "Accessibility Testing for Web Applications",
+      "description": "Measuring efficiency and completion rates for common user tasks",
+      "researcherId": "user_1752167389771_e0ff1ecb",
+      "status": "active",
+      "createdAt": "2025-06-25T01:25:20.225Z",
+      "updatedAt": "2025-07-09T23:18:03.801Z",
+      "targetParticipants": 53,
+      "estimatedDuration": 26,
+      "compensation": 42,
+      "requirements": [
+        "English fluency required"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_248eb19c",
+          "type": "welcome",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_5ea22d2c",
+          "type": "thank-you",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_4447fef7",
+          "type": "question",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389772_060bfc7e",
+          "type": "question",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389772_d0306846",
+          "type": "welcome",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389772_52598e4d",
+          "type": "rating",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        },
+        {
+          "id": "block_1752167389772_886ac344",
+          "type": "question",
+          "order": 7,
+          "title": "Block 7",
+          "content": "Content for block 7"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_1dbe2149",
+      "title": "Task Completion Efficiency Analysis",
+      "description": "Gathering user preferences on new product features before development",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "active",
+      "createdAt": "2025-06-08T02:10:27.104Z",
+      "updatedAt": "2025-07-07T02:58:48.073Z",
+      "targetParticipants": 14,
+      "estimatedDuration": 27,
+      "compensation": 11,
+      "requirements": [
+        "Previous online shopping experience",
+        "Stable internet connection",
+        "Access to desktop computer"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_1efc6f12",
+          "type": "question",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_50a826d3",
+          "type": "question",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_08850db1",
+          "type": "thank-you",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389772_39ea9ad4",
+          "type": "instruction",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389772_f933e87b",
+          "type": "thank-you",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_67404e9a",
+      "title": "Social Media Platform User Behavior",
+      "description": "Investigating how users discover and consume digital content across platforms",
+      "researcherId": "user_1752167389771_47f9600e",
+      "status": "active",
+      "createdAt": "2025-05-27T23:21:24.657Z",
+      "updatedAt": "2025-07-07T23:28:12.612Z",
+      "targetParticipants": 19,
+      "estimatedDuration": 18,
+      "compensation": 49,
+      "requirements": [
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_c0ce95eb",
+          "type": "rating",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_da6667b8",
+          "type": "thank-you",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_bdf7372a",
+          "type": "thank-you",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_f71208b1",
+      "title": "Website Navigation Patterns Analysis",
+      "description": "Gathering user preferences on new product features before development",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "active",
+      "createdAt": "2025-06-22T19:49:27.169Z",
+      "updatedAt": "2025-07-06T02:50:36.206Z",
+      "targetParticipants": 37,
+      "estimatedDuration": 26,
+      "compensation": 49,
+      "requirements": [
+        "Previous online shopping experience",
+        "Stable internet connection"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_3ede0947",
+          "type": "task",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_0ee5d30e",
+          "type": "thank-you",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_985a9349",
+          "type": "task",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_dcd38ed9",
+      "title": "Task Completion Efficiency Analysis",
+      "description": "Evaluating the effectiveness and usability of voice-controlled interfaces",
+      "researcherId": "user_1752167389771_52e75ab6",
+      "status": "active",
+      "createdAt": "2025-05-18T18:24:34.541Z",
+      "updatedAt": "2025-07-09T16:22:37.795Z",
+      "targetParticipants": 40,
+      "estimatedDuration": 33,
+      "compensation": 26,
+      "requirements": [
+        "Previous online shopping experience",
+        "English fluency required"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_43e56e57",
+          "type": "rating",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_cd925c20",
+          "type": "task",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_46685446",
+          "type": "task",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389772_635d9076",
+          "type": "thank-you",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389772_71ff4dad",
+          "type": "instruction",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_37d949e2",
+      "title": "Accessibility Testing for Web Applications",
+      "description": "Analyzing user behavior patterns on social media platforms for engagement optimization",
+      "researcherId": "user_1752167389771_c9f559af",
+      "status": "active",
+      "createdAt": "2025-06-30T16:30:37.461Z",
+      "updatedAt": "2025-07-08T06:06:15.871Z",
+      "targetParticipants": 11,
+      "estimatedDuration": 14,
+      "compensation": 59,
+      "requirements": [
+        "Access to desktop computer",
+        "English fluency required"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_4d0d4512",
+          "type": "thank-you",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_0b437b1c",
+          "type": "thank-you",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_28553bb7",
+          "type": "instruction",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389772_8742e60e",
+          "type": "instruction",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389772_e35b4d55",
+          "type": "instruction",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389772_6b0c3ec7",
+          "type": "task",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_92255a3a",
+      "title": "Website Navigation Patterns Analysis",
+      "description": "Analyzing the checkout process to reduce cart abandonment and increase conversions",
+      "researcherId": "user_1752167389771_52e75ab6",
+      "status": "active",
+      "createdAt": "2025-05-16T05:53:32.414Z",
+      "updatedAt": "2025-07-07T03:39:30.226Z",
+      "targetParticipants": 14,
+      "estimatedDuration": 17,
+      "compensation": 48,
+      "requirements": [
+        "Must be 18 years or older",
+        "English fluency required",
+        "Access to desktop computer"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_46858c3a",
+          "type": "thank-you",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_1b9d11e2",
+          "type": "instruction",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_49f87ed7",
+          "type": "rating",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389772_b31c0cf7",
+          "type": "rating",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389772_09e50be5",
+          "type": "question",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_b8841b65",
+      "title": "Brand Perception and Recognition Study",
+      "description": "Measuring efficiency and completion rates for common user tasks",
+      "researcherId": "user_1752167389771_c9f559af",
+      "status": "active",
+      "createdAt": "2025-06-15T17:52:02.343Z",
+      "updatedAt": "2025-07-10T13:58:30.607Z",
+      "targetParticipants": 51,
+      "estimatedDuration": 23,
+      "compensation": 42,
+      "requirements": [
+        "English fluency required",
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389772_de6cabe4",
+          "type": "instruction",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389772_91a49ac3",
+          "type": "thank-you",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389772_53565f8f",
+          "type": "thank-you",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389772_1b3fa5a5",
+          "type": "thank-you",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389772_0363418f",
+          "type": "question",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389772_2b927ef6",
+      "title": "Product Feature Preference Survey",
+      "description": "Testing website accessibility for users with disabilities and assistive technologies",
+      "researcherId": "user_1752167389771_c9f559af",
+      "status": "active",
+      "createdAt": "2025-06-03T07:07:57.265Z",
+      "updatedAt": "2025-07-07T13:20:09.019Z",
+      "targetParticipants": 30,
+      "estimatedDuration": 20,
+      "compensation": 15,
+      "requirements": [
+        "Stable internet connection"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_35236e63",
+          "type": "task",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_481ef948",
+          "type": "task",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_1992a996",
+          "type": "task",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_f999337c",
+          "type": "question",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389773_7f9e4886",
+          "type": "rating",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389773_0f4cfd56",
+          "type": "thank-you",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        },
+        {
+          "id": "block_1752167389773_965f6cd6",
+          "type": "rating",
+          "order": 7,
+          "title": "Block 7",
+          "content": "Content for block 7"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_44c58414",
+      "title": "Accessibility Testing for Web Applications",
+      "description": "Evaluating the effectiveness and usability of voice-controlled interfaces",
+      "researcherId": "user_1752167389771_52e75ab6",
+      "status": "draft",
+      "createdAt": "2025-06-01T20:42:18.775Z",
+      "updatedAt": "2025-07-06T21:56:32.432Z",
+      "targetParticipants": 25,
+      "estimatedDuration": 37,
+      "compensation": 27,
+      "requirements": [
+        "Stable internet connection"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_f25d993b",
+          "type": "instruction",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_b4cfcb70",
+          "type": "instruction",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_423e1e77",
+          "type": "task",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_6f2390ac",
+      "title": "Social Media Platform User Behavior",
+      "description": "Analyzing user behavior patterns on social media platforms for engagement optimization",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "draft",
+      "createdAt": "2025-05-24T15:44:15.829Z",
+      "updatedAt": "2025-07-10T12:30:43.369Z",
+      "targetParticipants": 18,
+      "estimatedDuration": 27,
+      "compensation": 23,
+      "requirements": [
+        "Previous online shopping experience",
+        "Must be 18 years or older"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_00e7bfce",
+          "type": "task",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_29e7ce49",
+          "type": "rating",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_dd43def2",
+          "type": "thank-you",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_5ffd47bf",
+          "type": "rating",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389773_2193b131",
+          "type": "welcome",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389773_12fa5dde",
+          "type": "instruction",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_728bb3c5",
+      "title": "E-commerce Checkout Process Optimization",
+      "description": "Measuring brand awareness and perception among target demographics",
+      "researcherId": "user_1752167389771_47f9600e",
+      "status": "draft",
+      "createdAt": "2025-06-18T20:48:50.200Z",
+      "updatedAt": "2025-07-07T17:07:15.798Z",
+      "targetParticipants": 23,
+      "estimatedDuration": 24,
+      "compensation": 10,
+      "requirements": [
+        "Previous online shopping experience",
+        "Stable internet connection"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_32d585dd",
+          "type": "thank-you",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_14b71663",
+          "type": "task",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_d50a82b8",
+          "type": "rating",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_c82d1aea",
+          "type": "thank-you",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389773_8fbde333",
+          "type": "rating",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_b006492a",
+      "title": "User Experience Research for Mobile Apps",
+      "description": "Measuring efficiency and completion rates for common user tasks",
+      "researcherId": "user_1752167389771_c9f559af",
+      "status": "draft",
+      "createdAt": "2025-06-11T21:43:13.345Z",
+      "updatedAt": "2025-07-08T07:25:08.548Z",
+      "targetParticipants": 40,
+      "estimatedDuration": 11,
+      "compensation": 19,
+      "requirements": [
+        "Must be 18 years or older",
+        "English fluency required"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_83d1ec18",
+          "type": "rating",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_8955e435",
+          "type": "question",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_503a64b0",
+          "type": "instruction",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_d340bcca",
+          "type": "task",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389773_5533478c",
+          "type": "thank-you",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389773_63db5a87",
+          "type": "question",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        },
+        {
+          "id": "block_1752167389773_8370e3ba",
+          "type": "question",
+          "order": 7,
+          "title": "Block 7",
+          "content": "Content for block 7"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_73510207",
+      "title": "Brand Perception and Recognition Study",
+      "description": "Analyzing the checkout process to reduce cart abandonment and increase conversions",
+      "researcherId": "user_1752167389771_52e75ab6",
+      "status": "draft",
+      "createdAt": "2025-07-05T07:33:06.957Z",
+      "updatedAt": "2025-07-06T14:15:23.613Z",
+      "targetParticipants": 29,
+      "estimatedDuration": 10,
+      "compensation": 37,
+      "requirements": [
+        "Previous online shopping experience",
+        "Stable internet connection"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_4421cd14",
+          "type": "thank-you",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_0b46e294",
+          "type": "question",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_9fb076d7",
+          "type": "task",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_576340eb",
+          "type": "welcome",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_3415876a",
+      "title": "User Experience Research for Mobile Apps",
+      "description": "Measuring efficiency and completion rates for common user tasks",
+      "researcherId": "user_1752167389771_e0ff1ecb",
+      "status": "completed",
+      "createdAt": "2025-06-02T01:59:38.827Z",
+      "updatedAt": "2025-07-07T20:06:59.238Z",
+      "targetParticipants": 53,
+      "estimatedDuration": 39,
+      "compensation": 15,
+      "requirements": [
+        "Access to desktop computer",
+        "English fluency required",
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_adc0ce54",
+          "type": "question",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_0937456b",
+          "type": "rating",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_a5ad1c03",
+          "type": "thank-you",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_95cf9474",
+      "title": "User Experience Research for Mobile Apps",
+      "description": "Analyzing the checkout process to reduce cart abandonment and increase conversions",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "completed",
+      "createdAt": "2025-06-04T04:33:03.800Z",
+      "updatedAt": "2025-07-09T22:40:09.308Z",
+      "targetParticipants": 10,
+      "estimatedDuration": 31,
+      "compensation": 21,
+      "requirements": [
+        "Access to desktop computer"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_b12da630",
+          "type": "rating",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_b3ec8687",
+          "type": "instruction",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_1b4fa6e0",
+          "type": "thank-you",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_1093fb1f",
+      "title": "Social Media Platform User Behavior",
+      "description": "Gathering user preferences on new product features before development",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "completed",
+      "createdAt": "2025-06-28T03:49:55.840Z",
+      "updatedAt": "2025-07-09T02:37:47.366Z",
+      "targetParticipants": 11,
+      "estimatedDuration": 27,
+      "compensation": 41,
+      "requirements": [
+        "Access to desktop computer",
+        "Stable internet connection",
+        "English fluency required"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_8b0ba972",
+          "type": "question",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_f8511430",
+          "type": "welcome",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_f0ed5b6b",
+          "type": "welcome",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_d4398b97",
+          "type": "task",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389773_167c78a1",
+          "type": "task",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389773_dedf4757",
+          "type": "question",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_c392a7c4",
+      "title": "Website Navigation Patterns Analysis",
+      "description": "Gathering user preferences on new product features before development",
+      "researcherId": "user_1752167389771_52e75ab6",
+      "status": "completed",
+      "createdAt": "2025-06-11T03:31:28.896Z",
+      "updatedAt": "2025-07-10T04:43:13.517Z",
+      "targetParticipants": 49,
+      "estimatedDuration": 11,
+      "compensation": 18,
+      "requirements": [
+        "Access to desktop computer",
+        "English fluency required",
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_34f3febd",
+          "type": "instruction",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_e00bc691",
+          "type": "task",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_1b1ce1e6",
+          "type": "rating",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_c18ad95b",
+          "type": "task",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_d00a315c",
+      "title": "User Experience Research for Mobile Apps",
+      "description": "Evaluating the effectiveness and usability of voice-controlled interfaces",
+      "researcherId": "user_1752167389771_47f9600e",
+      "status": "completed",
+      "createdAt": "2025-07-02T01:32:27.266Z",
+      "updatedAt": "2025-07-06T15:59:55.861Z",
+      "targetParticipants": 12,
+      "estimatedDuration": 11,
+      "compensation": 14,
+      "requirements": [
+        "Access to desktop computer",
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_4448942b",
+          "type": "task",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_9e4d387a",
+          "type": "thank-you",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_1d00b66a",
+          "type": "question",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_be31030a",
+          "type": "rating",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389773_5cca117c",
+          "type": "thank-you",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389773_2e580295",
+          "type": "thank-you",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_e6b831a3",
+      "title": "Voice Interface Usability Study",
+      "description": "Testing website accessibility for users with disabilities and assistive technologies",
+      "researcherId": "user_1752167389771_52e75ab6",
+      "status": "completed",
+      "createdAt": "2025-06-19T20:25:22.487Z",
+      "updatedAt": "2025-07-06T06:47:27.492Z",
+      "targetParticipants": 53,
+      "estimatedDuration": 37,
+      "compensation": 12,
+      "requirements": [
+        "Access to desktop computer"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_9affd6ba",
+          "type": "task",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_42799fdc",
+          "type": "welcome",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_0c4a2846",
+          "type": "instruction",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_bfd0d9d6",
+      "title": "Product Feature Preference Survey",
+      "description": "Gathering user preferences on new product features before development",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "completed",
+      "createdAt": "2025-05-19T17:34:16.374Z",
+      "updatedAt": "2025-07-10T06:12:22.642Z",
+      "targetParticipants": 31,
+      "estimatedDuration": 11,
+      "compensation": 55,
+      "requirements": [
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_74720c8a",
+          "type": "question",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_b4b4e996",
+          "type": "instruction",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389773_abed1ae0",
+          "type": "thank-you",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389773_9c258f34",
+          "type": "rating",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389773_45f7bd3e",
+      "title": "E-commerce Checkout Process Optimization",
+      "description": "Investigating how users discover and consume digital content across platforms",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "completed",
+      "createdAt": "2025-06-04T10:30:38.573Z",
+      "updatedAt": "2025-07-10T01:57:51.215Z",
+      "targetParticipants": 25,
+      "estimatedDuration": 27,
+      "compensation": 23,
+      "requirements": [
+        "Must be 18 years or older",
+        "English fluency required",
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389773_4985fb98",
+          "type": "thank-you",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389773_8ad2be6e",
+          "type": "welcome",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389774_0912192a",
+          "type": "welcome",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389774_23988c08",
+          "type": "welcome",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389774_7a7fa563",
+          "type": "welcome",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389774_0408ed25",
+          "type": "task",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        },
+        {
+          "id": "block_1752167389774_353ed2cb",
+          "type": "task",
+          "order": 7,
+          "title": "Block 7",
+          "content": "Content for block 7"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389774_b6be229c",
+      "title": "Brand Perception and Recognition Study",
+      "description": "Gathering user preferences on new product features before development",
+      "researcherId": "user_1752167389771_52e75ab6",
+      "status": "archived",
+      "createdAt": "2025-06-01T08:17:54.971Z",
+      "updatedAt": "2025-07-08T11:27:58.301Z",
+      "targetParticipants": 13,
+      "estimatedDuration": 28,
+      "compensation": 52,
+      "requirements": [
+        "Stable internet connection",
+        "Access to desktop computer",
+        "Previous online shopping experience"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389774_839bc52b",
+          "type": "rating",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389774_f7c90ed2",
+          "type": "task",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389774_69b6084e",
+          "type": "instruction",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389774_52ad236e",
+          "type": "rating",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389774_7ac3ff76",
+          "type": "instruction",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389774_2632f8ef",
+          "type": "task",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        },
+        {
+          "id": "block_1752167389774_f3ded65f",
+          "type": "rating",
+          "order": 7,
+          "title": "Block 7",
+          "content": "Content for block 7"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389774_c65c4853",
+      "title": "Brand Perception and Recognition Study",
+      "description": "Measuring efficiency and completion rates for common user tasks",
+      "researcherId": "user_1752167389771_47f9600e",
+      "status": "archived",
+      "createdAt": "2025-06-22T17:54:45.432Z",
+      "updatedAt": "2025-07-06T06:13:15.216Z",
+      "targetParticipants": 56,
+      "estimatedDuration": 23,
+      "compensation": 49,
+      "requirements": [
+        "Previous online shopping experience",
+        "Stable internet connection",
+        "English fluency required"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389774_173eaa04",
+          "type": "task",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389774_f0c43bdf",
+          "type": "rating",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389774_4c5dbfba",
+          "type": "rating",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389774_8a652da9",
+          "type": "question",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        },
+        {
+          "id": "block_1752167389774_9b9d845e",
+          "type": "question",
+          "order": 5,
+          "title": "Block 5",
+          "content": "Content for block 5"
+        },
+        {
+          "id": "block_1752167389774_27ea0dda",
+          "type": "task",
+          "order": 6,
+          "title": "Block 6",
+          "content": "Content for block 6"
+        },
+        {
+          "id": "block_1752167389774_33c052a9",
+          "type": "rating",
+          "order": 7,
+          "title": "Block 7",
+          "content": "Content for block 7"
+        }
+      ]
+    },
+    {
+      "id": "study_1752167389774_4e423f03",
+      "title": "Content Discovery and Consumption Habits",
+      "description": "Analyzing user behavior patterns on social media platforms for engagement optimization",
+      "researcherId": "user_1752167389771_de593881",
+      "status": "archived",
+      "createdAt": "2025-05-24T07:16:45.850Z",
+      "updatedAt": "2025-07-09T06:16:52.503Z",
+      "targetParticipants": 27,
+      "estimatedDuration": 33,
+      "compensation": 16,
+      "requirements": [
+        "Access to desktop computer",
+        "Stable internet connection",
+        "English fluency required"
+      ],
+      "blocks": [
+        {
+          "id": "block_1752167389774_b8ac3089",
+          "type": "task",
+          "order": 1,
+          "title": "Block 1",
+          "content": "Content for block 1"
+        },
+        {
+          "id": "block_1752167389774_294f0608",
+          "type": "instruction",
+          "order": 2,
+          "title": "Block 2",
+          "content": "Content for block 2"
+        },
+        {
+          "id": "block_1752167389774_855f94cf",
+          "type": "welcome",
+          "order": 3,
+          "title": "Block 3",
+          "content": "Content for block 3"
+        },
+        {
+          "id": "block_1752167389774_3912e414",
+          "type": "question",
+          "order": 4,
+          "title": "Block 4",
+          "content": "Content for block 4"
+        }
+      ]
+    }
+  ],
+  "applications": [
+    {
+      "id": "app_1752167389775_1d450185",
+      "studyId": "study_1752167389771_3f05052c",
+      "participantId": "user_1752167389770_cbd6404c",
+      "status": "rejected",
+      "appliedAt": "2025-07-03T05:24:13.442Z",
+      "updatedAt": "2025-07-09T22:04:07.420Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_57d78f0a",
+      "studyId": "study_1752167389771_3f05052c",
+      "participantId": "user_1752167389770_5a5ab1ad",
+      "status": "approved",
+      "appliedAt": "2025-06-11T18:21:14.448Z",
+      "updatedAt": "2025-07-10T12:09:47.820Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_a45d002c",
+      "studyId": "study_1752167389771_3f05052c",
+      "participantId": "user_1752167389770_ea83ca8f",
+      "status": "pending",
+      "appliedAt": "2025-06-20T14:36:55.121Z",
+      "updatedAt": "2025-07-10T09:36:13.469Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_d05015a9",
+      "studyId": "study_1752167389771_3f05052c",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "rejected",
+      "appliedAt": "2025-07-01T02:46:55.239Z",
+      "updatedAt": "2025-07-09T18:00:37.123Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_4512faa2",
+      "studyId": "study_1752167389771_3f05052c",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "pending",
+      "appliedAt": "2025-06-16T19:54:56.353Z",
+      "updatedAt": "2025-07-10T08:53:31.967Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_1e1253ba",
+      "studyId": "study_1752167389771_3f05052c",
+      "participantId": "user_1752167389770_6ca07991",
+      "status": "rejected",
+      "appliedAt": "2025-07-03T04:04:43.853Z",
+      "updatedAt": "2025-07-10T03:37:12.540Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_8aa4fceb",
+      "studyId": "study_1752167389771_3f05052c",
+      "participantId": "user_1752167389770_ea83ca8f",
+      "status": "approved",
+      "appliedAt": "2025-06-18T23:11:59.149Z",
+      "updatedAt": "2025-07-10T07:44:39.539Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_bda150e9",
+      "studyId": "study_1752167389772_cbf8358f",
+      "participantId": "user_1752167389771_635de06f",
+      "status": "approved",
+      "appliedAt": "2025-07-05T03:59:57.244Z",
+      "updatedAt": "2025-07-10T02:24:08.417Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_27cbd442",
+      "studyId": "study_1752167389772_cbf8358f",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "pending",
+      "appliedAt": "2025-06-20T21:23:22.415Z",
+      "updatedAt": "2025-07-10T16:07:41.802Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_eb710e74",
+      "studyId": "study_1752167389772_cbf8358f",
+      "participantId": "user_1752167389770_545924f8",
+      "status": "pending",
+      "appliedAt": "2025-06-19T06:44:28.523Z",
+      "updatedAt": "2025-07-10T05:57:39.935Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_37e1b619",
+      "studyId": "study_1752167389772_cbf8358f",
+      "participantId": "user_1752167389770_5a5ab1ad",
+      "status": "approved",
+      "appliedAt": "2025-06-26T16:29:20.563Z",
+      "updatedAt": "2025-07-10T15:03:32.918Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_4a26c472",
+      "studyId": "study_1752167389772_cbf8358f",
+      "participantId": "user_1752167389770_6ca07991",
+      "status": "approved",
+      "appliedAt": "2025-06-13T06:14:02.853Z",
+      "updatedAt": "2025-07-09T23:51:16.654Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_f36c3105",
+      "studyId": "study_1752167389772_cbf8358f",
+      "participantId": "user_1752167389771_96c6d2fe",
+      "status": "approved",
+      "appliedAt": "2025-06-25T08:21:13.856Z",
+      "updatedAt": "2025-07-10T00:25:13.638Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_c54b5a22",
+      "studyId": "study_1752167389772_1dbe2149",
+      "participantId": "user_1752167389771_18a18c97",
+      "status": "completed",
+      "appliedAt": "2025-06-30T00:18:48.584Z",
+      "updatedAt": "2025-07-10T05:03:23.405Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T09:17:32.350Z"
+    },
+    {
+      "id": "app_1752167389775_2dde0949",
+      "studyId": "study_1752167389772_1dbe2149",
+      "participantId": "user_1752167389770_b04b0b55",
+      "status": "completed",
+      "appliedAt": "2025-06-10T22:37:04.121Z",
+      "updatedAt": "2025-07-10T16:04:40.264Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T23:54:03.214Z"
+    },
+    {
+      "id": "app_1752167389775_26aaac25",
+      "studyId": "study_1752167389772_1dbe2149",
+      "participantId": "user_1752167389771_17dd3b04",
+      "status": "pending",
+      "appliedAt": "2025-06-27T02:55:54.619Z",
+      "updatedAt": "2025-07-10T13:19:02.875Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_0dd4ab16",
+      "studyId": "study_1752167389772_1dbe2149",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "pending",
+      "appliedAt": "2025-06-30T09:56:42.725Z",
+      "updatedAt": "2025-07-10T03:55:47.706Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_123a3b65",
+      "studyId": "study_1752167389772_1dbe2149",
+      "participantId": "user_1752167389771_17dd3b04",
+      "status": "completed",
+      "appliedAt": "2025-07-09T08:08:36.071Z",
+      "updatedAt": "2025-07-09T22:06:09.438Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T20:44:24.749Z"
+    },
+    {
+      "id": "app_1752167389775_1537464f",
+      "studyId": "study_1752167389772_1dbe2149",
+      "participantId": "user_1752167389771_96c6d2fe",
+      "status": "completed",
+      "appliedAt": "2025-06-17T17:33:56.831Z",
+      "updatedAt": "2025-07-10T13:51:33.209Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T06:33:15.495Z"
+    },
+    {
+      "id": "app_1752167389775_76186af0",
+      "studyId": "study_1752167389772_1dbe2149",
+      "participantId": "user_1752167389770_b04b0b55",
+      "status": "rejected",
+      "appliedAt": "2025-07-09T03:58:33.830Z",
+      "updatedAt": "2025-07-10T04:27:03.899Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_6158a86f",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389771_913fc853",
+      "status": "pending",
+      "appliedAt": "2025-07-03T19:55:40.794Z",
+      "updatedAt": "2025-07-10T14:09:31.721Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_08262f17",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_3359c0cd",
+      "status": "pending",
+      "appliedAt": "2025-06-28T18:31:56.846Z",
+      "updatedAt": "2025-07-10T12:00:52.594Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_d2253e85",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_b04b0b55",
+      "status": "approved",
+      "appliedAt": "2025-06-14T17:50:51.239Z",
+      "updatedAt": "2025-07-10T11:21:12.187Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_1d0f7e29",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "pending",
+      "appliedAt": "2025-06-26T18:10:36.656Z",
+      "updatedAt": "2025-07-10T05:47:45.934Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_20f32150",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389771_96c6d2fe",
+      "status": "approved",
+      "appliedAt": "2025-06-11T10:18:07.820Z",
+      "updatedAt": "2025-07-10T15:25:17.110Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_e01f68e7",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_3359c0cd",
+      "status": "pending",
+      "appliedAt": "2025-06-23T15:11:34.264Z",
+      "updatedAt": "2025-07-10T14:02:30.138Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_932b0702",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_ed20333f",
+      "status": "approved",
+      "appliedAt": "2025-06-29T01:12:30.731Z",
+      "updatedAt": "2025-07-10T05:58:22.301Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_2acb230d",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_ed20333f",
+      "status": "approved",
+      "appliedAt": "2025-06-12T02:15:28.983Z",
+      "updatedAt": "2025-07-10T03:32:59.797Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_7bf368c2",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389769_9352ed21",
+      "status": "approved",
+      "appliedAt": "2025-07-01T16:43:29.618Z",
+      "updatedAt": "2025-07-10T11:31:35.447Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_f9b25055",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_545924f8",
+      "status": "approved",
+      "appliedAt": "2025-06-28T00:30:59.988Z",
+      "updatedAt": "2025-07-09T19:44:45.381Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_a6f02926",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_6ca07991",
+      "status": "completed",
+      "appliedAt": "2025-06-17T06:46:27.988Z",
+      "updatedAt": "2025-07-10T01:04:43.141Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T03:20:45.753Z"
+    },
+    {
+      "id": "app_1752167389775_6d8b85f2",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_ed20333f",
+      "status": "approved",
+      "appliedAt": "2025-07-02T19:03:20.251Z",
+      "updatedAt": "2025-07-10T14:03:01.428Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_2874b2c9",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389771_96c6d2fe",
+      "status": "approved",
+      "appliedAt": "2025-07-07T21:57:12.387Z",
+      "updatedAt": "2025-07-10T05:50:16.124Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_78380be8",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "pending",
+      "appliedAt": "2025-06-11T05:36:02.339Z",
+      "updatedAt": "2025-07-09T22:57:18.434Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_25661215",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389771_17dd3b04",
+      "status": "completed",
+      "appliedAt": "2025-06-29T18:15:41.493Z",
+      "updatedAt": "2025-07-10T07:26:54.102Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T06:58:09.722Z"
+    },
+    {
+      "id": "app_1752167389775_6a43ca50",
+      "studyId": "study_1752167389772_67404e9a",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "approved",
+      "appliedAt": "2025-06-21T19:26:14.323Z",
+      "updatedAt": "2025-07-10T01:55:47.521Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_75d56d0f",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_635de06f",
+      "status": "rejected",
+      "appliedAt": "2025-06-28T18:55:55.903Z",
+      "updatedAt": "2025-07-10T15:56:37.308Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_d4cef896",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "pending",
+      "appliedAt": "2025-06-25T23:57:07.749Z",
+      "updatedAt": "2025-07-10T05:14:29.649Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_34d3345e",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_77e29544",
+      "status": "completed",
+      "appliedAt": "2025-06-24T14:44:09.305Z",
+      "updatedAt": "2025-07-09T22:03:56.979Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T05:06:09.032Z"
+    },
+    {
+      "id": "app_1752167389775_a01419c2",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_77e29544",
+      "status": "completed",
+      "appliedAt": "2025-06-15T13:52:01.768Z",
+      "updatedAt": "2025-07-09T20:26:48.463Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T18:39:17.314Z"
+    },
+    {
+      "id": "app_1752167389775_2aeb99cd",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389770_ed20333f",
+      "status": "approved",
+      "appliedAt": "2025-06-17T04:30:36.754Z",
+      "updatedAt": "2025-07-10T06:34:02.273Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_b43f1381",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "rejected",
+      "appliedAt": "2025-07-04T03:04:55.453Z",
+      "updatedAt": "2025-07-10T07:16:23.761Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_6acae894",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "approved",
+      "appliedAt": "2025-06-17T19:20:50.450Z",
+      "updatedAt": "2025-07-10T14:36:40.651Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_2c75e561",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_17dd3b04",
+      "status": "rejected",
+      "appliedAt": "2025-06-24T18:28:19.313Z",
+      "updatedAt": "2025-07-10T09:27:57.720Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389775_b2dafe63",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389770_545924f8",
+      "status": "completed",
+      "appliedAt": "2025-07-07T03:57:23.628Z",
+      "updatedAt": "2025-07-10T12:59:19.652Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T20:02:15.057Z"
+    },
+    {
+      "id": "app_1752167389776_7c303e56",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "pending",
+      "appliedAt": "2025-07-07T17:33:46.329Z",
+      "updatedAt": "2025-07-10T13:43:47.131Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_ee830287",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "pending",
+      "appliedAt": "2025-06-16T04:30:41.257Z",
+      "updatedAt": "2025-07-10T15:22:39.333Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_2f620c9b",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "approved",
+      "appliedAt": "2025-06-19T13:31:07.926Z",
+      "updatedAt": "2025-07-10T05:41:45.647Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_b53c020f",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389771_17dd3b04",
+      "status": "completed",
+      "appliedAt": "2025-06-29T07:18:35.164Z",
+      "updatedAt": "2025-07-10T11:37:14.775Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T05:01:18.447Z"
+    },
+    {
+      "id": "app_1752167389776_374f1c30",
+      "studyId": "study_1752167389772_f71208b1",
+      "participantId": "user_1752167389770_5a5ab1ad",
+      "status": "approved",
+      "appliedAt": "2025-06-11T07:58:14.477Z",
+      "updatedAt": "2025-07-09T23:03:47.571Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_0ace0132",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_5a5ab1ad",
+      "status": "pending",
+      "appliedAt": "2025-06-28T15:03:20.550Z",
+      "updatedAt": "2025-07-09T21:23:26.699Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_8fff63bc",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_ed20333f",
+      "status": "completed",
+      "appliedAt": "2025-06-14T02:09:26.608Z",
+      "updatedAt": "2025-07-09T17:43:05.090Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T11:23:29.179Z"
+    },
+    {
+      "id": "app_1752167389776_2358f74d",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_ea83ca8f",
+      "status": "completed",
+      "appliedAt": "2025-07-03T22:48:49.582Z",
+      "updatedAt": "2025-07-10T14:08:52.137Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T01:42:42.090Z"
+    },
+    {
+      "id": "app_1752167389776_9ce253f5",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389771_913fc853",
+      "status": "approved",
+      "appliedAt": "2025-07-05T07:20:05.484Z",
+      "updatedAt": "2025-07-10T05:50:27.897Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_1a6f93c0",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "rejected",
+      "appliedAt": "2025-06-22T16:55:14.332Z",
+      "updatedAt": "2025-07-10T14:59:37.478Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_d4d8cd73",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "pending",
+      "appliedAt": "2025-07-09T16:21:26.494Z",
+      "updatedAt": "2025-07-09T22:50:23.140Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_f4feffdb",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389769_9352ed21",
+      "status": "rejected",
+      "appliedAt": "2025-06-11T23:17:24.317Z",
+      "updatedAt": "2025-07-10T08:02:14.212Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_fea8ed63",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_545924f8",
+      "status": "approved",
+      "appliedAt": "2025-06-30T03:03:20.621Z",
+      "updatedAt": "2025-07-10T12:46:08.733Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_622d4a09",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "rejected",
+      "appliedAt": "2025-07-03T03:54:54.590Z",
+      "updatedAt": "2025-07-10T05:16:55.817Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_793b50ea",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_cbd6404c",
+      "status": "completed",
+      "appliedAt": "2025-07-02T22:56:00.283Z",
+      "updatedAt": "2025-07-09T20:43:48.557Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T02:17:17.887Z"
+    },
+    {
+      "id": "app_1752167389776_95817bf5",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "pending",
+      "appliedAt": "2025-06-20T22:28:50.749Z",
+      "updatedAt": "2025-07-10T16:58:45.421Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_8484bc14",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_ed20333f",
+      "status": "approved",
+      "appliedAt": "2025-06-14T06:39:35.817Z",
+      "updatedAt": "2025-07-10T15:48:36.468Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_cec5291a",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "completed",
+      "appliedAt": "2025-07-02T07:31:19.275Z",
+      "updatedAt": "2025-07-10T13:10:33.560Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T20:00:16.220Z"
+    },
+    {
+      "id": "app_1752167389776_21b91a24",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "pending",
+      "appliedAt": "2025-06-26T06:41:48.333Z",
+      "updatedAt": "2025-07-10T09:54:05.598Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_e5a7bfa5",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_b04b0b55",
+      "status": "approved",
+      "appliedAt": "2025-06-28T06:35:05.031Z",
+      "updatedAt": "2025-07-10T16:10:16.064Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_fa3f47a0",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389771_17dd3b04",
+      "status": "rejected",
+      "appliedAt": "2025-07-08T08:33:55.271Z",
+      "updatedAt": "2025-07-09T19:29:40.591Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_5a24537a",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "rejected",
+      "appliedAt": "2025-06-28T03:37:36.690Z",
+      "updatedAt": "2025-07-10T09:02:10.525Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Learning experience"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_d5b7f1b1",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389771_77e29544",
+      "status": "pending",
+      "appliedAt": "2025-06-15T13:19:57.139Z",
+      "updatedAt": "2025-07-10T15:56:47.599Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_da9a6eb1",
+      "studyId": "study_1752167389772_dcd38ed9",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "completed",
+      "appliedAt": "2025-06-23T14:06:56.813Z",
+      "updatedAt": "2025-07-09T18:25:47.732Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T16:35:29.368Z"
+    },
+    {
+      "id": "app_1752167389776_f7e9b555",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "rejected",
+      "appliedAt": "2025-06-28T19:45:43.154Z",
+      "updatedAt": "2025-07-10T03:25:14.213Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_8e3a93ab",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389770_ea83ca8f",
+      "status": "pending",
+      "appliedAt": "2025-06-11T19:52:19.345Z",
+      "updatedAt": "2025-07-10T10:48:34.413Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_3b27efe6",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389770_6ca07991",
+      "status": "approved",
+      "appliedAt": "2025-06-28T03:42:51.487Z",
+      "updatedAt": "2025-07-09T20:04:08.577Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_e0e4c82f",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "completed",
+      "appliedAt": "2025-06-12T05:01:08.448Z",
+      "updatedAt": "2025-07-10T04:24:26.731Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T08:55:47.704Z"
+    },
+    {
+      "id": "app_1752167389776_61be715a",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_96c6d2fe",
+      "status": "completed",
+      "appliedAt": "2025-06-15T23:45:45.347Z",
+      "updatedAt": "2025-07-10T01:04:00.172Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T02:52:27.959Z"
+    },
+    {
+      "id": "app_1752167389776_2277363d",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_77e29544",
+      "status": "completed",
+      "appliedAt": "2025-06-22T15:18:00.019Z",
+      "updatedAt": "2025-07-09T17:43:26.037Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T11:08:43.126Z"
+    },
+    {
+      "id": "app_1752167389776_1ec8c99b",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389770_3359c0cd",
+      "status": "pending",
+      "appliedAt": "2025-06-14T10:33:00.497Z",
+      "updatedAt": "2025-07-10T11:50:58.793Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_6d580be1",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389769_9352ed21",
+      "status": "pending",
+      "appliedAt": "2025-07-09T15:33:36.309Z",
+      "updatedAt": "2025-07-10T06:20:26.780Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_77d068ea",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "completed",
+      "appliedAt": "2025-06-10T17:42:17.008Z",
+      "updatedAt": "2025-07-10T10:12:42.013Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T05:13:19.241Z"
+    },
+    {
+      "id": "app_1752167389776_08d28847",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389769_9352ed21",
+      "status": "approved",
+      "appliedAt": "2025-06-22T11:45:09.174Z",
+      "updatedAt": "2025-07-09T23:19:58.717Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_96f538d5",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "approved",
+      "appliedAt": "2025-06-27T07:07:38.447Z",
+      "updatedAt": "2025-07-10T09:46:19.829Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_abc6a5fa",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389770_6ca07991",
+      "status": "approved",
+      "appliedAt": "2025-06-11T13:56:06.046Z",
+      "updatedAt": "2025-07-10T02:30:54.434Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_a6fc68ac",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_96c6d2fe",
+      "status": "completed",
+      "appliedAt": "2025-07-02T11:45:25.375Z",
+      "updatedAt": "2025-07-10T15:28:41.624Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T20:47:52.302Z"
+    },
+    {
+      "id": "app_1752167389776_73042e91",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389769_9352ed21",
+      "status": "rejected",
+      "appliedAt": "2025-07-01T21:34:40.998Z",
+      "updatedAt": "2025-07-10T01:54:07.174Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_0db39cba",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "approved",
+      "appliedAt": "2025-06-24T23:49:10.138Z",
+      "updatedAt": "2025-07-10T16:08:16.276Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_1fb92a80",
+      "studyId": "study_1752167389772_37d949e2",
+      "participantId": "user_1752167389770_ea83ca8f",
+      "status": "completed",
+      "appliedAt": "2025-07-06T21:55:24.567Z",
+      "updatedAt": "2025-07-10T08:16:42.021Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T05:09:45.122Z"
+    },
+    {
+      "id": "app_1752167389776_41626ed6",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_635de06f",
+      "status": "completed",
+      "appliedAt": "2025-06-21T18:56:52.894Z",
+      "updatedAt": "2025-07-10T04:33:35.594Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T23:53:21.026Z"
+    },
+    {
+      "id": "app_1752167389776_63aad206",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "pending",
+      "appliedAt": "2025-06-20T01:04:28.609Z",
+      "updatedAt": "2025-07-09T19:04:19.329Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_63b26b46",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389770_6ca07991",
+      "status": "rejected",
+      "appliedAt": "2025-06-27T05:28:13.394Z",
+      "updatedAt": "2025-07-10T02:21:49.975Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_f4886a3b",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "rejected",
+      "appliedAt": "2025-07-04T15:40:43.897Z",
+      "updatedAt": "2025-07-10T04:31:03.634Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_576b8fd7",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_77e29544",
+      "status": "pending",
+      "appliedAt": "2025-06-21T16:09:05.809Z",
+      "updatedAt": "2025-07-10T08:40:28.413Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_91182f8e",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_18a18c97",
+      "status": "pending",
+      "appliedAt": "2025-06-16T19:39:06.884Z",
+      "updatedAt": "2025-07-10T09:06:54.149Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_95d2f402",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "approved",
+      "appliedAt": "2025-06-24T21:49:56.227Z",
+      "updatedAt": "2025-07-09T17:48:42.098Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_892c5778",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "rejected",
+      "appliedAt": "2025-06-16T22:32:10.794Z",
+      "updatedAt": "2025-07-10T01:18:56.566Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_8c2bfd28",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "approved",
+      "appliedAt": "2025-06-15T21:56:36.867Z",
+      "updatedAt": "2025-07-10T07:01:51.274Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_7f8f38b4",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "completed",
+      "appliedAt": "2025-06-14T09:13:54.918Z",
+      "updatedAt": "2025-07-09T19:39:44.540Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T04:12:47.389Z"
+    },
+    {
+      "id": "app_1752167389776_62eda430",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389770_ea83ca8f",
+      "status": "rejected",
+      "appliedAt": "2025-07-09T06:03:12.414Z",
+      "updatedAt": "2025-07-10T06:56:47.567Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_f7cc53bb",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389770_545924f8",
+      "status": "approved",
+      "appliedAt": "2025-07-05T17:51:17.659Z",
+      "updatedAt": "2025-07-10T14:34:59.209Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_0d4a5af4",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "completed",
+      "appliedAt": "2025-06-24T01:35:27.835Z",
+      "updatedAt": "2025-07-10T10:34:22.768Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T19:20:52.613Z"
+    },
+    {
+      "id": "app_1752167389776_d0d7977f",
+      "studyId": "study_1752167389772_92255a3a",
+      "participantId": "user_1752167389771_913fc853",
+      "status": "completed",
+      "appliedAt": "2025-07-06T12:07:42.724Z",
+      "updatedAt": "2025-07-10T05:14:23.413Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T17:53:20.250Z"
+    },
+    {
+      "id": "app_1752167389776_e1d02528",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "rejected",
+      "appliedAt": "2025-06-25T03:42:46.258Z",
+      "updatedAt": "2025-07-10T13:25:15.517Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_0b7edc2d",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389771_913fc853",
+      "status": "approved",
+      "appliedAt": "2025-06-11T10:44:35.139Z",
+      "updatedAt": "2025-07-10T09:55:05.942Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_6bf626eb",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_ea83ca8f",
+      "status": "approved",
+      "appliedAt": "2025-07-03T00:59:34.298Z",
+      "updatedAt": "2025-07-09T20:27:57.233Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_6527b8fa",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389771_18a18c97",
+      "status": "completed",
+      "appliedAt": "2025-06-19T15:48:39.980Z",
+      "updatedAt": "2025-07-10T16:59:16.699Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T21:23:10.522Z"
+    },
+    {
+      "id": "app_1752167389776_240e22d0",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "pending",
+      "appliedAt": "2025-06-19T22:15:42.916Z",
+      "updatedAt": "2025-07-10T11:58:10.480Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_2e850e31",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_3359c0cd",
+      "status": "completed",
+      "appliedAt": "2025-06-12T01:54:16.060Z",
+      "updatedAt": "2025-07-09T23:52:26.287Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T13:31:40.784Z"
+    },
+    {
+      "id": "app_1752167389776_519b77b0",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_5a5ab1ad",
+      "status": "approved",
+      "appliedAt": "2025-06-13T16:38:48.655Z",
+      "updatedAt": "2025-07-09T22:03:22.113Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_33dc9e94",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "pending",
+      "appliedAt": "2025-06-16T11:24:19.902Z",
+      "updatedAt": "2025-07-10T05:36:02.049Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_8d5370ff",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389769_9352ed21",
+      "status": "approved",
+      "appliedAt": "2025-07-08T15:40:58.712Z",
+      "updatedAt": "2025-07-10T17:05:10.741Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_6ae81315",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "rejected",
+      "appliedAt": "2025-06-22T15:48:11.319Z",
+      "updatedAt": "2025-07-10T17:09:28.137Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389776_e40182da",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389771_77e29544",
+      "status": "completed",
+      "appliedAt": "2025-06-21T23:54:28.646Z",
+      "updatedAt": "2025-07-10T04:11:51.592Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T19:19:32.951Z"
+    },
+    {
+      "id": "app_1752167389777_c6dee438",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_5a5ab1ad",
+      "status": "completed",
+      "appliedAt": "2025-06-20T17:30:07.071Z",
+      "updatedAt": "2025-07-10T15:44:05.463Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T22:05:17.857Z"
+    },
+    {
+      "id": "app_1752167389777_b9e7d5e2",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_5a5ab1ad",
+      "status": "completed",
+      "appliedAt": "2025-07-01T22:11:42.359Z",
+      "updatedAt": "2025-07-10T03:21:23.737Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": "2025-07-09T18:26:20.061Z"
+    },
+    {
+      "id": "app_1752167389777_c115fa9e",
+      "studyId": "study_1752167389772_b8841b65",
+      "participantId": "user_1752167389770_b04b0b55",
+      "status": "pending",
+      "appliedAt": "2025-06-15T23:52:16.467Z",
+      "updatedAt": "2025-07-10T12:47:40.255Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Learning experience"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_99d94304",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "pending",
+      "appliedAt": "2025-06-26T00:16:29.653Z",
+      "updatedAt": "2025-07-09T20:36:12.792Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_1ec431e0",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389770_f598ecf9",
+      "status": "pending",
+      "appliedAt": "2025-06-26T01:16:31.138Z",
+      "updatedAt": "2025-07-09T23:28:23.356Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_0cd1ade0",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "approved",
+      "appliedAt": "2025-07-07T05:40:00.564Z",
+      "updatedAt": "2025-07-09T23:19:08.769Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_af8b1ec3",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389770_6ca07991",
+      "status": "pending",
+      "appliedAt": "2025-06-19T06:43:27.250Z",
+      "updatedAt": "2025-07-09T20:40:52.096Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_f4cb88a5",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "approved",
+      "appliedAt": "2025-06-14T03:11:42.862Z",
+      "updatedAt": "2025-07-09T18:20:37.348Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_dde68777",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389770_4d152aae",
+      "status": "completed",
+      "appliedAt": "2025-06-10T22:00:00.122Z",
+      "updatedAt": "2025-07-09T18:30:35.797Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekdays",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T12:09:01.909Z"
+    },
+    {
+      "id": "app_1752167389777_752cbb64",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389770_ed20333f",
+      "status": "completed",
+      "appliedAt": "2025-07-04T01:17:44.230Z",
+      "updatedAt": "2025-07-10T13:21:39.602Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekdays",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T16:28:44.379Z"
+    },
+    {
+      "id": "app_1752167389777_a590f3b0",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_3f0cebd1",
+      "status": "approved",
+      "appliedAt": "2025-06-21T11:15:42.719Z",
+      "updatedAt": "2025-07-09T21:25:55.000Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_ae5d0616",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_635de06f",
+      "status": "completed",
+      "appliedAt": "2025-07-02T08:30:59.090Z",
+      "updatedAt": "2025-07-10T05:23:40.620Z",
+      "responses": {
+        "experience": "intermediate",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T16:52:19.318Z"
+    },
+    {
+      "id": "app_1752167389777_b8a2c3ef",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "rejected",
+      "appliedAt": "2025-07-08T05:46:12.944Z",
+      "updatedAt": "2025-07-10T00:18:54.515Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": "Did not meet study requirements",
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_c849c8f0",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_96c6d2fe",
+      "status": "approved",
+      "appliedAt": "2025-07-07T22:10:10.110Z",
+      "updatedAt": "2025-07-09T18:58:23.714Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "flexible",
+        "motivation": "Product improvement"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_f7e13f9c",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_f2b7dbd6",
+      "status": "completed",
+      "appliedAt": "2025-06-16T23:55:45.629Z",
+      "updatedAt": "2025-07-10T03:27:22.972Z",
+      "responses": {
+        "experience": "advanced",
+        "availability": "flexible",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": "2025-07-10T02:34:54.319Z"
+    },
+    {
+      "id": "app_1752167389777_1ee2fa50",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389771_aae16502",
+      "status": "approved",
+      "appliedAt": "2025-07-08T17:04:54.834Z",
+      "updatedAt": "2025-07-10T07:39:59.054Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Compensation"
+      },
+      "notes": null,
+      "completedAt": null
+    },
+    {
+      "id": "app_1752167389777_9e8e3447",
+      "studyId": "study_1752167389772_2b927ef6",
+      "participantId": "user_1752167389769_9352ed21",
+      "status": "approved",
+      "appliedAt": "2025-07-06T00:22:02.377Z",
+      "updatedAt": "2025-07-10T00:01:37.992Z",
+      "responses": {
+        "experience": "beginner",
+        "availability": "weekends",
+        "motivation": "Interest in research"
+      },
+      "notes": null,
+      "completedAt": null
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2025-07-10T17:09:49.768Z",
+    "generator": "ResearchHub Test Data Generator v1.0",
+    "config": {
+      "users": {
+        "participants": 20,
+        "researchers": 5,
+        "admins": 2
+      },
+      "studies": {
+        "active": 10,
+        "draft": 5,
+        "completed": 8,
+        "archived": 3
+      },
+      "applications": {
+        "perStudy": 15,
+        "statusDistribution": {
+          "pending": 0.3,
+          "approved": 0.4,
+          "rejected": 0.2,
+          "completed": 0.1
+        }
+      }
+    }
+  }
+}

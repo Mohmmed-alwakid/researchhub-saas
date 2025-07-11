@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-07-08T11:08:26.406Z",
+  "overallHealth": "healthy",
+  "checks": [
+    {
+      "name": "UAT Framework",
+      "status": "healthy",
+      "details": "UAT framework operational",
+      "timestamp": "2025-07-08T11:08:26.404Z"
+    },
+    {
+      "name": "Test Accounts",
+      "status": "healthy",
+      "details": "Test accounts configured: researcher, participant, admin",
+      "timestamp": "2025-07-08T11:08:26.404Z"
+    },
+    {
+      "name": "Reports Generation",
+      "status": "healthy",
+      "details": "Report files available: 2/2",
+      "timestamp": "2025-07-08T11:08:26.405Z"
+    },
+    {
+      "name": "Performance Monitoring",
+      "status": "healthy",
+      "details": "Performance monitoring data available",
+      "timestamp": "2025-07-08T11:08:26.405Z"
+    },
+    {
+      "name": "Business Intelligence",
+      "status": "healthy",
+      "details": "Business intelligence data available",
+      "timestamp": "2025-07-08T11:08:26.405Z"
+    }
+  ]
+}

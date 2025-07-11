@@ -99,10 +99,46 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
     };
   }, [currentStep, formData, completedSteps, validationErrors, hasUnsavedChanges, autoSaveInterval]);
 
-  // Load draft on mount
+  // Load draft on mount and check for template selection
   useEffect(() => {
     const draftKey = 'study-creation-draft';
     const saved = localStorage.getItem(draftKey);
+    
+    // Check if launched from a template
+    const selectedTemplate = sessionStorage.getItem('selectedTemplate');
+    if (selectedTemplate && !initialData) {
+      try {
+        const templateData = JSON.parse(selectedTemplate);
+        console.log('Loading template data:', templateData);
+        
+        // Pre-populate form with template data
+        setFormData(prev => ({
+          ...prev,
+          title: `${templateData.name} - Copy`,
+          description: templateData.description,
+          blocks: templateData.blocks || []
+        }));
+        
+        // Skip to setup step since template is already selected
+        setCurrentStep(2); // setup step
+        setCompletedSteps([0, 1]); // type and template steps completed
+        
+        // Clear the template from session storage
+        sessionStorage.removeItem('selectedTemplate');
+        
+        // Show success message
+        setTimeout(() => {
+          // Note: toast should be available from context/import
+          console.log(`Study initialized from template: ${templateData.name}`);
+        }, 500);
+        
+        return; // Skip draft loading if template was used
+      } catch (error) {
+        console.warn('Failed to load template data:', error);
+      }
+    }
+    
+    // Load draft if no template and no initial data
     if (saved && !initialData) {
       try {
         const draft = JSON.parse(saved);

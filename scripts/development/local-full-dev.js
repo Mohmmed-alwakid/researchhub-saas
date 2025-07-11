@@ -390,6 +390,7 @@ app.all('/api/profile', async (req, res) => {
 // Studies endpoints - import the actual handler
 import studiesHandler from '../../api/studies.js';
 import walletsHandler from '../../api/wallets.js';
+import templatesHandler from '../../api/templates-simple.js';
 
 app.all('/api/studies*', async (req, res) => {
   // Use the actual studies.js handler which has proper data transformation
@@ -399,6 +400,11 @@ app.all('/api/studies*', async (req, res) => {
 // Wallets endpoints - participant wallet and withdrawal management (PRODUCTION)
 app.all('/api/wallets*', async (req, res) => {
   await walletsHandler(req, res);
+});
+
+// Templates endpoints - Template Creation UI backend (NEW - July 10, 2025)
+app.all('/api/templates*', async (req, res) => {
+  await templatesHandler(req, res);
 });
 
 // Redirect study-builder endpoints to studies API with action=build
@@ -2350,7 +2356,7 @@ app.get('/api/admin/system-performance', async (req, res) => {
     }
 
     // Get user profile to check role
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -2513,7 +2519,7 @@ app.all('/api/applications*', async (req, res) => {
   
   try {
     // Import the consolidated applications handler
-    const applicationsModule = await import('./api/applications.js');
+    const applicationsModule = await import('../../api/applications.js');
     const handler = applicationsModule.default;
     
     await handler(req, res);

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-07-10T17:07:33.975Z",
+  "url": "http://localhost:5175",
+  "metrics": {
+    "pageLoad": 1297,
+    "loadTime": 0.40000003576278687,
+    "domContentLoaded": 0.10000002384185791,
+    "firstContentfulPaint": 0,
+    "largestContentfulPaint": 0,
+    "cumulativeLayoutShift": 0,
+    "firstInputDelay": 0
+  },
+  "scores": {
+    "performance": 100,
+    "accessibility": 95,
+    "bestPractices": 90,
+    "seo": 85
+  },
+  "recommendations": [],
+  "status": "pass"
+}

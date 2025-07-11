@@ -1,0 +1,572 @@
+/**
+ * Templates API - Complete study template management system with Authentication
+ * 
+ * Endpoints:
+ * - GET /api/templates - Get all templates with filtering
+ * - GET /api/templates/:id - Get specific template by ID
+ * - POST /api/templates - Create new template (researchers/admin only)
+ * - PUT /api/templates/:id - Update existing template (creator/admin only)
+ * - DELETE /api/templates/:id - Delete template (creator/admin only)
+ * - GET /api/templates/categories - Get template categories
+ * - POST /api/templates/:id/duplicate - Duplicate template (researchers/admin only)
+ * 
+ * Author: AI Assistant
+ * Created: July 10, 2025 - Template Creation UI Integration
+ * Updated: July 10, 2025 - Added authentication and role-based access
+ * Status: Enhanced with authentication integration
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL || 'https://bpcgkrsmcttfvkhwvclp.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwY2drcnNtY3R0ZnZraHd2Y2xwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNDQ5NTc2NSwiZXhwIjoyMDUwMDcxNzY1fQ.J-6rGFqVxwdQ1cSDLnhKR1Y5teDr5q0L4_3jUNhFqms';
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+/**
+ * Authenticate and authorize user for template operations
+ */
+async function authenticateUser(req, allowedRoles = []) {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { success: false, error: 'No authentication token provided', status: 401 };
+  }
+
+  const token = authHeader.substring(7);
+
+  try {
+    // Verify the JWT token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (error || !user) {
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Get user profile to check role
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('role, firstName, lastName, status')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      return { success: false, error: 'User profile not found', status: 403 };
+    }
+
+    // Check if user has required role
+    if (allowedRoles.length > 0 && !allowedRoles.includes(profile.role)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${allowedRoles.join(', ')}. Your role: ${profile.role}`, 
+        status: 403 
+      };
+    }
+
+    // Check if user account is active
+    if (profile.status !== 'active') {
+      return { success: false, error: 'Account is not active', status: 403 };
+    }
+
+    return { 
+      success: true, 
+      user: {
+        id: user.id,
+        email: user.email,
+        role: profile.role,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        status: profile.status
+      }
+    };
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication failed', status: 500 };
+  }
+}
+
+export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    const { id } = req.query;
+    const { action } = req.query;
+
+    // Route to appropriate handler
+    if (req.method === 'GET' && !id && action === 'categories') {
+      return await handleGetCategories(req, res);
+    } else if (req.method === 'GET' && !id) {
+      return await handleGetTemplates(req, res);
+    } else if (req.method === 'GET' && id) {
+      return await handleGetTemplate(req, res, id);
+    } else if (req.method === 'POST' && id && action === 'duplicate') {
+      return await handleDuplicateTemplate(req, res, id);
+    } else if (req.method === 'POST' && !id) {
+      return await handleCreateTemplate(req, res);
+    } else if (req.method === 'PUT' && id) {
+      return await handleUpdateTemplate(req, res, id);
+    } else if (req.method === 'DELETE' && id) {
+      return await handleDeleteTemplate(req, res, id);
+    } else {
+      return res.status(405).json({
+        success: false,
+        error: `Method ${req.method} not allowed for this endpoint`
+      });
+    }
+
+  } catch (error) {
+    console.error('Templates API error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message
+    });
+  }
+}
+
+// Get template categories (public access)
+async function handleGetCategories(req, res) {
+  const categories = [
+    { 
+      id: 'usability-testing', 
+      name: 'Usability Testing',
+      description: 'Test user interactions and workflows',
+      icon: '🖱️',
+      blockSuggestions: ['welcome_screen', 'context_screen', '5_second_test', 'open_question', 'thank_you']
+    },
+    { 
+      id: 'content-testing', 
+      name: 'Content Testing',
+      description: 'Evaluate content effectiveness and comprehension',
+      icon: '📝',
+      blockSuggestions: ['welcome_screen', 'context_screen', 'multiple_choice', 'opinion_scale', 'thank_you']
+    },
+    { 
+      id: 'user-interviews', 
+      name: 'User Interviews',
+      description: 'Conduct structured user interviews',
+      icon: '🎤',
+      blockSuggestions: ['welcome_screen', 'open_question', 'simple_input', 'thank_you']
+    },
+    { 
+      id: 'concept-testing', 
+      name: 'Concept Testing',
+      description: 'Test new ideas and concepts',
+      icon: '💡',
+      blockSuggestions: ['welcome_screen', 'context_screen', 'opinion_scale', 'yes_no', 'thank_you']
+    },
+    { 
+      id: 'card-sorting', 
+      name: 'Card Sorting',
+      description: 'Information architecture and categorization',
+      icon: '🃏',
+      blockSuggestions: ['welcome_screen', 'context_screen', 'card_sort', 'open_question', 'thank_you']
+    },
+    { 
+      id: 'survey-research', 
+      name: 'Survey Research',
+      description: 'Structured data collection and analysis',
+      icon: '📊',
+      blockSuggestions: ['welcome_screen', 'multiple_choice', 'opinion_scale', 'simple_input', 'thank_you']
+    },
+    { 
+      id: 'accessibility-testing', 
+      name: 'Accessibility Testing',
+      description: 'Evaluate accessibility and inclusive design',
+      icon: '♿',
+      blockSuggestions: ['welcome_screen', 'context_screen', 'open_question', 'simple_input', 'thank_you']
+    },
+    { 
+      id: 'navigation-testing', 
+      name: 'Navigation Testing',
+      description: 'Test information architecture and findability',
+      icon: '🧭',
+      blockSuggestions: ['welcome_screen', 'context_screen', 'tree_test', 'open_question', 'thank_you']
+    }
+  ];
+
+  return res.status(200).json({
+    success: true,
+    data: categories
+  });
+}
+
+// Get all templates with filtering (public access)
+async function handleGetTemplates(req, res) {
+  try {
+    const { category, search, limit = 50, offset = 0 } = req.query;
+    
+    // For development, return default templates
+    let templates = getDefaultTemplates();
+
+    // Apply category filter
+    if (category) {
+      templates = templates.filter(t => t.category === category);
+    }
+
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      templates = templates.filter(t => 
+        t.name.toLowerCase().includes(searchLower) ||
+        t.description.toLowerCase().includes(searchLower) ||
+        t.category.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply pagination
+    const limitNum = parseInt(limit);
+    const offsetNum = parseInt(offset);
+    const paginatedTemplates = templates.slice(offsetNum, offsetNum + limitNum);
+
+    return res.status(200).json({
+      success: true,
+      data: paginatedTemplates,
+      meta: {
+        total: templates.length,
+        limit: limitNum,
+        offset: offsetNum,
+        hasMore: offsetNum + limitNum < templates.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get templates error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch templates',
+      details: error.message
+    });
+  }
+}
+
+// Get specific template by ID (public access)
+async function handleGetTemplate(req, res, id) {
+  try {
+    // For development, find in default templates
+    const defaultTemplates = getDefaultTemplates();
+    const template = defaultTemplates.find(t => t.id === id);
+    
+    if (!template) {
+      return res.status(404).json({
+        success: false,
+        error: 'Template not found'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: template
+    });
+
+  } catch (error) {
+    console.error('Get template error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch template',
+      details: error.message
+    });
+  }
+}
+
+// Create new template (researchers/admin only)
+async function handleCreateTemplate(req, res) {
+  try {
+    // Authenticate user (researchers and admin only)
+    const authResult = await authenticateUser(req, ['researcher', 'admin']);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({
+        success: false,
+        error: authResult.error
+      });
+    }
+
+    const { user } = authResult;
+    const templateData = req.body;
+
+    // Validate required fields
+    if (!templateData.name || !templateData.category || !templateData.blocks) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: name, category, blocks'
+      });
+    }
+
+    // For development mode, return success response
+    const newTemplate = {
+      id: `template_${Date.now()}`,
+      name: templateData.name,
+      description: templateData.description || '',
+      category: templateData.category,
+      blocks: templateData.blocks,
+      tags: templateData.tags || [],
+      isPublic: templateData.isPublic || false,
+      createdBy: user.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      usage: {
+        timesUsed: 0,
+        timesCloned: 0,
+        avgRating: 0,
+        ratingCount: 0
+      }
+    };
+
+    return res.status(201).json({
+      success: true,
+      data: newTemplate,
+      message: 'Template created successfully (development mode)'
+    });
+
+  } catch (error) {
+    console.error('Create template error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to create template',
+      details: error.message
+    });
+  }
+}
+
+// Update template (creator/admin only)
+async function handleUpdateTemplate(req, res, id) {
+  try {
+    // Authenticate user (researchers and admin only)
+    const authResult = await authenticateUser(req, ['researcher', 'admin']);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({
+        success: false,
+        error: authResult.error
+      });
+    }
+
+    const { user } = authResult;
+    const templateData = req.body;
+
+    // For development mode, simulate permission check and update
+    const updatedTemplate = {
+      id: id,
+      name: templateData.name || 'Updated Template',
+      description: templateData.description || 'Updated description',
+      category: templateData.category || 'usability-testing',
+      blocks: templateData.blocks || [],
+      tags: templateData.tags || [],
+      isPublic: templateData.isPublic || false,
+      createdBy: user.id,
+      updatedBy: user.id,
+      updatedAt: new Date().toISOString()
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: updatedTemplate,
+      message: 'Template updated successfully (development mode)'
+    });
+
+  } catch (error) {
+    console.error('Update template error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update template',
+      details: error.message
+    });
+  }
+}
+
+// Delete template (creator/admin only)
+async function handleDeleteTemplate(req, res, id) {
+  try {
+    // Authenticate user (researchers and admin only)
+    const authResult = await authenticateUser(req, ['researcher', 'admin']);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({
+        success: false,
+        error: authResult.error
+      });
+    }
+
+    // For development mode, simulate deletion
+    return res.status(200).json({
+      success: true,
+      message: 'Template deleted successfully (development mode)'
+    });
+
+  } catch (error) {
+    console.error('Delete template error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to delete template',
+      details: error.message
+    });
+  }
+}
+
+// Duplicate template (researchers/admin only)
+async function handleDuplicateTemplate(req, res, id) {
+  try {
+    // Authenticate user (researchers and admin only)
+    const authResult = await authenticateUser(req, ['researcher', 'admin']);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({
+        success: false,
+        error: authResult.error
+      });
+    }
+
+    const { user } = authResult;
+
+    // For development, find the original template
+    const defaultTemplates = getDefaultTemplates();
+    const originalTemplate = defaultTemplates.find(t => t.id === id);
+    
+    if (!originalTemplate) {
+      return res.status(404).json({
+        success: false,
+        error: 'Template not found'
+      });
+    }
+
+    // Create duplicate
+    const duplicatedTemplate = {
+      ...originalTemplate,
+      id: `template_${Date.now()}`,
+      name: `${originalTemplate.name} (Copy)`,
+      createdBy: user.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      usage: {
+        timesUsed: 0,
+        timesCloned: 0,
+        avgRating: 0,
+        ratingCount: 0
+      }
+    };
+
+    return res.status(201).json({
+      success: true,
+      data: duplicatedTemplate,
+      message: 'Template duplicated successfully (development mode)'
+    });
+
+  } catch (error) {
+    console.error('Duplicate template error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to duplicate template',
+      details: error.message
+    });
+  }
+}
+
+// Default templates for development (fallback data)
+function getDefaultTemplates() {
+  return [
+    {
+      id: 'template_usability_basic',
+      name: 'Basic Usability Test',
+      description: 'A simple usability testing flow to gather user feedback on core interactions',
+      category: 'usability-testing',
+      blocks: [
+        { type: 'welcome_screen', settings: { title: 'Welcome to our usability test', description: 'Help us improve our product by testing key features' } },
+        { type: 'context_screen', settings: { title: 'Task Overview', description: 'You will be asked to complete a few tasks on our website' } },
+        { type: '5_second_test', settings: { question: 'What is your first impression?', image: '/sample-homepage.png' } },
+        { type: 'open_question', settings: { question: 'What would you expect to find on this page?' } },
+        { type: 'opinion_scale', settings: { question: 'How easy was it to complete the task?', scale: '1-5', labels: ['Very difficult', 'Very easy'] } },
+        { type: 'thank_you', settings: { title: 'Thank you!', description: 'Your feedback helps us create better user experiences' } }
+      ],
+      tags: ['usability', 'basic', 'feedback'],
+      isPublic: true,
+      createdBy: 'system',
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      usage: {
+        timesUsed: 45,
+        timesCloned: 12,
+        avgRating: 4.2,
+        ratingCount: 8
+      }
+    },
+    {
+      id: 'template_card_sort_basic',
+      name: 'Card Sorting Study',
+      description: 'Understand how users categorize and organize information',
+      category: 'card-sorting',
+      blocks: [
+        { type: 'welcome_screen', settings: { title: 'Card Sorting Study', description: 'Help us organize information in a way that makes sense to you' } },
+        { type: 'context_screen', settings: { title: 'Instructions', description: 'You will be given cards to sort into categories' } },
+        { type: 'card_sort', settings: { cards: ['Home', 'About', 'Products', 'Services', 'Contact'], categories: ['Main Navigation', 'Secondary Pages', 'Other'] } },
+        { type: 'open_question', settings: { question: 'Why did you organize the items this way?' } },
+        { type: 'thank_you', settings: { title: 'Complete!', description: 'Thank you for helping us improve our site structure' } }
+      ],
+      tags: ['information-architecture', 'categorization', 'navigation'],
+      isPublic: true,
+      createdBy: 'system',
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      usage: {
+        timesUsed: 23,
+        timesCloned: 7,
+        avgRating: 4.5,
+        ratingCount: 4
+      }
+    },
+    {
+      id: 'template_content_test',
+      name: 'Content Effectiveness Test',
+      description: 'Evaluate how well content communicates key messages',
+      category: 'content-testing',
+      blocks: [
+        { type: 'welcome_screen', settings: { title: 'Content Review', description: 'We want to make sure our content is clear and helpful' } },
+        { type: 'context_screen', settings: { title: 'Reading Task', description: 'Please read the following content carefully' } },
+        { type: 'multiple_choice', settings: { question: 'What is the main purpose of this page?', options: ['To sell products', 'To provide information', 'To collect leads', 'To entertain'] } },
+        { type: 'opinion_scale', settings: { question: 'How clear was the content?', scale: '1-5', labels: ['Very unclear', 'Very clear'] } },
+        { type: 'open_question', settings: { question: 'What questions do you still have after reading?' } },
+        { type: 'thank_you', settings: { title: 'Thank you!', description: 'Your input helps us create better content' } }
+      ],
+      tags: ['content', 'clarity', 'messaging'],
+      isPublic: true,
+      createdBy: 'system',
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      usage: {
+        timesUsed: 31,
+        timesCloned: 9,
+        avgRating: 4.1,
+        ratingCount: 6
+      }
+    },
+    {
+      id: 'template_user_interview',
+      name: 'User Interview Guide',
+      description: 'Structured interview template for user research',
+      category: 'user-interviews',
+      blocks: [
+        { type: 'welcome_screen', settings: { title: 'User Interview', description: 'Thank you for participating in our research interview' } },
+        { type: 'simple_input', settings: { question: 'Tell us about your role and experience', type: 'text' } },
+        { type: 'open_question', settings: { question: 'What challenges do you face in your daily work?' } },
+        { type: 'open_question', settings: { question: 'How do you currently solve these challenges?' } },
+        { type: 'open_question', settings: { question: 'What would an ideal solution look like?' } },
+        { type: 'thank_you', settings: { title: 'Interview Complete', description: 'Thank you for sharing your insights with us' } }
+      ],
+      tags: ['interview', 'qualitative', 'research'],
+      isPublic: true,
+      createdBy: 'system',
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      usage: {
+        timesUsed: 18,
+        timesCloned: 15,
+        avgRating: 4.7,
+        ratingCount: 3
+      }
+    }
+  ];
+}

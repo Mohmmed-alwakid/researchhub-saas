@@ -1,4 +1,4 @@
-# ResearchHub - Copilot Instructions
+# Afkar - Copilot Instructions
 
 <!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
 
@@ -22,11 +22,11 @@ node scripts/development/vibe-coder-docs.js all
 ```
 
 ### Key Sections
-- [Local Development Tools](#-local-vibe-coder-mcp-tools-usage-examples) - AI-powered development assistance
-- [Testing Strategy](#-comprehensive-testing-framework-new---july-3-2025) - Automated testing framework
-- [Development Rules](#-important-development-rules) - Mandatory development process
-- [Study Blocks System](#-study-blocks-system-architecture) - Core feature architecture
-- [MCP Tools](#-mcp-model-context-protocol-development-tools) - Available AI assistants
+- **Local Development Tools** - AI-powered development assistance
+- **Testing Strategy** - Automated testing framework
+- **Development Rules** - Mandatory development process
+- **Study Blocks System** - Core feature architecture
+- **MCP Tools** - Available AI assistants
 
 ## ⚠️ Project Status: PRODUCTION READY - VIBE-CODER-MCP IMPLEMENTATION COMPLETE
 **Last Updated**: July 7, 2025  

@@ -1,0 +1,8 @@
+Metric,Value,Status,Target
+UAT Success Rate,86.6%,good,>80%
+Performance Score,78,good,>70
+Test Coverage,78%,good,>75%
+Automation Coverage,85%,excellent,>80%
+Defect Detection,91%,excellent,>85%
+Business Risk,low,good,low
+Deployment Status,conditional,warning,ready

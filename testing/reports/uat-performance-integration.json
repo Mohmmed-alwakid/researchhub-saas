@@ -1,0 +1,45 @@
+{
+  "uat": {
+    "researcher": {},
+    "participant": {}
+  },
+  "performance": {},
+  "combined": {},
+  "timestamp": "2025-07-08T11:28:11.021Z",
+  "summary": {
+    "totalTests": 0,
+    "passed": 0,
+    "failed": 0,
+    "performanceScore": 0,
+    "businessImpact": "unknown"
+  },
+  "health": [
+    {
+      "name": "API Health",
+      "status": "healthy",
+      "responseTime": 54.57336325395383,
+      "timestamp": "2025-07-08T11:28:11.027Z"
+    },
+    {
+      "name": "Database Check",
+      "status": "healthy",
+      "responseTime": 148.22632401570098,
+      "timestamp": "2025-07-08T11:28:11.028Z"
+    },
+    {
+      "name": "Auth Service",
+      "status": "healthy",
+      "responseTime": 160.83302402318367,
+      "timestamp": "2025-07-08T11:28:11.028Z"
+    },
+    {
+      "name": "Studies API",
+      "status": "healthy",
+      "responseTime": 114.69165409557714,
+      "timestamp": "2025-07-08T11:28:11.028Z"
+    }
+  ],
+  "generatedAt": "2025-07-08T11:28:11.029Z",
+  "version": "1.0.0",
+  "framework": "UAT Performance Integration"
+}

@@ -1,0 +1,70 @@
+{
+  "timestamp": "2025-07-10T17:07:38.409Z",
+  "summary": {
+    "performanceScore": 100,
+    "status": "pass",
+    "criticalIssues": 0,
+    "apiEndpoints": 4,
+    "apiFailures": 2
+  },
+  "frontend": {
+    "timestamp": "2025-07-10T17:07:33.975Z",
+    "url": "http://localhost:5175",
+    "metrics": {
+      "pageLoad": 1297,
+      "loadTime": 0.40000003576278687,
+      "domContentLoaded": 0.10000002384185791,
+      "firstContentfulPaint": 0,
+      "largestContentfulPaint": 0,
+      "cumulativeLayoutShift": 0,
+      "firstInputDelay": 0
+    },
+    "scores": {
+      "performance": 100,
+      "accessibility": 95,
+      "bestPractices": 90,
+      "seo": 85
+    },
+    "recommendations": [],
+    "status": "pass"
+  },
+  "api": {
+    "/api/health": {
+      "responseTime": 43,
+      "status": 200,
+      "success": true
+    },
+    "/api/auth?action=verify": {
+      "responseTime": 5,
+      "status": 400,
+      "success": false
+    },
+    "/api/studies": {
+      "responseTime": 1056,
+      "status": 200,
+      "success": true
+    },
+    "/api/applications": {
+      "responseTime": 3,
+      "status": 400,
+      "success": false
+    }
+  },
+  "recommendations": [
+    {
+      "type": "critical",
+      "issue": "API endpoint /api/auth?action=verify is failing",
+      "suggestion": "Fix API endpoint: Unknown error"
+    },
+    {
+      "type": "important",
+      "issue": "Slow API response: /api/studies",
+      "suggestion": "Optimize database queries and add caching"
+    },
+    {
+      "type": "critical",
+      "issue": "API endpoint /api/applications is failing",
+      "suggestion": "Fix API endpoint: Unknown error"
+    }
+  ]
+}

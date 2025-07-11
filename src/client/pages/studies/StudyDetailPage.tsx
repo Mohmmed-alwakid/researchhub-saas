@@ -89,7 +89,15 @@ const StudyDetailPage: React.FC = () => {
     </div>
   );
 
-  const StudyAnalyticsTab = ({ study }: { study: IStudy }) => (
+  const StudyAnalyticsTab = ({ study }: { study: IStudy }) => {
+    // Provide default analytics data if not available
+    const analytics = study.analytics || {
+      successRate: 0,
+      avgCompletionTime: 0,
+      dropoffRate: 0
+    };
+
+    return (
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
@@ -97,22 +105,22 @@ const StudyDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
             <BarChart3 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-xl font-bold text-blue-600">{Math.round(study.analytics.successRate * 100) || 0}%</div>
+            <div className="text-xl font-bold text-blue-600">{Math.round(analytics.successRate * 100) || 0}%</div>
             <div className="text-sm text-gray-600">Success Rate</div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
             <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <div className="text-xl font-bold text-green-600">{study.participants.enrolled || 0}</div>
+            <div className="text-xl font-bold text-green-600">{study.participants?.enrolled || 0}</div>
             <div className="text-sm text-gray-600">Participants</div>
           </div>
           <div className="text-center p-4 bg-purple-50 rounded-lg">
             <Clock className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-            <div className="text-xl font-bold text-purple-600">{Math.round(study.analytics.avgCompletionTime) || 0}m</div>
+            <div className="text-xl font-bold text-purple-600">{Math.round(analytics.avgCompletionTime) || 0}m</div>
             <div className="text-sm text-gray-600">Avg. Time</div>
           </div>
           <div className="text-center p-4 bg-orange-50 rounded-lg">
             <Target className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-            <div className="text-xl font-bold text-orange-600">{Math.round((1 - study.analytics.dropoffRate) * 100) || 0}%</div>
+            <div className="text-xl font-bold text-orange-600">{Math.round((1 - analytics.dropoffRate) * 100) || 0}%</div>
             <div className="text-sm text-gray-600">Completion Rate</div>
           </div>
         </div>
@@ -125,8 +133,9 @@ const StudyDetailPage: React.FC = () => {
       </Card>
     </div>
   );
+  };
 
-  const StudyParticipantsTab = ({ study: _ }: { study: IStudy }) => (
+  const StudyParticipantsTab = ({ study }: { study: IStudy }) => (
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
@@ -141,7 +150,7 @@ const StudyDetailPage: React.FC = () => {
     </div>
   );
 
-  const StudyCollaborationTab = ({ study: _ }: { study: IStudy }) => (
+  const StudyCollaborationTab = ({ study }: { study: IStudy }) => (
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
@@ -156,7 +165,7 @@ const StudyDetailPage: React.FC = () => {
     </div>
   );
 
-  const StudySettingsTab = ({ study: _ }: { study: IStudy }) => (
+  const StudySettingsTab = ({ study }: { study: IStudy }) => (
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">

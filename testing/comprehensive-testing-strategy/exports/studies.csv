@@ -1,0 +1,27 @@
+id,title,researcherId,status,createdAt,targetParticipants,estimatedDuration,compensation
+study_1752167389771_3f05052c,"Brand Perception and Recognition Study",user_1752167389771_c9f559af,active,2025-05-17T13:27:50.498Z,30,34,54
+study_1752167389772_cbf8358f,"Accessibility Testing for Web Applications",user_1752167389771_e0ff1ecb,active,2025-06-25T01:25:20.225Z,53,26,42
+study_1752167389772_1dbe2149,"Task Completion Efficiency Analysis",user_1752167389771_de593881,active,2025-06-08T02:10:27.104Z,14,27,11
+study_1752167389772_67404e9a,"Social Media Platform User Behavior",user_1752167389771_47f9600e,active,2025-05-27T23:21:24.657Z,19,18,49
+study_1752167389772_f71208b1,"Website Navigation Patterns Analysis",user_1752167389771_de593881,active,2025-06-22T19:49:27.169Z,37,26,49
+study_1752167389772_dcd38ed9,"Task Completion Efficiency Analysis",user_1752167389771_52e75ab6,active,2025-05-18T18:24:34.541Z,40,33,26
+study_1752167389772_37d949e2,"Accessibility Testing for Web Applications",user_1752167389771_c9f559af,active,2025-06-30T16:30:37.461Z,11,14,59
+study_1752167389772_92255a3a,"Website Navigation Patterns Analysis",user_1752167389771_52e75ab6,active,2025-05-16T05:53:32.414Z,14,17,48
+study_1752167389772_b8841b65,"Brand Perception and Recognition Study",user_1752167389771_c9f559af,active,2025-06-15T17:52:02.343Z,51,23,42
+study_1752167389772_2b927ef6,"Product Feature Preference Survey",user_1752167389771_c9f559af,active,2025-06-03T07:07:57.265Z,30,20,15
+study_1752167389773_44c58414,"Accessibility Testing for Web Applications",user_1752167389771_52e75ab6,draft,2025-06-01T20:42:18.775Z,25,37,27
+study_1752167389773_6f2390ac,"Social Media Platform User Behavior",user_1752167389771_de593881,draft,2025-05-24T15:44:15.829Z,18,27,23
+study_1752167389773_728bb3c5,"E-commerce Checkout Process Optimization",user_1752167389771_47f9600e,draft,2025-06-18T20:48:50.200Z,23,24,10
+study_1752167389773_b006492a,"User Experience Research for Mobile Apps",user_1752167389771_c9f559af,draft,2025-06-11T21:43:13.345Z,40,11,19
+study_1752167389773_73510207,"Brand Perception and Recognition Study",user_1752167389771_52e75ab6,draft,2025-07-05T07:33:06.957Z,29,10,37
+study_1752167389773_3415876a,"User Experience Research for Mobile Apps",user_1752167389771_e0ff1ecb,completed,2025-06-02T01:59:38.827Z,53,39,15
+study_1752167389773_95cf9474,"User Experience Research for Mobile Apps",user_1752167389771_de593881,completed,2025-06-04T04:33:03.800Z,10,31,21
+study_1752167389773_1093fb1f,"Social Media Platform User Behavior",user_1752167389771_de593881,completed,2025-06-28T03:49:55.840Z,11,27,41
+study_1752167389773_c392a7c4,"Website Navigation Patterns Analysis",user_1752167389771_52e75ab6,completed,2025-06-11T03:31:28.896Z,49,11,18
+study_1752167389773_d00a315c,"User Experience Research for Mobile Apps",user_1752167389771_47f9600e,completed,2025-07-02T01:32:27.266Z,12,11,14
+study_1752167389773_e6b831a3,"Voice Interface Usability Study",user_1752167389771_52e75ab6,completed,2025-06-19T20:25:22.487Z,53,37,12
+study_1752167389773_bfd0d9d6,"Product Feature Preference Survey",user_1752167389771_de593881,completed,2025-05-19T17:34:16.374Z,31,11,55
+study_1752167389773_45f7bd3e,"E-commerce Checkout Process Optimization",user_1752167389771_de593881,completed,2025-06-04T10:30:38.573Z,25,27,23
+study_1752167389774_b6be229c,"Brand Perception and Recognition Study",user_1752167389771_52e75ab6,archived,2025-06-01T08:17:54.971Z,13,28,52
+study_1752167389774_c65c4853,"Brand Perception and Recognition Study",user_1752167389771_47f9600e,archived,2025-06-22T17:54:45.432Z,56,23,49
+study_1752167389774_4e423f03,"Content Discovery and Consumption Habits",user_1752167389771_de593881,archived,2025-05-24T07:16:45.850Z,27,33,16

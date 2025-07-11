@@ -15,6 +15,7 @@ import {
   Compass,
   BookOpen,
   Building,
+  Layout,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
@@ -43,6 +44,7 @@ const AppLayout = () => {
   const navigation = [
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Studies', href: '/app/studies', icon: FileText },
+    { name: 'Templates', href: '/app/templates', icon: Layout },
     { name: 'Organizations', href: '/app/organizations', icon: Building },
     { name: 'Participants', href: '/app/participants', icon: Users },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },

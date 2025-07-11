@@ -15,6 +15,7 @@ import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./client/pages/LandingPage'));
+const PricingPage = lazy(() => import('./client/pages/PricingPage'));
 const LoginPage = lazy(() => import('./client/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('./client/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./client/pages/auth/ForgotPasswordPage'));
@@ -29,6 +30,7 @@ const StudyApplicationPage = lazy(() => import('./client/pages/studies/StudyAppl
 const StudyApplicationsManagementPage = lazy(() => import('./client/pages/studies/StudyApplicationsManagementPage'));
 const StudySessionPage = lazy(() => import('./client/pages/studies/StudySessionPage'));
 const ParticipantDashboardPage = lazy(() => import('./client/pages/studies/ParticipantDashboardPage'));
+const TemplateManagerPage = lazy(() => import('./client/pages/templates/TemplateManagerPage'));
 const ParticipantsPage = lazy(() => import('./client/pages/participants/ParticipantsPage'));
 const AnalyticsPage = lazy(() => import('./client/pages/analytics/AnalyticsPage'));
 const BillingSettingsPage = lazy(() => import('./client/pages/settings/BillingSettingsPage'));
@@ -121,6 +123,7 @@ function App() {
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -195,6 +198,11 @@ function App() {
               <Route path="studies/:studyId/applications" element={
                 <ProtectedRoute allowedRoles={['researcher']}>
                   <StudyApplicationsManagementPage />
+                </ProtectedRoute>
+              } />
+              <Route path="templates" element={
+                <ProtectedRoute allowedRoles={['researcher', 'admin']}>
+                  <TemplateManagerPage />
                 </ProtectedRoute>
               } />
               <Route path="participants" element={

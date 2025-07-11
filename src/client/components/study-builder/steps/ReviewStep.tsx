@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StepProps } from '../types';
 import { StudyPreviewModal } from '../StudyPreviewModal';
+import { SaveAsTemplateModal } from '../SaveAsTemplateModal';
 
 export const ReviewStep: React.FC<StepProps> = ({
   formData,
@@ -8,6 +9,7 @@ export const ReviewStep: React.FC<StepProps> = ({
   onPrevious
 }) => {
   const [showPreview, setShowPreview] = useState(false);
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
 
   const formatDuration = (minutes?: number) => {
     if (!minutes) return 'Not specified';
@@ -196,6 +198,20 @@ export const ReviewStep: React.FC<StepProps> = ({
         </button>
 
         <div className="flex items-center space-x-4">
+          <button
+            type="button"
+            onClick={() => setShowPreview(true)}
+            className="px-6 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+          >
+            Preview Study
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowSaveTemplate(true)}
+            className="px-6 py-2 text-green-600 border border-green-600 rounded-lg hover:bg-green-50 transition-colors"
+          >
+            Save as Template
+          </button>
           <div className="text-sm text-gray-500">
             Step 5 of 6
           </div>
@@ -216,6 +232,21 @@ export const ReviewStep: React.FC<StepProps> = ({
         studyDescription={formData.description || 'No description'}
         blocks={formData.blocks || []}
         onConfirm={() => setShowPreview(false)}
+      />
+
+      <SaveAsTemplateModal
+        isOpen={showSaveTemplate}
+        onClose={() => setShowSaveTemplate(false)}
+        studyData={{
+          title: formData.title || 'Untitled Study',
+          description: formData.description || 'No description',
+          type: formData.type || 'usability_test',
+          blocks: formData.blocks || []
+        }}
+        onSave={(templateId: string) => {
+          console.log('Template saved with ID:', templateId);
+          setShowSaveTemplate(false);
+        }}
       />
     </div>
   );

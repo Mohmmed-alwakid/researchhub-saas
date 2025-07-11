@@ -21,6 +21,7 @@ import { Button, Input } from '../../components/ui';
 import { Card, CardContent } from '../../components/ui/Card';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
+import { EnhancedStudyCreationModal } from '../../components/studies/EnhancedStudyCreationModal';
 import { IStudy } from '../../../shared/types';
 
 const StudiesPage: React.FC = () => {
@@ -38,6 +39,7 @@ const StudiesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [showStudyCreationModal, setShowStudyCreationModal] = useState(false);
 
   useEffect(() => {
     fetchStudies();
@@ -69,10 +71,21 @@ const StudiesPage: React.FC = () => {
     fetchStudies();
   };
 
-  // Handle study creation flow - direct to new Study Builder
+  // Handle study creation flow - show enhanced modal instead of direct navigation
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/app/study-builder');
+    setShowStudyCreationModal(true);
+  };
+
+  const handleCreateFromTemplate = () => {
+    // Use the new modal flow instead of navigation
+    setShowStudyCreationModal(true);
+    // The modal will handle template selection internally
+  };
+
+  const handleCreateFromScratch = () => {
+    // Use the new modal flow instead of navigation
+    setShowStudyCreationModal(true);
   };
 
   const filteredStudies = (studies || []).filter(study => {
@@ -177,7 +190,7 @@ const StudiesPage: React.FC = () => {
             Refresh
           </Button>
           <Button
-            onClick={() => navigate('/app/study-builder')}
+            onClick={handleCreateNewStudy}
             variant="primary"
             size="md"
             leftIcon={<Plus className="w-4 h-4" />}
@@ -448,6 +461,14 @@ const StudiesPage: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Enhanced Study Creation Modal */}
+      <EnhancedStudyCreationModal
+        isOpen={showStudyCreationModal}
+        onClose={() => setShowStudyCreationModal(false)}
+        onCreateFromTemplate={handleCreateFromTemplate}
+        onCreateFromScratch={handleCreateFromScratch}
+      />
     </div>
   );
 };

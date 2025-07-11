@@ -1,0 +1,21 @@
+{
+  "testEnvironment": "local",
+  "baseUrl": "http://localhost:5175",
+  "apiUrl": "http://localhost:3003",
+  "timeout": 30000,
+  "retries": 2,
+  "testAccounts": {
+    "participant": {
+      "email": "abwanwr77+participant@gmail.com",
+      "password": "Testtest123"
+    },
+    "researcher": {
+      "email": "abwanwr77+Researcher@gmail.com",
+      "password": "Testtest123"
+    },
+    "admin": {
+      "email": "abwanwr77+admin@gmail.com",
+      "password": "Testtest123"
+    }
+  }
+}

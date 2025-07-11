@@ -10,7 +10,6 @@ import {
   ArrowDownRight,
   Eye,
   Filter,
-  MessageSquare,
   Settings,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
@@ -21,7 +20,8 @@ import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
 import { CollaborationDashboard } from '../../components/collaboration/CollaborationDashboard';
 import { useAuthStore } from '../../stores/authStore';
-import type { WorkspaceRole } from '../../../shared/types';
+import { EnhancedStudyCreationModal } from '../../components/studies/EnhancedStudyCreationModal';
+import type { WorkspaceRole, EnhancedStudyTemplate } from '../../../shared/types';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -29,6 +29,7 @@ const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState<DashboardAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'collaboration' | 'analytics' | 'settings'>('overview');
+  const [showStudyCreationModal, setShowStudyCreationModal] = useState(false);
 
   // Fetch real dashboard data on component mount
   useEffect(() => {
@@ -54,13 +55,33 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, []);  // Handle study creation flow - navigate directly to new StudyCreationWizard
+  }, []);  // Handle study creation flow - show enhanced modal instead of direct navigation
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/app/studies/create');
+    setShowStudyCreationModal(true);
   };
 
-  // Removed handleStudyTypeSelect - no longer needed with direct navigation
+  const handleCreateFromTemplate = (template: EnhancedStudyTemplate) => {
+    // TODO: Complete study creation within modal - no navigation
+    console.log('Creating study from template:', template);
+    setShowStudyCreationModal(false);
+    // Placeholder: Will be handled by complete modal flow
+  };
+
+  const handleCreateFromScratch = () => {
+    // TODO: Complete study creation within modal - no navigation
+    console.log('Creating study from scratch');
+    setShowStudyCreationModal(false);
+    // Placeholder: Will be handled by complete modal flow
+  };
+
+  const handleStudyCreated = (studyId: string) => {
+    // Handle successful study creation
+    console.log('Study created successfully:', studyId);
+    setShowStudyCreationModal(false);
+    // Refresh dashboard or navigate to new study
+    navigate(`/app/studies/${studyId}`);
+  };
 
   // Calculate stats for display
   const stats = dashboardData ? [
@@ -469,7 +490,14 @@ const DashboardPage = () => {
           </div>
         )}
 
-        {/* Removed SimplifiedStudyCreationModal - now using direct navigation to StudyCreationWizard */}
+        {/* Enhanced Study Creation Modal */}
+        <EnhancedStudyCreationModal
+          isOpen={showStudyCreationModal}
+          onClose={() => setShowStudyCreationModal(false)}
+          onCreateFromTemplate={handleCreateFromTemplate}
+          onCreateFromScratch={handleCreateFromScratch}
+          onStudyCreated={handleStudyCreated}
+        />
       </div>
     </div>
   );

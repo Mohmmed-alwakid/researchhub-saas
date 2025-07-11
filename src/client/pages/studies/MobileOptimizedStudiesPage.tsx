@@ -4,17 +4,14 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
   MoreHorizontal, 
   Eye, 
   Edit, 
-  Trash2, 
   Users, 
-  Play, 
-  Pause, 
   Calendar,
   Clock,
   DollarSign,
@@ -36,7 +33,6 @@ import { Button, Input } from '../../components/ui';
 import { Card, CardContent } from '../../components/ui/Card';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
-import { IStudy } from '../../../shared/types';
 
 const MobileOptimizedStudiesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -46,10 +42,7 @@ const MobileOptimizedStudiesPage: React.FC = () => {
   const { 
     studies, 
     studiesLoading, 
-    fetchStudies, 
-    deleteStudy,
-    updateStudy,
-    setCurrentStudy 
+    fetchStudies
   } = useAppStore();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -76,19 +69,6 @@ const MobileOptimizedStudiesPage: React.FC = () => {
     return matchesSearch && matchesStatus && matchesType;
   }) || [];
 
-  const handleDeleteStudy = async (studyId: string) => {
-    if (window.confirm('Are you sure you want to delete this study?')) {
-      await deleteStudy(studyId);
-    }
-  };
-
-  const handleUpdateStudyStatus = async (studyId: string, newStatus: string) => {
-    const study = studies?.find(s => s.id === studyId);
-    if (study) {
-      await updateStudy(studyId, { ...study, status: newStatus });
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'text-green-600 bg-green-100';
@@ -100,7 +80,7 @@ const MobileOptimizedStudiesPage: React.FC = () => {
   };
 
   const navigateToStudyBuilder = () => {
-    navigate('/study-builder');
+    navigate('/app/study-builder');
   };
 
   const navigateToStudyDetail = (studyId: string) => {
@@ -265,11 +245,11 @@ const MobileOptimizedStudiesPage: React.FC = () => {
             </div>
           ) : (
             filteredStudies.map((study) => (
-              <React.Fragment key={study.id}>
+              <React.Fragment key={study._id}>
                 {/* Mobile Card */}
                 {(isMobile || isTablet) ? (
                   <MobileCard
-                    onClick={() => navigateToStudyDetail(study.id)}
+                    onClick={() => navigateToStudyDetail(study._id)}
                     className="space-y-4"
                   >
                     {/* Study Header */}
@@ -298,20 +278,19 @@ const MobileOptimizedStudiesPage: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100">
                       <div className="flex items-center text-sm text-gray-500">
                         <Users className="w-4 h-4 mr-1.5" />
-                        <span>{study.participant_count || 0} participants</span>
+                        <span>{study.participants?.enrolled || 0} participants</span>
                       </div>
                       <div className="flex items-center text-sm text-gray-500">
                         <Clock className="w-4 h-4 mr-1.5" />
-                        <span>{formatDistanceToNow(new Date(study.created_at))} ago</span>
+                        <span>{formatDistanceToNow(new Date(study.createdAt))} ago</span>
                       </div>
                     </div>
 
                     {/* Mobile Action Buttons */}
                     <div className="flex space-x-2 pt-3 border-t border-gray-100">
                       <MobileButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/studies/${study.id}/edit`);
+                        onClick={() => {
+                          navigate(`/studies/${study._id}/edit`);
                         }}
                         variant="secondary"
                         size="small"
@@ -322,9 +301,8 @@ const MobileOptimizedStudiesPage: React.FC = () => {
                         Edit
                       </MobileButton>
                       <MobileButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/studies/${study.id}/results`);
+                        onClick={() => {
+                          navigate(`/studies/${study._id}/results`);
                         }}
                         variant="secondary"
                         size="small"
@@ -338,7 +316,7 @@ const MobileOptimizedStudiesPage: React.FC = () => {
                   </MobileCard>
                 ) : (
                   /* Desktop Card */
-                  <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={() => navigateToStudyDetail(study.id)}>
+                  <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={() => navigateToStudyDetail(study._id)}>
                     <CardContent className="p-6">
                       {/* Study Header */}
                       <div className="flex items-start justify-between mb-4">
@@ -369,11 +347,11 @@ const MobileOptimizedStudiesPage: React.FC = () => {
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="flex items-center text-sm text-gray-500">
                           <Users className="w-4 h-4 mr-2" />
-                          <span>{study.participant_count || 0} participants</span>
+                          <span>{study.participants?.enrolled || 0} participants</span>
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
                           <Clock className="w-4 h-4 mr-2" />
-                          <span>{formatDistanceToNow(new Date(study.created_at))} ago</span>
+                          <span>{formatDistanceToNow(new Date(study.createdAt))} ago</span>
                         </div>
                       </div>
 
@@ -384,7 +362,7 @@ const MobileOptimizedStudiesPage: React.FC = () => {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/studies/${study.id}/edit`);
+                            navigate(`/studies/${study._id}/edit`);
                           }}
                         >
                           <Edit className="w-4 h-4 mr-1" />
@@ -395,7 +373,7 @@ const MobileOptimizedStudiesPage: React.FC = () => {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/studies/${study.id}/results`);
+                            navigate(`/studies/${study._id}/results`);
                           }}
                         >
                           <Eye className="w-4 h-4 mr-1" />

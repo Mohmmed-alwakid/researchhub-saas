@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { SmartTemplateFilter, type FilterOptions } from './SmartTemplateFilter';
 import { 
   getTemplatesByCategory,
   TEMPLATE_CATEGORIES
@@ -36,6 +37,8 @@ interface EnhancedTemplateGalleryProps {
     description: string;
     priority: 'high' | 'medium' | 'low';
   };
+  // Quick flow support
+  onQuickCreate?: (template: EnhancedStudyTemplate) => void;
 }
 
 interface TemplatePreviewModalProps {
@@ -258,25 +261,41 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
   studyType,
   onStartFromScratch,
   recommendedTemplates = [],
-  intentContext
+  intentContext,
+  onQuickCreate
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory>('usability-testing');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<EnhancedStudyTemplate | null>(null);
   const [variables, setVariables] = useState<Record<string, string>>({});
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  
+  // Smart filter state
+  const [filters, setFilters] = useState<FilterOptions>({
+    searchQuery: '',
+    duration: 'any',
+    complexity: 'any',
+    popularity: 'any',
+    tags: []
+  });
 
   // Get templates for the selected category
   const templates = useMemo(() => {
     return getTemplatesByCategory(selectedCategory);
   }, [selectedCategory]);
 
+  // Get all available tags from templates
+  const availableTags = useMemo(() => {
+    const allTags = templates.flatMap((template: EnhancedStudyTemplate) => template.metadata.tags);
+    return [...new Set(allTags)].sort();
+  }, [templates]);
+
   // Enhanced filtering with intelligent recommendations
   const filteredTemplates = useMemo(() => {
     let baseTemplates = templates;
     
     // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    if (filters.searchQuery.trim()) {
+      const query = filters.searchQuery.toLowerCase();
       baseTemplates = templates.filter(template => 
         template.name.toLowerCase().includes(query) ||
         template.description.toLowerCase().includes(query) ||
@@ -284,29 +303,59 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
       );
     }
 
-    // Apply intelligent sorting based on recommendations
-    if (recommendedTemplates.length > 0) {
-      return baseTemplates.sort((a, b) => {
-        const aRecommended = recommendedTemplates.includes(a.id);
-        const bRecommended = recommendedTemplates.includes(b.id);
-        
-        // Recommended templates first
-        if (aRecommended && !bRecommended) return -1;
-        if (!aRecommended && bRecommended) return 1;
-        
-        // Then by priority context if available
-        if (intentContext?.priority === 'high') {
-          // For high priority, prefer templates with higher usage
-          return (b.usage?.usageCount || 0) - (a.usage?.usageCount || 0);
+    // Apply duration filter
+    if (filters.duration !== 'any') {
+      baseTemplates = baseTemplates.filter(template => {
+        const duration = template.metadata?.estimatedDuration || 15;
+        switch (filters.duration) {
+          case 'quick': return duration <= 10;
+          case 'medium': return duration > 10 && duration <= 30;
+          case 'long': return duration > 30;
+          default: return true;
         }
-        
-        // Default sort by popularity
-        return (b.usage?.rating || 0) - (a.usage?.rating || 0);
       });
     }
-    
-    return baseTemplates;
-  }, [templates, searchQuery, recommendedTemplates, intentContext]);
+
+    // Apply complexity filter
+    if (filters.complexity !== 'any') {
+      baseTemplates = baseTemplates.filter(template => 
+        template.metadata.difficulty === filters.complexity
+      );
+    }
+
+    // Apply tag filter
+    if (filters.tags.length > 0) {
+      baseTemplates = baseTemplates.filter(template =>
+        filters.tags.some(tag => template.metadata.tags.includes(tag))
+      );
+    }
+
+    // Apply intelligent sorting based on recommendations and popularity
+    return baseTemplates.sort((a, b) => {
+      const aRecommended = recommendedTemplates.includes(a.id);
+      const bRecommended = recommendedTemplates.includes(b.id);
+      
+      // Recommended templates first
+      if (aRecommended && !bRecommended) return -1;
+      if (!aRecommended && bRecommended) return 1;
+      
+      // Then by popularity filter
+      if (filters.popularity === 'popular') {
+        return (b.usage?.usageCount || 0) - (a.usage?.usageCount || 0);
+      }
+      if (filters.popularity === 'trending') {
+        return (b.usage?.rating || 0) - (a.usage?.rating || 0);
+      }
+      
+      // Finally by priority context if available
+      if (intentContext?.priority === 'high') {
+        return (b.usage?.usageCount || 0) - (a.usage?.usageCount || 0);
+      }
+      
+      // Default sort by popularity
+      return (b.usage?.rating || 0) - (a.usage?.rating || 0);
+    });
+  }, [templates, filters, recommendedTemplates, intentContext]);
 
   // Initialize variables when template is selected
   const handleTemplateSelect = (template: EnhancedStudyTemplate) => {
@@ -326,6 +375,16 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
   const handleUseTemplate = (template: EnhancedStudyTemplate) => {
     onSelectTemplate(template);
     onClose();
+  };
+
+  const handleQuickCreateTemplate = (template: EnhancedStudyTemplate, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent the card click handler
+    if (onQuickCreate) {
+      onQuickCreate(template);
+    } else {
+      // Fallback to regular template selection
+      handleUseTemplate(template);
+    }
   };
 
   if (!isOpen) return null;
@@ -413,22 +472,17 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
           </div>
         )}
 
-        {/* Search and Filters */}
+        {/* Smart Filters */}
         <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search templates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div className="text-sm text-gray-500">
-              {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}
-            </div>
+          <SmartTemplateFilter
+            filters={filters}
+            onFiltersChange={setFilters}
+            availableTags={availableTags}
+            isExpanded={isFilterExpanded}
+            onToggleExpanded={() => setIsFilterExpanded(!isFilterExpanded)}
+          />
+          <div className="mt-4 text-sm text-gray-500 text-center">
+            {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''} found
           </div>
         </div>
 
@@ -468,20 +522,36 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
                   
                   <CardContent className="pt-0">
                     <div className="space-y-3">
-                      {/* Stats */}
-                      <div className="flex items-center justify-between text-sm text-gray-500">
+                      {/* Enhanced Stats */}
+                      <div className="grid grid-cols-3 gap-2 text-xs text-gray-500">
                         <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {template.estimatedTime}
+                          <Clock className="w-3 h-3" />
+                          <span>{template.metadata?.estimatedDuration || 15}m</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          {template.recommendedParticipants}
+                          <Users className="w-3 h-3" />
+                          <span>{template.metadata?.participantCount || 5}+</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          {template.usage.rating}
+                          <Star className="w-3 h-3 text-yellow-500" />
+                          <span>{template.usage?.rating || 4.5}</span>
                         </div>
+                      </div>
+
+                      {/* Complexity and Usage Stats */}
+                      <div className="flex items-center justify-between text-xs">
+                        <span className={`px-2 py-1 rounded-full ${
+                          template.metadata.difficulty === 'beginner' ? 'bg-green-100 text-green-800' :
+                          template.metadata.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {template.metadata.difficulty}
+                        </span>
+                        {template.usage?.usageCount && (
+                          <span className="text-gray-500">
+                            {template.usage.usageCount} uses
+                          </span>
+                        )}
                       </div>
 
                       {/* Tags */}
@@ -500,6 +570,30 @@ const EnhancedTemplateGallery: React.FC<EnhancedTemplateGalleryProps> = ({
                           </span>
                         )}
                       </div>
+
+                      {/* Action Buttons */}
+                      {onQuickCreate && (
+                        <div className="flex space-x-2 pt-2">
+                          <Button
+                            size="sm"
+                            onClick={(e) => handleQuickCreateTemplate(template, e)}
+                            className="flex-1 text-xs bg-blue-600 hover:bg-blue-700"
+                          >
+                            Quick Create
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTemplateSelect(template);
+                            }}
+                            className="flex-1 text-xs"
+                          >
+                            Customize
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

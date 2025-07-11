@@ -1,0 +1,67 @@
+{
+  "monitoring": {
+    "intervals": {
+      "quick": 300,
+      "full": 1800,
+      "daily": 86400
+    },
+    "thresholds": {
+      "uatSuccessRate": {
+        "warning": 0.75,
+        "critical": 0.65
+      },
+      "performanceScore": {
+        "warning": 65,
+        "critical": 50
+      },
+      "systemHealth": {
+        "warning": "degraded",
+        "critical": "unhealthy"
+      }
+    },
+    "retention": {
+      "metrics": 30,
+      "reports": 90,
+      "alerts": 7
+    }
+  },
+  "alerts": {
+    "enabled": true,
+    "channels": {
+      "slack": {
+        "enabled": false,
+        "channel": "#uat-monitoring"
+      },
+      "email": {
+        "enabled": false,
+        "recipients": []
+      },
+      "console": {
+        "enabled": true
+      }
+    },
+    "rules": [
+      {
+        "name": "UAT Success Rate Drop",
+        "metric": "uatSuccessRate",
+        "condition": "below",
+        "threshold": 0.75,
+        "severity": "warning"
+      },
+      {
+        "name": "Critical UAT Failure",
+        "metric": "uatSuccessRate",
+        "condition": "below",
+        "threshold": 0.65,
+        "severity": "critical"
+      },
+      {
+        "name": "Performance Degradation",
+        "metric": "performanceScore",
+        "condition": "below",
+        "threshold": 65,
+        "severity": "warning"
+      }
+    ]
+  }
+}

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Sessions API Test - ResearchHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .api-response {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .success { border-color: #22c55e; background-color: #f0fdf4; }
+        .error { border-color: #ef4444; background-color: #fef2f2; }
+        .warning { border-color: #f59e0b; background-color: #fffbeb; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">🎯 Study Sessions API Test</h1>
+        
+        <!-- Authentication Section -->
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+            <h2 class="text-xl font-semibold mb-4">🔑 Authentication Setup</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <button onclick="useParticipantAccount()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    Use Participant Account
+                </button>
+                <button onclick="useResearcherAccount()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Use Researcher Account
+                </button>
+                <button onclick="useAdminAccount()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                    Use Admin Account
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Auth Token</label>
+                <input type="text" id="authToken" placeholder="Authentication token will appear here..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Study ID (for testing)</label>
+                <input type="text" id="testStudyId" value="study-12345" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                <small class="text-gray-500">Use a test study ID or real one from database</small>
+            </div>
+            
+            <div id="authResult" class="api-response" style="display: none;"></div>
+        </div>
+
+        <!-- Study Sessions Testing -->
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+            <h2 class="text-xl font-semibold mb-4">📋 Study Sessions Operations</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <button onclick="testCreateSession()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    1️⃣ Create Study Session
+                </button>
+                <button onclick="testGetSession()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    2️⃣ Get Session Details
+                </button>
+                <button onclick="testUpdateProgress()" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+                    3️⃣ Update Progress
+                </button>
+                <button onclick="testCompleteSession()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                    4️⃣ Complete Session
+                </button>
+                <button onclick="testGetMySessions()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    5️⃣ Get My Sessions
+                </button>
+                <button onclick="testGetStudySessions()" class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700">
+                    6️⃣ Get Study Sessions
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Session ID (auto-filled after creation)</label>
+                <input type="text" id="testSessionId" placeholder="Session ID will be filled automatically..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div id="sessionResult" class="api-response" style="display: none;"></div>
+        </div>
+
+        <!-- Block Session Testing -->
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+            <h2 class="text-xl font-semibold mb-4">🧩 Block Session Integration</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <button onclick="testGetStudyBlocks()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    📋 Get Study Blocks
+                </button>
+                <button onclick="testBlockResponse()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    💾 Save Block Response
+                </button>
+            </div>
+            
+            <div id="blockResult" class="api-response" style="display: none;"></div>
+        </div>
+
+        <!-- Integration Flow Test -->
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h2 class="text-xl font-semibold mb-4">🔄 Full Integration Flow Test</h2>
+            <p class="text-gray-600 mb-4">Test the complete participant workflow: Login → Create Session → Load Blocks → Save Response → Complete</p>
+            
+            <button onclick="testFullFlow()" class="px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:from-green-700 hover:to-blue-700 font-semibold">
+                🚀 Run Full Integration Test
+            </button>
+            
+            <div id="flowResult" class="api-response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = '';
+        let currentSessionId = '';
+        const baseUrl = window.location.origin;
+
+        // Test account configurations
+        const testAccounts = {
+            participant: {
+                email: 'abwanwr77+participant@gmail.com',
+                password: 'Testtest123'
+            },
+            researcher: {
+                email: 'abwanwr77+Researcher@gmail.com',
+                password: 'Testtest123'
+            },
+            admin: {
+                email: 'abwanwr77+admin@gmail.com',
+                password: 'Testtest123'
+            }
+        };
+
+        // Utility functions
+        function displayResult(elementId, data, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `api-response ${type}`;
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+        function getAuthHeaders() {
+            if (!currentToken) {
+                throw new Error('No authentication token available. Please authenticate first.');
+            }
+            return {
+                'Authorization': `Bearer ${currentToken}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        // Authentication functions
+        async function authenticateUser(accountType) {
+            try {
+                const account = testAccounts[accountType];
+                const response = await fetch(`${baseUrl}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(account)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    currentToken = data.token;
+                    document.getElementById('authToken').value = currentToken;
+                    displayResult('authResult', {
+                        message: `✅ Authenticated as ${accountType}`,
+                        user: data.user,
+                        tokenPreview: currentToken.substring(0, 50) + '...'
+                    }, 'success');
+                } else {
+                    throw new Error(data.error || 'Authentication failed');
+                }
+            } catch (error) {
+                displayResult('authResult', { error: error.message }, 'error');
+            }
+        }
+
+        function useParticipantAccount() { authenticateUser('participant'); }
+        function useResearcherAccount() { authenticateUser('researcher'); }
+        function useAdminAccount() { authenticateUser('admin'); }
+
+        // Study Sessions API tests
+        async function testCreateSession() {
+            try {
+                const studyId = document.getElementById('testStudyId').value;
+                const response = await fetch(`${baseUrl}/api/study-sessions`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ studyId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.session) {
+                    currentSessionId = data.session.id;
+                    document.getElementById('testSessionId').value = currentSessionId;
+                    displayResult('sessionResult', {
+                        message: '✅ Session created successfully',
+                        session: data.session
+                    }, 'success');
+                } else {
+                    throw new Error(data.error || 'Failed to create session');
+                }
+            } catch (error) {
+                displayResult('sessionResult', { error: error.message }, 'error');
+            }
+        }
+
+        async function testGetSession() {
+            try {
+                const sessionId = document.getElementById('testSessionId').value || currentSessionId;
+                if (!sessionId) throw new Error('No session ID available');
+                
+                const response = await fetch(`${baseUrl}/api/study-sessions/${sessionId}`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const data = await response.json();
+                displayResult('sessionResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('sessionResult', { error: error.message }, 'error');
+            }
+        }
+
+        async function testUpdateProgress() {
+            try {
+                const sessionId = document.getElementById('testSessionId').value || currentSessionId;
+                if (!sessionId) throw new Error('No session ID available');
+                
+                const response = await fetch(`${baseUrl}/api/study-sessions/progress`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        sessionId,
+                        currentBlockIndex: 1,
+                        completedBlocks: ['test_welcome'],
+                        progressData: { testProgress: true }
+                    })
+                });
+                
+                const data = await response.json();
+                displayResult('sessionResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('sessionResult', { error: error.message }, 'error');
+            }
+        }
+
+        async function testCompleteSession() {
+            try {
+                const sessionId = document.getElementById('testSessionId').value || currentSessionId;
+                if (!sessionId) throw new Error('No session ID available');
+                
+                const response = await fetch(`${baseUrl}/api/study-sessions/${sessionId}/complete`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        completionData: { reason: 'test_completion' }
+                    })
+                });
+                
+                const data = await response.json();
+                displayResult('sessionResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('sessionResult', { error: error.message }, 'error');
+            }
+        }
+
+        async function testGetMySessions() {
+            try {
+                const response = await fetch(`${baseUrl}/api/study-sessions/my-sessions`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const data = await response.json();
+                displayResult('sessionResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('sessionResult', { error: error.message }, 'error');
+            }
+        }
+
+        async function testGetStudySessions() {
+            try {
+                const studyId = document.getElementById('testStudyId').value;
+                const response = await fetch(`${baseUrl}/api/study-sessions?studyId=${studyId}`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const data = await response.json();
+                displayResult('sessionResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('sessionResult', { error: error.message }, 'error');
+            }
+        }
+
+        // Block session tests
+        async function testGetStudyBlocks() {
+            try {
+                const studyId = document.getElementById('testStudyId').value;
+                const response = await fetch(`${baseUrl}/api/blocks?action=study&studyId=${studyId}`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const data = await response.json();
+                displayResult('blockResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('blockResult', { error: error.message }, 'error');
+            }
+        }
+
+        async function testBlockResponse() {
+            try {
+                const sessionId = document.getElementById('testSessionId').value || currentSessionId;
+                if (!sessionId) throw new Error('No session ID available');
+                
+                const response = await fetch(`${baseUrl}/api/blocks?action=response`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        sessionId,
+                        blockId: 'test_welcome',
+                        blockType: 'welcome',
+                        response: { acknowledged: true },
+                        metadata: { testResponse: true }
+                    })
+                });
+                
+                const data = await response.json();
+                displayResult('blockResult', data, data.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('blockResult', { error: error.message }, 'error');
+            }
+        }
+
+        // Full integration flow test
+        async function testFullFlow() {
+            const results = [];
+            
+            try {
+                displayResult('flowResult', { message: '🚀 Starting full integration test...' }, 'warning');
+                
+                // 1. Authenticate as participant
+                await authenticateUser('participant');
+                results.push('✅ Authentication successful');
+                
+                // 2. Create session
+                const studyId = document.getElementById('testStudyId').value;
+                const sessionResponse = await fetch(`${baseUrl}/api/study-sessions`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ studyId })
+                });
+                const sessionData = await sessionResponse.json();
+                if (!sessionData.success) throw new Error('Session creation failed');
+                currentSessionId = sessionData.session.id;
+                results.push('✅ Session created: ' + currentSessionId);
+                
+                // 3. Get study blocks
+                const blocksResponse = await fetch(`${baseUrl}/api/blocks?action=study&studyId=${studyId}`, {
+                    headers: getAuthHeaders()
+                });
+                const blocksData = await blocksResponse.json();
+                if (!blocksData.success) throw new Error('Failed to load blocks');
+                results.push(`✅ Loaded ${blocksData.blocks?.length || 0} blocks`);
+                
+                // 4. Save a block response
+                const blockResponse = await fetch(`${baseUrl}/api/blocks?action=response`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        sessionId: currentSessionId,
+                        blockId: 'test_welcome',
+                        blockType: 'welcome',
+                        response: { acknowledged: true },
+                        metadata: { fullFlowTest: true }
+                    })
+                });
+                const blockData = await blockResponse.json();
+                if (!blockData.success) throw new Error('Failed to save block response');
+                results.push('✅ Block response saved successfully');
+                
+                // 5. Update session progress
+                const progressResponse = await fetch(`${baseUrl}/api/study-sessions/progress`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        sessionId: currentSessionId,
+                        currentBlockIndex: 1,
+                        completedBlocks: ['test_welcome'],
+                        progressData: { fullFlowTest: true }
+                    })
+                });
+                const progressData = await progressResponse.json();
+                if (!progressData.success) throw new Error('Failed to update progress');
+                results.push('✅ Session progress updated');
+                
+                displayResult('flowResult', {
+                    message: '🎉 Full integration test completed successfully!',
+                    results,
+                    sessionId: currentSessionId,
+                    totalSteps: results.length
+                }, 'success');
+                
+            } catch (error) {
+                results.push('❌ Error: ' + error.message);
+                displayResult('flowResult', {
+                    message: '❌ Full integration test failed',
+                    results,
+                    error: error.message
+                }, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

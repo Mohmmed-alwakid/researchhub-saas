@@ -235,9 +235,12 @@ export const StudyBlockSession: React.FC<StudyBlockSessionProps> = ({
         sessionStorage.setItem(blockKey, Date.now().toString());
         sessionStorage.setItem(`block_${currentBlock.id}_interactions`, '0');
         console.log('📊 Started tracking block:', currentBlock.id);
+        
+        // Auto-save session progress when starting a new block
+        saveSessionProgress();
       }
     }
-  }, [currentBlockIndex, blocks]);
+  }, [currentBlockIndex, blocks, saveSessionProgress]);
 
   const saveBlockResponse = async (blockId: string, blockType: string, response: Record<string, string | number | boolean | string[]>) => {
     try {
