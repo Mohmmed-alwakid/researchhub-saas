@@ -29,9 +29,9 @@ const ProgressStep: React.FC<ProgressStepProps> = ({
   showLabels
 }) => {
   const sizeClasses = {
-    sm: 'w-6 h-6 text-xs',
-    md: 'w-8 h-8 text-sm',
-    lg: 'w-10 h-10 text-base'
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-12 h-12 text-base'
   };
 
   const stepClass = sizeClasses[size];
@@ -40,10 +40,10 @@ const ProgressStep: React.FC<ProgressStepProps> = ({
     <div className={`flex items-center ${!isLast ? 'flex-1' : ''}`}>
       <div className="flex flex-col items-center">
         <div
-          className={`${stepClass} rounded-full flex items-center justify-center font-medium transition-all duration-200 ${
+          className={`${stepClass} rounded-full flex items-center justify-center font-semibold transition-all duration-300 transform hover:scale-110 ${
             isCompleted || isActive
-              ? 'bg-primary-600 text-white shadow-soft'
-              : 'bg-neutral-200 text-neutral-600'
+              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-200/50 border-2 border-blue-300' 
+              : 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-600 shadow-md border-2 border-gray-200 hover:from-gray-200 hover:to-slate-200'
           }`}
           role="img"
           aria-label={`Step ${stepNumber}${isCompleted ? ' completed' : isActive ? ' current' : ' pending'}`}
@@ -57,8 +57,8 @@ const ProgressStep: React.FC<ProgressStepProps> = ({
           )}
         </div>
         {showLabels && label && (
-          <span className={`mt-2 text-xs font-medium text-center ${
-            isActive ? 'text-primary-600' : 'text-neutral-600'
+          <span className={`mt-2 text-xs font-semibold text-center transition-colors duration-200 ${
+            isActive ? 'text-blue-600' : 'text-gray-600'
           }`}>
             {label}
           </span>
@@ -66,8 +66,8 @@ const ProgressStep: React.FC<ProgressStepProps> = ({
       </div>
       {!isLast && (
         <div
-          className={`flex-1 h-1 mx-4 transition-all duration-300 ${
-            isCompleted ? 'bg-primary-600' : 'bg-neutral-200'
+          className={`flex-1 h-2 mx-4 rounded-full transition-all duration-500 ${
+            isCompleted ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md' : 'bg-gradient-to-r from-gray-200 to-slate-200'
           }`}
           role="presentation"
         />
@@ -112,7 +112,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
   return (
     <div 
-      className={`w-full ${className}`}
+      className={`w-full p-4 bg-gradient-to-r from-white to-gray-50 rounded-lg shadow-sm border border-gray-100 ${className}`}
       role="progressbar"
       aria-valuemin={1}
       aria-valuemax={totalSteps}

@@ -61,13 +61,14 @@
   },
   "functions": {
     "api/auth.js": { "maxDuration": 30 },
+    "api/auth-enhanced.js": { "maxDuration": 30 },
+    "api/user-enhanced.js": { "maxDuration": 30 },
     "api/studies.js": { "maxDuration": 30 },
     "api/applications.js": { "maxDuration": 30 },
     "api/blocks.js": { "maxDuration": 30 },
     "api/profile.js": { "maxDuration": 30 },
     "api/subscriptions.js": { "maxDuration": 30 },
     "api/admin.js": { "maxDuration": 30 },
-    "api/admin-consolidated.js": { "maxDuration": 30 },
     "api/payments-consolidated.js": { "maxDuration": 30 },
     "api/health.js": { "maxDuration": 10 }
   },

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points System Test - Real Database</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 10px 0; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .account-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .researcher { border-color: #28a745; }
+        .admin { border-color: #dc3545; }
+        .participant { border-color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>🪙 Points System Test - Real Database</h1>
+    
+    <div class="container info">
+        <h3>🎯 Testing Real Points System</h3>
+        <p>This interface tests the <strong>PRODUCTION</strong> points API with real database integration.</p>
+        <p><strong>Status:</strong> Using real Supabase database (no more mock data!)</p>
+    </div>
+
+    <div class="account-section researcher">
+        <h3>👩‍🔬 Researcher Account Test</h3>
+        <p><strong>Email:</strong> abwanwr77+researcher@gmail.com</p>
+        <p><strong>Expected:</strong> 1000 points (for study creation testing)</p>
+        <input type="password" id="researcherToken" placeholder="Enter researcher JWT token">
+        <button onclick="testResearcherBalance()">Check Balance</button>
+        <button onclick="testStudyCost()">Calculate Study Cost</button>
+        <div id="researcherResult"></div>
+    </div>
+
+    <div class="account-section admin">
+        <h3>🛡️ Admin Account Test</h3>
+        <p><strong>Email:</strong> abwanwr77+admin@gmail.com</p>
+        <p><strong>Expected:</strong> 9999 points (unlimited for admin testing)</p>
+        <input type="password" id="adminToken" placeholder="Enter admin JWT token">
+        <button onclick="testAdminBalance()">Check Balance</button>
+        <button onclick="testAssignPoints()">Test Assign Points</button>
+        <div id="adminResult"></div>
+    </div>
+
+    <div class="account-section participant">
+        <h3>👥 Participant Account Test</h3>
+        <p><strong>Email:</strong> abwanwr77+participant@gmail.com</p>
+        <p><strong>Expected:</strong> 0 points (participants earn through studies)</p>
+        <input type="password" id="participantToken" placeholder="Enter participant JWT token">
+        <button onclick="testParticipantBalance()">Check Balance</button>
+        <div id="participantResult"></div>
+    </div>
+
+    <div class="container">
+        <h3>📊 System Status</h3>
+        <button onclick="testHealthCheck()">Health Check</button>
+        <button onclick="testDatabaseConnection()">Database Connection</button>
+        <div id="systemResult"></div>
+    </div>
+
+    <div class="container info">
+        <h3>📋 How to Get JWT Tokens</h3>
+        <ol>
+            <li>Open browser dev tools (F12)</li>
+            <li>Go to ResearchHub frontend: <a href="http://localhost:5175" target="_blank">http://localhost:5175</a></li>
+            <li>Login with test account</li>
+            <li>In Console, run: <code>localStorage.getItem('supabase.auth.token')</code></li>
+            <li>Copy the access_token value and paste above</li>
+        </ol>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+
+        async function makeRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                const data = await response.json();
+                return { success: response.ok, data, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            const className = result.success ? 'success' : 'error';
+            element.innerHTML = `
+                <div class="container ${className}">
+                    <strong>Status:</strong> ${result.success ? 'Success' : 'Error'}<br>
+                    <strong>Response:</strong>
+                    <pre>${JSON.stringify(result.data || result.error, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        async function testResearcherBalance() {
+            const token = document.getElementById('researcherToken').value;
+            if (!token) {
+                alert('Please enter researcher JWT token');
+                return;
+            }
+
+            const result = await makeRequest('/points?action=balance', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            displayResult('researcherResult', result);
+        }
+
+        async function testAdminBalance() {
+            const token = document.getElementById('adminToken').value;
+            if (!token) {
+                alert('Please enter admin JWT token');
+                return;
+            }
+
+            const result = await makeRequest('/points?action=balance', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            displayResult('adminResult', result);
+        }
+
+        async function testParticipantBalance() {
+            const token = document.getElementById('participantToken').value;
+            if (!token) {
+                alert('Please enter participant JWT token');
+                return;
+            }
+
+            const result = await makeRequest('/points?action=balance', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            displayResult('participantResult', result);
+        }
+
+        async function testStudyCost() {
+            const result = await makeRequest('/points?action=calculate-cost', {
+                method: 'POST',
+                body: JSON.stringify({
+                    blockCount: 5,
+                    participantCount: 10
+                })
+            });
+            displayResult('researcherResult', result);
+        }
+
+        async function testAssignPoints() {
+            const token = document.getElementById('adminToken').value;
+            if (!token) {
+                alert('Please enter admin JWT token');
+                return;
+            }
+
+            const targetUserId = prompt('Enter user ID to assign points to:');
+            const amount = prompt('Enter points amount to assign:', '100');
+            
+            if (!targetUserId || !amount) return;
+
+            const result = await makeRequest('/points?action=assign', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    userId: targetUserId,
+                    amount: parseInt(amount),
+                    reason: 'Admin test assignment'
+                })
+            });
+            displayResult('adminResult', result);
+        }
+
+        async function testHealthCheck() {
+            const result = await makeRequest('/health');
+            displayResult('systemResult', result);
+        }
+
+        async function testDatabaseConnection() {
+            const result = await makeRequest('/db-check');
+            displayResult('systemResult', result);
+        }
+
+        // Auto-test health on page load
+        window.onload = () => {
+            testHealthCheck();
+        };
+    </script>
+</body>
+</html>

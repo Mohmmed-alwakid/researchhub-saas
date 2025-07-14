@@ -1,0 +1,33 @@
+/* Study Card Text Truncation Styles */
+.study-card-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.study-card-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  hyphens: auto;
+  line-height: 1.5;
+  max-height: 4.5em; /* 3 lines * 1.5 line-height */
+}
+
+.study-card-stat {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  .study-card-description {
+    -webkit-line-clamp: 2;
+    max-height: 3em; /* 2 lines * 1.5 line-height */
+  }
+}

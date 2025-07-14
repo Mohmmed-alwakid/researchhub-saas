@@ -4,7 +4,7 @@
  * Date: June 30, 2025
  */
 
-const API_BASE = 'http://localhost:3003/api';
+const API_BASE = 'http://localhost:3000/api';
 
 // Test accounts
 const PARTICIPANT_ACCOUNT = {

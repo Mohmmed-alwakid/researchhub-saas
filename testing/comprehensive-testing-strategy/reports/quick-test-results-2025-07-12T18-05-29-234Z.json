@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-07-12T18:05:08.511Z",
+  "testType": "quick",
+  "summary": {
+    "total": 3,
+    "passed": 1,
+    "failed": 2,
+    "warnings": 0,
+    "duration": 20722
+  },
+  "tests": [
+    {
+      "name": "Application Loads",
+      "status": "passed",
+      "timestamp": "2025-07-12T18:05:13.201Z",
+      "duration": 4582,
+      "details": "Application loaded successfully with title: Afkar - User Testing Research Platform",
+      "error": null
+    },
+    {
+      "name": "Authentication",
+      "status": "failed",
+      "timestamp": "2025-07-12T18:05:29.137Z",
+      "duration": 15931,
+      "details": "",
+      "error": "page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"dashboard\"], .dashboard, h1:has-text(\"Dashboard\")') to be visible\u001b[22m\n"
+    },
+    {
+      "name": "API Health",
+      "status": "failed",
+      "timestamp": "2025-07-12T18:05:29.175Z",
+      "duration": 38,
+      "details": "",
+      "error": "fetch failed"
+    }
+  ],
+  "errors": []
+}

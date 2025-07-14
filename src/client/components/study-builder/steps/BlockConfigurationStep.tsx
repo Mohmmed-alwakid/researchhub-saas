@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StepProps, StudyBuilderBlock, BlockType, BLOCK_LIBRARY, getBlockDisplayName, getDefaultBlockDescription, getDefaultBlockSettings } from '../types';
 import { StudyPreviewModal } from '../StudyPreviewModal';
+import { RealTimeBlockPreview } from '../RealTimeBlockPreview';
 
 export const BlockConfigurationStep: React.FC<StepProps> = ({
   formData,
@@ -13,15 +14,15 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
 
   // Ensure there's always a thank you block at the end
   const ensureThankYouBlock = (blocks: StudyBuilderBlock[]): StudyBuilderBlock[] => {
-    const hasThankYou = blocks.some(block => block.type === 'thank_you');
+    const hasThankYou = blocks.some(block => block.type === 'thank_you_screen');
     if (!hasThankYou) {
       const newThankYouBlock: StudyBuilderBlock = {
         id: `block_${Date.now()}`,
-        type: 'thank_you',
+        type: 'thank_you_screen',
         order: blocks.length,
         title: 'Thank You',
         description: 'Thank you for participating!',
-        settings: getDefaultBlockSettings('thank_you')
+        settings: getDefaultBlockSettings('thank_you_screen')
       };
       return [...blocks, newThankYouBlock];
     }
@@ -32,7 +33,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
 
   const addBlock = (type: BlockType) => {
     // Find the thank you block to insert before it
-    const thankYouIndex = blocks.findIndex(block => block.type === 'thank_you');
+    const thankYouIndex = blocks.findIndex(block => block.type === 'thank_you_screen');
     const insertOrder = thankYouIndex >= 0 ? thankYouIndex : blocks.length;
 
     const newBlock: StudyBuilderBlock = {
@@ -57,7 +58,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
 
   const removeBlock = (blockId: string) => {
     const blockToRemove = blocks.find(b => b.id === blockId);
-    if (blockToRemove?.type === 'thank_you') {
+    if (blockToRemove?.type === 'thank_you_screen') {
       // Don't allow removing the thank you block
       return;
     }
@@ -69,17 +70,16 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
     onUpdateFormData({ blocks: updatedBlocks });
     setSelectedBlockId(null);
   };
-
   const moveBlock = (blockId: string, direction: 'up' | 'down') => {
     const blockIndex = blocks.findIndex(b => b.id === blockId);
     const block = blocks[blockIndex];
     
-    if (!block || block.type === 'thank_you') return; // Don't move thank you block
-
+    if (!block || block.type === 'thank_you_screen') return; // Don't move thank you block
+    
     const newIndex = direction === 'up' ? blockIndex - 1 : blockIndex + 1;
     
     // Don't move past thank you block
-    const thankYouIndex = blocks.findIndex(b => b.type === 'thank_you');
+    const thankYouIndex = blocks.findIndex(b => b.type === 'thank_you_screen');
     if (thankYouIndex >= 0 && newIndex >= thankYouIndex) return;
     
     if (newIndex < 0 || newIndex >= blocks.length) return;
@@ -167,7 +167,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
           </div>
 
           {/* Block-specific settings */}
-          {(block.type === 'open_question' || block.type === 'simple_input') && (
+          {(block.type === 'feedback_collection' || block.type === 'task_instruction') && (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -194,7 +194,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
             </>
           )}
 
-          {block.type === 'opinion_scale' && (
+          {block.type === 'rating_scale' && (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -234,7 +234,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
             </>
           )}
 
-          {block.type === 'five_second_test' && (
+          {block.type === 'comparison_test' && (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -302,7 +302,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
               Block Library
             </h3>
             <div className="space-y-2">
-              {BLOCK_LIBRARY.filter(block => block.type !== 'thank_you').map((blockType) => (
+              {BLOCK_LIBRARY.filter(block => block.type !== 'thank_you_screen').map((blockType) => (
                 <button
                   key={blockType.type}
                   onClick={() => addBlock(blockType.type)}
@@ -376,7 +376,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
                         </div>
 
                         <div className="flex items-center space-x-2">
-                          {block.type !== 'thank_you' && (
+                          {block.type !== 'thank_you_screen' && (
                             <>
                               <button
                                 onClick={(e) => {
@@ -423,8 +423,24 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
               )}
             </div>
 
-            {/* Block Editor */}
-            {selectedBlock && <BlockEditor block={selectedBlock} />}
+            {/* Enhanced Layout: Block Editor + Real-time Preview */}
+            {selectedBlock && (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {/* Block Editor */}
+                <BlockEditor block={selectedBlock} />
+                
+                {/* Real-time Block Preview */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Live Preview
+                  </h3>                <RealTimeBlockPreview
+                    blocks={blocks}
+                    currentEditingBlock={selectedBlock}
+                    className="h-full"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

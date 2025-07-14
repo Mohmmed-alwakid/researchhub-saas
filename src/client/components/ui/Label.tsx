@@ -10,14 +10,23 @@ const Label = forwardRef<HTMLLabelElement, LabelProps>(
     return (
       <label
         className={cn(
-          'block text-sm font-medium text-gray-700 mb-1',
+          'block text-sm font-semibold mb-2 transition-colors duration-200',
+          'bg-gradient-to-r from-gray-700 to-slate-700 bg-clip-text text-transparent',
+          'hover:from-gray-800 hover:to-slate-800',
           className
         )}
         ref={ref}
         {...props}
       >
         {children}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && (
+          <span 
+            className="text-red-500 ml-1 font-bold" 
+            aria-label="required field"
+          >
+            *
+          </span>
+        )}
       </label>
     );
   }

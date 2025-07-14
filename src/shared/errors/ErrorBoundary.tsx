@@ -6,6 +6,8 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import { ResearchHubError, ErrorCategory, ErrorSeverity, ERROR_CODES } from './ErrorTypes.js';
 import { globalErrorHandler } from './ErrorHandler.js';
+import { Card } from '../../client/components/ui/Card';
+import { Button } from '../../client/components/ui/Button';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -93,7 +95,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Default error UI
       return (
-        <div className="error-boundary-container bg-red-50 border border-red-200 rounded-lg p-6 m-4">
+        <Card variant="elevated" padding="md" className="bg-red-50 border-red-200 m-4">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -117,13 +119,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                     Try Again ({this.maxRetries - this.retryCount} attempts left)
                   </button>
                 )}
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => window.location.reload()}
-                  className="bg-white hover:bg-gray-50 text-red-800 px-3 py-2 rounded text-sm font-medium border border-red-300 transition-colors"
+                  className="text-red-800 border-red-300 hover:bg-red-50"
                 >
                   Refresh Page
-                </button>
+                </Button>
               </div>
               <details className="mt-4">
                 <summary className="text-sm text-red-600 cursor-pointer hover:text-red-500">
@@ -137,7 +140,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </details>
             </div>
           </div>
-        </div>
+        </Card>
       );
     }
 

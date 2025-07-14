@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { StudyTypeStep } from './steps/StudyTypeStep';
-import { EnhancedTemplateSelectionStep } from './steps/EnhancedTemplateSelectionStep';
 import { StudySetupStep } from './steps/StudySetupStep';
 import { BlockConfigurationStep } from './steps/BlockConfigurationStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { LaunchStep } from './steps/LaunchStep';
+import { InterviewSessionConfigStep } from './steps/InterviewSessionConfig';
+import { UsabilityStudyConfigStep } from './steps/UsabilityStudyConfig';
 import { StudyFormData } from './types';
+import { RealTimeBlockPreview } from './RealTimeBlockPreview';
 
 interface StudyCreationWizardProps {
   onComplete?: (studyData: StudyFormData) => void;
@@ -17,19 +19,17 @@ interface StudyCreationWizardProps {
   autoSaveInterval?: number;
 }
 
-const STEPS = [
-  'type',
-  'template', 
-  'setup',
-  'blocks',
-  'review',
-  'launch'
-] as const;
+// Steps specific to usability studies
+const USABILITY_STEPS = ['type', 'setup', 'usability_config', 'blocks', 'review', 'launch'] as const;
+
+// Steps specific to interview studies  
+const INTERVIEW_STEPS = ['type', 'setup', 'session_config', 'review', 'launch'] as const;
 
 const STEP_TITLES = {
   type: 'Study Type',
-  template: 'Template',
-  setup: 'Study Details',
+  setup: 'Study Details', 
+  usability_config: 'Usability Setup',
+  session_config: 'Session Setup',
   blocks: 'Build Study',
   review: 'Review',
   launch: 'Launch'
@@ -49,7 +49,7 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
   const [formData, setFormData] = useState<StudyFormData>({
     title: '',
     description: '',
-    type: 'usability_test',
+    type: 'usability',
     target_participants: 15,
     blocks: [],
     ...initialData
@@ -59,6 +59,20 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
   const [stepValidationStates, setStepValidationStates] = useState<Record<number, boolean>>({});
   const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'error' | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Get current steps based on study type
+  const getCurrentSteps = () => {
+    switch (formData.type) {
+      case 'usability':
+        return USABILITY_STEPS;
+      case 'interview':
+        return INTERVIEW_STEPS;
+      default:
+        return USABILITY_STEPS; // Default to usability flow
+    }
+  };
+
+  const STEPS = getCurrentSteps();
 
   // Enhanced auto-save with debouncing and status tracking
   useEffect(() => {
@@ -164,6 +178,7 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
           errors.type = 'Please select a study type to continue';
         }
         break;
+        
       case 'setup':
         if (!formData.title?.trim()) {
           errors.title = 'Study title is required';
@@ -185,17 +200,49 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
           errors.target_participants = 'Maximum 1000 participants allowed';
         }
         break;
-      case 'blocks':
-        if (!formData.blocks || formData.blocks.length === 0) {
-          errors.blocks = 'At least one block is required to create a study';
-        } else if (formData.blocks.length > 50) {
-          errors.blocks = 'Maximum 50 blocks allowed per study';
+        
+      case 'usability_config':
+        // Usability studies validation
+        break;
+        
+      case 'session_config':
+        // Interview session validation
+        if (!formData.interview_session_config) {
+          errors.session_config = 'Session configuration is required for interview studies';
+        } else {
+          const sessionConfig = formData.interview_session_config;
+          if (!sessionConfig.duration_minutes || sessionConfig.duration_minutes < 15) {
+            errors.session_config = 'Session duration must be at least 15 minutes';
+          }
+          if (!sessionConfig.interview_script?.questions?.length) {
+            errors.session_config = 'At least one interview question is required';
+          }
         }
         break;
+        
+      case 'blocks':
+        // Only validate blocks for usability studies
+        if (formData.type === 'usability') {
+          if (!formData.blocks || formData.blocks.length === 0) {
+            errors.blocks = 'At least one block is required to create a usability study';
+          } else if (formData.blocks.length > 50) {
+            errors.blocks = 'Maximum 50 blocks allowed per study';
+          }
+        }
+        break;
+        
       case 'review':
         // Final validation before launch
-        if (!formData.title?.trim() || !formData.description?.trim() || !formData.blocks?.length) {
+        if (!formData.title?.trim() || !formData.description?.trim()) {
           errors.review = 'Please complete all required fields before launching';
+        }
+        
+        if (formData.type === 'usability' && !formData.blocks?.length) {
+          errors.review = 'At least one block is required for usability studies';
+        }
+        
+        if (formData.type === 'interview' && !formData.interview_session_config?.interview_script?.questions?.length) {
+          errors.review = 'At least one interview question is required for interview studies';
         }
         break;
     }
@@ -210,7 +257,7 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
     }));
     
     return isValid;
-  }, [currentStep, formData]);
+  }, [currentStep, formData, STEPS]);
 
   const updateFormData = useCallback((updates: Partial<StudyFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -273,7 +320,7 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
     setFormData({
       title: '',
       description: '',
-      type: 'usability_test',
+      type: 'usability',
       target_participants: 15,
       blocks: []
     });
@@ -352,10 +399,12 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
     switch (STEPS[currentStep]) {
       case 'type':
         return <StudyTypeStep {...stepProps} />;
-      case 'template':
-        return <EnhancedTemplateSelectionStep {...stepProps} />;
       case 'setup':
         return <StudySetupStep {...stepProps} />;
+      case 'usability_config':
+        return <UsabilityStudyConfigStep {...stepProps} />;
+      case 'session_config':
+        return <InterviewSessionConfigStep {...stepProps} />;
       case 'blocks':
         return <BlockConfigurationStep {...stepProps} />;
       case 'review':
@@ -366,6 +415,25 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
         return null;
     }
   };
+
+  // Reset step progression when study type changes
+  useEffect(() => {
+    // If we're past the type selection step and the type changes, 
+    // we need to reset the step progression to avoid issues
+    if (currentStep > 0) {
+      const newSteps = getCurrentSteps();
+      const currentStepName = STEPS[currentStep];
+      
+      // Check if current step exists in new flow
+      const newStepIndex = newSteps.indexOf(currentStepName as any);
+      
+      if (newStepIndex === -1) {
+        // Current step doesn't exist in new flow, go to setup step
+        setCurrentStep(1); // setup step
+        setCompletedSteps([0]); // only type step completed
+      }
+    }
+  }, [formData.type]);
 
   return (
     <div className="min-h-screen bg-gray-50">

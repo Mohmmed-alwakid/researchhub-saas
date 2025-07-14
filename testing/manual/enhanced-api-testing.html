@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchHub Enhanced API Testing Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .api-section {
+            margin-bottom: 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .api-header {
+            background: #f8fafc;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .api-header:hover {
+            background: #f1f5f9;
+        }
+        
+        .api-header h3 {
+            color: #1e293b;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .api-header p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .api-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .api-content.active {
+            display: block;
+        }
+        
+        .test-form {
+            background: #fafbfc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .response.success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+        
+        .response.error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .test-accounts {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .test-accounts h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        
+        .account-item {
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #451a03;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ResearchHub Enhanced API</h1>
+            <p>Phase 1 & 2 Testing Interface - Foundation & Authentication</p>
+        </div>
+        
+        <div class="content">
+            <!-- Test Accounts Section -->
+            <div class="test-accounts">
+                <h4>🧪 Available Test Accounts</h4>
+                <div class="account-item">👤 <strong>Researcher:</strong> abwanwr77+Researcher@gmail.com / Testtest123</div>
+                <div class="account-item">👤 <strong>Participant:</strong> abwanwr77+participant@gmail.com / Testtest123</div>
+                <div class="account-item">👤 <strong>Admin:</strong> abwanwr77+admin@gmail.com / Testtest123</div>
+            </div>
+            
+            <!-- Phase 2: Enhanced Authentication -->
+            <div class="api-section">
+                <div class="api-header" onclick="toggleSection('auth')">
+                    <h3>🔐 Enhanced Authentication API</h3>
+                    <p>JWT validation, role-based access, user registration</p>
+                    <span class="status-badge status-success">PHASE 2</span>
+                </div>
+                <div class="api-content" id="auth-content">
+                    <div class="test-form">
+                        <h4>Login Test</h4>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="login-email" value="abwanwr77+Researcher@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="login-password" value="Testtest123">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="login-remember"> Remember Me
+                            </label>
+                        </div>
+                        <button class="btn" onclick="testLogin()">Test Login</button>
+                        <button class="btn btn-secondary" onclick="testRegister()">Test Registration</button>
+                    </div>
+                    <div id="auth-response" class="response" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <!-- Phase 1: Database Migration -->
+            <div class="api-section">
+                <div class="api-header" onclick="toggleSection('migration')">
+                    <h3>🗄️ Database Migration API</h3>
+                    <p>Database schema enhancement and migration tools</p>
+                    <span class="status-badge status-success">PHASE 1</span>
+                </div>
+                <div class="api-content" id="migration-content">
+                    <div class="test-form">
+                        <h4>Migration Operations</h4>
+                        <div class="form-group">
+                            <label>Action:</label>
+                            <select id="migration-action">
+                                <option value="validate">Validate Database</option>
+                                <option value="backup">Create Backup</option>
+                                <option value="migrate">Run Migration</option>
+                                <option value="report">Generate Report</option>
+                                <option value="full">Full Migration</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="testMigration()">Execute Migration</button>
+                    </div>
+                    <div id="migration-response" class="response" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <!-- Phase 1: Enhanced User Management -->
+            <div class="api-section">
+                <div class="api-header" onclick="toggleSection('user')">
+                    <h3>👤 Enhanced User Management API</h3>
+                    <p>Service layer architecture with modern user management</p>
+                    <span class="status-badge status-success">PHASE 1</span>
+                </div>
+                <div class="api-content" id="user-content">
+                    <div class="test-form">
+                        <h4>User Operations</h4>
+                        <div class="form-group">
+                            <label>Action:</label>
+                            <select id="user-action">
+                                <option value="profile">Get Profile</option>
+                                <option value="ping">Ping Service</option>
+                                <option value="health_check">Health Check</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="testUserAPI()">Test User API</button>
+                        <button class="btn btn-secondary" onclick="testProfileUpdate()">Test Profile Update</button>
+                    </div>
+                    <div id="user-response" class="response" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <!-- System Health -->
+            <div class="api-section">
+                <div class="api-header" onclick="toggleSection('health')">
+                    <h3>❤️ System Health Monitor</h3>
+                    <p>Real-time system status and performance monitoring</p>
+                    <span class="status-badge status-success">ACTIVE</span>
+                </div>
+                <div class="api-content" id="health-content">
+                    <div class="test-form">
+                        <button class="btn" onclick="testHealth()">Check System Health</button>
+                        <button class="btn btn-secondary" onclick="testAllEndpoints()">Test All Endpoints</button>
+                    </div>
+                    <div id="health-response" class="response" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            content.classList.toggle('active');
+        }
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.text();
+                let parsedData;
+                
+                try {
+                    parsedData = JSON.parse(data);
+                } catch (e) {
+                    parsedData = { raw: data };
+                }
+                
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    data: parsedData
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    ok: false,
+                    data: { error: error.message }
+                };
+            }
+        }
+        
+        function displayResponse(elementId, response) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `response ${response.ok ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(response, null, 2);
+        }
+        
+        async function testLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const rememberMe = document.getElementById('login-remember').checked;
+            
+            const response = await makeRequest(`${API_BASE}/auth-enhanced?action=login`, {
+                method: 'POST',
+                body: JSON.stringify({ email, password, rememberMe })
+            });
+            
+            displayResponse('auth-response', response);
+        }
+        
+        async function testRegister() {
+            const response = await makeRequest(`${API_BASE}/auth-enhanced?action=register`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: 'test@example.com',
+                    password: 'TestPassword123',
+                    firstName: 'Test',
+                    lastName: 'User',
+                    role: 'researcher'
+                })
+            });
+            
+            displayResponse('auth-response', response);
+        }
+        
+        async function testMigration() {
+            const action = document.getElementById('migration-action').value;
+            
+            const response = await makeRequest(`${API_BASE}/migration?action=${action}`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+            
+            displayResponse('migration-response', response);
+        }
+        
+        async function testUserAPI() {
+            const action = document.getElementById('user-action').value;
+            
+            let response;
+            if (action === 'profile' || action === undefined) {
+                response = await makeRequest(`${API_BASE}/user-enhanced`, {
+                    method: 'GET'
+                });
+            } else {
+                response = await makeRequest(`${API_BASE}/user-enhanced`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action })
+                });
+            }
+            
+            displayResponse('user-response', response);
+        }
+        
+        async function testProfileUpdate() {
+            const response = await makeRequest(`${API_BASE}/user-enhanced`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    first_name: 'Test',
+                    last_name: 'User',
+                    bio: 'Enhanced API testing user'
+                })
+            });
+            
+            displayResponse('user-response', response);
+        }
+        
+        async function testHealth() {
+            const response = await makeRequest(`${API_BASE}/health`);
+            displayResponse('health-response', response);
+        }
+        
+        async function testAllEndpoints() {
+            const endpoints = [
+                { name: 'Health', url: `${API_BASE}/health` },
+                { name: 'Auth Test Accounts', url: `${API_BASE}/auth-enhanced?action=test-accounts` },
+                { name: 'Migration Validate', url: `${API_BASE}/migration?action=validate`, method: 'POST' },
+                { name: 'User Enhanced', url: `${API_BASE}/user-enhanced` }
+            ];
+            
+            let results = 'Testing all endpoints...\n\n';
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await makeRequest(endpoint.url, {
+                        method: endpoint.method || 'GET',
+                        body: endpoint.method === 'POST' ? '{}' : undefined
+                    });
+                    
+                    results += `✅ ${endpoint.name}: ${response.status} ${response.ok ? 'OK' : 'ERROR'}\n`;
+                } catch (error) {
+                    results += `❌ ${endpoint.name}: ERROR - ${error.message}\n`;
+                }
+            }
+            
+            const element = document.getElementById('health-response');
+            element.style.display = 'block';
+            element.className = 'response success';
+            element.textContent = results;
+        }
+        
+        // Auto-expand first section
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('auth-content').classList.add('active');
+        });
+    </script>
+</body>
+</html>

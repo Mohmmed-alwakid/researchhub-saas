@@ -8,8 +8,9 @@ import AppLayout from './client/components/common/AppLayout';
 import AuthGuard from './client/components/auth/AuthGuard';
 import ProtectedRoute from './client/components/auth/ProtectedRoute';
 import { ErrorBoundary } from './client/components/ErrorBoundary';
-import { PerformanceMonitor } from './client/components/PerformanceMonitor';
-import FloatingReportButton from './client/components/performance/FloatingReportButton';
+// Removed during cleanup - will be restored when needed
+// import { PerformanceMonitor } from './client/components/performance/PerformanceMonitor';
+// import FloatingReportButton from './client/components/performance/FloatingReportButton';
 import { useAuthStore } from './client/stores/authStore';
 import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
 
@@ -36,8 +37,8 @@ const AnalyticsPage = lazy(() => import('./client/pages/analytics/AnalyticsPage'
 const BillingSettingsPage = lazy(() => import('./client/pages/settings/BillingSettingsPage'));
 const SettingsPage = lazy(() => import('./client/pages/settings/SettingsPage'));
 const AdminDashboard = lazy(() => import('./client/pages/admin/AdminDashboard'));
-const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPaymentPage'));
-const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage').then(module => ({ default: module.CreativeJourneyPage })));
+const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPaymentPage.tsx'));
+const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage.tsx'));
 const ProfessionalStudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage').then(module => ({ default: module.StudyBuilderPage })));
 const OrganizationDashboard = lazy(() => import('./client/pages/organization/OrganizationDashboard'));
 
@@ -211,14 +212,14 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="analytics" element={
-                <ProtectedRoute allowedRoles={['researcher']}>
+                <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
                   <AnalyticsPage />
                 </ProtectedRoute>
               } />
               
-              {/* Organization Routes */}
+              {/* Organization Routes - Admin Only */}
               <Route path="organizations" element={
-                <ProtectedRoute allowedRoles={['researcher']}>
+                <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
                   <OrganizationDashboard />
                 </ProtectedRoute>
               } />
@@ -265,8 +266,10 @@ function App() {
           </Routes>
             </Suspense>
           <Toaster position="top-right" />
+          {/* Temporarily disabled during cleanup - will be restored when needed
           <PerformanceMonitor showMetrics={process.env.NODE_ENV === 'development'} />
           <FloatingReportButton />
+          */}
         </div>
       </Router>
     </QueryClientProvider>

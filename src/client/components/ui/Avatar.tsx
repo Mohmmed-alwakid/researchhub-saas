@@ -20,21 +20,21 @@ export const Avatar: React.FC<AvatarProps> = ({
   status,
   showStatus = false
 }) => {
-  // Size configurations
+  // Size configurations with enhanced proportions
   const sizes = {
-    xs: 'w-6 h-6 text-xs',
-    sm: 'w-8 h-8 text-sm',
-    md: 'w-10 h-10 text-base',
-    lg: 'w-12 h-12 text-lg',
-    xl: 'w-16 h-16 text-xl'
+    xs: 'w-8 h-8 text-xs',
+    sm: 'w-10 h-10 text-sm',
+    md: 'w-12 h-12 text-base',
+    lg: 'w-16 h-16 text-lg',
+    xl: 'w-20 h-20 text-xl'
   };
 
-  // Status colors
+  // Enhanced status colors with gradients
   const statusColors = {
-    online: 'bg-green-500',
-    offline: 'bg-gray-400',
-    busy: 'bg-red-500',
-    away: 'bg-yellow-500'
+    online: 'bg-gradient-to-r from-green-400 to-emerald-500 shadow-green-200',
+    offline: 'bg-gradient-to-r from-gray-400 to-slate-500 shadow-gray-200',
+    busy: 'bg-gradient-to-r from-red-400 to-pink-500 shadow-red-200',
+    away: 'bg-gradient-to-r from-yellow-400 to-orange-500 shadow-yellow-200'
   };
 
   // Generate fallback from name
@@ -47,8 +47,9 @@ export const Avatar: React.FC<AvatarProps> = ({
   return (
     <div className={cn('relative inline-block', className)}>
       <div className={cn(
-        'rounded-full overflow-hidden flex items-center justify-center font-medium',
-        'bg-primary-100 text-primary-800',
+        'rounded-full overflow-hidden flex items-center justify-center font-semibold transition-all duration-300 transform hover:scale-110 shadow-lg',
+        'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-2 border-blue-200',
+        'hover:from-blue-200 hover:to-indigo-200 hover:shadow-xl',
         sizes[size]
       )}>
         {src ? (
@@ -70,10 +71,12 @@ export const Avatar: React.FC<AvatarProps> = ({
       
       {showStatus && status && (
         <div className={cn(
-          'absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white',
-          'w-3 h-3',
+          'absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white shadow-lg',
+          'w-4 h-4 animate-pulse',
           statusColors[status]
-        )} />
+        )} 
+        aria-label={`Status: ${status}`}
+        />
       )}
     </div>
   );

@@ -1,19 +1,18 @@
-import ManualPaymentFlow from '../../components/payments/ManualPaymentFlow';
+import React from 'react';
 
-const ManualPaymentPage = () => {
+/**
+ * Manual Payment Page - Placeholder
+ * This page was archived during cleanup but is still referenced in routes
+ */
+const ManualPaymentPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Manual Payment
-          </h1>
-          <p className="text-gray-600">
-            Complete your payment through bank transfer and upload proof for verification
-          </p>
-        </div>
-        
-        <ManualPaymentFlow />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Manual Payment</h1>
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <p className="text-yellow-800">
+          This page is currently under maintenance. 
+          Manual payment functionality will be restored in a future update.
+        </p>
       </div>
     </div>
   );

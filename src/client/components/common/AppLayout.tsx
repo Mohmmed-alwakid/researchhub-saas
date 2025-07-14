@@ -41,16 +41,6 @@ const AppLayout = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  const navigation = [
-    { name: 'Dashboard', href: '/app/dashboard', icon: Home },
-    { name: 'Studies', href: '/app/studies', icon: FileText },
-    { name: 'Templates', href: '/app/templates', icon: Layout },
-    { name: 'Organizations', href: '/app/organizations', icon: Building },
-    { name: 'Participants', href: '/app/participants', icon: Users },
-    { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
-    { name: 'Settings', href: '/app/settings', icon: Settings },
-  ];
-
   // Get role-specific navigation
   const getNavigationForRole = () => {
     const userRole = user?.role;
@@ -63,8 +53,34 @@ const AppLayout = () => {
       ];
     }
     
-    // For researchers, admins, and super_admins - use the full navigation
-    return navigation;
+    if (userRole === 'researcher') {
+      return [
+        { name: 'Dashboard', href: '/app/dashboard', icon: Home },
+        { name: 'Studies', href: '/app/studies', icon: FileText },
+        { name: 'Templates', href: '/app/templates', icon: Layout },
+        { name: 'Participants', href: '/app/participants', icon: Users },
+        { name: 'Settings', href: '/app/settings', icon: Settings },
+      ];
+    }
+    
+    // For admins and super_admins - include all features
+    if (userRole === 'admin' || userRole === 'super_admin') {
+      return [
+        { name: 'Dashboard', href: '/app/dashboard', icon: Home },
+        { name: 'Studies', href: '/app/studies', icon: FileText },
+        { name: 'Templates', href: '/app/templates', icon: Layout },
+        { name: 'Organizations', href: '/app/organizations', icon: Building },
+        { name: 'Participants', href: '/app/participants', icon: Users },
+        { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
+        { name: 'Settings', href: '/app/settings', icon: Settings },
+      ];
+    }
+    
+    // Default fallback (should not happen with proper role assignment)
+    return [
+      { name: 'Dashboard', href: '/app/dashboard', icon: Home },
+      { name: 'Settings', href: '/app/settings', icon: Settings },
+    ];
   };
 
   const currentNavigation = getNavigationForRole();

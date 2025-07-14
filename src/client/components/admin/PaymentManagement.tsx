@@ -8,13 +8,15 @@ import {
   Download,  CreditCard,
   Plus,
   Search,
-  Filter
+  Filter,
+  Coins
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { getPaymentRequests, getEnhancedFinancialOverview } from '../../services/admin.service';
+import AdminPointsManager from './AdminPointsManager';
 
 interface PaymentRequest {
   _id: string;
@@ -69,6 +71,7 @@ const PaymentManagement: React.FC = () => {
   const [showAddCredits, setShowAddCredits] = useState(false);
   const [filter, setFilter] = useState<'all' | 'pending' | 'verified' | 'rejected'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState<'payments' | 'points'>('payments');
 
   // Form states
   const [verificationNotes, setVerificationNotes] = useState('');
@@ -251,17 +254,56 @@ const PaymentManagement: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Payment Management</h2>
-          <p className="text-gray-600">Manage manual payments and user credits</p>
+          <h2 className="text-2xl font-bold text-gray-900">Payment & Points Management</h2>
+          <p className="text-gray-600">Manage payments, credits, and user points</p>
         </div>
-        <Button
-          onClick={() => setShowAddCredits(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Credits
-        </Button>
       </div>
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('payments')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'payments'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              Payment Requests
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('points')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'points'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Coins className="w-4 h-4" />
+              Points Management
+            </div>
+          </button>
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'payments' && (
+        <div className="space-y-6">
+          {/* Add Credits Button */}
+          <div className="flex justify-end">
+            <Button
+              onClick={() => setShowAddCredits(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Credits
+            </Button>
+          </div>
 
       {/* Stats Cards */}
       {stats && (
@@ -597,6 +639,13 @@ const PaymentManagement: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+      )}
+        </div>
+      )}
+
+      {/* Points Management Tab */}
+      {activeTab === 'points' && (
+        <AdminPointsManager />
       )}
     </div>
   );

@@ -6,9 +6,10 @@ import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, D
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import { useAuthStore } from '../../stores/authStore';
 
+// Import the new tab-based user management component
+import UserManagement from '../../components/admin/UserManagement';
+
 // Lazy load admin components for better bundle splitting
-const AdvancedUserManagement = lazy(() => import('../../components/admin/users/AdvancedUserManagement'));
-const UserAnalyticsDashboard = lazy(() => import('../../components/admin/analytics/UserAnalyticsDashboard'));
 const SubscriptionManager = lazy(() => import('../../components/admin/SubscriptionManager'));
 const RolePermissionManager = lazy(() => import('../../components/admin/RolePermissionManager'));
 const SystemSettings = lazy(() => import('../../components/admin/SystemSettings'));
@@ -174,17 +175,9 @@ const adminRoutes: AdminRoute[] = [
     path: '/app/admin/users',
     label: 'User Management',
     icon: Users,
-    component: AdvancedUserManagement,
+    component: UserManagement,
     permission: 'USER_MANAGE_ROLES',
-    description: 'Manage users, roles, and access'
-  },
-  {
-    path: '/app/admin/user-analytics',
-    label: 'User Analytics',
-    icon: BarChart3,
-    component: UserAnalyticsDashboard,
-    permission: 'SYSTEM_MONITOR',
-    description: 'User behavior and engagement analytics'
+    description: 'Comprehensive user management and analytics'
   },
   {
     path: '/app/admin/templates',

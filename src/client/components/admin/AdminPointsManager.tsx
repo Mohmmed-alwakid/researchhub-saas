@@ -34,6 +34,7 @@ interface UserTransaction extends PointsTransaction {
 const AdminPointsManager: React.FC = () => {
   const [balances, setBalances] = useState<UserBalance[]>([]);
   const [transactions, setTransactions] = useState<UserTransaction[]>([]);
+  const [allUsers, setAllUsers] = useState<Array<{id: string; email: string; first_name: string; last_name: string; role: string}>>([]);
   const [activeTab, setActiveTab] = useState<'balances' | 'transactions' | 'assign'>('balances');
   const [loading, setLoading] = useState(true);
   const [assignPoints, setAssignPoints] = useState({
@@ -46,6 +47,7 @@ const AdminPointsManager: React.FC = () => {
   useEffect(() => {
     fetchBalances();
     fetchTransactions();
+    fetchAllUsers();
   }, []);
 
   const fetchBalances = async () => {
@@ -72,6 +74,26 @@ const AdminPointsManager: React.FC = () => {
     } catch (error) {
       console.error('Error fetching transactions:', error);
       toast.error('Failed to fetch transactions');
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    try {
+      // Fetch all users from admin API
+      const response = await fetch('/api/admin?action=users', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.users) {
+          setAllUsers(data.users);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching all users:', error);
     }
   };
 
@@ -378,59 +400,92 @@ const AdminPointsManager: React.FC = () => {
             <h3 className="text-lg font-semibold">Assign Points to User</h3>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 max-w-md">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select User
-                </label>
-                <select
-                  value={assignPoints.userId}
-                  onChange={(e) => setAssignPoints({ ...assignPoints, userId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            {balances.length === 0 && allUsers.length === 0 ? (
+              <div className="text-center py-8">
+                <Coins className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-gray-700 mb-2">No Users Found</h4>
+                <p className="text-gray-600 mb-4">
+                  No users found in the system. Users need to register and log in first.
+                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                  <h5 className="font-semibold text-blue-800 mb-2">To create test users:</h5>
+                  <ol className="text-sm text-blue-700 space-y-1">
+                    <li>1. Ensure development server is running: <code className="bg-blue-100 px-1 rounded">npm run dev:fullstack</code></li>
+                    <li>2. Visit <a href="http://localhost:5175" target="_blank" className="underline">http://localhost:5175</a></li>
+                    <li>3. Register with test accounts:</li>
+                    <ul className="ml-4 mt-1 space-y-1">
+                      <li>• abwanwr77+Researcher@gmail.com / Testtest123</li>
+                      <li>• abwanwr77+participant@gmail.com / Testtest123</li>
+                      <li>• abwanwr77+admin@gmail.com / Testtest123</li>
+                    </ul>
+                    <li>4. Refresh this page</li>
+                  </ol>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 max-w-md">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select User
+                  </label>
+                  <select
+                    value={assignPoints.userId}
+                    onChange={(e) => setAssignPoints({ ...assignPoints, userId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select a user...</option>
+                    {/* First show users with balances */}
+                    {balances.map((balance) => (
+                      <option key={balance.userId} value={balance.userId}>
+                        {balance.user.first_name} {balance.user.last_name} ({balance.user.email}) - {balance.currentBalance} points
+                      </option>
+                    ))}
+                    {/* Then show users without balances */}
+                    {allUsers
+                      .filter(user => !balances.find(b => b.userId === user.id))
+                      .map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.first_name} {user.last_name} ({user.email}) - No balance
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Points Amount
+                  </label>
+                  <input
+                    type="number"
+                    value={assignPoints.amount || ''}
+                    onChange={(e) => setAssignPoints({ ...assignPoints, amount: Number(e.target.value) })}
+                    placeholder="Enter points amount"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Reason
+                  </label>
+                  <input
+                    type="text"
+                    value={assignPoints.reason}
+                    onChange={(e) => setAssignPoints({ ...assignPoints, reason: e.target.value })}
+                    placeholder="Reason for assigning points"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleAssignPoints}
+                  className="w-full"
+                  disabled={!assignPoints.userId || assignPoints.amount === 0 || !assignPoints.reason}
                 >
-                  <option value="">Select a user...</option>
-                  {balances.map((balance) => (
-                    <option key={balance.userId} value={balance.userId}>
-                      {balance.user.first_name} {balance.user.last_name} ({balance.user.email})
-                    </option>
-                  ))}
-                </select>
+                  Assign Points
+                </Button>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Points Amount
-                </label>
-                <input
-                  type="number"
-                  value={assignPoints.amount || ''}
-                  onChange={(e) => setAssignPoints({ ...assignPoints, amount: Number(e.target.value) })}
-                  placeholder="Enter points amount"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reason
-                </label>
-                <input
-                  type="text"
-                  value={assignPoints.reason}
-                  onChange={(e) => setAssignPoints({ ...assignPoints, reason: e.target.value })}
-                  placeholder="Reason for assigning points"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <Button
-                onClick={handleAssignPoints}
-                className="w-full"
-                disabled={!assignPoints.userId || assignPoints.amount === 0 || !assignPoints.reason}
-              >
-                Assign Points
-              </Button>
-            </div>
+            )}
           </CardContent>
         </Card>
       )}

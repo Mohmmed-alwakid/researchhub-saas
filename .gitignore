@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# TypeScript compilation artifacts in source directory (should not exist)
+src/**/*.js
+src/**/*.js.map
+
 # Environment variables
 .env
 .env.local
