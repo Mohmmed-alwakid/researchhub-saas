@@ -142,7 +142,10 @@ export const getAllUsers = async (params: {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   
-  return response.json();
+  const result = await response.json();
+  
+  // Return the full response object to match what AdvancedUserManagement expects
+  return result;
 };
 
 export const updateUser = async (userId: string, data: {

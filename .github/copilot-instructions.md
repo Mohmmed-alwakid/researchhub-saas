@@ -1,53 +1,142 @@
-# Afkar - Copilot Instructions
+# ResearchHub - Copilot Instructions
 
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+## 📖 How to Use This File
 
-## 🚀 Quick Reference
+This file provides workspace-specific instructions to GitHub Copilot. To enable it:
 
-### Essential Commands
+1. **Enable in VS Code**: 
+   - Open Settings (Ctrl+,)
+   - Search for "copilot instructions"
+   - Enable "GitHub › Copilot › Chat › Code Generation: Use Instruction Files"
+
+2. **Verify it's working**:
+   - Copilot will automatically reference these instructions
+   - Ask Copilot about ResearchHub features - it should know our architecture
+   - Code suggestions should follow our patterns and rules
+
+3. **File location**: Must be in `.github/copilot-instructions.md` (this file)
+
+---
+
+## 🎯 SINGLE SOURCE OF TRUTH
+**ALL specifications are in `docs/requirements/` - never contradict this folder.**
+
+## 🚀 Quick Start
 ```bash
-# Start local development
-npm run dev:fullstack
-
-# Run automated testing
-npm run test:quick
-
-# Clean up project structure
-npm run cleanup
-
-# Use development tools
-node scripts/development/vibe-coder-patterns.js analyze
-node scripts/development/vibe-coder-testing.js all
-node scripts/development/vibe-coder-docs.js all
+npm run dev:fullstack    # Local development
+npm run test:quick       # Run tests
+npm run cleanup          # Clean project structure
 ```
 
-### Key Sections
-- **Local Development Tools** - AI-powered development assistance
-- **Testing Strategy** - Automated testing framework
-- **Development Rules** - Mandatory development process
-- **Study Blocks System** - Core feature architecture
-- **MCP Tools** - Available AI assistants
+## 📁 Project Architecture
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Vercel Functions + Supabase
+- **Database**: PostgreSQL with RLS policies
+- **Auth**: Supabase Auth with JWT tokens
 
-## ⚠️ Project Status: PRODUCTION READY - VIBE-CODER-MCP IMPLEMENTATION COMPLETE
-**Last Updated**: July 7, 2025  
-**Status**: ✅ Production Ready - Comprehensive Enhancement System Implemented  
-**Build Status**: ✅ 0 TypeScript errors, Production-Ready with Advanced Monitoring
+## 🔒 Test Accounts (MANDATORY)
+```bash
+# Researcher: abwanwr77+Researcher@gmail.com / Testtest123
+# Participant: abwanwr77+participant@gmail.com / Testtest123  
+# Admin: abwanwr77+admin@gmail.com / Testtest123
+```
 
-## 📋 Project Overview
-ResearchHub is an **in-development** SaaS platform for user testing research. Recent major progress includes a complete **Professional Study Builder** with enterprise-grade user experience, enhanced **Study Blocks System** with custom editing interfaces, comprehensive **Template Integration** with detailed previews, and **Interactive Study Preview** for researchers.
+## 📋 Development Rules
+1. **Requirements First**: Check `docs/requirements/` before coding
+2. **Extend Don't Replace**: Enhance existing code vs creating new
+3. **Local Testing**: Always test with `npm run dev:fullstack`
+4. **Clean Structure**: Use proper directories (testing/, docs/, scripts/)
 
-### ACTUAL Implementation Status (Current Reality)
-- ✅ **Authentication System**: Complete JWT auth with role management
-- ✅ **Database**: Supabase with RLS security properly implemented
-- ✅ **Professional Study Builder**: Complete 6-step wizard with enterprise-grade UX
-- ✅ **Study Blocks System**: 13 block types with custom editing interfaces
-- ✅ **Template System**: Enhanced template preview with detailed information
-- ✅ **Interactive Study Preview**: Researchers can experience participant view
-- ✅ **Block Library**: Predefined block types with descriptions and enhanced UI
-- ✅ **Role-Based Access**: Working admin/researcher/participant system
-- ✅ **Local Development**: Optimized full-stack development environment
-- ✅ **API Endpoints**: Core functionality working with real database
-- ✅ **Frontend**: Modern React with TypeScript, production-ready components
+## 🎯 Study-Centric Architecture
+- **Main Dashboard** - Research overview
+- **Study Page** - Central hub with tabs (builder, participants, results, collaboration)
+- **Studies Management** - List/organize studies
+- **Analytics** - Cross-study insights
+- **Templates** - Template library
+- **Integrations** - External tools
+- **Account** - Settings & billing
+- **API Docs** - Developer resources
+
+## 🧩 Study Creation Flow
+1. **Type Selection**: Unmoderated Study OR Moderated Interviews
+2. **Template/Scratch**: Use template or start from scratch
+3. **4-Step Builder**: Overview → Characteristics → Blocks → Review
+4. **Launch**: Publish for participants
+
+## 💻 Code Patterns
+```typescript
+// API Pattern
+export default async function handler(req, res) {
+  try {
+    // Logic here
+    return res.status(200).json({ success: true, data });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// React Component Pattern
+interface Props {
+  data: DataType;
+  onUpdate: (data: DataType) => void;
+}
+
+export const Component = ({ data, onUpdate }: Props) => {
+  // Implementation
+};
+```
+
+## 🗂️ File Structure Rules
+```
+docs/requirements/    ← Single source of truth
+testing/             ← All tests
+scripts/             ← Utilities
+database/            ← Migrations
+src/                 ← Frontend code
+api/                 ← Backend functions
+```
+
+## 📝 File Naming Conventions (MANDATORY)
+
+### **Component Naming Rules**
+- **Use Clear, Simple Names**: `UserManagement.tsx`, `StudyBuilder.tsx`, `PaymentSettings.tsx`
+- **Avoid Confusing Modifiers**: Never use "Advanced", "Enhanced", "Unified", "Creative", etc.
+- **One Component Per Feature**: If you need variants, use props/modes within the same component
+- **Descriptive Function**: Name should clearly indicate what the component does
+
+### **File Replacement Strategy**
+When updating/replacing components:
+1. **Keep Original Name**: Update the existing component instead of creating new variants
+2. **Temporary Suffix**: If needed during development, use `.temp.tsx` or `.new.tsx`
+3. **Replace, Don't Rename**: Replace old component with new implementation
+4. **Document Changes**: Update relevant documentation files
+
+### **Examples of Good vs Bad Naming**
+```typescript
+// ✅ GOOD - Clear, descriptive names
+UserManagement.tsx          // Handles all user management
+StudyBuilder.tsx           // Builds studies
+PaymentDashboard.tsx       // Payment overview
+NotificationCenter.tsx     // Notifications hub
+
+// ❌ BAD - Confusing modifiers
+AdvancedUserManagement.tsx // What makes it "advanced"?
+EnhancedStudyBuilder.tsx   // Enhanced how?
+UnifiedPaymentDashboard.tsx // Unified with what?
+CreativeNotifications.tsx   // Meaningless modifier
+```
+
+### **Component Organization**
+- **Single Responsibility**: One component handles one major feature area
+- **Progressive Disclosure**: Use modes/states within component for complexity levels
+- **Props for Variants**: Use props to control different behaviors/views
+- **Clear Documentation**: Document all modes and features in component comments
+
+## 🚨 Never Create
+- Duplicate directories (tests/ when testing/ exists)
+- Root directory clutter
+- Conflicting documentation
+- New components when existing ones can be extended
 - ✅ **Collaboration Features**: Real-time team collaboration fully integrated in Study Builder
 - ✅ **Backend APIs**: Collaboration, approval, and comments APIs with WebSocket server
 - ✅ **Database Schema**: Collaboration tables and RLS policies ready for production

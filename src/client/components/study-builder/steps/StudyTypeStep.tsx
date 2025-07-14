@@ -1,46 +1,80 @@
 import React from 'react';
-import { StepProps, StudyFormData } from '../types';
+import { StepProps } from '../types';
 
 interface StudyTypeOption {
-  id: string;
+  id: 'usability' | 'interview';
   title: string;
   description: string;
+  detailedDescription: string;
   icon: string;
-  popular?: boolean;
+  features: string[];
+  dataCollection: string[];
+  duration: string;
+  recommended: string[];
 }
 
 const STUDY_TYPE_OPTIONS: StudyTypeOption[] = [
   {
-    id: 'usability_test',
-    title: 'Usability Test',
-    description: 'Test how users interact with your product or prototype',
+    id: 'usability',
+    title: 'Usability Study',
+    description: 'Test how users interact with your website, app, or prototype',
+    detailedDescription: 'Block-based usability testing that guides participants through specific tasks while collecting screen recordings, click data, and feedback.',
     icon: '🖱️',
-    popular: true
+    features: [
+      'Task-based testing',
+      'Screen recording', 
+      'Click tracking',
+      'Time measurement',
+      'User feedback collection',
+      'SUS scoring'
+    ],
+    dataCollection: [
+      'Screen recordings',
+      'Click tracking data',
+      'Time-on-task metrics',
+      'Task completion rates',
+      'User satisfaction ratings',
+      'Error logs and issues'
+    ],
+    duration: '15-45 minutes',
+    recommended: [
+      'Testing website usability',
+      'App interaction flows',
+      'Prototype validation',
+      'Interface improvements',
+      'Navigation testing'
+    ]
   },
   {
     id: 'interview',
-    title: 'User Interview', 
-    description: 'Conduct structured interviews to gather deep insights',
-    icon: '🎙️'
-  },
-  {
-    id: 'survey',
-    title: 'Survey',
-    description: 'Collect quantitative data through questionnaires',
-    icon: '📋',
-    popular: true
-  },
-  {
-    id: 'card_sort',
-    title: 'Card Sort',
-    description: 'Understand how users categorize information',
-    icon: '🗂️'
-  },
-  {
-    id: 'tree_test',
-    title: 'Tree Test',
-    description: 'Test navigation and information architecture',
-    icon: '🌳'
+    title: 'Interview Session',
+    description: 'Conduct live interviews to gather deep insights about user needs',
+    detailedDescription: 'Live session configuration for one-on-one interviews with participants via audio or video calls.',
+    icon: '🎙️',
+    features: [
+      'Live video/audio sessions',
+      'Interview script guides',
+      'Session recording',
+      'Real-time notes',
+      'Automated scheduling',
+      'Consent management'
+    ],
+    dataCollection: [
+      'Audio/video recordings',
+      'Interview transcripts',
+      'Researcher notes',
+      'Session insights',
+      'Participant quotes',
+      'Follow-up tasks'
+    ],
+    duration: '30-90 minutes',
+    recommended: [
+      'User needs research',
+      'Feature discovery',
+      'Pain point analysis',
+      'Behavioral insights',
+      'Product feedback'
+    ]
   }
 ];
 
@@ -48,12 +82,11 @@ export const StudyTypeStep: React.FC<StepProps> = ({
   formData,
   onUpdateFormData,
   onNext,
-  isFirst,
-  isLast
+  isFirst
 }) => {
-  const handleTypeSelect = (type: string) => {
+  const handleTypeSelect = (type: 'usability' | 'interview') => {
     onUpdateFormData({ 
-      type: type as StudyFormData['type']
+      type: type
     });
   };
 
@@ -64,50 +97,88 @@ export const StudyTypeStep: React.FC<StepProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
-          What type of study do you want to create?
+    <div className="max-w-6xl mx-auto">
+      <div className="text-center mb-12">
+        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          Choose Your Research Method
         </h2>
-        <p className="text-lg text-gray-600">
-          Choose the research method that best fits your goals
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Select the type of study that best matches your research goals. Each method has different flows and data collection approaches.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {STUDY_TYPE_OPTIONS.map((option) => (
           <div
             key={option.id}
             onClick={() => handleTypeSelect(option.id)}
             className={`
-              relative p-6 rounded-xl border-2 cursor-pointer transition-all duration-200
-              hover:shadow-lg transform hover:-translate-y-1
+              relative p-8 rounded-2xl border-2 cursor-pointer transition-all duration-300
+              hover:shadow-xl transform hover:-translate-y-2
               ${formData.type === option.id
-                ? 'border-blue-500 bg-blue-50 shadow-md'
+                ? 'border-blue-500 bg-blue-50 shadow-lg ring-4 ring-blue-100'
                 : 'border-gray-200 bg-white hover:border-gray-300'
               }
             `}
           >
-            {option.popular && (
-              <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                Popular
-              </div>
-            )}
-            
-            <div className="text-center">
-              <div className="text-4xl mb-3">{option.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">{option.icon}</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
                 {option.title}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 text-lg leading-relaxed mb-4">
                 {option.description}
+              </p>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {option.detailedDescription}
               </p>
             </div>
 
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                  ⚡ Key Features
+                </h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  {option.features.slice(0, 3).map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                  📊 Data Collected
+                </h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  {option.dataCollection.slice(0, 3).map((data, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                      {data}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                <div>
+                  <span className="text-xs font-medium text-gray-500">DURATION</span>
+                  <div className="text-sm font-semibold text-gray-900">{option.duration}</div>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-medium text-gray-500">RECOMMENDED FOR</span>
+                  <div className="text-sm font-semibold text-gray-900">{option.recommended[0]}</div>
+                </div>
+              </div>
+            </div>
+
             {formData.type === option.id && (
-              <div className="absolute top-4 right-4">
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="absolute top-6 right-6">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
@@ -122,7 +193,7 @@ export const StudyTypeStep: React.FC<StepProps> = ({
           {!isFirst && (
             <button
               type="button"
-              className="px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               disabled
             >
               Previous
@@ -132,21 +203,21 @@ export const StudyTypeStep: React.FC<StepProps> = ({
 
         <div className="flex items-center space-x-4">
           <div className="text-sm text-gray-500">
-            Step 1 of 6
+            Step 1 of {formData.type === 'usability' ? '6' : '5'}
           </div>
           <button
             type="button"
             onClick={handleNext}
             disabled={!formData.type}
             className={`
-              px-8 py-3 rounded-lg font-medium transition-all duration-200
+              px-10 py-3 rounded-xl font-semibold transition-all duration-200 text-lg
               ${formData.type
-                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }
             `}
           >
-            Continue
+            Continue to {formData.type === 'usability' ? 'Block Builder' : 'Session Setup'}
           </button>
         </div>
       </div>

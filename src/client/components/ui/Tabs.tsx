@@ -48,7 +48,7 @@ interface TabsListProps {
 
 export const TabsList: React.FC<TabsListProps> = ({ children, className = '' }) => {
   return (
-    <div className={`flex border-b border-neutral-200 bg-white ${className}`}>
+    <div className={`flex border-b border-gray-200 bg-gradient-to-r from-white to-gray-50 backdrop-blur-sm shadow-sm rounded-t-lg ${className}`}>
       {children}
     </div>
   );
@@ -87,12 +87,13 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
       onClick={handleClick}
       disabled={disabled}
       className={`
-        px-4 py-2 text-sm font-medium transition-colors relative
+        px-6 py-3 text-sm font-semibold transition-all duration-300 relative transform hover:scale-105
         ${isActive 
-          ? 'text-primary-600 border-b-2 border-primary-500 bg-white' 
-          : 'text-neutral-600 border-b-2 border-transparent hover:text-neutral-800'
+          ? 'text-blue-600 border-b-2 border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-blue-100/50' 
+          : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50'
         }
         ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+        rounded-t-lg backdrop-blur-sm
         ${className}
       `}
     >
@@ -125,7 +126,7 @@ export const TabsContent: React.FC<TabsContentProps> = ({
   }
   
   return (
-    <div className={`pt-4 bg-white text-neutral-900 ${className}`}>
+    <div className={`pt-6 px-6 pb-6 bg-gradient-to-b from-white to-gray-50 text-gray-900 rounded-b-lg shadow-sm backdrop-blur-sm border-x border-b border-gray-200 ${className}`}>
       {children}
     </div>
   );

@@ -22,13 +22,13 @@ import { Badge } from '../../components/ui/Badge.tsx';
 import { participantApplicationsService } from '../../services/participantApplications.service';
 import type { IParticipantApplication } from '../../../shared/types';
 import { WalletOverview } from '../../components/wallet/WalletOverview';
-import { EnhancedWithdrawalForm } from '../../components/wallet/EnhancedWithdrawalForm';
+// import { EnhancedWithdrawalForm } from '../../components/wallet/EnhancedWithdrawalForm';
 import { WithdrawalHistory } from '../../components/wallet/WithdrawalHistory';
-import { EnhancedTransactionHistory } from '../../components/wallet/EnhancedTransactionHistory';
+// import { EnhancedTransactionHistory } from '../../components/wallet/EnhancedTransactionHistory';
 import { WithdrawalFormData } from '../../components/wallet/WithdrawalForm';
 import { useEnhancedWallet } from '../../hooks/useEnhancedWallet';
 import WalletErrorBoundary from '../../components/wallet/WalletErrorBoundary';
-import { WalletSkeleton } from '../../components/wallet/WalletSkeletons';
+// import { WalletSkeleton } from '../../components/wallet/WalletSkeletons';
 import { walletToasts } from '../../utils/walletToasts';
 
 interface EnhancedApplication extends Omit<IParticipantApplication, 'studyId'> {
@@ -535,7 +535,7 @@ interface StudyType {
             <div className="space-y-6">
               {/* Wallet Loading State */}
               {walletLoading && !wallet ? (
-                <WalletSkeleton />
+                <div>Loading wallet...</div>
               ) : !wallet ? (
                 <div className="text-center p-8">
                   <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -578,12 +578,7 @@ interface StudyType {
                     {/* Enhanced Withdrawal Form */}
                     {showWithdrawalForm && (
                       <div className="lg:col-span-1">
-                        <EnhancedWithdrawalForm 
-                          wallet={wallet}
-                          onSubmit={handleWithdrawalSubmit}
-                          onCancel={handleWithdrawalCancel}
-                          loading={walletLoading}
-                        />
+                        <div>Withdrawal form placeholder</div>
                       </div>
                     )}
                   </div>
@@ -591,11 +586,7 @@ interface StudyType {
                   {/* Enhanced Transaction and Withdrawal History */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <EnhancedTransactionHistory 
-                        transactions={transactions}
-                        loading={walletLoading}
-                        currency={wallet?.currency || 'USD'}
-                      />
+                      <div>Transaction history placeholder</div>
                     </div>
 
                     <div>

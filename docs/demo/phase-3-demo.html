@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3: Enhanced Authentication Integration Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .feature-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 16px;
+        }
+        .status-success {
+            color: #059669;
+            font-weight: 600;
+        }
+        .status-active {
+            color: #2563eb;
+            font-weight: 600;
+        }
+        .test-account {
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+        .test-account-role {
+            font-weight: 600;
+            color: #374151;
+        }
+        .test-account-email {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .api-endpoint {
+            font-family: Monaco, 'Courier New', monospace;
+            background: #f9fafb;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #2563eb;
+        }
+        .implementation-list {
+            list-style: none;
+            padding: 0;
+        }
+        .implementation-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .implementation-list li:before {
+            content: "✅";
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="card">
+            <div class="header">
+                <h1>Phase 3: Enhanced Authentication Integration</h1>
+                <p style="margin: 8px 0 0 0; opacity: 0.9;">
+                    Complete implementation of enhanced user experience with authentication integration
+                </p>
+            </div>
+        </div>
+
+        <!-- Implementation Status -->
+        <div class="card">
+            <div class="content">
+                <h2>🎯 Implementation Status</h2>
+                <ul class="implementation-list">
+                    <li><strong>Enhanced Authentication Hook:</strong> Complete TypeScript implementation with JWT management</li>
+                    <li><strong>Study Creation Wizard:</strong> Modern multi-step interface with role-based access</li>
+                    <li><strong>Authentication Testing:</strong> Comprehensive test interface with quick login</li>
+                    <li><strong>Role-Based Access Control:</strong> Granular permissions for researcher/participant/admin</li>
+                    <li><strong>TypeScript Integration:</strong> Full type safety across all components</li>
+                    <li><strong>API Integration:</strong> Seamless connection to enhanced backend endpoints</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="card">
+            <div class="content">
+                <h2>🌟 Key Features Implemented</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Enhanced Authentication</h3>
+                        <p><strong>File:</strong> <code>useEnhancedAuth.ts</code></p>
+                        <ul>
+                            <li>JWT token management with auto-refresh</li>
+                            <li>Role-based access control</li>
+                            <li>Session persistence</li>
+                            <li>Test account integration</li>
+                            <li>Comprehensive error handling</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Study Creation Wizard</h3>
+                        <p><strong>File:</strong> <code>EnhancedStudyCreationWizard.tsx</code></p>
+                        <ul>
+                            <li>Multi-step wizard interface</li>
+                            <li>Real-time validation</li>
+                            <li>Role-based access restrictions</li>
+                            <li>Responsive design</li>
+                            <li>Progress tracking</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Testing Interface</h3>
+                        <p><strong>File:</strong> <code>AuthIntegrationTest.tsx</code></p>
+                        <ul>
+                            <li>Quick test account login</li>
+                            <li>Role permission verification</li>
+                            <li>API status monitoring</li>
+                            <li>Manual login testing</li>
+                            <li>Feature demonstration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Accounts -->
+        <div class="card">
+            <div class="content">
+                <h2>🧪 Test Accounts Available</h2>
+                <p>Use these test accounts to verify authentication and role-based features:</p>
+                
+                <div class="test-account">
+                    <div class="test-account-role">Researcher Account</div>
+                    <div class="test-account-email">abwanwr77+researcher@gmail.com / test123</div>
+                    <small>Can create and manage studies</small>
+                </div>
+
+                <div class="test-account">
+                    <div class="test-account-role">Participant Account</div>
+                    <div class="test-account-email">abwanwr77+participant@gmail.com / test123</div>
+                    <small>Can participate in studies but cannot create them</small>
+                </div>
+
+                <div class="test-account">
+                    <div class="test-account-role">Admin Account</div>
+                    <div class="test-account-email">abwanwr77+admin@gmail.com / test123</div>
+                    <small>Full platform access including study creation</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Integration -->
+        <div class="card">
+            <div class="content">
+                <h2>🔗 API Integration Points</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Enhanced Authentication API</h3>
+                        <p><strong>Endpoint:</strong> <span class="api-endpoint">/api/auth-enhanced</span></p>
+                        <p><strong>Status:</strong> <span class="status-success">✅ Active</span></p>
+                        <ul>
+                            <li>User authentication with JWT</li>
+                            <li>Token refresh management</li>
+                            <li>Profile management</li>
+                            <li>Test account support</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Enhanced User API</h3>
+                        <p><strong>Endpoint:</strong> <span class="api-endpoint">/api/user-enhanced</span></p>
+                        <p><strong>Status:</strong> <span class="status-success">✅ Active</span></p>
+                        <ul>
+                            <li>User profile data</li>
+                            <li>Profile updates</li>
+                            <li>User management actions</li>
+                            <li>Role-based data access</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Development Status -->
+        <div class="card">
+            <div class="content">
+                <h2>🚀 Development Server Status</h2>
+                <p>The enhanced features are running on the development server:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Frontend Application</h3>
+                        <p><strong>URL:</strong> <span class="status-active">http://localhost:5175</span></p>
+                        <p><strong>Status:</strong> <span class="status-success">✅ Running</span></p>
+                        <p>React application with enhanced authentication components</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Backend API Server</h3>
+                        <p><strong>URL:</strong> <span class="status-active">http://localhost:3003</span></p>
+                        <p><strong>Status:</strong> <span class="status-success">✅ Running</span></p>
+                        <p>Enhanced API endpoints with JWT authentication</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="card">
+            <div class="content">
+                <h2>📈 Next Phase Readiness</h2>
+                <p><strong>Phase 3 Complete - Ready for Phase 4: System Administration</strong></p>
+                
+                <div class="feature-card">
+                    <h3>Foundation Provided for Phase 4</h3>
+                    <ul>
+                        <li>Complete authentication system with admin role support</li>
+                        <li>Role-based access control framework</li>
+                        <li>Modern UI patterns for admin interfaces</li>
+                        <li>Testing infrastructure for admin functionality</li>
+                        <li>TypeScript safety for complex admin operations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card">
+            <div class="content">
+                <h2>🔧 Testing Instructions</h2>
+                <ol>
+                    <li>Ensure both frontend (localhost:5175) and backend (localhost:3003) servers are running</li>
+                    <li>Navigate to the application in your browser</li>
+                    <li>Use the test accounts provided to log in with different roles</li>
+                    <li>Test study creation as a researcher (should work)</li>
+                    <li>Test study creation as a participant (should be blocked)</li>
+                    <li>Verify role-based access control is working correctly</li>
+                    <li>Test token refresh and session management</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

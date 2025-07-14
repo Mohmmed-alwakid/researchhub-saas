@@ -395,12 +395,9 @@ export default async function handler(req, res) {
           hasPointsSystem = true;
           currentPoints = pointsBalance?.total_points || 0;
           
-          // FOR DEVELOPMENT: Points check is disabled to allow study creation
-          // TODO: Re-enable points check for production deployment
-          console.log(`Points check disabled for development. Would need ${totalPointsNeeded} points (user has ${currentPoints})`);
+          // PRODUCTION: Points check is now ENABLED for real database testing
+          console.log(`Checking points: Need ${totalPointsNeeded}, User has ${currentPoints}`);
           
-          // Uncomment below for production points enforcement:
-          /*
           if (currentPoints < totalPointsNeeded) {
             return res.status(400).json({
               success: false,
@@ -409,7 +406,8 @@ export default async function handler(req, res) {
               currentPoints: currentPoints
             });
           }
-          */
+          
+          console.log(`✅ Points check passed: ${currentPoints} >= ${totalPointsNeeded}`);
         }
       } catch (pointsErr) {
         console.warn('Points balance check failed, continuing without points system:', pointsErr.message);

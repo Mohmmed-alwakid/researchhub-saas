@@ -20,32 +20,87 @@ export interface StudyBuilderBlock {
   settings: Record<string, unknown>;
 }
 
+// Usability block types (focused on usability testing)
 export type BlockType = 
-  | 'welcome_screen'
-  | 'open_question'
-  | 'opinion_scale'
-  | 'simple_input'
-  | 'multiple_choice'
-  | 'context_screen'
-  | 'yes_no'
-  | 'five_second_test'
-  | 'card_sort'
-  | 'tree_test'
-  | 'thank_you'
-  | 'image_upload'
-  | 'file_upload';
+  | 'welcome_screen'        // Study introduction
+  | 'task_instruction'      // Specific task to complete
+  | 'website_navigation'    // Navigate website/app
+  | 'rating_scale'         // Rate experience (1-5, 1-10, SUS)
+  | 'feedback_collection'   // Open-ended feedback
+  | 'comparison_test'       // A/B testing blocks
+  | 'completion_check'      // Task completion verification
+  | 'thank_you_screen';     // Study completion
+
+// Enhanced study types according to requirements - simplified to two types
+export type StudyType = 'usability' | 'interview';
 
 export interface StudyFormData {
-  title: string;
-  description: string;
-  type: 'usability_test' | 'interview' | 'survey' | 'card_sort' | 'tree_test';
-  target_participants: number;
+  title?: string;
+  description?: string;
+  type?: StudyType;
+  target_participants?: number;
   duration?: number;
   include_audio?: boolean;
   research_objectives?: string[];
   instructions?: string;
   template_id?: string;
-  blocks: StudyBuilderBlock[];
+  blocks?: StudyBuilderBlock[];
+  // Interview-specific fields
+  interview_session_config?: InterviewSessionConfig;
+  // Usability-specific fields  
+  usability_config?: UsabilityConfig;
+}
+
+// Interview session configuration
+export interface InterviewSessionConfig {
+  type: 'live_interview';
+  duration_minutes: number;
+  recording: {
+    enabled: boolean;
+    audio: boolean;
+    video: boolean;
+    screen_share: boolean;
+    consent_required: boolean;
+  };
+  interview_script: {
+    introduction: string;
+    questions: InterviewQuestion[];
+    conclusion: string;
+  };
+  scheduling: {
+    buffer_time_minutes: number;
+    available_slots: string[];
+    auto_confirm: boolean;
+    reminder_settings: {
+      email_24h: boolean;
+      email_1h: boolean;
+      sms_15min: boolean;
+    };
+  };
+}
+
+// Interview question structure
+export interface InterviewQuestion {
+  id: string;
+  text: string;
+  type: 'open_ended' | 'behavioral' | 'scenario' | 'follow_up';
+  time_allocation_minutes: number;
+  follow_up_prompts?: string[];
+}
+
+// Usability study configuration
+export interface UsabilityConfig {
+  website_url?: string;
+  recording_settings: {
+    screen_recording: boolean;
+    click_tracking: boolean;
+    time_tracking: boolean;
+    error_tracking: boolean;
+  };
+  completion_criteria: {
+    min_tasks_completed: number;
+    auto_submit: boolean;
+  };
 }
 
 export interface WizardStep {
@@ -80,91 +135,56 @@ export const BLOCK_LIBRARY: BlockLibraryItem[] = [
   {
     type: 'welcome_screen',
     name: 'Welcome Screen',
-    description: 'Introduce participants to your study with a friendly welcome message',
+    description: 'Introduce participants to your usability study with clear instructions',
     icon: '👋',
     category: 'display'
   },
   {
-    type: 'open_question',
-    name: 'Open Question',
-    description: 'Collect detailed qualitative feedback with text responses',
-    icon: '💭',
-    category: 'input'
-  },
-  {
-    type: 'opinion_scale',
-    name: 'Opinion Scale',
-    description: 'Gather quantitative ratings using numerical or visual scales',
-    icon: '📊',
-    category: 'assessment'
-  },
-  {
-    type: 'simple_input',
-    name: 'Simple Input',
-    description: 'Collect structured data like names, emails, or numbers',
-    icon: '📝',
-    category: 'input'
-  },
-  {
-    type: 'multiple_choice',
-    name: 'Multiple Choice',
-    description: 'Present options for single or multiple selection responses',
-    icon: '☑️',
-    category: 'input'
-  },
-  {
-    type: 'context_screen',
-    name: 'Context Screen',
-    description: 'Provide instructions or transitional information',
-    icon: 'ℹ️',
+    type: 'task_instruction',
+    name: 'Task Instructions',
+    description: 'Provide specific tasks for participants to complete on your website or app',
+    icon: '�',
     category: 'display'
   },
   {
-    type: 'yes_no',
-    name: 'Yes/No Question',
-    description: 'Ask binary questions with clear yes or no responses',
-    icon: '✅',
+    type: 'website_navigation',
+    name: 'Website Navigation',
+    description: 'Guide users through specific navigation tasks on your website or application',
+    icon: '🌐',
+    category: 'assessment'
+  },
+  {
+    type: 'rating_scale',
+    name: 'Rating Scale',
+    description: 'Collect satisfaction, difficulty, or usability ratings (1-5, 1-10, SUS)',
+    icon: '⭐',
+    category: 'assessment'
+  },
+  {
+    type: 'feedback_collection',
+    name: 'Feedback Collection',
+    description: 'Gather open-ended feedback about user experience and observations',
+    icon: '�',
     category: 'input'
   },
   {
-    type: 'five_second_test',
-    name: '5-Second Test',
-    description: 'Test first impressions and immediate recall',
-    icon: '⏱️',
+    type: 'comparison_test',
+    name: 'A/B Comparison',
+    description: 'Present two options for participants to compare and evaluate',
+    icon: '⚖️',
     category: 'assessment'
   },
   {
-    type: 'card_sort',
-    name: 'Card Sort',
-    description: 'Understand how users categorize and organize information',
-    icon: '🗂️',
+    type: 'completion_check',
+    name: 'Task Completion Check',
+    description: 'Verify whether participants successfully completed the assigned task',
+    icon: '✅',
     category: 'assessment'
   },
   {
-    type: 'tree_test',
-    name: 'Tree Test',
-    description: 'Evaluate navigation and information findability',
-    icon: '🌳',
-    category: 'assessment'
-  },
-  {
-    type: 'image_upload',
-    name: 'Image Upload',
-    description: 'Allow participants to upload images or screenshots',
-    icon: '🖼️',
-    category: 'collection'
-  },
-  {
-    type: 'file_upload',
-    name: 'File Upload',
-    description: 'Collect documents and files from participants',
-    icon: '📎',
-    category: 'collection'
-  },
-  {
-    type: 'thank_you',
+    type: 'thank_you_screen',
     name: 'Thank You',
-    description: 'End the study with appreciation and completion message',
+    description: 'Complete the study with appreciation and next steps for participants',
     icon: '🙏',
     category: 'display'
   }
@@ -178,19 +198,14 @@ export const getBlockDisplayName = (type: BlockType): string => {
 
 export const getDefaultBlockDescription = (type: BlockType): string => {
   const descriptions = {
-    welcome_screen: 'Welcome participants to your study',
-    open_question: 'Ask an open-ended question',
-    opinion_scale: 'Rate on a scale of 1-10',
-    simple_input: 'Enter your response',
-    multiple_choice: 'Select your answer',
-    context_screen: 'Additional information',
-    yes_no: 'Please answer yes or no',
-    five_second_test: 'View the image for 5 seconds',
-    card_sort: 'Sort the cards into categories',
-    tree_test: 'Find the information in the structure',
-    thank_you: 'Thank you for participating!',
-    image_upload: 'Upload an image',
-    file_upload: 'Upload a file'
+    welcome_screen: 'Welcome participants to your usability study',
+    task_instruction: 'Instructions for a specific task',
+    website_navigation: 'Navigate to a specific page or section',
+    rating_scale: 'Rate your experience from 1 to 10',
+    feedback_collection: 'Share your thoughts and feedback',
+    comparison_test: 'Compare two options and choose one',
+    completion_check: 'Did you successfully complete the task?',
+    thank_you_screen: 'Thank you for participating!'
   };
   return descriptions[type] || 'Block description';
 };
@@ -198,86 +213,66 @@ export const getDefaultBlockDescription = (type: BlockType): string => {
 export const getDefaultBlockSettings = (type: BlockType): Record<string, unknown> => {
   const defaults = {
     welcome_screen: {
-      title: 'Welcome to our study',
-      message: 'Thank you for participating in our research study.',
+      title: 'Welcome to our usability study',
+      message: 'Thank you for participating in our usability research. Your feedback will help us improve our product.',
       showContinueButton: true
     },
-    open_question: {
-      question: 'What are your thoughts?',
-      placeholder: 'Please share your thoughts here...',
-      required: true,
-      maxLength: 500
+    task_instruction: {
+      title: 'Task Instructions',
+      instruction: 'Please complete the following task:',
+      task: 'Navigate to the homepage and find the contact information.',
+      timeLimit: 0, // 0 means no time limit
+      successCriteria: 'Successfully locate and view contact information'
     },
-    opinion_scale: {
-      question: 'How would you rate this?',
+    website_navigation: {
+      title: 'Navigation Task',
+      startUrl: 'https://example.com',
+      targetUrl: 'https://example.com/contact',
+      instruction: 'Navigate to the contact page',
+      trackClicks: true,
+      trackTime: true
+    },
+    rating_scale: {
+      question: 'How would you rate the ease of completing this task?',
       scaleType: 'numeric',
       minValue: 1,
       maxValue: 10,
-      minLabel: 'Poor',
-      maxLabel: 'Excellent',
+      minLabel: 'Very Difficult',
+      maxLabel: 'Very Easy',
       required: true
     },
-    simple_input: {
-      question: 'Please provide your input',
-      inputType: 'text',
-      placeholder: 'Enter your answer',
+    feedback_collection: {
+      question: 'Please share your thoughts about this task',
+      placeholder: 'Describe your experience, any difficulties you encountered, or suggestions for improvement...',
+      required: false,
+      maxLength: 1000
+    },
+    comparison_test: {
+      title: 'Compare These Options',
+      question: 'Which option do you prefer?',
+      optionA: {
+        title: 'Option A',
+        description: 'First option',
+        imageUrl: ''
+      },
+      optionB: {
+        title: 'Option B', 
+        description: 'Second option',
+        imageUrl: ''
+      },
+      required: true
+    },
+    completion_check: {
+      question: 'Were you able to successfully complete the task?',
+      options: ['Yes, completed successfully', 'Partially completed', 'Could not complete'],
       required: true,
-      validation: {}
+      followUpQuestion: 'Please explain:'
     },
-    multiple_choice: {
-      question: 'Please select an option',
-      options: ['Option 1', 'Option 2', 'Option 3'],
-      allowMultiple: false,
-      required: true,
-      randomizeOptions: false
-    },
-    context_screen: {
-      title: 'Instructions',
-      content: 'Please read the following instructions carefully.',
-      showContinueButton: true
-    },
-    yes_no: {
-      question: 'Do you agree?',
-      required: true,
-      showIcons: true
-    },
-    five_second_test: {
-      question: 'What do you remember?',
-      imageUrl: '',
-      displayDuration: 5,
-      followUpQuestion: 'What do you remember seeing?'
-    },
-    card_sort: {
-      title: 'Sort these items',
-      items: ['Item 1', 'Item 2', 'Item 3'],
-      categories: ['Category A', 'Category B'],
-      allowNewCategories: true
-    },
-    tree_test: {
-      title: 'Find the information',
-      task: 'Where would you look to find...?',
-      tree: {
-        name: 'Home',
-        children: []
-      }
-    },
-    thank_you: {
-      title: 'Thank you!',
-      message: 'Thank you for participating in our study. Your feedback is valuable.',
+    thank_you_screen: {
+      title: 'Thank you for your participation!',
+      message: 'Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.',
       showCompletionCode: false,
       redirectUrl: ''
-    },
-    image_upload: {
-      question: 'Please upload an image',
-      acceptedTypes: ['image/jpeg', 'image/png', 'image/gif'],
-      maxFileSize: 5242880, // 5MB
-      required: true
-    },
-    file_upload: {
-      question: 'Please upload a file',
-      acceptedTypes: ['.pdf', '.doc', '.docx', '.txt'],
-      maxFileSize: 10485760, // 10MB
-      required: true
     }
   };
   

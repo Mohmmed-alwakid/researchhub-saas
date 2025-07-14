@@ -100,6 +100,9 @@ export default async function handler(req, res) {
       case 'user-actions':
         return await handleUserActions(req, res, userId);
       
+      case 'assign-points':
+        return await handleAssignPoints(req, res);
+      
       case 'users-bulk':
         return await handleUsersBulk(req, res);
       
@@ -1771,6 +1774,144 @@ async function handleFixResearcherProfile(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: `Failed to fix researcher profile: ${error.message}` 
+    });
+  }
+}
+
+// Admin Points Management Handler
+async function handleAssignPoints(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { userId, amount, reason } = req.body;
+
+    if (!userId || !amount || !reason) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: userId, amount, reason'
+      });
+    }
+
+    if (amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Amount must be positive'
+      });
+    }
+
+    // Get admin user info from request
+    const adminUser = await verifyAdmin(req);
+
+    // Check if target user exists
+    const { data: targetUser, error: userError } = await supabase
+      .from('profiles')
+      .select('id, email, first_name, last_name')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !targetUser) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    // Get current balance or create if doesn't exist
+    let { data: currentBalance, error: balanceError } = await supabase
+      .from('points_balance')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (balanceError && balanceError.code !== 'PGRST116') {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch current balance'
+      });
+    }
+
+    // Create balance if doesn't exist
+    if (!currentBalance) {
+      const { data: newBalance, error: createError } = await supabase
+        .from('points_balance')
+        .insert({
+          user_id: userId,
+          total_points: amount,
+          available_points: amount,
+          used_points: 0,
+          expired_points: 0
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to create points balance'
+        });
+      }
+
+      currentBalance = newBalance;
+    } else {
+      // Update existing balance
+      const { data: updatedBalance, error: updateError } = await supabase
+        .from('points_balance')
+        .update({
+          total_points: currentBalance.total_points + amount,
+          available_points: currentBalance.available_points + amount,
+          last_updated: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (updateError) {
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to update points balance'
+        });
+      }
+
+      currentBalance = updatedBalance;
+    }
+
+    // Record transaction
+    const { error: transactionError } = await supabase
+      .from('points_transactions')
+      .insert({
+        user_id: userId,
+        type: 'admin_assigned',
+        amount: amount,
+        description: reason,
+        assigned_by: adminUser.id,
+        expires_at: null // Admin assigned points don't expire
+      });
+
+    if (transactionError) {
+      console.warn('Transaction recording failed:', transactionError.message);
+      // Don't fail the operation, just log
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully assigned ${amount} points to ${targetUser.email}`,
+      user: {
+        id: targetUser.id,
+        email: targetUser.email,
+        name: `${targetUser.first_name} ${targetUser.last_name}`
+      },
+      pointsAssigned: amount,
+      newBalance: currentBalance.total_points,
+      reason: reason
+    });
+
+  } catch (error) {
+    console.error('Assign points error:', error);
+    return res.status(500).json({
+      success: false,
+      error: `Failed to assign points: ${error.message}`
     });
   }
 }

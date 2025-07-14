@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-07-12T16:35:59.086Z",
+  "testType": "quick",
+  "summary": {
+    "total": 3,
+    "passed": 1,
+    "failed": 2,
+    "warnings": 0,
+    "duration": 2923
+  },
+  "tests": [
+    {
+      "name": "Application Loads",
+      "status": "failed",
+      "timestamp": "2025-07-12T16:36:01.674Z",
+      "duration": 2481,
+      "details": "",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5175/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5175/\", waiting until \"networkidle\"\u001b[22m\n"
+    },
+    {
+      "name": "Authentication",
+      "status": "failed",
+      "timestamp": "2025-07-12T16:36:01.903Z",
+      "duration": 229,
+      "details": "",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5175/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5175/login\", waiting until \"load\"\u001b[22m\n"
+    },
+    {
+      "name": "API Health",
+      "status": "passed",
+      "timestamp": "2025-07-12T16:36:01.953Z",
+      "duration": 49,
+      "details": "API health check passed: Local full-stack development server is running",
+      "error": null
+    }
+  ],
+  "errors": []
+}

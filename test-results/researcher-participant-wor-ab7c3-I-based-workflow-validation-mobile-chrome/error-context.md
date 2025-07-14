@@ -1,0 +1,50 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - link "Afkar":
+    - /url: /
+    - img "Afkar"
+  - link "Sign in":
+    - /url: /login
+  - button "Get Started"
+- text: AI-Powered Research Platform
+- heading "User research made simple & powerful" [level=1]
+- paragraph: Conduct user testing, gather feedback, and analyze behavior with our comprehensive research platform. Screen recording, heatmaps, and analytics powered by AI.
+- button "Start Free Trial"
+- button "Watch Demo"
+- text: No credit card required 14-day free trial
+- heading "Live Dashboard" [level=3]
+- text: Live Completion Rate
+- paragraph: 98%
+- text: Active Users
+- paragraph: 50,000
+- text: Study Progress 87%
+- heading "See our platform in action" [level=2]
+- paragraph: Discover powerful features that make user research effortless and insightful
+- heading "Screen Recording" [level=3]
+- paragraph: Watch how users interact with your designs
+- heading "Click Heatmaps" [level=3]
+- paragraph: Visualize where users click and interact
+- heading "Real-time Analytics" [level=3]
+- paragraph: Track user behavior and conversion metrics
+- text: "Recording: 00:32 Powerful Features"
+- heading "Everything you need for user research" [level=2]
+- paragraph: Comprehensive tools to conduct, manage, and analyze user research studies with AI-powered insights
+- heading "HD Screen Recording" [level=3]
+- paragraph: Capture crystal-clear user interactions with advanced screen recording technology. No downloads required.
+- heading "AI-Powered Analytics" [level=3]
+- paragraph: Get actionable insights with heatmaps, conversion funnels, and behavioral analysis powered by machine learning.
+- heading "Smart Participant Management" [level=3]
+- paragraph: Recruit, screen, and manage participants with built-in tools, automated compensation, and CRM integration.
+- heading "Enterprise Security" [level=3]
+- paragraph: Bank-grade security with SOC 2 compliance, GDPR ready, and end-to-end encryption for all data.
+- heading "Real-time Collaboration" [level=3]
+- paragraph: Work together with your team in real-time. Share insights, tag moments, and collaborate on analysis.
+- heading "Advanced Integrations" [level=3]
+- paragraph: Connect with 50+ tools including Slack, Figma, Notion, and your favorite design and project management tools.
+- heading "Ready to transform your user research?" [level=2]
+- paragraph: Join thousands of researchers who trust Afkar for their user testing needs.
+- button "Start Free Trial"
+- button "Watch Demo"
+```

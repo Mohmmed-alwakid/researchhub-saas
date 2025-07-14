@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-07-12T18:13:23.682Z",
+  "testType": "daily",
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "warnings": 0,
+    "duration": 3816
+  },
+  "tests": [
+    {
+      "name": "Application Loads",
+      "status": "passed",
+      "timestamp": "2025-07-12T18:13:25.358Z",
+      "duration": 1578,
+      "details": "Application loaded successfully with title: Afkar - User Testing Research Platform",
+      "error": null
+    },
+    {
+      "name": "Authentication",
+      "status": "passed",
+      "timestamp": "2025-07-12T18:13:27.393Z",
+      "duration": 2030,
+      "details": "User successfully logged in",
+      "error": null
+    },
+    {
+      "name": "API Health",
+      "status": "passed",
+      "timestamp": "2025-07-12T18:13:27.447Z",
+      "duration": 46,
+      "details": "API health check passed: Local full-stack development server is running",
+      "error": null
+    }
+  ],
+  "errors": []
+}

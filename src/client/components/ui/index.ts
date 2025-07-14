@@ -8,6 +8,12 @@ export { Textarea } from './Textarea';
 export { ProgressBar } from './ProgressBar';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export { 
+  default as Skeleton,
+  CardSkeleton,
+  ButtonSkeleton,
+  InputSkeleton
+} from './Skeleton';
+export { 
   default as ValidationFeedback,
   ErrorFeedback,
   WarningFeedback,

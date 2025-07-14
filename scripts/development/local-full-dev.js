@@ -5,6 +5,10 @@ import { createClient } from '@supabase/supabase-js';
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,10 +24,20 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Supabase configuration (same as production)
-const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+// Supabase configuration (using environment variables)
+const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Regular Supabase client (for general operations)
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Admin Supabase client (for admin operations that need service role)
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseKey);
+
+console.log('🔑 Supabase Configuration:');
+console.log('   URL:', supabaseUrl);
+console.log('   Service Role Key:', supabaseServiceKey ? '✅ Set' : '❌ Missing');
 
 // Test accounts
 const TEST_ACCOUNTS = {
@@ -188,6 +202,21 @@ app.all('/api/auth', async (req, res) => {
 
       // Get role from profile first, then from user metadata, with fallback
       const userRole = profile?.role || data.user.user_metadata?.role || 'participant';
+      const userStatus = profile?.status || 'active';
+      
+      // Check if user is active (especially important for participants)
+      if (userStatus === 'inactive') {
+        // Sign out the user immediately
+        await supabase.auth.signOut();
+        
+        return res.status(403).json({
+          success: false,
+          error: userRole === 'participant' 
+            ? 'Your account is pending admin verification. Please wait for approval before logging in.'
+            : 'Your account has been deactivated. Please contact an administrator.',
+          code: 'ACCOUNT_INACTIVE'
+        });
+      }
       
       // If no profile exists, create one with the correct role
       if (!profile) {
@@ -391,6 +420,11 @@ app.all('/api/profile', async (req, res) => {
 import studiesHandler from '../../api/studies.js';
 import walletsHandler from '../../api/wallets.js';
 import templatesHandler from '../../api/templates-simple.js';
+// PHASE 1 ENHANCED ENDPOINTS
+import migrationHandler from '../../api/migration.js';
+import userEnhancedHandler from '../../api/user-enhanced.js';
+// PHASE 2 ENHANCED AUTHENTICATION
+import authEnhancedHandler from '../../api/auth-enhanced.js';
 
 app.all('/api/studies*', async (req, res) => {
   // Use the actual studies.js handler which has proper data transformation
@@ -405,6 +439,20 @@ app.all('/api/wallets*', async (req, res) => {
 // Templates endpoints - Template Creation UI backend (NEW - July 10, 2025)
 app.all('/api/templates*', async (req, res) => {
   await templatesHandler(req, res);
+});
+
+// PHASE 1 ENHANCED ENDPOINTS - Database Migration and User Management
+app.all('/api/migration*', async (req, res) => {
+  await migrationHandler(req, res);
+});
+
+app.all('/api/user-enhanced*', async (req, res) => {
+  await userEnhancedHandler(req, res);
+});
+
+// PHASE 2 ENHANCED AUTHENTICATION - JWT validation and role-based access
+app.all('/api/auth-enhanced*', async (req, res) => {
+  await authEnhancedHandler(req, res);
 });
 
 // Redirect study-builder endpoints to studies API with action=build
@@ -1026,7 +1074,7 @@ app.all('/api/admin/user-actions', async (req, res) => {
       console.log('Creating new user:', { email, name, role, isActive });
 
       // Create user in Supabase Auth
-      const { data: authData, error: authCreateError } = await supabase.auth.admin.createUser({
+      const { data: authData, error: authCreateError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
@@ -1044,10 +1092,10 @@ app.all('/api/admin/user-actions', async (req, res) => {
         });
       }
 
-      // Create profile
-      const { data: profileData, error: profileError } = await supabase
+      // Create or update profile (upsert to handle potential auto-creation)
+      const { data: profileData, error: profileError } = await supabaseAdmin
         .from('profiles')
-        .insert({
+        .upsert({
           id: authData.user.id,
           email,
           first_name: name.split(' ')[0] || name,
@@ -1063,7 +1111,7 @@ app.all('/api/admin/user-actions', async (req, res) => {
       if (profileError) {
         console.error('Profile creation error:', profileError);
         // If profile creation fails, delete the auth user
-        await supabase.auth.admin.deleteUser(authData.user.id);
+        await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
         return res.status(400).json({ 
           success: false, 
           error: profileError.message 
@@ -1120,7 +1168,7 @@ app.all('/api/admin/user-actions', async (req, res) => {
         updateData.status = isActive ? 'active' : 'inactive';
       }
 
-      const { data: updatedProfile, error: updateError } = await supabase
+      const { data: updatedProfile, error: updateError } = await supabaseAdmin
         .from('profiles')
         .update(updateData)
         .eq('id', userId)
@@ -2556,13 +2604,13 @@ app.all('/api/payments*', async (req, res) => {
   }
 });
 
-// Points Management API (Enhanced)
+// Points Management API (Production - Real Database)
 app.all('/api/points*', async (req, res) => {
   try {
     console.log(`🪙 Points API Request: ${req.method} ${req.url}`);
     
-    // Import the points handler
-    const pointsModule = await import('./api/points.js');
+    // Import the production points handler (real database)
+    const pointsModule = await import('../../api/points.js');
     const handler = pointsModule.default;
     
     // Call the handler with req and res

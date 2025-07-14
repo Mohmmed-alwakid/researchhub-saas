@@ -24,7 +24,7 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({ classNam
       setLoading(true);
       setError(null);
       const data = await getEnhancedFinancialOverview();
-      setFinancial(data);
+      setFinancial(data as FinancialReport);
     } catch (err) {
       console.error('Failed to fetch financial data:', err);
       setError('Failed to load financial data');

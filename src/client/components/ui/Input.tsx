@@ -30,38 +30,39 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     // Generate unique ID if not provided
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
     
-    // Base styles using design tokens approach
+    // Enhanced base styles with professional effects
     const baseStyles = `
-      block w-full border rounded-xl shadow-sm transition-all duration-200
-      focus:outline-none focus:ring-2 focus:ring-offset-1
-      disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-neutral-50
-      placeholder:text-neutral-400
+      block w-full border rounded-xl shadow-sm transition-all duration-300 ease-out
+      focus:outline-none focus:ring-2 focus:ring-offset-1 focus:shadow-lg
+      disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50
+      placeholder:text-gray-400 backdrop-blur-sm
+      hover:shadow-md transform hover:scale-[1.01] focus:scale-[1.01]
     `;
     
-    // Variant styles
+    // Enhanced variant styles with beautiful focus states
     const variants = {
       default: `
-        border-neutral-300 bg-white text-neutral-900
-        focus:border-primary-500 focus:ring-primary-500
-        hover:border-neutral-400
+        border-gray-300/60 bg-white/90 text-gray-900
+        focus:border-blue-500 focus:ring-blue-500/30 focus:bg-white
+        hover:border-gray-400/80 hover:bg-white
       `,
       error: `
-        border-error-500 bg-white text-neutral-900
-        focus:border-error-600 focus:ring-error-500
-        hover:border-error-600
+        border-red-400/60 bg-red-50/30 text-gray-900
+        focus:border-red-500 focus:ring-red-500/30 focus:bg-red-50/50
+        hover:border-red-500/80 hover:bg-red-50/40
       `,
       success: `
-        border-success-500 bg-white text-neutral-900
-        focus:border-success-600 focus:ring-success-500
-        hover:border-success-600
+        border-green-400/60 bg-green-50/30 text-gray-900
+        focus:border-green-500 focus:ring-green-500/30 focus:bg-green-50/50
+        hover:border-green-500/80 hover:bg-green-50/40
       `,
     };
     
-    // Size styles
+    // Enhanced size styles with better proportions
     const sizes = {
-      sm: `px-3 py-2 text-sm`,
-      md: `px-4 py-3 text-base`,
-      lg: `px-5 py-4 text-lg`,
+      sm: `px-4 py-2.5 text-sm`,
+      md: `px-5 py-3.5 text-base`,
+      lg: `px-6 py-4.5 text-lg`,
     };
     
     // Icon sizing
@@ -77,7 +78,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label 
             htmlFor={inputId}
-            className="block text-sm font-medium text-neutral-700 mb-2"
+            className="block text-sm font-semibold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent mb-2"
           >
             {label}
           </label>

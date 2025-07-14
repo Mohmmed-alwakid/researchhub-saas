@@ -21,29 +21,55 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     disabled,
     ...props 
   }, ref) => {
-    // Base styles using design tokens approach
+    // Enhanced base styles with professional animations
     const baseStyles = `
-      inline-flex items-center justify-center font-medium rounded-xl 
-      transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 
+      inline-flex items-center justify-center font-semibold rounded-xl 
+      transition-all duration-300 ease-out focus:outline-none focus:ring-2 
       focus:ring-offset-2 transform hover:scale-[1.02] active:scale-[0.98]
-      ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+      shadow-sm hover:shadow-lg active:shadow-md
+      backdrop-blur-sm border border-transparent
+      ${disabled || isLoading ? 'opacity-50 cursor-not-allowed hover:scale-100' : 'cursor-pointer'}
     `;
     
-    // Variant styles using consistent token naming
+    // Enhanced variant styles with professional gradients and effects
     const variants = {
-      primary: `text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:ring-primary-500 shadow-soft hover:shadow-medium`,
-      secondary: `text-neutral-700 bg-white border border-neutral-300 hover:bg-neutral-50 focus:ring-primary-500 shadow-soft hover:shadow-medium`,
-      outline: `text-primary-700 bg-transparent border border-primary-300 hover:bg-primary-50 focus:ring-primary-500`,
-      ghost: `text-neutral-700 bg-transparent hover:bg-neutral-100 focus:ring-neutral-500`,
-      danger: `text-white bg-gradient-to-r from-error-600 to-error-700 hover:from-error-700 hover:to-error-800 focus:ring-error-500 shadow-soft hover:shadow-medium`,
+      primary: `
+        text-white bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700
+        hover:from-blue-700 hover:via-blue-800 hover:to-purple-800
+        focus:ring-blue-500 shadow-blue-500/25 hover:shadow-blue-600/30
+        border-blue-600/20
+      `,
+      secondary: `
+        text-gray-700 bg-gradient-to-br from-white to-gray-50 
+        border-gray-300 hover:from-gray-50 hover:to-gray-100
+        focus:ring-blue-500 shadow-gray-400/20 hover:shadow-gray-500/25
+        hover:border-gray-400
+      `,
+      outline: `
+        text-blue-700 bg-transparent border-2 border-blue-300 
+        hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100
+        focus:ring-blue-500 hover:border-blue-400 hover:text-blue-800
+        shadow-blue-200/30 hover:shadow-blue-300/40
+      `,
+      ghost: `
+        text-gray-700 bg-transparent hover:bg-gradient-to-br 
+        hover:from-gray-100 hover:to-gray-200
+        focus:ring-gray-500 hover:shadow-gray-300/30
+      `,
+      danger: `
+        text-white bg-gradient-to-br from-red-600 via-red-700 to-pink-700
+        hover:from-red-700 hover:via-red-800 hover:to-pink-800
+        focus:ring-red-500 shadow-red-500/25 hover:shadow-red-600/30
+        border-red-600/20
+      `,
     };
     
-    // Size styles using consistent spacing
+    // Enhanced size styles with better proportions
     const sizes = {
-      sm: `px-4 py-2 text-sm`,
-      md: `px-6 py-3 text-base`,
-      lg: `px-8 py-4 text-lg`,
-      xl: `px-10 py-5 text-xl`,
+      sm: `px-4 py-2.5 text-sm font-medium`,
+      md: `px-6 py-3 text-base font-semibold`,
+      lg: `px-8 py-4 text-lg font-semibold`,
+      xl: `px-10 py-5 text-xl font-bold`,
     };
 
     return (

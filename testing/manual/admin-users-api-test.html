@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Users API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Admin Users API Test</h1>
+    <p>This will test if the admin users API is working and what users exist in the database.</p>
+    
+    <button onclick="testUsersAPI()">Test Users API</button>
+    <button onclick="testPointsAPI()">Test Points API</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function addResult(title, content, isError = false) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${isError ? 'error' : 'success'}`;
+            div.innerHTML = `<h3>${title}</h3><pre>${content}</pre>`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testUsersAPI() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    addResult('❌ No Auth Token', 'Please log in first. No auth token found in localStorage.', true);
+                    return;
+                }
+
+                addResult('🔐 Auth Token', `Found token: ${token.substring(0, 50)}...`);
+
+                const response = await fetch('/api/admin?action=users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    addResult('✅ Users API Success', JSON.stringify(data, null, 2));
+                    
+                    if (data.data && data.data.length > 0) {
+                        addResult('👥 Users Found', `Found ${data.data.length} users. Emails: ${data.data.map(u => u.email).join(', ')}`);
+                    } else {
+                        addResult('📭 No Users', 'No users found in the database. You may need to register test accounts first.', true);
+                    }
+                } else {
+                    addResult('❌ Users API Error', `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                addResult('❌ Request Failed', error.message, true);
+            }
+        }
+
+        async function testPointsAPI() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    addResult('❌ No Auth Token', 'Please log in first. No auth token found in localStorage.', true);
+                    return;
+                }
+
+                const response = await fetch('/api/points?action=admin-balances', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    addResult('✅ Points API Success', JSON.stringify(data, null, 2));
+                } else {
+                    addResult('❌ Points API Error', `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                addResult('❌ Points Request Failed', error.message, true);
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.onload = function() {
+            addResult('🚀 Page Loaded', 'Ready to test APIs. Make sure you are logged in as admin first.');
+        };
+    </script>
+</body>
+</html>

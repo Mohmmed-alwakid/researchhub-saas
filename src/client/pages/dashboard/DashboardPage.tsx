@@ -20,8 +20,8 @@ import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
 import { CollaborationDashboard } from '../../components/collaboration/CollaborationDashboard';
 import { useAuthStore } from '../../stores/authStore';
-import { EnhancedStudyCreationModal } from '../../components/studies/EnhancedStudyCreationModal';
-import type { WorkspaceRole, EnhancedStudyTemplate } from '../../../shared/types';
+import { SimplifiedStudyCreationModal } from '../../components/studies/SimplifiedStudyCreationModal';
+import type { WorkspaceRole } from '../../../shared/types';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -29,7 +29,9 @@ const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState<DashboardAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'collaboration' | 'analytics' | 'settings'>('overview');
-  const [showStudyCreationModal, setShowStudyCreationModal] = useState(false);
+  
+  // Study creation modal state
+  const [showStudyModal, setShowStudyModal] = useState(false);
 
   // Fetch real dashboard data on component mount
   useEffect(() => {
@@ -55,32 +57,33 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, []);  // Handle study creation flow - show enhanced modal instead of direct navigation
+  }, []);
+
+  // Handle study creation flow - show simplified modal per requirements
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowStudyCreationModal(true);
+    setShowStudyModal(true);
   };
 
-  const handleCreateFromTemplate = (template: EnhancedStudyTemplate) => {
-    // TODO: Complete study creation within modal - no navigation
-    console.log('Creating study from template:', template);
-    setShowStudyCreationModal(false);
-    // Placeholder: Will be handled by complete modal flow
-  };
-
-  const handleCreateFromScratch = () => {
-    // TODO: Complete study creation within modal - no navigation
-    console.log('Creating study from scratch');
-    setShowStudyCreationModal(false);
-    // Placeholder: Will be handled by complete modal flow
-  };
-
-  const handleStudyCreated = (studyId: string) => {
-    // Handle successful study creation
-    console.log('Study created successfully:', studyId);
-    setShowStudyCreationModal(false);
-    // Refresh dashboard or navigate to new study
-    navigate(`/app/studies/${studyId}`);
+  const handleSelectStudyType = (type: 'unmoderated' | 'moderated') => {
+    // Route based on study type selection per requirements
+    if (type === 'unmoderated') {
+      // Navigate to usability study builder per Step 2A requirements
+      navigate('/app/study-builder', { 
+        state: { 
+          studyType: 'usability',
+          fromModal: true 
+        }
+      });
+    } else {
+      // Navigate to interview session configuration per Step 2B requirements  
+      navigate('/app/study-builder', { 
+        state: { 
+          studyType: 'interview',
+          fromModal: true 
+        }
+      });
+    }
   };
 
   // Calculate stats for display
@@ -490,15 +493,14 @@ const DashboardPage = () => {
           </div>
         )}
 
-        {/* Enhanced Study Creation Modal */}
-        <EnhancedStudyCreationModal
-          isOpen={showStudyCreationModal}
-          onClose={() => setShowStudyCreationModal(false)}
-          onCreateFromTemplate={handleCreateFromTemplate}
-          onCreateFromScratch={handleCreateFromScratch}
-          onStudyCreated={handleStudyCreated}
-        />
       </div>
+
+      {/* Study Creation Modal */}
+      <SimplifiedStudyCreationModal
+        isOpen={showStudyModal}
+        onClose={() => setShowStudyModal(false)}
+        onSelectType={handleSelectStudyType}
+      />
     </div>
   );
 };

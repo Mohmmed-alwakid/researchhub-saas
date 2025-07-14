@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Researcher Navigation Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2d3748;
+        }
+        .test-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f7fafc;
+        }
+        .btn {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+        .result {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #38a169;
+        }
+        .error {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #e53e3e;
+        }
+        .info {
+            background: #bee3f8;
+            color: #2a4365;
+            border-left: 4px solid #3182ce;
+        }
+        .navigation-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .nav-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-item:hover {
+            border-color: #3182ce;
+            background: #f0f9ff;
+        }
+        .nav-item.should-work {
+            border-color: #38a169;
+            background: #f0fff4;
+        }
+        .nav-item.should-not-work {
+            border-color: #e53e3e;
+            background: #fffafa;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success { background: #38a169; }
+        .status-error { background: #e53e3e; }
+        .status-pending { background: #ed8936; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Researcher Navigation Test</h1>
+            <p>Testing the updated researcher navigation structure</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="test-section">
+            <h3>🔐 Step 1: Researcher Authentication</h3>
+            <p>Login with researcher credentials to test navigation</p>
+            <button class="btn" onclick="testResearcherLogin()">Login as Researcher</button>
+            <div id="authResult" class="result info">Click the button to authenticate as researcher</div>
+        </div>
+
+        <!-- Navigation Test Section -->
+        <div class="test-section">
+            <h3>🧭 Step 2: Navigation Structure Test</h3>
+            <p><strong>✅ Should Work (Researcher Access):</strong></p>
+            <div class="navigation-test">
+                <div class="nav-item should-work" onclick="testNavigation('/app/dashboard')">
+                    <strong>📊 Dashboard</strong><br>
+                    <small>Main researcher dashboard</small>
+                </div>
+                <div class="nav-item should-work" onclick="testNavigation('/app/studies')">
+                    <strong>📚 Studies</strong><br>
+                    <small>Study management</small>
+                </div>
+                <div class="nav-item should-work" onclick="testNavigation('/app/templates')">
+                    <strong>📋 Templates</strong><br>
+                    <small>Study templates</small>
+                </div>
+                <div class="nav-item should-work" onclick="testNavigation('/app/participants')">
+                    <strong>👥 Participants</strong><br>
+                    <small>Application management</small>
+                </div>
+                <div class="nav-item should-work" onclick="testNavigation('/app/settings')">
+                    <strong>⚙️ Settings</strong><br>
+                    <small>Account settings</small>
+                </div>
+                <div class="nav-item should-work" onclick="testNavigation('/app/settings/billing')">
+                    <strong>💳 Billing & Credits</strong><br>
+                    <small>Credits management</small>
+                </div>
+            </div>
+
+            <p><strong>❌ Should NOT Work (Admin Only):</strong></p>
+            <div class="navigation-test">
+                <div class="nav-item should-not-work" onclick="testNavigation('/app/organizations')">
+                    <strong>🏢 Organizations</strong><br>
+                    <small>Should be admin-only</small>
+                </div>
+                <div class="nav-item should-not-work" onclick="testNavigation('/app/analytics')">
+                    <strong>📈 Global Analytics</strong><br>
+                    <small>Should be admin-only</small>
+                </div>
+            </div>
+
+            <div id="navigationResults"></div>
+        </div>
+
+        <!-- Test Accounts Info -->
+        <div class="test-section">
+            <h3>🔑 Test Accounts (MANDATORY)</h3>
+            <ul>
+                <li><strong>Researcher:</strong> abwanwr77+Researcher@gmail.com / Testtest123</li>
+                <li><strong>Admin:</strong> abwanwr77+admin@gmail.com / Testtest123</li>
+                <li><strong>Participant:</strong> abwanwr77+participant@gmail.com / Testtest123</li>
+            </ul>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="test-section">
+            <h3>🔗 Quick Access Links</h3>
+            <button class="btn" onclick="window.open('http://localhost:5175', '_blank')">Open ResearchHub</button>
+            <button class="btn" onclick="window.open('http://localhost:5175/login', '_blank')">Login Page</button>
+            <button class="btn" onclick="window.open('http://localhost:3003/api/health', '_blank')">API Health Check</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003';
+        const FRONTEND_BASE = 'http://localhost:5175';
+        let authToken = null;
+
+        function updateResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.innerHTML = message;
+        }
+
+        async function testResearcherLogin() {
+            try {
+                updateResult('authResult', '🔄 Authenticating as researcher...', 'info');
+                
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.session) {
+                    authToken = result.session.access_token;
+                    updateResult('authResult', 
+                        `✅ Login successful!<br>
+                         👤 User: ${result.user.email}<br>
+                         🔑 Role: ${result.user.role}<br>
+                         🎯 Token: ${authToken.substring(0, 20)}...`, 
+                        'success'
+                    );
+                } else {
+                    updateResult('authResult', `❌ Login failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                updateResult('authResult', `❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNavigation(path) {
+            if (!authToken) {
+                alert('⚠️ Please login first!');
+                return;
+            }
+
+            try {
+                // Test if the path exists by making a request
+                const response = await fetch(`${FRONTEND_BASE}${path}`, {
+                    method: 'HEAD',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const resultsDiv = document.getElementById('navigationResults');
+                const timestamp = new Date().toLocaleTimeString();
+                const status = response.ok ? '✅' : '❌';
+                const statusClass = response.ok ? 'status-success' : 'status-error';
+                
+                resultsDiv.innerHTML += `
+                    <div class="result info">
+                        <span class="status-indicator ${statusClass}"></span>
+                        ${status} [${timestamp}] ${path} - Status: ${response.status}
+                    </div>
+                `;
+
+                // Also open in new tab for manual verification
+                window.open(`${FRONTEND_BASE}${path}`, '_blank');
+                
+            } catch (error) {
+                const resultsDiv = document.getElementById('navigationResults');
+                resultsDiv.innerHTML += `
+                    <div class="result error">
+                        <span class="status-indicator status-error"></span>
+                        ❌ ${path} - Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize
+        console.log('🧪 Researcher Navigation Test Ready!');
+        console.log('Frontend:', FRONTEND_BASE);
+        console.log('Backend:', API_BASE);
+    </script>
+</body>
+</html>

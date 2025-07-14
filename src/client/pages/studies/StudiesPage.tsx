@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
   Users, 
-  Play, 
-  Pause, 
   Calendar,
   Clock,
-  DollarSign,
-  UserCheck,
-  BarChart3
+  DollarSign
 } from 'lucide-react';
 // Enhanced UI components for professional appearance
 import { Button, Input } from '../../components/ui';
 import { Card, CardContent } from '../../components/ui/Card';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
-import { EnhancedStudyCreationModal } from '../../components/studies/EnhancedStudyCreationModal';
 import { IStudy } from '../../../shared/types';
+import { SimplifiedStudyCreationModal } from '../../components/studies/SimplifiedStudyCreationModal';
+import StudyCardActions from '../../components/studies/StudyCardActions';
+import RenameStudyModal from '../../components/studies/RenameStudyModal';
+import '../../styles/study-card.css';
 
 const StudiesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -39,7 +34,14 @@ const StudiesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [showStudyCreationModal, setShowStudyCreationModal] = useState(false);
+  
+  // Study creation modal state
+  const [showStudyModal, setShowStudyModal] = useState(false);
+  
+  // Rename modal state
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [studyToRename, setStudyToRename] = useState<IStudy | null>(null);
+  const [isRenaming, setIsRenaming] = useState(false);
 
   useEffect(() => {
     fetchStudies();
@@ -71,21 +73,31 @@ const StudiesPage: React.FC = () => {
     fetchStudies();
   };
 
-  // Handle study creation flow - show enhanced modal instead of direct navigation
+  // Handle study creation flow - show simplified modal per requirements
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowStudyCreationModal(true);
+    setShowStudyModal(true);
   };
 
-  const handleCreateFromTemplate = () => {
-    // Use the new modal flow instead of navigation
-    setShowStudyCreationModal(true);
-    // The modal will handle template selection internally
-  };
-
-  const handleCreateFromScratch = () => {
-    // Use the new modal flow instead of navigation
-    setShowStudyCreationModal(true);
+  const handleSelectStudyType = (type: 'unmoderated' | 'moderated') => {
+    // Route based on study type selection per requirements
+    if (type === 'unmoderated') {
+      // Navigate to usability study builder per Step 2A requirements
+      navigate('/app/study-builder', { 
+        state: { 
+          studyType: 'usability',
+          fromModal: true 
+        }
+      });
+    } else {
+      // Navigate to interview session configuration per Step 2B requirements  
+      navigate('/app/study-builder', { 
+        state: { 
+          studyType: 'interview',
+          fromModal: true 
+        }
+      });
+    }
   };
 
   const filteredStudies = (studies || []).filter(study => {
@@ -99,15 +111,15 @@ const StudiesPage: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      draft: 'bg-gray-100 text-gray-800',
-      recruiting: 'bg-blue-100 text-blue-800',
-      active: 'bg-green-100 text-green-800',
-      completed: 'bg-purple-100 text-purple-800',
-      paused: 'bg-yellow-100 text-yellow-800'
+      draft: 'bg-gray-100 text-gray-800 border-gray-200',
+      recruiting: 'bg-blue-100 text-blue-800 border-blue-200',
+      active: 'bg-green-100 text-green-800 border-green-200',
+      completed: 'bg-purple-100 text-purple-800 border-purple-200',
+      paused: 'bg-yellow-100 text-yellow-800 border-yellow-200'
     };
     
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status as keyof typeof styles]}`}>
+      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${styles[status as keyof typeof styles]} min-w-0 text-center`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
@@ -122,31 +134,6 @@ const StudiesPage: React.FC = () => {
     };
     
     return icons[type as keyof typeof icons] || '📊';
-  };  const handleStatusToggle = async (study: IStudy) => {
-    const newStatus = study.status === 'active' ? 'paused' : 'active';
-    if (study.status === 'draft') return;
-    
-    try {
-      await updateStudy(study._id, { status: newStatus });
-    } catch (error) {
-      console.error('Failed to update study status:', error);
-    }
-  };
-
-  const handlePublishStudy = async (study: IStudy) => {
-    try {
-      // Update study to active status and make it public
-      await updateStudy(study._id, { 
-        status: 'active',
-        visibility: 'public' 
-      });
-      
-      // Show success message
-      alert('Ready to go!\n\nLooking good! Is it time to put this in front of testers and start collecting insights?');
-    } catch (error) {
-      console.error('Failed to publish study:', error);
-      alert('Failed to publish study. Please try again.');
-    }
   };
 
   const handleDelete = async (studyId: string) => {
@@ -156,6 +143,58 @@ const StudiesPage: React.FC = () => {
       } catch (error) {
         console.error('Failed to delete study:', error);
       }
+    }
+  };
+
+  // New action handlers for simplified study card
+  const handleCardClick = (study: IStudy) => {
+    // Navigate to study details/overview page
+    navigate(`/app/studies/${study._id}`);
+  };
+
+  const handleEdit = (study: IStudy) => {
+    setCurrentStudy(study);
+    navigate(`/app/studies/${study._id}/edit`);
+  };
+
+  const handleRename = (study: IStudy) => {
+    setStudyToRename(study);
+    setShowRenameModal(true);
+  };
+
+  const handleRenameSubmit = async (newTitle: string) => {
+    if (!studyToRename) return;
+    
+    setIsRenaming(true);
+    try {
+      await updateStudy(studyToRename._id, { title: newTitle });
+      setShowRenameModal(false);
+      setStudyToRename(null);
+    } catch (error) {
+      console.error('Failed to rename study:', error);
+      alert('Failed to rename study. Please try again.');
+    } finally {
+      setIsRenaming(false);
+    }
+  };
+
+  const handleDuplicate = async (study: IStudy) => {
+    try {
+      // For now, we'll create a copy with "(Copy)" suffix
+      // In a real implementation, this would call a duplicate API endpoint
+      const duplicatedStudy = {
+        ...study,
+        title: `${study.title} (Copy)`,
+        status: 'draft' as const,
+        participants: { enrolled: 0, target: study.participants?.target || 10 }
+      };
+      
+      // This would be replaced with actual API call
+      console.log('Duplicating study:', duplicatedStudy);
+      alert('Study duplication feature is coming soon!');
+    } catch (error) {
+      console.error('Failed to duplicate study:', error);
+      alert('Failed to duplicate study. Please try again.');
     }
   };
 
@@ -259,7 +298,8 @@ const StudiesPage: React.FC = () => {
       </Card>
 
       {/* Studies Grid */}
-      {filteredStudies.length === 0 ? (
+      <div className="mt-8">
+        {filteredStudies.length === 0 ? (
         <div>
           {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' ? (
             // Show basic empty state when filters are applied
@@ -291,183 +331,98 @@ const StudiesPage: React.FC = () => {
             </div>
           )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredStudies.map((study) => (
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredStudies.map((study) => (
             <Card 
               key={study._id} 
-              className="p-6 hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => navigate(`/app/studies/${study._id}/results`)}
+              className="group relative p-6 hover:shadow-xl hover:shadow-indigo-500/20 transition-all duration-300 cursor-pointer bg-gradient-to-br from-white via-white to-indigo-50/30 border border-gray-200/80 hover:border-indigo-300/60 backdrop-blur-sm hover:scale-[1.02] flex flex-col h-full"
+              onClick={() => handleCardClick(study)}
             >
               {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-3">{getTypeIcon(study.type)}</span>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 line-clamp-1">{study.title}</h3>
+              <div className="flex items-start mb-6">
+                <div className="flex items-start flex-1 min-w-0">
+                  <div className="flex flex-col items-center mr-3 flex-shrink-0">
+                    <div className="text-3xl p-2 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 mb-2">
+                      {getTypeIcon(study.type)}
+                    </div>
+                    {getStatusBadge(study.status)}
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  {getStatusBadge(study.status)}
-                  <div className="relative">
-                    <button className="p-1 text-gray-400 hover:text-gray-600 rounded">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </button>
+                  <div className="min-w-0 flex-1 pt-2">
+                    <h3 className="study-card-title font-bold text-lg text-gray-900 group-hover:text-indigo-700 transition-colors" title={study.title}>
+                      {study.title}
+                    </h3>
                   </div>
                 </div>
               </div>
 
               {/* Description */}
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{study.description}</p>
+              <div className="mb-6">
+                <p 
+                  className="study-card-description text-gray-600 text-sm leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-gray-100"
+                  title={study.description}
+                >
+                  {study.description}
+                </p>
+              </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-4">                <div className="flex items-center text-sm text-gray-600">
-                  <Users className="w-4 h-4 mr-2" />
-                  {study.participants?.enrolled || 0}/{study.participants?.target || study.settings?.maxParticipants || 10}
+              <div className="grid grid-cols-2 gap-3 mb-6 p-4 bg-gradient-to-r from-gray-50/80 to-indigo-50/40 rounded-xl border border-gray-100/80">
+                <div className="flex items-center text-sm text-gray-700 bg-white/60 p-2 rounded-lg min-w-0">
+                  <Users className="w-4 h-4 mr-2 text-blue-500 flex-shrink-0" />
+                  <span className="study-card-stat font-medium">{study.participants?.enrolled || 0}/{study.participants?.target || study.settings?.maxParticipants || 10}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Clock className="w-4 h-4 mr-2" />
-                  {study.settings?.duration || 30}min
+                <div className="flex items-center text-sm text-gray-700 bg-white/60 p-2 rounded-lg min-w-0">
+                  <Clock className="w-4 h-4 mr-2 text-green-500 flex-shrink-0" />
+                  <span className="study-card-stat font-medium">{study.settings?.duration || 30}min</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  ${study.settings?.compensation || 25}
-                </div>                <div className="flex items-center text-sm text-gray-600">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {study.createdAt ? formatDistanceToNow(new Date(study.createdAt), { addSuffix: true }) : 'Unknown date'}
+                <div className="flex items-center text-sm text-gray-700 bg-white/60 p-2 rounded-lg min-w-0">
+                  <DollarSign className="w-4 h-4 mr-2 text-yellow-500 flex-shrink-0" />
+                  <span className="study-card-stat font-medium">${study.settings?.compensation || 25}</span>
                 </div>
-              </div>              {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-                  <Link
-                    to={`/studies/${study._id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentStudy(study);
-                    }}
-                    className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
-                    title="View study"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Link>                  <Link
-                    to={`/app/studies/${study._id}/edit`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentStudy(study);
-                    }}
-                    className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
-                    title="Edit study"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    to={`/app/studies/${study._id}/applications`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-                    title="View applications"
-                  >
-                    <UserCheck className="w-4 h-4" />
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(study._id);
-                    }}
-                    className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                    title="Delete study"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="flex items-center text-sm text-gray-700 bg-white/60 p-2 rounded-lg min-w-0">
+                  <Calendar className="w-4 h-4 mr-2 text-purple-500 flex-shrink-0" />
+                  <span className="study-card-stat font-medium" title={study.createdAt ? formatDistanceToNow(new Date(study.createdAt), { addSuffix: true }) : 'Unknown date'}>
+                    {study.createdAt ? formatDistanceToNow(new Date(study.createdAt), { addSuffix: true }) : 'Unknown date'}
+                  </span>
                 </div>
+              </div>
 
-                {/* Action buttons based on study status */}
-                <div className="flex items-center space-x-2">
-                  {/* Draft studies: Start Testing button */}
-                  {study.status === 'draft' && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePublishStudy(study);
-                      }}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                      title="Publish study and make it available to participants"
-                    >
-                      Start Testing
-                    </button>
-                  )}
-
-                  {/* Active/Paused studies: Management buttons */}
-                  {(study.status === 'active' || study.status === 'paused') && (
-                    <>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/app/studies/${study._id}/applications`);
-                        }}
-                        variant="primary"
-                        size="sm"
-                        leftIcon={<UserCheck className="w-4 h-4" />}
-                        title="Manage participant applications"
-                      >
-                        Applications
-                      </Button>
-                      
-                      <Link
-                        to={`/app/studies/${study._id}/results`}
-                        className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium inline-flex items-center gap-2"
-                        title="View study results and analytics"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                        Results
-                      </Link>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStatusToggle(study);
-                        }}
-                        className={`p-2 rounded-lg transition-colors ${
-                          study.status === 'active'
-                            ? 'text-yellow-600 hover:bg-yellow-50'
-                            : 'text-green-600 hover:bg-green-50'
-                        }`}
-                        title={study.status === 'active' ? 'Pause study' : 'Resume study'}
-                      >
-                        {study.status === 'active' ? (
-                          <Pause className="w-4 h-4" />
-                        ) : (
-                          <Play className="w-4 h-4" />
-                        )}
-                      </button>
-                    </>
-                  )}
-
-                  {/* Completed studies: View Results only */}
-                  {study.status === 'completed' && (
-                    <Link
-                      to={`/app/studies/${study._id}/results`}
-                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium inline-flex items-center gap-2"
-                      title="View final study results"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <BarChart3 className="w-4 h-4" />
-                      View Results
-                    </Link>
-                  )}
+              {/* Actions Footer */}
+              <div className="mt-auto pt-4 border-t border-gray-200/60">
+                <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+                  <StudyCardActions
+                    study={study}
+                    onEdit={handleEdit}
+                    onRename={handleRename}
+                    onDuplicate={handleDuplicate}
+                    onDelete={(study) => handleDelete(study._id)}
+                  />
                 </div>
               </div>
             </Card>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
-      {/* Enhanced Study Creation Modal */}
-      <EnhancedStudyCreationModal
-        isOpen={showStudyCreationModal}
-        onClose={() => setShowStudyCreationModal(false)}
-        onCreateFromTemplate={handleCreateFromTemplate}
-        onCreateFromScratch={handleCreateFromScratch}
+      {/* Study Creation Modal */}
+      <SimplifiedStudyCreationModal
+        isOpen={showStudyModal}
+        onClose={() => setShowStudyModal(false)}
+        onSelectType={handleSelectStudyType}
+      />
+
+      {/* Rename Study Modal */}
+      <RenameStudyModal
+        isOpen={showRenameModal}
+        currentTitle={studyToRename?.title || ''}
+        onClose={() => {
+          setShowRenameModal(false);
+          setStudyToRename(null);
+        }}
+        onRename={handleRenameSubmit}
+        isLoading={isRenaming}
       />
     </div>
   );
