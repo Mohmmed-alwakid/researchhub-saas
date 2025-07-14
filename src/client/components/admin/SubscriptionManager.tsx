@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   CreditCard, 
   DollarSign, 
@@ -57,31 +57,6 @@ const SubscriptionManager: React.FC = () => {
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPlans();
-    fetchSubscriptions();
-  }, []);
-
-  // Show Coming Soon if subscription management is disabled
-  if (!ENABLE_SUBSCRIPTION_MANAGEMENT) {
-    return (
-      <ComingSoon
-        variant="card"
-        title="Subscription Management"
-        description="Manage subscription plans, billing, and revenue analytics with our comprehensive subscription system."
-        features={[
-          "Create and manage subscription plans",
-          "Real-time billing and payment processing",
-          "Revenue analytics and reporting",
-          "Subscriber management and support",
-          "Points system for study access control",
-          "Automated billing and invoicing"
-        ]}
-        expectedRelease="Q4 2024"
-      />
-    );
-  }
-
   const getAuthToken = () => {
     let token = '';
     const authStorage = localStorage.getItem('auth-storage');
@@ -89,14 +64,14 @@ const SubscriptionManager: React.FC = () => {
       try {
         const { state } = JSON.parse(authStorage);
         token = state?.token || '';
-      } catch (e) {
+      } catch {
         // fallback: token remains ''
       }
     }
     return token;
   };
 
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -117,8 +92,9 @@ const SubscriptionManager: React.FC = () => {
       } else {
         throw new Error(result.error || 'Failed to fetch plans');
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to fetch plans');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch plans';
+      setError(errorMessage);
       // Keep mock data as fallback
       const mockPlans: SubscriptionPlan[] = [
         {
@@ -171,9 +147,9 @@ const SubscriptionManager: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchSubscriptions = async () => {
+  const fetchSubscriptions = useCallback(async () => {
     try {
       setError(null);
       const token = getAuthToken();
@@ -193,11 +169,37 @@ const SubscriptionManager: React.FC = () => {
       } else {
         throw new Error(result.error || 'Failed to fetch subscriptions');
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to fetch subscriptions');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch subscriptions';
+      setError(errorMessage);
       setSubscriptions([]);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPlans();
+    fetchSubscriptions();
+  }, [fetchPlans, fetchSubscriptions]);
+
+  // Show Coming Soon if subscription management is disabled
+  if (!ENABLE_SUBSCRIPTION_MANAGEMENT) {
+    return (
+      <ComingSoon
+        variant="card"
+        title="Subscription Management"
+        description="Manage subscription plans, billing, and revenue analytics with our comprehensive subscription system."
+        features={[
+          "Create and manage subscription plans",
+          "Real-time billing and payment processing",
+          "Revenue analytics and reporting",
+          "Subscriber management and support",
+          "Points system for study access control",
+          "Automated billing and invoicing"
+        ]}
+        expectedRelease="Q4 2024"
+      />
+    );
+  }
 
   const handleSavePlan = async () => {
     if (!editingPlan) return;
@@ -685,7 +687,7 @@ const SubscriptionManager: React.FC = () => {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as 'plans' | 'subscriptions' | 'analytics')}
               className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'

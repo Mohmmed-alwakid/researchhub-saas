@@ -2,978 +2,908 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search, 
   Plus, 
-  MoreVertical,
   UserCheck,
   UserX,
   Crown,
-  Mail,
-  Calendar,
   Activity,
-  Users
+  Users,
+  Filter,
+  BarChart3,
+  Edit,
+  Trash2,
+  RefreshCw,
+  CheckSquare,
+  Square
 } from 'lucide-react';
-import { getAllUsers, updateUser, createUser, deleteUser, bulkUpdateUsers } from '../../services/admin.service';
+import { getAllUsers, updateUser, createUser, deleteUser } from '../../services/admin.service';
 
 interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: string; // Using string to match API response
-  isActive: boolean;
-  createdAt: string;
-  lastLoginAt?: string;
-  // Additional computed fields
-  subscription?: string;
-  studiesCreated?: number;
-  studiesParticipated?: number;
-}
-
-interface ApiUser {
-  _id?: string;
-  id?: string;
+  id: string;
+  _id?: string; // Support both ID formats
   name?: string;
   first_name?: string;
   last_name?: string;
   email: string;
-  role: string;
+  role: 'admin' | 'researcher' | 'participant';
+  status?: 'active' | 'inactive' | 'suspended';
   isActive?: boolean;
-  status?: string;
-  createdAt?: string;
   created_at?: string;
+  createdAt?: string;
+  last_login?: string | null;
   lastLoginAt?: string;
-  last_login_at?: string;
-  subscription?: string;
-  subscription_tier?: string;
+  study_count?: number;
   studiesCreated?: number;
   studiesParticipated?: number;
+  engagement_score?: number;
+  subscription_status?: string;
+  subscription?: string;
+  phone?: string;
+  location?: string;
+  tags?: string[];
 }
 
 interface UserFilters {
   role: string;
   status: string;
+  search: string;
+  dateRange: string;
   subscription: string;
-  searchQuery: string;
+  engagement: string;
+}
+
+interface UserModalData {
+  id?: string;
+  name: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  first_name?: string;
+  last_name?: string;
 }
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);  const [showUserModal, setShowUserModal] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+  const [showFilters, setShowFilters] = useState(false);
+  const [showAdvancedMode, setShowAdvancedMode] = useState(false);
+  const [sortField, setSortField] = useState<keyof User>('created_at');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
+  // Modal states
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserModalData>({
+    name: '',
+    email: '',
+    role: 'participant',
+    isActive: true
+  });
+  
+  // Filters
   const [filters, setFilters] = useState<UserFilters>({
-    role: 'all',
-    status: 'all',
-    subscription: 'all',
-    searchQuery: ''  });
+    role: '',
+    status: '',
+    search: '',
+    dateRange: '',
+    subscription: '',
+    engagement: ''
+  });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);  const fetchUsers = async () => {
+  // Transform API user to component user format
+  const transformUser = (apiUser: Record<string, unknown>): User => {
+    // Type assertion for API flexibility - we know the structure but TypeScript doesn't
+    const user = apiUser as {
+      id?: string;
+      _id?: string;
+      name?: string;
+      first_name?: string;
+      last_name?: string;
+      email: string;
+      role: string;
+      status?: string;
+      isActive?: boolean;
+      created_at?: string;
+      createdAt?: string;
+      last_login?: string;
+      lastLoginAt?: string;
+      study_count?: number;
+      studiesCreated?: number;
+      studiesParticipated?: number;
+      engagement_score?: number;
+      subscription_status?: string;
+      subscription?: string;
+      phone?: string;
+      location?: string;
+      tags?: string[];
+    };
+    const id = user.id || user._id || '';
+    const firstName = user.first_name || user.name?.split(' ')[0] || '';
+    const lastName = user.last_name || user.name?.split(' ').slice(1).join(' ') || '';
+    const name = user.name || `${firstName} ${lastName}`.trim();
+    
+    return {
+      id,
+      _id: user._id,
+      name,
+      first_name: firstName,
+      last_name: lastName,
+      email: user.email,
+      role: user.role as 'admin' | 'researcher' | 'participant',
+      status: (user.status as 'active' | 'inactive' | 'suspended') || (user.isActive ? 'active' : 'inactive'),
+      isActive: user.isActive ?? (user.status === 'active'),
+      created_at: user.created_at || user.createdAt,
+      createdAt: user.createdAt || user.created_at,
+      last_login: user.last_login || user.lastLoginAt,
+      lastLoginAt: user.lastLoginAt || user.last_login,
+      study_count: user.study_count || user.studiesCreated || 0,
+      studiesCreated: user.studiesCreated || user.study_count || 0,
+      studiesParticipated: user.studiesParticipated || 0,
+      engagement_score: user.engagement_score || 0,
+      subscription_status: user.subscription_status || user.subscription,
+      subscription: user.subscription || user.subscription_status,
+      phone: user.phone,
+      location: user.location,
+      tags: user.tags || []
+    };
+  };
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      console.log('🔍 Fetching users from admin API...');
+      console.log('🔄 Fetching users...');
+      const response = await getAllUsers({});
+      console.log('📦 API Response:', response);
       
-      const response = await getAllUsers({
-        page: 1,
-        limit: 100, // Get more users for admin view
-        sortBy: 'created_at',
-        sortOrder: 'desc'
-      });
-      
-      console.log('📊 API Response:', response); // Debug log
-      
-      // Handle both nested and direct data structures
-      const userData = response.data?.data || response.data || response;
-      console.log('📋 User data:', userData);
-      
-      if (!Array.isArray(userData)) {
-        console.error('❌ Invalid user data structure:', userData);
-        // If the response has users property, try that
-        if (response.users && Array.isArray(response.users)) {
-          console.log('✅ Found users in response.users');
-          const mappedUsers: User[] = response.users.map((user: ApiUser) => ({
-            _id: user._id || user.id || '',
-            name: user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'No Name',
-            email: user.email,
-            role: user.role || 'participant',
-            isActive: user.isActive !== undefined ? user.isActive : (user.status === 'active'),
-            createdAt: user.createdAt || user.created_at || '',
-            lastLoginAt: user.lastLoginAt || user.last_login_at,
-            subscription: user.subscription || user.subscription_tier || 'free',
-            studiesCreated: user.studiesCreated || 0,
-            studiesParticipated: user.studiesParticipated || 0,
-          }));
-          setUsers(mappedUsers);
-        } else {
-          console.log('🔧 Creating demo users for development...');
-          // Create some demo users for development
-          const demoUsers: User[] = [
-            {
-              _id: 'demo-admin',
-              name: 'Admin User',
-              email: 'abwanwr77+admin@gmail.com',
-              role: 'admin',
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              subscription: 'pro',
-              studiesCreated: 5,
-              studiesParticipated: 0,
-            },
-            {
-              _id: 'demo-researcher',
-              name: 'Researcher User',
-              email: 'abwanwr77+Researcher@gmail.com',
-              role: 'researcher',
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              subscription: 'basic',
-              studiesCreated: 3,
-              studiesParticipated: 0,
-            },
-            {
-              _id: 'demo-participant',
-              name: 'Participant User',
-              email: 'abwanwr77+participant@gmail.com',
-              role: 'participant',
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              subscription: 'free',
-              studiesCreated: 0,
-              studiesParticipated: 8,
-            }
-          ];
-          setUsers(demoUsers);
-        }
-        return;
-      }// Map the API response to match our component interface
-      const mappedUsers: User[] = userData.map((user: ApiUser) => ({
-        _id: user._id || user.id || '',
-        name: user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'No Name',
-        email: user.email,
-        role: user.role || 'participant',
-        isActive: user.isActive !== undefined ? user.isActive : (user.status === 'active'),
-        createdAt: user.createdAt || user.created_at || '',
-        lastLoginAt: user.lastLoginAt || user.last_login_at,
-        subscription: user.subscription || user.subscription_tier || 'free',
-        studiesCreated: user.studiesCreated || 0,
-        studiesParticipated: user.studiesParticipated || 0
-      }));
-        console.log('📋 Mapped users:', mappedUsers); // Debug log
-      setUsers(mappedUsers);
-    } catch (error) {
-      console.error('❌ Failed to fetch users:', error);
-      console.log('🔧 Using demo users due to API error...');
-      // Fallback to demo users if API fails
-      const demoUsers: User[] = [
-        {
-          _id: 'demo-admin',
-          name: 'Admin User',
-          email: 'abwanwr77+admin@gmail.com',
-          role: 'admin',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          subscription: 'pro',
-          studiesCreated: 5,
-          studiesParticipated: 0,
-        },
-        {
-          _id: 'demo-researcher',
-          name: 'Researcher User',
-          email: 'abwanwr77+Researcher@gmail.com',
-          role: 'researcher',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          subscription: 'basic',
-          studiesCreated: 3,
-          studiesParticipated: 0,
-        },
-        {
-          _id: 'demo-participant',
-          name: 'Participant User',
-          email: 'abwanwr77+participant@gmail.com',
-          role: 'participant',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          subscription: 'free',
-          studiesCreated: 0,
-          studiesParticipated: 8,
-        }
-      ];
-      setUsers(demoUsers);
+      if (response.success && response.data) {
+        const rawUsers = Array.isArray(response.data) ? response.data : 
+                        (response.data.users || response.data.data || []);
+        
+        const transformedUsers = rawUsers.map(transformUser);
+        console.log('✅ Transformed users:', transformedUsers);
+        
+        setUsers(transformedUsers);
+        setError(null);
+      } else {
+        throw new Error(response.error || 'Failed to fetch users');
+      }
+    } catch (err) {
+      console.error('❌ Error fetching users:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
     } finally {
       setLoading(false);
     }
-  };
-  const applyFilters = useCallback(() => {
-    let filtered = users;
-
-    // Search filter
-    if (filters.searchQuery) {
-      filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(filters.searchQuery.toLowerCase())
-      );
-    }
-
-    // Role filter
-    if (filters.role !== 'all') {
-      filtered = filtered.filter(user => user.role === filters.role);
-    }    // Status filter
-    if (filters.status !== 'all') {
-      if (filters.status === 'active') {
-        filtered = filtered.filter(user => user.isActive);
-      } else if (filters.status === 'inactive' || filters.status === 'suspended') {
-        filtered = filtered.filter(user => !user.isActive);
-      }
-    }
-
-    // Subscription filter
-    if (filters.subscription !== 'all') {
-      filtered = filtered.filter(user => user.subscription === filters.subscription);
-    }    setFilteredUsers(filtered);
-  }, [users, filters]);
+  }, []);
 
   useEffect(() => {
-    applyFilters();
-  }, [users, filters, applyFilters]);
+    fetchUsers();
+  }, [fetchUsers]);
+
+  // Filter and sort users
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = !searchQuery || 
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (user.first_name && user.first_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (user.last_name && user.last_name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesRole = !filters.role || user.role === filters.role;
+    const matchesStatus = !filters.status || 
+      (filters.status === 'active' && user.isActive) ||
+      (filters.status === 'inactive' && !user.isActive) ||
+      user.status === filters.status;
+    
+    return matchesSearch && matchesRole && matchesStatus;
+  }).sort((a, b) => {
+    const aVal = a[sortField] || '';
+    const bVal = b[sortField] || '';
+    
+    if (sortDirection === 'asc') {
+      return aVal > bVal ? 1 : -1;
+    } else {
+      return aVal < bVal ? 1 : -1;
+    }
+  });
+
+  const handleSort = (field: keyof User) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
+  const handleSelectUser = (userId: string) => {
+    const newSelected = new Set(selectedUsers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedUsers.size === filteredUsers.length) {
+      setSelectedUsers(new Set());
+    } else {
+      setSelectedUsers(new Set(filteredUsers.map(user => user.id)));
+    }
+  };
+
   const handleUserAction = async (action: string, userId: string) => {
-    try {
-      switch (action) {
-        case 'activate':
-          await updateUser(userId, { isActive: true });
-          setUsers(users.map(user => 
-            user._id === userId ? { ...user, isActive: true } : user
-          ));
-          break;
-        case 'suspend':
-          await updateUser(userId, { isActive: false });
-          setUsers(users.map(user => 
-            user._id === userId ? { ...user, isActive: false } : user
-          ));
-          break;
-        case 'delete':
-          if (confirm('Are you sure you want to delete this user?')) {
-            await deleteUser(userId);
-            setUsers(users.filter(user => user._id !== userId));
+    const user = users.find(u => u.id === userId || u._id === userId);
+    if (!user) return;
+
+    if (action === 'edit') {
+      setEditingUser({
+        id: user.id || user._id,
+        name: user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive ?? (user.status === 'active'),
+        first_name: user.first_name,
+        last_name: user.last_name
+      });
+      setShowEditModal(true);
+    } else if (action === 'delete') {
+      if (window.confirm('Are you sure you want to delete this user?')) {
+        try {
+          const response = await deleteUser(user.id || user._id || '');
+          if (response.success) {
+            await fetchUsers();
+          } else {
+            setError(response.error || 'Failed to delete user');
           }
-          break;
-        case 'edit': {
-          const userToEdit = users.find(user => user._id === userId);
-          if (userToEdit) {
-            setEditingUser(userToEdit);
-            setShowUserModal(true);
-          }
-          break;
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Failed to delete user');
         }
       }
-    } catch (error) {
-      console.error('Failed to perform user action:', error);
-      alert('Failed to perform action. Please try again.');
-    }  };
-  const handleSaveUser = async (userData: Partial<User>) => {
-    try {
-      console.log('handleSaveUser called with:', userData);
-      
-      if (editingUser) {
-        // Update existing user
-        console.log('Updating user:', editingUser._id, userData);
-        const updatedUser = await updateUser(editingUser._id, {
-          name: userData.name,
-          role: userData.role,
-          isActive: userData.isActive
+    } else if (action === 'toggle-status') {
+      try {
+        const newStatus = !user.isActive;
+        const response = await updateUser(user.id || user._id || '', {
+          isActive: newStatus
         });
         
-        console.log('Update response:', updatedUser);
-        
-        // Update local state
-        const updatedUsers = users.map(user => 
-          user._id === editingUser._id 
-            ? {
-                ...user,
-                name: updatedUser.name,
-                role: updatedUser.role,
-                isActive: updatedUser.isActive
-              }
-            : user
-        );
-        setUsers(updatedUsers);
-      } else {
-        // Create new user
-        console.log('Creating new user:', userData);
-        const newUserData = {
-          name: userData.name!,
-          email: userData.email!,
-          password: (userData as User & { password: string }).password,
-          role: userData.role!,
-          isActive: userData.isActive ?? true
-        };
-        
-        console.log('Sending create user request:', newUserData);
-        const newUser = await createUser(newUserData);
-        
-        console.log('Create user response:', newUser);
-        
-        // Add to local state
-        const mappedUser: User = {
-          _id: newUser._id,
-          name: newUser.name,
-          email: newUser.email,
-          role: newUser.role,
-          isActive: newUser.isActive,
-          createdAt: newUser.createdAt,
-          lastLoginAt: newUser.lastLoginAt,
-          subscription: newUser.subscription || 'free',
-          studiesCreated: newUser.studiesCreated || 0,
-          studiesParticipated: newUser.studiesParticipated || 0
-        };
-          setUsers([mappedUser, ...users]);
-        console.log('User added to local state');
+        if (response.success) {
+          await fetchUsers();
+        } else {
+          setError(response.error || 'Failed to update user status');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to update user status');
       }
-      
-      setShowUserModal(false);
-      setEditingUser(null);
-      console.log('Modal closed, editing user cleared');
-    } catch (error) {
-      console.error('Error saving user:', error);
-      alert(`Failed to ${editingUser ? 'update' : 'create'} user: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      throw error;
     }
   };
-  
-  const handleBulkAction = async (action: string) => {
-    if (selectedUsers.length === 0) return;
 
+  const handleSaveUser = async (userData: UserModalData) => {
     try {
-      let apiAction: string;
+      let response;
+      
+      if (userData.id) {
+        // Update existing user
+        const updateData = {
+          name: userData.name,
+          email: userData.email,
+          role: userData.role,
+          isActive: userData.isActive
+        };
+        
+        response = await updateUser(userData.id, updateData);
+      } else {
+        // Create new user - need to add password
+        const password = 'TempPassword123!'; // Generate or prompt for password
+        const createData = {
+          name: userData.name,
+          email: userData.email,
+          password: password,
+          role: userData.role
+        };
+        
+        response = await createUser(createData);
+      }
+      
+      if (response.success) {
+        setShowEditModal(false);
+        setShowCreateModal(false);
+        setEditingUser({
+          name: '',
+          email: '',
+          role: 'participant',
+          isActive: true
+        });
+        await fetchUsers();
+      } else {
+        setError(response.error || `Failed to ${userData.id ? 'update' : 'create'} user`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Failed to ${userData.id ? 'update' : 'create'} user`);
+    }
+  };
+
+  const handleBulkAction = async (action: string) => {
+    if (selectedUsers.size === 0) return;
+    
+    const userIds = Array.from(selectedUsers);
+    
+    try {
+      let promises: Promise<{ success: boolean; error?: string }>[] = [];
+      
       switch (action) {
         case 'activate':
-          apiAction = 'activate';
+          promises = userIds.map(id => updateUser(id, { isActive: true }));
           break;
-        case 'suspend':
-          apiAction = 'deactivate';
+        case 'deactivate':
+          promises = userIds.map(id => updateUser(id, { isActive: false }));
           break;
         case 'delete':
-          if (!confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) {
+          if (window.confirm(`Are you sure you want to delete ${userIds.length} users?`)) {
+            promises = userIds.map(id => deleteUser(id));
+          } else {
             return;
           }
-          // Delete users one by one since there's no bulk delete in the API
-          for (const userId of selectedUsers) {
-            await deleteUser(userId);
-          }
-          setUsers(users.filter(user => !selectedUsers.includes(user._id)));
-          setSelectedUsers([]);
-          return;
+          break;
         default:
-          throw new Error('Invalid action');
+          return;
       }
-
-      // Use bulk API for activate/deactivate
-      await bulkUpdateUsers({
-        userIds: selectedUsers,
-        action: apiAction as 'activate' | 'deactivate'
-      });
-
-      // Update local state
-      setUsers(users.map(user => 
-        selectedUsers.includes(user._id) 
-          ? { ...user, isActive: action === 'activate' } 
-          : user
-      ));
       
-      setSelectedUsers([]);
-    } catch (error) {
-      console.error('Failed to perform bulk action:', error);
-      alert('Failed to perform bulk action. Please try again.');
+      const responses = await Promise.all(promises);
+      const successCount = responses.filter(r => r.success).length;
+      
+      if (successCount > 0) {
+        setSelectedUsers(new Set());
+        await fetchUsers();
+        if (successCount < userIds.length) {
+          setError(`${successCount}/${userIds.length} users ${action}d successfully`);
+        }
+      } else {
+        setError(`Failed to ${action} users`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Failed to ${action} users`);
     }
-  };
-  const getRoleIcon = (role: string) => {
-    const roleNormalized = role.toLowerCase();
-    switch (roleNormalized) {
-      case 'super_admin':
-      case 'admin':
-        return <Crown className="w-4 h-4 text-yellow-600" />;
-      case 'researcher':
-        return <UserCheck className="w-4 h-4 text-blue-600" />;
-      default:
-        return <UserX className="w-4 h-4 text-gray-600" />;
-    }
-  };
-  const getStatusBadge = (isActive: boolean) => {
-    return isActive 
-      ? 'bg-green-100 text-green-800'
-      : 'bg-red-100 text-red-800';
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'admin': return 'bg-red-100 text-red-800';
+      case 'researcher': return 'bg-blue-100 text-blue-800';
+      default: return 'bg-green-100 text-green-800';
+    }
+  };
+
+  const getStatusBadgeColor = (user: User) => {
+    const isActive = user.isActive ?? (user.status === 'active');
+    return isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Never';
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const getUserDisplayName = (user: User) => {
+    return user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
+  };
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage platform users and their access</p>
+          <p className="text-gray-600">Manage and monitor all platform users</p>
         </div>
-        <button
-          onClick={() => {
-            setEditingUser(null);
-            setShowUserModal(true);
-          }}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add User
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowAdvancedMode(!showAdvancedMode)}
+            className={`px-4 py-2 rounded-lg border transition-colors ${
+              showAdvancedMode 
+                ? 'bg-blue-600 text-white border-blue-600' 
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <BarChart3 className="h-4 w-4 mr-2 inline" />
+            {showAdvancedMode ? 'Basic Mode' : 'Advanced Mode'}
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="h-4 w-4 mr-2 inline" />
+            Add User
+          </button>
+        </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-600">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-500 hover:text-red-700 mt-2 text-sm underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col lg:flex-row gap-4">
           {/* Search */}
-          <div className="relative">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={filters.searchQuery}
-              onChange={(e) => setFilters({ ...filters, searchQuery: e.target.value })}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>          {/* Role Filter */}
-          <select
-            value={filters.role}
-            onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Filter by role"
-          >
-            <option value="all">All Roles</option>
-            <option value="participant">Participant</option>
-            <option value="researcher">Researcher</option>
-            <option value="admin">Admin</option>
-            <option value="super_admin">Super Admin</option>
-          </select>          {/* Status Filter */}
-          <select
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Filter by status"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-          </select>          {/* Subscription Filter */}
-          <select
-            value={filters.subscription}
-            onChange={(e) => setFilters({ ...filters, subscription: e.target.value })}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Filter by subscription"
-          >
-            <option value="all">All Plans</option>
-            <option value="Free">Free</option>
-            <option value="Basic">Basic</option>
-            <option value="Pro">Pro</option>
-            <option value="Enterprise">Enterprise</option>
-          </select>          {/* Bulk Actions */}
-          {selectedUsers.length > 0 && (
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handleBulkAction('activate')}
-                className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-              >
-                Activate ({selectedUsers.length})
-              </button>
-              <button
-                onClick={() => handleBulkAction('suspend')}
-                className="px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm"
-              >
-                Suspend ({selectedUsers.length})
-              </button>
-              <button
-                onClick={() => handleBulkAction('delete')}
-                className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-              >
-                Delete ({selectedUsers.length})
-              </button>
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="h-5 w-5 text-gray-400 absolute left-3 top-3" />
+              <input
+                type="text"
+                placeholder="Search users by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="w-12 px-6 py-3">                  <input
-                    type="checkbox"
-                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedUsers(filteredUsers.map(user => user._id));
-                      } else {
-                        setSelectedUsers([]);
-                      }
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    aria-label="Select all users"
-                  />
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Subscription
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Login
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Activity
-                </th>
-                <th className="w-12 px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">              {filteredUsers.map((user) => (
-                <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">                    <input
-                      type="checkbox"
-                      checked={selectedUsers.includes(user._id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedUsers([...selectedUsers, user._id]);
-                        } else {
-                          setSelectedUsers(selectedUsers.filter(id => id !== user._id));
-                        }
-                      }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      aria-label={`Select user ${user.name}`}
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">
-                          {user.name.charAt(0)}
-                        </span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-600 flex items-center">
-                          <Mail className="w-3 h-3 mr-1" />
-                          {user.email}
-                        </div>
-                      </div>
-                    </div>
-                  </td>                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      {getRoleIcon(user.role)}
-                      <span className="ml-2 text-sm font-medium">
-                        {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
-                      </span>
-                    </div>
-                  </td><td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(user.isActive)}`}>
-                      {user.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {user.subscription || 'None'}
-                  </td>                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 flex items-center">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-xs text-gray-600">
-                      <div className="flex items-center">
-                        <Activity className="w-3 h-3 mr-1" />
-                        {user.studiesCreated || 0} studies created
-                      </div>
-                      <div>{user.studiesParticipated || 0} participated</div>
-                    </div>
-                  </td>                  <td className="px-6 py-4">
-                    <div className="relative">                      <button 
-                        onClick={() => setDropdownOpen(dropdownOpen === user._id ? null : user._id)}
-                        className="p-2 hover:bg-gray-100 rounded-lg"
-                        aria-label="User actions menu"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                      {dropdownOpen === user._id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                          <div className="py-1">
-                            <button
-                              onClick={() => {
-                                handleUserAction('edit', user._id);
-                                setDropdownOpen(null);
-                              }}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              Edit User
-                            </button>
-                            {!user.isActive && (
-                              <button
-                                onClick={() => {
-                                  handleUserAction('activate', user._id);
-                                  setDropdownOpen(null);
-                                }}
-                                className="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-gray-100"
-                              >
-                                Activate
-                              </button>
-                            )}
-                            {user.isActive && (
-                              <button
-                                onClick={() => {
-                                  handleUserAction('suspend', user._id);
-                                  setDropdownOpen(null);
-                                }}
-                                className="w-full text-left px-4 py-2 text-sm text-yellow-700 hover:bg-gray-100"
-                              >
-                                Suspend
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                handleUserAction('delete', user._id);
-                                setDropdownOpen(null);
-                              }}
-                              className="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
-                            >
-                              Delete User
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>        {filteredUsers.length === 0 && (
-          <div className="text-center py-16">
-            <div className="max-w-md mx-auto">
-              <Users className="w-16 h-16 text-gray-300 mx-auto mb-6" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                {filters.searchQuery || filters.role !== 'all' || filters.status !== 'all' || filters.subscription !== 'all' 
-                  ? 'No users match your criteria' 
-                  : 'No users found'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {filters.searchQuery || filters.role !== 'all' || filters.status !== 'all' || filters.subscription !== 'all'
-                  ? 'Try adjusting your search or filter criteria to find the users you\'re looking for.'
-                  : 'Get started by inviting users to join your platform or check if users have been created successfully.'}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button
-                  onClick={() => setShowUserModal(true)}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add New User
-                </button>
-                {(filters.searchQuery || filters.role !== 'all' || filters.status !== 'all' || filters.subscription !== 'all') && (
-                  <button
-                    onClick={() => setFilters({
-                      role: 'all',
-                      status: 'all', 
-                      subscription: 'all',
-                      searchQuery: ''
-                    })}
-                    className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
+          {/* Quick Filters */}
+          <div className="flex items-center gap-2">
+            <select
+              value={filters.role}
+              onChange={(e) => setFilters(prev => ({ ...prev, role: e.target.value }))}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="researcher">Researcher</option>
+              <option value="participant">Participant</option>
+            </select>
+
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Filter className="h-4 w-4" />
+            </button>
+
+            <button
+              onClick={fetchUsers}
+              disabled={loading}
+              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* Advanced Filters */}
+        {showFilters && showAdvancedMode && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <select
+                value={filters.subscription}
+                onChange={(e) => setFilters(prev => ({ ...prev, subscription: e.target.value }))}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Subscriptions</option>
+                <option value="active">Active Subscription</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="expired">Expired</option>
+              </select>
+
+              <select
+                value={filters.dateRange}
+                onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value }))}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="quarter">This Quarter</option>
+              </select>
+
+              <select
+                value={filters.engagement}
+                onChange={(e) => setFilters(prev => ({ ...prev, engagement: e.target.value }))}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Engagement</option>
+                <option value="high">High Engagement</option>
+                <option value="medium">Medium Engagement</option>
+                <option value="low">Low Engagement</option>
+              </select>
             </div>
           </div>
         )}
       </div>
 
-      {/* User Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-gray-900">{users.length}</div>
-          <div className="text-sm text-gray-600">Total Users</div>
-        </div>        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-green-600">
-            {users.filter(u => u.isActive).length}
-          </div>
-          <div className="text-sm text-gray-600">Active Users</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-blue-600">
-            {users.filter(u => u.role.toLowerCase() === 'researcher').length}
-          </div>
-          <div className="text-sm text-gray-600">Researchers</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="text-2xl font-bold text-purple-600">
-            {users.filter(u => u.subscription && u.subscription !== 'Free').length}
-          </div>
-          <div className="text-sm text-gray-600">Paid Subscribers</div>
-        </div>      </div>      {/* User Modal - Full Add/Edit User Functionality */}
-      {showUserModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">
-                {editingUser ? 'Edit User' : 'Create New User'}
-              </h3>              <button
-                onClick={() => setShowUserModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-                aria-label="Close modal"
+      {/* Bulk Actions */}
+      {selectedUsers.size > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-blue-800 font-medium">
+              {selectedUsers.size} user{selectedUsers.size > 1 ? 's' : ''} selected
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleBulkAction('activate')}
+                className="px-3 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <UserCheck className="h-4 w-4 mr-1 inline" />
+                Activate
+              </button>
+              <button
+                onClick={() => handleBulkAction('deactivate')}
+                className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors"
+              >
+                <UserX className="h-4 w-4 mr-1 inline" />
+                Deactivate
+              </button>
+              <button
+                onClick={() => handleBulkAction('delete')}
+                className="px-3 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors"
+              >
+                <Trash2 className="h-4 w-4 mr-1 inline" />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Users Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-3 text-left">
+                  <button
+                    onClick={handleSelectAll}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    {selectedUsers.size === filteredUsers.length ? (
+                      <CheckSquare className="h-4 w-4" />
+                    ) : (
+                      <Square className="h-4 w-4" />
+                    )}
+                  </button>
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                  <button
+                    onClick={() => handleSort('name')}
+                    className="flex items-center gap-1 hover:text-gray-900"
+                  >
+                    User
+                    {sortField === 'name' && (
+                      <span className="text-xs">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                  <button
+                    onClick={() => handleSort('role')}
+                    className="flex items-center gap-1 hover:text-gray-900"
+                  >
+                    Role
+                    {sortField === 'role' && (
+                      <span className="text-xs">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                  <button
+                    onClick={() => handleSort('created_at')}
+                    className="flex items-center gap-1 hover:text-gray-900"
+                  >
+                    Joined
+                    {sortField === 'created_at' && (
+                      <span className="text-xs">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                {showAdvancedMode && (
+                  <>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                      Studies
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                      Engagement
+                    </th>
+                  </>
+                )}
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan={showAdvancedMode ? 8 : 6} className="px-4 py-8 text-center">
+                    <div className="flex items-center justify-center">
+                      <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+                      Loading users...
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={showAdvancedMode ? 8 : 6} className="px-4 py-8 text-center text-gray-500">
+                    No users found
+                  </td>
+                </tr>
+              ) : (
+                filteredUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleSelectUser(user.id)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        {selectedUsers.has(user.id) ? (
+                          <CheckSquare className="h-4 w-4" />
+                        ) : (
+                          <Square className="h-4 w-4" />
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-sm font-medium text-gray-600">
+                            {getUserDisplayName(user).charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{getUserDisplayName(user)}</p>
+                          <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor(user.role)}`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(user)}`}>
+                        {user.isActive ?? (user.status === 'active') ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {formatDate(user.created_at || user.createdAt)}
+                    </td>
+                    {showAdvancedMode && (
+                      <>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {user.study_count || user.studiesCreated || 0}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center">
+                            <div className="w-12 h-2 bg-gray-200 rounded-full mr-2">
+                              <div 
+                                className="h-2 bg-blue-500 rounded-full" 
+                                style={{ width: `${(user.engagement_score || 0) * 10}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-600">
+                              {user.engagement_score || 0}/10
+                            </span>
+                          </div>
+                        </td>
+                      </>
+                    )}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleUserAction('edit', user.id)}
+                          className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                          title="Edit User"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleUserAction('toggle-status', user.id)}
+                          className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                          title={user.isActive ? 'Deactivate' : 'Activate'}
+                        >
+                          {user.isActive ?? (user.status === 'active') ? (
+                            <UserX className="h-4 w-4" />
+                          ) : (
+                            <UserCheck className="h-4 w-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleUserAction('delete', user.id)}
+                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          title="Delete User"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* User Statistics */}
+      {showAdvancedMode && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-blue-500" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Total Users</p>
+                <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="flex items-center">
+              <UserCheck className="h-8 w-8 text-green-500" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Active Users</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.filter(u => u.isActive ?? (u.status === 'active')).length}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="flex items-center">
+              <Crown className="h-8 w-8 text-purple-500" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Researchers</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.filter(u => u.role === 'researcher').length}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="flex items-center">
+              <Activity className="h-8 w-8 text-orange-500" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Participants</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.filter(u => u.role === 'participant').length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create/Edit User Modal */}
+      {(showCreateModal || showEditModal) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-md">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {editingUser.id ? 'Edit User' : 'Create New User'}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setShowEditModal(false);
+                  setEditingUser({
+                    name: '',
+                    email: '',
+                    role: 'participant',
+                    isActive: true
+                  });
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ×
               </button>
             </div>
             
-            <UserForm 
-              user={editingUser}
-              onSave={handleSaveUser}
-              onCancel={() => setShowUserModal(false)}
-            />
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={editingUser.name}
+                  onChange={(e) => setEditingUser(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter user's full name"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={editingUser.email}
+                  onChange={(e) => setEditingUser(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter email address"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role
+                </label>
+                <select
+                  value={editingUser.role}
+                  onChange={(e) => setEditingUser(prev => ({ ...prev, role: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="participant">Participant</option>
+                  <option value="researcher">Researcher</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={editingUser.isActive}
+                  onChange={(e) => setEditingUser(prev => ({ ...prev, isActive: e.target.checked }))}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
+                  Active Account
+                </label>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setShowEditModal(false);
+                  setEditingUser({
+                    name: '',
+                    email: '',
+                    role: 'participant',
+                    isActive: true
+                  });
+                }}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleSaveUser(editingUser)}
+                disabled={!editingUser.name || !editingUser.email}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {editingUser.id ? 'Update User' : 'Create User'}
+              </button>
+            </div>
           </div>
         </div>
       )}
     </div>
-  );
-};
-
-// User Form Component
-interface UserFormProps {
-  user: User | null;
-  onSave: (userData: Partial<User>) => void;
-  onCancel: () => void;
-}
-
-const UserForm: React.FC<UserFormProps> = ({ user, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    role: user?.role || 'participant',
-    isActive: user?.isActive ?? true,
-    password: '',
-    confirmPassword: ''
-  });
-  
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
-    
-    if (!user && !formData.password) {
-      newErrors.password = 'Password is required for new users';
-    }
-    
-    if (!user && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-    
-    if (!user && formData.password && formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    setSaving(true);
-    try {
-      const userData: Partial<User> = {
-        name: formData.name,
-        email: formData.email,
-        role: formData.role,
-        isActive: formData.isActive
-      };
-        if (!user) {
-        // Add password for new users
-        (userData as User & { password: string }).password = formData.password;
-      }
-      
-      await onSave(userData);
-    } catch (error) {
-      console.error('Error saving user:', error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Name */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Full Name *
-        </label>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.name ? 'border-red-500' : 'border-gray-300'
-          }`}
-          placeholder="Enter full name"
-        />
-        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-      </div>
-
-      {/* Email */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Email Address *
-        </label>
-        <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.email ? 'border-red-500' : 'border-gray-300'
-          }`}
-          placeholder="Enter email address"
-        />
-        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-      </div>
-
-      {/* Password (for new users only) */}
-      {!user && (
-        <>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password *
-            </label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.password ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Enter password"
-            />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm Password *
-            </label>
-            <input
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Confirm password"
-            />
-            {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
-          </div>
-        </>
-      )}
-
-      {/* Role */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Role *
-        </label>        <select
-          value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label="Select user role"
-        >
-          <option value="participant">Participant</option>
-          <option value="researcher">Researcher</option>
-          <option value="admin">Admin</option>
-          <option value="super_admin">Super Admin</option>
-        </select>
-      </div>
-
-      {/* Status */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Status
-        </label>
-        <div className="flex items-center space-x-4">
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="status"
-              checked={formData.isActive}
-              onChange={() => setFormData({ ...formData, isActive: true })}
-              className="mr-2"
-            />
-            Active
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="status"
-              checked={!formData.isActive}
-              onChange={() => setFormData({ ...formData, isActive: false })}
-              className="mr-2"
-            />
-            Inactive
-          </label>
-        </div>
-      </div>
-
-      {/* Form Actions */}
-      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={saving}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-        >
-          {saving ? 'Saving...' : user ? 'Update User' : 'Create User'}
-        </button>
-      </div>
-    </form>
   );
 };
 
