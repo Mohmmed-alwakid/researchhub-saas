@@ -78,7 +78,10 @@ const AppLayout = () => {
     }
     
     if (userRole === 'researcher') {
+<<<<<<< HEAD
       console.log('✅ AppLayout - Returning researcher navigation');
+=======
+>>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
       return [
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
         { name: 'Studies', href: '/app/studies', icon: FileText },
@@ -90,7 +93,10 @@ const AppLayout = () => {
     
     // For admins and super_admins - include all features
     if (userRole === 'admin' || userRole === 'super_admin') {
+<<<<<<< HEAD
       console.log('✅ AppLayout - Returning admin navigation');
+=======
+>>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
       return [
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
         { name: 'Studies', href: '/app/studies', icon: FileText },
@@ -103,8 +109,11 @@ const AppLayout = () => {
     }
     
     // Default fallback (should not happen with proper role assignment)
+<<<<<<< HEAD
     console.warn('🚨 AppLayout - Using default navigation fallback for role:', userRole);
     console.warn('🚨 AppLayout - This indicates an issue with role detection!');
+=======
+>>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
     return [
       { name: 'Dashboard', href: '/app/dashboard', icon: Home },
       { name: 'Settings', href: '/app/settings', icon: Settings },

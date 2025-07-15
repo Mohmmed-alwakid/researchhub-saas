@@ -122,8 +122,13 @@ const StudiesPage: React.FC = () => {
     };
     
     return (
+<<<<<<< HEAD
       <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${styles[safeStatus as keyof typeof styles]} min-w-0 text-center`}>
         {safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1)}
+=======
+      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${styles[status as keyof typeof styles]} min-w-0 text-center`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+>>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
       </span>
     );
   };
