@@ -104,39 +104,41 @@ export const authService = {  /**
    * Login user with Supabase
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('auth?action=login', credentials);
+    return apiService.post<AuthResponse>('auth-consolidated?action=login', credentials);
   },
 
   /**
    * Register new user with Supabase
    */
   async register(userData: RegisterRequest): Promise<AuthResponse> {
-    return apiService.post<AuthResponse>('auth?action=register', userData);
+    return apiService.post<AuthResponse>('auth-consolidated?action=register', userData);
   },
 
   /**
    * Get current user status
    */
-  async getCurrentUser(): Promise<AuthResponse> {    return apiService.get<AuthResponse>('auth?action=status');
+  async getCurrentUser(): Promise<AuthResponse> {
+    return apiService.get<AuthResponse>('auth-consolidated?action=status');
   },
+
   /**
    * Refresh access token
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-    return apiService.post<RefreshTokenResponse>('auth?action=refresh', { refreshToken });
+    return apiService.post<RefreshTokenResponse>('auth-consolidated?action=refresh', { refreshToken });
   },
 
   /**
    * Logout user
    */
   async logout(): Promise<{ success: boolean; message: string }> {
-    return apiService.post('auth?action=logout');
-  },/**
+    return apiService.post('auth-consolidated?action=logout');
+  },  /**
    * Get current user profile
    */
   async getProfile(): Promise<{ success: boolean; user: SupabaseUser }> {
-    return apiService.get('auth?action=status');
-  },  /**
+    return apiService.get('auth-consolidated?action=status');
+  },/**
    * Update user profile
    */
   async updateProfile(data: ProfileUpdateRequest): Promise<{ success: boolean; user: SupabaseUser; message: string }> {

@@ -109,7 +109,10 @@ const StudiesPage: React.FC = () => {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | undefined) => {
+    // Handle undefined/null status with default
+    const safeStatus = status || 'draft';
+    
     const styles = {
       draft: 'bg-gray-100 text-gray-800 border-gray-200',
       recruiting: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -119,8 +122,8 @@ const StudiesPage: React.FC = () => {
     };
     
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${styles[status as keyof typeof styles]} min-w-0 text-center`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${styles[safeStatus as keyof typeof styles]} min-w-0 text-center`}>
+        {safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1)}
       </span>
     );
   };

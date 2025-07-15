@@ -1,0 +1,28 @@
+# Ignore ALL files in api directory EXCEPT consolidated functions
+
+api/*
+!api/auth-consolidated.js
+!api/templates-consolidated.js
+!api/payments-consolidated-full.js
+!api/user-profile-consolidated.js
+!api/system-consolidated.js
+!api/research-consolidated.js
+!api/admin-consolidated.js
+
+## Ignore subdirectories completely
+
+api/archive-old-functions/**
+api/dashboard/**
+api/services/**
+api/future-features/**
+
+## Ignore other directories
+
+scripts/
+archive/
+uploads/
+test-results/
+database/
+docs/
+product-manager/
+testing/

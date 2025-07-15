@@ -98,7 +98,7 @@ export interface AdminActivity {
 
 // Platform Overview
 export const getPlatformOverview = async (): Promise<PlatformOverview> => {
-  return apiService.get<{ data: PlatformOverview }>('/api/admin?action=overview').then(response => response.data);
+  return apiService.get<{ data: PlatformOverview }>('admin-consolidated?action=overview').then(response => response.data);
 };
 
 // User Management
@@ -110,7 +110,7 @@ export const getAllUsers = async (params: {
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
-}): Promise<any> => {
+}): Promise<PaginatedResponse<AdminUser>> => {
   const queryParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
@@ -130,7 +130,7 @@ export const getAllUsers = async (params: {
     }
   }
   
-  const response = await fetch(`/api/admin/users?${queryParams.toString()}`, {
+  const response = await fetch(`/api/admin-consolidated?action=users&${queryParams.toString()}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ export const updateUser = async (userId: string, data: {
   isActive?: boolean;
   name?: string;
   email?: string;
-}): Promise<any> => {
+}): Promise<{ success: boolean; user?: AdminUser; message: string }> => {
   // Get token from localStorage
   const authStorage = localStorage.getItem('auth-storage');
   let token = '';
@@ -187,7 +187,7 @@ export const createUser = async (data: {
   email: string;
   password: string;
   role: string;
-}): Promise<any> => {
+}): Promise<{ success: boolean; user?: AdminUser; message: string }> => {
   // Get token from localStorage
   const authStorage = localStorage.getItem('auth-storage');
   let token = '';
@@ -216,7 +216,7 @@ export const createUser = async (data: {
   return response.json();
 };
 
-export const deleteUser = async (userId: string): Promise<any> => {
+export const deleteUser = async (userId: string): Promise<{ success: boolean; message: string }> => {
   // Get token from localStorage
   const authStorage = localStorage.getItem('auth-storage');
   let token = '';
@@ -280,18 +280,18 @@ export const updateStudyStatus = async (studyId: string, data: {
   status: string;
   reason?: string;
 }): Promise<AdminStudy> => {
-  return apiService.put<{ data: { study: AdminStudy } }>(`/api/admin?action=studies&studyId=${studyId}`, data).then(response => response.data.study);
+  return apiService.put<{ data: { study: AdminStudy } }>(`admin-consolidated?action=studies&studyId=${studyId}`, data).then(response => response.data.study);
 };
 
 // Recent Activity
 export const getRecentActivity = async (limit: number = 20): Promise<AdminActivity[]> => {
-  return apiService.get<{ data: AdminActivity[] }>(`/api/admin?action=activity&limit=${limit}`).then(response => response.data);
+  return apiService.get<{ data: AdminActivity[] }>(`admin-consolidated?action=activity&limit=${limit}`).then(response => response.data);
 };
 
 // Financial Reporting - UPDATED FOR NEW REAL MONEY INTEGRATION
 export const getFinancialReport = async (timeframe: '7d' | '30d' | '90d' | '1y' = '30d'): Promise<FinancialReport> => {
   // Use new payments API endpoint
-  return apiService.get<{ data: FinancialReport }>(`/api/payments?action=financial-overview&timeframe=${timeframe}`).then(response => response.data);
+  return apiService.get<{ data: FinancialReport }>(`payments-consolidated-full?action=financial-overview&timeframe=${timeframe}`).then(response => response.data);
 };
 
 // NEW REAL MONEY INTEGRATION ADMIN FUNCTIONS
@@ -319,7 +319,7 @@ export interface WithdrawalRequest {
  * Get all withdrawal requests for admin review
  */
 export const getWithdrawalRequests = async (): Promise<WithdrawalRequest[]> => {
-  return apiService.get<{ data: WithdrawalRequest[] }>('/api/payments?action=withdrawals').then(response => response.data);
+  return apiService.get<{ data: WithdrawalRequest[] }>('payments-consolidated-full?action=withdrawals').then(response => response.data);
 };
 
 /**
@@ -330,7 +330,7 @@ export const processWithdrawal = async (
   action: 'approve' | 'reject', 
   adminNotes?: string
 ): Promise<{ success: boolean; data?: WithdrawalRequest; error?: string }> => {
-  return apiService.post('/api/payments?action=process-withdrawal', {
+  return apiService.post('payments-consolidated-full?action=process-withdrawal', {
     withdrawalId,
     action,
     adminNotes
@@ -341,7 +341,7 @@ export const processWithdrawal = async (
  * Get enhanced financial overview with real money data
  */
 export const getEnhancedFinancialOverview = async () => {
-  const response = await apiService.get('/api/payments?action=financial-overview');
+  const response = await apiService.get('payments-consolidated-full?action=financial-overview');
   return response;
 };
 

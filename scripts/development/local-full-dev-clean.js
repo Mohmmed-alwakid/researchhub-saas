@@ -1,15 +1,14 @@
 // Complete local development environment with Frontend + Backend + Real Supabase
-import dotenv from 'dotenv';
-
-// Load environment variables FIRST, before any other imports
-dotenv.config();
-
 import express from 'express';
 import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,26 +39,7 @@ console.log('🔑 Supabase Configuration:');
 console.log('   URL:', supabaseUrl);
 console.log('   Service Role Key:', supabaseServiceKey ? '✅ Set' : '❌ Missing');
 
-// Test accounts
-const TEST_ACCOUNTS = {
-  participant: {
-    email: 'abwanwr77+participant@gmail.com',
-    password: 'Testtest123',
-    role: 'participant'
-  },
-  researcher: {
-    email: 'abwanwr77+Researcher@gmail.com', 
-    password: 'Testtest123',
-    role: 'researcher'
-  },
-  admin: {
-    email: 'abwanwr77+admin@gmail.com',
-    password: 'Testtest123',
-    role: 'admin'
-  }
-};
-
-// ===== Import consolidated API handlers =====
+// Import consolidated API handlers
 import authHandler from '../../api/auth-consolidated.js';
 import templatesHandler from '../../api/templates-consolidated.js';
 import paymentsHandler from '../../api/payments-consolidated-full.js';
@@ -77,10 +57,6 @@ app.all('/api/auth*', async (req, res) => {
 
 // Research endpoints: studies, applications, sessions, blocks
 app.all('/api/studies*', async (req, res) => {
-  await researchHandler(req, res);
-});
-
-app.all('/api/research-consolidated*', async (req, res) => {
   await researchHandler(req, res);
 });
 
@@ -132,11 +108,19 @@ app.all('/api/system*', async (req, res) => {
   await systemHandler(req, res);
 });
 
+app.all('/api/system-consolidated*', async (req, res) => {
+  await systemHandler(req, res);
+});
+
 app.all('/api/dashboard*', async (req, res) => {
   await systemHandler(req, res);
 });
 
 app.all('/api/migration*', async (req, res) => {
+  await systemHandler(req, res);
+});
+
+app.all('/api/db-check*', async (req, res) => {
   await systemHandler(req, res);
 });
 
@@ -153,90 +137,78 @@ app.all('/api/points*', async (req, res) => {
   await adminHandler(req, res);
 });
 
-// Frontend development server
-function startFrontend() {
-  return new Promise((resolve, reject) => {
-    console.log('🚀 Starting Vite frontend server...');
-    
-    const viteProcess = spawn('npm', ['run', 'dev'], {
-      cwd: path.resolve(__dirname, '../..'),
-      stdio: ['inherit', 'pipe', 'pipe'],
-      shell: true
-    });
+// Redirect study-builder endpoints to research API
+app.all('/api/study-builder*', async (req, res) => {
+  req.url = req.url.replace('/api/study-builder', '/api/research-consolidated?action=studies');
+  await researchHandler(req, res);
+});
 
-    let serverStarted = false;
-
-    viteProcess.stdout.on('data', (data) => {
-      const output = data.toString();
-      console.log(`📱 FRONTEND: ${output.trim()}`);
-      
-      if (output.includes('Local:') && !serverStarted) {
-        serverStarted = true;
-        resolve(viteProcess);
-      }
-    });
-
-    viteProcess.stderr.on('data', (data) => {
-      const error = data.toString();
-      if (!error.includes('Warning') && !error.includes('DeprecationWarning')) {
-        console.error(`❌ FRONTEND ERROR: ${error.trim()}`);
-      }
-    });
-
-    viteProcess.on('close', (code) => {
-      if (code !== 0 && !serverStarted) {
-        reject(new Error(`Frontend server failed to start with code ${code}`));
-      }
-    });
-
-    // Timeout fallback
-    setTimeout(() => {
-      if (!serverStarted) {
-        resolve(viteProcess);
-      }
-    }, 10000);
+// Catch-all for other API routes
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'API endpoint not found',
+    message: `${req.method} ${req.path} is not available`,
+    availableEndpoints: [
+      '/api/auth', '/api/studies', '/api/applications', '/api/blocks',
+      '/api/wallets', '/api/payments', '/api/templates', '/api/profile',
+      '/api/health', '/api/system', '/api/dashboard', '/api/admin'
+    ]
   });
-}
+});
 
-// Start servers
-async function startServers() {
-  try {
-    console.log('🌟 Starting ResearchHub Full Development Environment...\n');
+// Static file serving (for production build)
+const distPath = path.join(__dirname, '../../dist');
+app.use(express.static(distPath));
 
-    // Start backend
-    const backendServer = app.listen(API_PORT, () => {
-      console.log(`🔧 Backend API server running on http://localhost:${API_PORT}`);
-      console.log(`📊 API endpoints available at http://localhost:${API_PORT}/api/*`);
-      console.log(`🔍 Test health: http://localhost:${API_PORT}/api/system-consolidated?action=health\n`);
-    });
-
-    // Start frontend
-    await startFrontend();
-
-    console.log('\n✅ FULL DEVELOPMENT ENVIRONMENT READY!');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log(`🎯 Frontend: http://localhost:${FRONTEND_PORT}`);
-    console.log(`🔧 Backend:  http://localhost:${API_PORT}`);
-    console.log('🔑 Test Accounts:');
-    Object.entries(TEST_ACCOUNTS).forEach(([role, account]) => {
-      console.log(`   ${role.toUpperCase()}: ${account.email} / ${account.password}`);
-    });
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('💡 Both servers will restart automatically on file changes');
-    console.log('🛑 Press Ctrl+C to stop both servers\n');
-
-    // Graceful shutdown
-    process.on('SIGINT', () => {
-      console.log('\n🛑 Shutting down development servers...');
-      backendServer.close();
-      process.exit(0);
-    });
-
-  } catch (error) {
-    console.error('❌ Failed to start development environment:', error);
-    process.exit(1);
+// Catch-all handler for SPA routing
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ success: false, error: 'API endpoint not found' });
   }
-}
+  
+  res.sendFile(path.join(distPath, 'index.html'));
+});
 
-// Start the development environment
-startServers();
+// Start backend server
+app.listen(API_PORT, () => {
+  console.log('🚀 LOCAL FULLSTACK DEVELOPMENT SERVER');
+  console.log(`📡 Backend API: http://localhost:${API_PORT}`);
+  console.log(`🌐 Frontend: http://localhost:${FRONTEND_PORT}`);
+  console.log(`🔗 Health Check: http://localhost:${API_PORT}/api/health`);
+  console.log(`📊 Admin Analytics: http://localhost:${API_PORT}/api/admin?action=overview`);
+  console.log(`💳 Payment Integration: http://localhost:${API_PORT}/api/payments?action=conversion-rates`);
+  console.log(`🎯 Points System: http://localhost:${API_PORT}/api/points?action=get-points`);
+  console.log('');
+  console.log('✅ Server is running and ready for development!');
+  console.log('🧪 Use test accounts from TESTING_RULES_MANDATORY.md');
+});
+
+// Start frontend development server
+const frontendProcess = spawn('npm', ['run', 'dev'], {
+  cwd: path.join(__dirname, '../..'),
+  stdio: 'inherit',
+  shell: true
+});
+
+frontendProcess.on('error', (error) => {
+  console.error('❌ Frontend process error:', error);
+});
+
+frontendProcess.on('close', (code) => {
+  console.log(`🔄 Frontend process exited with code ${code}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n🛑 Shutting down development server...');
+  frontendProcess.kill('SIGINT');
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Shutting down development server...');
+  frontendProcess.kill('SIGTERM');
+  process.exit(0);
+});

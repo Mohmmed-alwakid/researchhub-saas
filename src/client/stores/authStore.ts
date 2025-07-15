@@ -252,7 +252,16 @@ export const useAuthStore = create<AuthState>()(
         }      },      checkAuth: async () => {
         const { token, refreshToken } = get();
         
+        // DEBUG: Enhanced checkAuth logging
+        console.log('🔄 Auth Store - checkAuth started:', {
+          hasToken: !!token,
+          hasRefreshToken: !!refreshToken,
+          tokenPreview: token ? `${token.substring(0, 20)}...` : null,
+          timestamp: new Date().toISOString()
+        });
+        
         if (!token) {
+          console.log('❌ Auth Store - No token found, setting unauthenticated state');
           set({ isLoading: false, isAuthenticated: false, user: null });
           return;
         }
@@ -261,6 +270,14 @@ export const useAuthStore = create<AuthState>()(
         
         try {
           const response = await authService.getCurrentUser();
+          
+          console.log('🔍 Auth Store - getCurrentUser response:', {
+            success: response.success,
+            hasUser: !!response.user,
+            userEmail: response.user?.email,
+            userRole: response.user?.role,
+            fullResponse: response
+          });
           
           if (response.success && response.user) {
             const user = response.user;
@@ -276,6 +293,7 @@ export const useAuthStore = create<AuthState>()(
               emailConfirmed: user.emailConfirmed
             };
             
+            console.log('✅ Auth Store - Setting authenticated user:', supabaseUser);
             set({ user: supabaseUser, isAuthenticated: true, isLoading: false });
           } else {
             throw new Error('Invalid response format');

@@ -45,7 +45,31 @@ const AppLayout = () => {
   const getNavigationForRole = () => {
     const userRole = user?.role;
     
+    // DEBUG: Enhanced debugging for role detection
+    console.log('🔍 AppLayout - Enhanced User Role Debug:', {
+      user: user,
+      userRole: userRole,
+      userRoleType: typeof userRole,
+      userEmail: user?.email,
+      userFirstName: user?.firstName,
+      userLastName: user?.lastName,
+      isAuthenticated: user !== null,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Additional debug for role comparison
+    console.log('🎯 AppLayout - Role Comparison Debug:', {
+      'userRole === "participant"': userRole === 'participant',
+      'userRole === "researcher"': userRole === 'researcher',
+      'userRole === "admin"': userRole === 'admin',
+      'userRole === "super_admin"': userRole === 'super_admin',
+      'userRole raw': JSON.stringify(userRole),
+      'userRole trimmed': userRole?.trim(),
+      'userRole toLowerCase': userRole?.toLowerCase()
+    });
+    
     if (userRole === 'participant') {
+      console.log('✅ AppLayout - Returning participant navigation');
       return [
         { name: 'My Applications', href: '/app/participant-dashboard', icon: BookOpen },
         { name: 'Discover Studies', href: '/app/discover', icon: Compass },
@@ -54,6 +78,7 @@ const AppLayout = () => {
     }
     
     if (userRole === 'researcher') {
+      console.log('✅ AppLayout - Returning researcher navigation');
       return [
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
         { name: 'Studies', href: '/app/studies', icon: FileText },
@@ -65,6 +90,7 @@ const AppLayout = () => {
     
     // For admins and super_admins - include all features
     if (userRole === 'admin' || userRole === 'super_admin') {
+      console.log('✅ AppLayout - Returning admin navigation');
       return [
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
         { name: 'Studies', href: '/app/studies', icon: FileText },
@@ -77,6 +103,8 @@ const AppLayout = () => {
     }
     
     // Default fallback (should not happen with proper role assignment)
+    console.warn('🚨 AppLayout - Using default navigation fallback for role:', userRole);
+    console.warn('🚨 AppLayout - This indicates an issue with role detection!');
     return [
       { name: 'Dashboard', href: '/app/dashboard', icon: Home },
       { name: 'Settings', href: '/app/settings', icon: Settings },

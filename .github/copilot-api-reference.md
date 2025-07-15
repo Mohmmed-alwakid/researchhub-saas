@@ -1,12 +1,14 @@
 # ResearchHub - API Reference for Copilot
 
 ## ⚠️ Project Status: UNDER DEVELOPMENT - LIMITED API IMPLEMENTATION
+
 **Last Updated**: December 28, 2024  
 **Status**: � Many endpoints incomplete or use mock data
 
 ## �🚀 Base Configuration
 
 ### Server Setup
+
 ```typescript
 // Local development: http://localhost:3003
 // Production: https://researchhub-saas.vercel.app
@@ -15,7 +17,9 @@
 ```
 
 ### Available API Endpoints
+
 **Working Endpoints:**
+
 - ✅ `/api/health` - Health check
 - ✅ `/api/auth` - Authentication (login, register, refresh)
 - ✅ `/api/studies` - Study management (basic CRUD)
@@ -25,6 +29,7 @@
 - 🚧 `/api/admin` - Admin functions (limited)
 
 **Incomplete/Mock Endpoints:**
+
 - ❌ `/api/analytics` - Not implemented
 - ❌ `/api/sessions` - Not implemented
 - ❌ `/api/subscriptions` - UI mockup only
@@ -33,6 +38,7 @@
 ## 🔐 Authentication Endpoints
 
 ### POST /api/auth/register
+
 ```typescript
 // Request
 {
@@ -55,6 +61,7 @@
 ```
 
 ### POST /api/auth/login
+
 ```typescript
 // Request
 {
@@ -73,6 +80,7 @@
 ```
 
 ### POST /api/auth/refresh
+
 ```typescript
 // Requires httpOnly refresh token cookie
 // Response
@@ -85,6 +93,7 @@
 ```
 
 ### POST /api/auth/logout
+
 ```typescript
 // Clears refresh token cookie
 // Response
@@ -97,6 +106,7 @@
 ## 👥 User Management Endpoints
 
 ### GET /api/users/profile
+
 ```typescript
 // Requires: Bearer token
 // Response
@@ -114,6 +124,7 @@
 ```
 
 ### PUT /api/users/profile
+
 ```typescript
 // Request
 {
@@ -132,6 +143,7 @@
 ## 📊 Study Management Endpoints
 
 ### GET /api/studies
+
 ```typescript
 // Requires: Bearer token
 // Query params: ?page=1&limit=10&status=active
@@ -162,6 +174,7 @@
 ```
 
 ### POST /api/studies
+
 ```typescript
 // Request
 {
@@ -191,6 +204,7 @@
 ```
 
 ### GET /api/studies/:id
+
 ```typescript
 // Response
 {
@@ -210,6 +224,7 @@
 ```
 
 ### PUT /api/studies/:id
+
 ```typescript
 // Request (partial update)
 {
@@ -225,6 +240,7 @@
 ```
 
 ### DELETE /api/studies/:id
+
 ```typescript
 // Response
 {
@@ -236,6 +252,7 @@
 ## 🎥 Session/Recording Endpoints
 
 ### POST /api/sessions
+
 ```typescript
 // Request
 {
@@ -338,6 +355,7 @@
 ## 🔧 System Endpoints
 
 ### GET /api/health
+
 ```typescript
 // Public endpoint
 // Response

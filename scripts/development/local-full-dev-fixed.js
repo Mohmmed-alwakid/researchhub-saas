@@ -1,15 +1,14 @@
 // Complete local development environment with Frontend + Backend + Real Supabase
-import dotenv from 'dotenv';
-
-// Load environment variables FIRST, before any other imports
-dotenv.config();
-
 import express from 'express';
 import cors from 'cors';
 import { createClient } from '@supabase/supabase-js';
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,10 +76,6 @@ app.all('/api/auth*', async (req, res) => {
 
 // Research endpoints: studies, applications, sessions, blocks
 app.all('/api/studies*', async (req, res) => {
-  await researchHandler(req, res);
-});
-
-app.all('/api/research-consolidated*', async (req, res) => {
   await researchHandler(req, res);
 });
 

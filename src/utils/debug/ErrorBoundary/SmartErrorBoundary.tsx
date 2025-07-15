@@ -117,7 +117,7 @@ class SmartErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryStat
     this.errorRecoveryStrategies.set('auth', async () => {
       try {
         // Attempt to refresh auth token
-        const response = await fetch('/api/auth?action=refresh', {
+        const response = await fetch('/api/auth-consolidated?action=refresh', {
           method: 'POST',
           credentials: 'include',
         });

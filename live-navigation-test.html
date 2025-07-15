@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Navigation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .test-frame { width: 100%; height: 600px; border: 2px solid #ddd; border-radius: 8px; margin: 20px 0; }
+        .instructions { background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .step { margin: 10px 0; padding: 10px; border-left: 4px solid #007bff; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Live Navigation Debug Test</h1>
+        <p>Test the researcher navigation issue in the actual application</p>
+
+        <div class="instructions">
+            <h3>📋 Test Instructions:</h3>
+            <div class="step">
+                <strong>Step 1:</strong> Click "Open App" below to load the application in the frame
+            </div>
+            <div class="step">
+                <strong>Step 2:</strong> In the app frame, navigate to login and use:<br>
+                <code>Email: abwanwr77+Researcher@gmail.com</code><br>
+                <code>Password: Testtest123</code>
+            </div>
+            <div class="step">
+                <strong>Step 3:</strong> After login, observe the navigation menu - should show Dashboard, Studies, Templates, Participants, Settings
+            </div>
+            <div class="step">
+                <strong>Step 4:</strong> Refresh the page (F5) and observe if navigation menu changes
+            </div>
+            <div class="step">
+                <strong>Step 5:</strong> Open browser console (F12) to see any debug messages from AppLayout
+            </div>
+        </div>
+
+        <div>
+            <button onclick="loadApp()">Open App</button>
+            <button onclick="refreshFrame()">Refresh Frame</button>
+            <button onclick="openDevTools()">Open DevTools Instructions</button>
+        </div>
+
+        <iframe id="appFrame" class="test-frame" src="about:blank"></iframe>
+
+        <div id="devToolsInfo" style="display: none; background: #fff3cd; padding: 15px; border-radius: 5px; margin: 10px 0;">
+            <h4>🔧 To see debug information:</h4>
+            <ol>
+                <li>Right-click inside the app frame above</li>
+                <li>Select "Inspect Element" or "Inspect"</li>
+                <li>Click the "Console" tab</li>
+                <li>Look for debug messages starting with 🔍, 🚀, or 🚨</li>
+                <li>Login and observe console output during navigation</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function loadApp() {
+            document.getElementById('appFrame').src = 'http://localhost:5175';
+        }
+
+        function refreshFrame() {
+            const frame = document.getElementById('appFrame');
+            frame.src = frame.src;
+        }
+
+        function openDevTools() {
+            const info = document.getElementById('devToolsInfo');
+            info.style.display = info.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Auto-load the app
+        window.onload = function() {
+            loadApp();
+        };
+    </script>
+</body>
+</html>

@@ -76,13 +76,16 @@ export const studiesService = {
    */
   async getStudies(filters: StudyFilters = {}): Promise<StudiesResponse> {
     const params = new URLSearchParams();
+    params.append('action', 'studies');
     
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== '') {
         params.append(key, value.toString());
       }
-    });    const queryString = params.toString();
-    const url = queryString ? `studies?${queryString}` : 'studies';
+    });
+
+    const queryString = params.toString();
+    const url = `research-consolidated?${queryString}`;
     
     return apiService.get<StudiesResponse>(url);
   },
@@ -90,69 +93,69 @@ export const studiesService = {
    * Get study by ID
    */
   async getStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.get<StudyResponse>(`studies/${studyId}`);
+    return apiService.get<StudyResponse>(`research-consolidated?action=get-study&id=${studyId}`);
   },
 
   /**
    * Create new study
    */
   async createStudy(data: CreateStudyRequest): Promise<StudyResponse> {
-    return apiService.post<StudyResponse>('studies', data);
+    return apiService.post<StudyResponse>('research-consolidated?action=create-study', data);
   },
 
   /**
    * Update study
    */
   async updateStudy(studyId: string, data: UpdateStudyRequest): Promise<StudyResponse> {
-    return apiService.put<StudyResponse>(`studies/${studyId}`, data);
+    return apiService.put<StudyResponse>(`research-consolidated?action=update-study&id=${studyId}`, data);
   },
 
   /**
    * Delete study
    */
   async deleteStudy(studyId: string): Promise<{ success: boolean; message: string }> {
-    return apiService.delete(`studies/${studyId}`);
+    return apiService.delete(`research-consolidated?action=delete-study&id=${studyId}`);
   },
   /**
    * Duplicate study
    */
   async duplicateStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.post<StudyResponse>(`studies/${studyId}/duplicate`);
+    return apiService.post<StudyResponse>(`research-consolidated?action=duplicate-study&id=${studyId}`);
   },
 
   /**
    * Launch study (change status to active)
    */
   async launchStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.patch<StudyResponse>(`studies/${studyId}/launch`);
+    return apiService.patch<StudyResponse>(`research-consolidated?action=launch-study&id=${studyId}`);
   },
 
   /**
    * Pause study
    */
   async pauseStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.patch<StudyResponse>(`studies/${studyId}/pause`);
+    return apiService.patch<StudyResponse>(`research-consolidated?action=pause-study&id=${studyId}`);
   },
 
   /**
    * Complete study
    */
   async completeStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.patch<StudyResponse>(`studies/${studyId}/complete`);
+    return apiService.patch<StudyResponse>(`research-consolidated?action=complete-study&id=${studyId}`);
   },
 
   /**
    * Get study analytics
    */
   async getStudyAnalytics(studyId: string): Promise<{ success: boolean; analytics: StudyAnalytics }> {
-    return apiService.get(`studies/${studyId}/analytics`);
+    return apiService.get(`research-consolidated?action=get-analytics&id=${studyId}`);
   },
 
   /**
    * Export study data
    */
   async exportStudyData(studyId: string, format: 'csv' | 'json' = 'csv'): Promise<Blob> {
-    return apiService.get(`studies/${studyId}/export?format=${format}`, {
+    return apiService.get(`research-consolidated?action=export-data&id=${studyId}&format=${format}`, {
       responseType: 'blob',
     });
   },
@@ -170,7 +173,7 @@ export const studiesService = {
       completedAt?: string;
     }>;
   }> {
-    return apiService.get(`studies/${studyId}/participants`);
+    return apiService.get(`research-consolidated?action=get-participants&id=${studyId}`);
   },
 
   /**
@@ -182,7 +185,7 @@ export const studiesService = {
     failed: string[];
     message: string;
   }> {
-    return apiService.post(`studies/${studyId}/invite`, { emails });
+    return apiService.post(`research-consolidated?action=invite-participants&id=${studyId}`, { emails });
   },
 
   /**
@@ -192,7 +195,7 @@ export const studiesService = {
     success: boolean;
     message: string;
   }> {
-    return apiService.delete(`studies/${studyId}/participants/${participantId}`);
+    return apiService.delete(`research-consolidated?action=remove-participant&id=${studyId}&participantId=${participantId}`);
   },
 };
 
