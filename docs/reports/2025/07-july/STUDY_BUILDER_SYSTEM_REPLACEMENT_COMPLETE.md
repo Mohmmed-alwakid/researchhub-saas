@@ -8,7 +8,7 @@
 
 ### 🔄 **What Was Replaced**
 - **Old Study Builder**: `StudyBuilderPage` in `/src/client/pages/studies/StudyBuilderPage.tsx`
-- **Old Modal System**: `SimplifiedStudyCreationModal` selection workflow
+- **Old Modal System**: ❌ `SimplifiedStudyCreationModal` removed (was redundant type selection)
 - **Legacy Routes**: Mixed routing between old and new study creation systems
 - **Inconsistent UX**: Different experiences for study creation vs editing
 
@@ -51,12 +51,12 @@ New Study Builder System:
 ### Files Modified
 - ✅ `src/App.tsx` - Updated routing to use new Study Builder
 - ✅ `src/client/pages/studies/StudiesPage.tsx` - Direct navigation to Study Builder
-- ✅ Removed unused `SimplifiedStudyCreationModal` import and logic
+- ✅ Removed unused ❌ `SimplifiedStudyCreationModal` import and logic
 - ✅ Updated documentation to reflect new system
 
 ### Files Removed/Deprecated
 - 🗑️ Old `StudyBuilderPage` import from App.tsx
-- 🗑️ `SimplifiedStudyCreationModal` usage in StudiesPage
+- 🗑️ ❌ `SimplifiedStudyCreationModal` usage in StudiesPage removed
 - 🗑️ Legacy study type selection modal workflow
 
 ## 🎯 User Experience Improvements

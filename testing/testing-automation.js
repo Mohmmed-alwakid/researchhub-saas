@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-// Testing Automation Runner
+// Enhanced Testing Automation Runner with Adaptive Capabilities
 // Main entry point for all testing automation throughout development cycles
+// Date: July 18, 2025 - Enhanced with adaptive testing features
 
 import { exec } from 'child_process';
 import fs from 'fs';
@@ -12,6 +13,11 @@ import SecurityTestSuite from './security/security-audit.js';
 import AccessibilityTestSuite from './accessibility/a11y-audit.js';
 import TestDataManager from './data/test-data-manager.js';
 
+// Import new adaptive testing components
+import ChangeDetectionSystem from '../scripts/testing/change-detector.js';
+import AdaptiveTestGenerator from '../scripts/testing/adaptive-test-generator.js';
+import CoverageAnalyzer from '../scripts/testing/coverage-analyzer.js';
+
 class TestingAutomation {
   constructor() {
     this.testRunner = new AutomatedTestRunner();
@@ -19,35 +25,342 @@ class TestingAutomation {
     this.securityTest = new SecurityTestSuite();
     this.accessibilityTest = new AccessibilityTestSuite();
     this.dataManager = new TestDataManager();
+    
+    // Add adaptive testing components
+    this.changeDetector = new ChangeDetectionSystem();
+    this.adaptiveGenerator = new AdaptiveTestGenerator();
+    this.coverageAnalyzer = new CoverageAnalyzer();
+    
     this.results = {};
+    this.adaptiveResults = {};
   }
 
-  // Run daily automated tests (quick cycle)
+  // Enhanced daily tests with adaptive capabilities
   async runDailyTests() {
-    console.log('🌅 Running daily automated tests...');
+    console.log('🌅 Running enhanced daily automated tests with adaptive capabilities...');
     
     const startTime = Date.now();
     
     try {
-      // Generate fresh test data
+      // 1. Detect changes since last run
+      console.log('🔍 Detecting code changes...');
+      await this.changeDetector.initialize();
+      const changes = await this.changeDetector.performInitialScan();
+      
+      // 2. Generate tests for detected changes
+      if (changes.coverageGaps.length > 0) {
+        console.log('🧪 Generating tests for coverage gaps...');
+        await this.generateTestsForGaps(changes.coverageGaps);
+      }
+      
+      // 3. Generate fresh test data
       console.log('🎲 Preparing test data...');
       this.dataManager.generateCompleteTestData();
       
-      // Run quick smoke tests
+      // 4. Run traditional test suite
       console.log('🔥 Running smoke tests...');
       this.results.smoke = await this.testRunner.runSmokeTests();
       
-      // Run performance tests
       console.log('⚡ Running performance tests...');
       this.results.performance = await this.performanceTest.runPerformanceTests();
       
-      // Run accessibility tests
       console.log('♿ Running accessibility tests...');
       this.results.accessibility = await this.accessibilityTest.runAccessibilityTests();
+      
+      // 5. Run adaptive tests
+      console.log('🤖 Running adaptive test suite...');
+      this.adaptiveResults.generated = await this.runGeneratedTests();
+      
+      // 6. Analyze coverage
+      console.log('📊 Analyzing test coverage...');
+      this.adaptiveResults.coverage = await this.coverageAnalyzer.analyzeCoverage();
       
       const endTime = Date.now();
       const duration = ((endTime - startTime) / 1000).toFixed(2);
       
+      console.log(`\n✅ Enhanced daily tests completed in ${duration}s`);
+      await this.generateEnhancedDailySummaryReport();
+      
+      return { ...this.results, adaptive: this.adaptiveResults };
+    } catch (error) {
+      console.error(`❌ Enhanced daily tests failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  // New method: Run adaptive test suite
+  async runAdaptiveTests() {
+    console.log('🤖 Running adaptive test suite...');
+    
+    const startTime = Date.now();
+    
+    try {
+      // Initialize adaptive components
+      await this.changeDetector.initialize();
+      await this.coverageAnalyzer.initialize();
+      
+      // Detect changes and generate tests
+      const changes = await this.changeDetector.performInitialScan();
+      const generatedTests = await this.generateTestsForChanges(changes);
+      
+      // Run generated tests
+      const testResults = await this.runGeneratedTests(generatedTests);
+      
+      // Analyze coverage
+      const coverage = await this.coverageAnalyzer.analyzeCoverage();
+      
+      // Optimize test suite
+      const optimization = await this.optimizeTestSuite();
+      
+      const endTime = Date.now();
+      const duration = ((endTime - startTime) / 1000).toFixed(2);
+      
+      console.log(`✅ Adaptive tests completed in ${duration}s`);
+      
+      return {
+        changes,
+        generatedTests,
+        testResults,
+        coverage,
+        optimization,
+        duration
+      };
+      
+    } catch (error) {
+      console.error(`❌ Adaptive tests failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  // New method: Generate tests for detected changes
+  async generateTestsForChanges(changes) {
+    const generatedTests = [];
+    
+    for (const gap of changes.coverageGaps) {
+      console.log(`🧪 Generating tests for ${gap.file}...`);
+      
+      const changeAnalysis = {
+        filePath: gap.file,
+        category: gap.type,
+        impact: gap.severity,
+        testTypes: gap.suggestedTests,
+        requiresTests: true
+      };
+      
+      const tests = await this.adaptiveGenerator.generateTestsForChange(changeAnalysis);
+      generatedTests.push(...tests);
+    }
+    
+    console.log(`✅ Generated ${generatedTests.length} adaptive tests`);
+    return generatedTests;
+  }
+
+  // New method: Generate tests for coverage gaps
+  async generateTestsForGaps(gaps) {
+    for (const gap of gaps) {
+      const changeAnalysis = {
+        filePath: gap.file,
+        category: gap.type,
+        impact: gap.severity,
+        testTypes: gap.suggestedTests,
+        requiresTests: true
+      };
+      
+      try {
+        const tests = await this.adaptiveGenerator.generateTestsForChange(changeAnalysis);
+        console.log(`✅ Generated ${tests.length} tests for ${gap.file}`);
+      } catch (error) {
+        console.warn(`⚠️ Could not generate tests for ${gap.file}:`, error.message);
+      }
+    }
+  }
+
+  // New method: Run generated tests
+  async runGeneratedTests(generatedTests = null) {
+    try {
+      // If no tests provided, find all generated tests
+      if (!generatedTests) {
+        const generatedDir = path.join(process.cwd(), 'testing', 'generated');
+        if (!fs.existsSync(generatedDir)) {
+          return { success: true, message: 'No generated tests to run' };
+        }
+      }
+      
+      // Run the generated tests using the test runner
+      const command = 'npm test -- testing/generated/';
+      const { stdout, stderr } = await this.execAsync(command);
+      
+      return {
+        success: true,
+        output: stdout,
+        errors: stderr
+      };
+      
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  // New method: Optimize test suite
+  async optimizeTestSuite() {
+    console.log('🎯 Optimizing test suite...');
+    
+    // Analyze test execution times
+    const slowTests = await this.identifySlowTests();
+    
+    // Find redundant tests
+    const redundantTests = await this.identifyRedundantTests();
+    
+    // Suggest optimizations
+    const optimizations = {
+      slowTests: slowTests.length,
+      redundantTests: redundantTests.length,
+      suggestions: this.generateOptimizationSuggestions(slowTests, redundantTests)
+    };
+    
+    console.log(`🎯 Optimization analysis complete: ${optimizations.suggestions.length} suggestions`);
+    return optimizations;
+  }
+
+  // New method: Start continuous monitoring
+  async startContinuousMonitoring() {
+    console.log('👁️ Starting continuous test monitoring...');
+    
+    // Start change detection monitoring
+    const watcher = this.changeDetector.startMonitoring();
+    
+    // Set up periodic coverage analysis
+    setInterval(async () => {
+      try {
+        await this.coverageAnalyzer.analyzeCoverage();
+        console.log('📊 Periodic coverage analysis completed');
+      } catch (error) {
+        console.warn('⚠️ Periodic coverage analysis failed:', error.message);
+      }
+    }, 30 * 60 * 1000); // Every 30 minutes
+    
+    console.log('✅ Continuous monitoring active');
+    return watcher;
+  }
+
+  // Enhanced summary report with adaptive data
+  async generateEnhancedDailySummaryReport() {
+    const timestamp = new Date().toISOString();
+    const reportPath = path.join(process.cwd(), 'testing', 'reports', `enhanced-daily-${timestamp.replace(/[:.]/g, '-')}.html`);
+    
+    const report = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enhanced Daily Test Report - ${timestamp}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { border-left: 4px solid #28a745; }
+        .warning { border-left: 4px solid #ffc107; }
+        .error { border-left: 4px solid #dc3545; }
+        .metric { display: inline-block; margin: 10px; padding: 10px; background: white; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Enhanced Daily Test Report</h1>
+        <p>ResearchHub Adaptive Testing System</p>
+        <p>Generated: ${timestamp}</p>
+    </div>
+    
+    <div class="section success">
+        <h2>🔥 Traditional Tests</h2>
+        <div class="metric">Smoke: ${this.results.smoke?.summary?.passed || 0} passed</div>
+        <div class="metric">Performance: ${this.results.performance?.success ? '✅' : '❌'}</div>
+        <div class="metric">Accessibility: ${this.results.accessibility?.success ? '✅' : '❌'}</div>
+    </div>
+    
+    <div class="section success">
+        <h2>🤖 Adaptive Tests</h2>
+        <div class="metric">Generated Tests: ${this.adaptiveResults.generated?.success ? '✅' : '❌'}</div>
+        <div class="metric">Coverage: ${this.adaptiveResults.coverage?.summary?.overallScore || 0}%</div>
+        <div class="metric">Gaps Found: ${this.adaptiveResults.coverage?.gaps?.length || 0}</div>
+    </div>
+    
+    <div class="section">
+        <h2>📈 Recommendations</h2>
+        ${this.adaptiveResults.coverage?.recommendations?.slice(0, 3).map(rec => 
+          `<p><strong>${rec.action}:</strong> ${rec.description}</p>`
+        ).join('') || '<p>No recommendations at this time.</p>'}
+    </div>
+</body>
+</html>`;
+    
+    fs.writeFileSync(reportPath, report);
+    console.log(`📋 Enhanced daily report generated: ${reportPath}`);
+    
+    // Also call the original daily summary
+    await this.generateDailySummaryReport();
+  }
+
+  // Helper methods for adaptive testing
+  async identifySlowTests() {
+    // Analyze test execution times and identify slow tests
+    return []; // Placeholder
+  }
+
+  async identifyRedundantTests() {
+    // Find tests that cover the same functionality
+    return []; // Placeholder
+  }
+
+  generateOptimizationSuggestions(slowTests, redundantTests) {
+    const suggestions = [];
+    
+    if (slowTests.length > 0) {
+      suggestions.push({
+        type: 'performance',
+        description: `Optimize ${slowTests.length} slow tests`,
+        impact: 'medium'
+      });
+    }
+    
+    if (redundantTests.length > 0) {
+      suggestions.push({
+        type: 'redundancy',
+        description: `Remove or merge ${redundantTests.length} redundant tests`,
+        impact: 'low'
+      });
+    }
+    
+    return suggestions;
+  }
+
+  // Helper to execute commands with promise
+  execAsync(command) {
+    return new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve({ stdout, stderr });
+        }
+      });
+    });
+  }
+
+  // Run daily automated tests (original method - kept for compatibility)
+  async runDailyTests() {
+    const startTime = Date.now();
+    console.log('🚀 Starting daily automated tests...');
+    
+    try {
+      // Run core daily tests
+      await this.runSmokeTests();
+      await this.runPerformanceTests();
+      await this.runAccessibilityTests();
+      
+      const duration = (Date.now() - startTime) / 1000;
       console.log(`\n✅ Daily tests completed in ${duration}s`);
       await this.generateDailySummaryReport();
       
@@ -429,6 +742,10 @@ class TestingAutomation {
     console.log(`📊 Deployment report: ${reportPath}`);
   }
 }
+
+// Export both names for compatibility
+export { TestingAutomation };
+export { TestingAutomation as AutomatedTestingFramework };
 
 // CLI Interface
 if (import.meta.url === `file://${process.argv[1]}`) {

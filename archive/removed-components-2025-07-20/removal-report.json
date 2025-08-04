@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-07-20T07:02:01.979Z",
+  "removedComponents": 5,
+  "totalTargeted": 5,
+  "archiveLocation": "D:\\MAMP\\AfakarM\\archive\\removed-components-2025-07-20",
+  "components": [
+    "src/client/components/admin/AdminDebugComponent.tsx",
+    "src/client/components/admin/AdminOverview.tsx",
+    "src/client/components/admin/AdminSystem.tsx",
+    "src/client/components/admin/AdminWithdrawalQueue.tsx",
+    "src/client/components/admin/analytics/SystemAnalyticsDashboard.tsx"
+  ]
+}

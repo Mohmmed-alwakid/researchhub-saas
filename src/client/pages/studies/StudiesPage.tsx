@@ -14,7 +14,6 @@ import { Card, CardContent } from '../../components/ui/Card';
 import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
 import { IStudy } from '../../../shared/types';
-import { SimplifiedStudyCreationModal } from '../../components/studies/SimplifiedStudyCreationModal';
 import StudyCardActions from '../../components/studies/StudyCardActions';
 import RenameStudyModal from '../../components/studies/RenameStudyModal';
 import '../../styles/study-card.css';
@@ -34,9 +33,6 @@ const StudiesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
-  
-  // Study creation modal state
-  const [showStudyModal, setShowStudyModal] = useState(false);
   
   // Rename modal state
   const [showRenameModal, setShowRenameModal] = useState(false);
@@ -73,31 +69,11 @@ const StudiesPage: React.FC = () => {
     fetchStudies();
   };
 
-  // Handle study creation flow - show simplified modal per requirements
+  // Handle study creation flow - go directly to study builder
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowStudyModal(true);
-  };
-
-  const handleSelectStudyType = (type: 'unmoderated' | 'moderated') => {
-    // Route based on study type selection per requirements
-    if (type === 'unmoderated') {
-      // Navigate to usability study builder per Step 2A requirements
-      navigate('/app/study-builder', { 
-        state: { 
-          studyType: 'usability',
-          fromModal: true 
-        }
-      });
-    } else {
-      // Navigate to interview session configuration per Step 2B requirements  
-      navigate('/app/study-builder', { 
-        state: { 
-          studyType: 'interview',
-          fromModal: true 
-        }
-      });
-    }
+    // Skip the redundant modal and go directly to Study Builder
+    navigate('/app/study-builder');
   };
 
   const filteredStudies = (studies || []).filter(study => {
@@ -122,13 +98,8 @@ const StudiesPage: React.FC = () => {
     };
     
     return (
-<<<<<<< HEAD
       <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${styles[safeStatus as keyof typeof styles]} min-w-0 text-center`}>
         {safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1)}
-=======
-      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border ${styles[status as keyof typeof styles]} min-w-0 text-center`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
->>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
       </span>
     );
   };
@@ -206,6 +177,59 @@ const StudiesPage: React.FC = () => {
     }
   };
 
+  const handleLaunch = async (study: IStudy) => {
+    try {
+      console.log('🚀 Launching study:', study._id);
+      
+      // Update study status to active
+      const updatedStudy = {
+        ...study,
+        status: 'active' as const,
+        recruitmentStatus: 'recruiting' as const
+      };
+      
+      await updateStudy(study._id, updatedStudy);
+      
+      // Refresh studies to show updated status
+      await fetchStudies();
+      
+      alert(`Study "${study.title}" is now live and accepting participants!`);
+    } catch (error) {
+      console.error('Failed to launch study:', error);
+      alert('Failed to launch study. Please try again.');
+    }
+  };
+
+  const handlePause = async (study: IStudy) => {
+    try {
+      console.log('⏸️ Pausing study:', study._id);
+      
+      // Update study status to paused
+      const updatedStudy = {
+        ...study,
+        status: 'paused' as const,
+        recruitmentStatus: 'recruitment_closed' as const
+      };
+      
+      await updateStudy(study._id, updatedStudy);
+      
+      // Refresh studies to show updated status
+      await fetchStudies();
+      
+      alert(`Study "${study.title}" has been paused.`);
+    } catch (error) {
+      console.error('Failed to pause study:', error);
+      alert('Failed to pause study. Please try again.');
+    }
+  };
+
+  const handleViewResults = (study: IStudy) => {
+    console.log('📊 Viewing results for study:', study._id);
+    // Navigate to results page
+    setCurrentStudy(study);
+    navigate(`/results/${study._id}`);
+  };
+
   if (studiesLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -244,13 +268,6 @@ const StudiesPage: React.FC = () => {
           >
             Create Study
           </Button>
-          <button
-            onClick={handleCreateNewStudy}
-            className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Quick Study
-          </button>
         </div>
       </div>
 
@@ -280,10 +297,10 @@ const StudiesPage: React.FC = () => {
             >
               <option value="all">All Statuses</option>
               <option value="draft">Draft</option>
-              <option value="recruiting">Recruiting</option>
               <option value="active">Active</option>
-              <option value="completed">Completed</option>
               <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+              <option value="archived">Archived</option>
             </select>
           </div>
 
@@ -396,6 +413,37 @@ const StudiesPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Primary Action for Draft Studies */}
+              {study.status === 'draft' && (
+                <div className="mb-4" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={() => handleLaunch(study)}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-green-500/25 border border-green-400"
+                    data-testid="launch-study"
+                  >
+                    🚀 Start Testing
+                  </button>
+                </div>
+              )}
+
+              {/* Status Display for Active Studies */}
+              {study.status === 'active' && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-green-700 font-medium">🟢 Live & Recruiting</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewResults(study);
+                      }}
+                      className="text-green-600 hover:text-green-700 text-sm font-medium underline"
+                    >
+                      View Results
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Actions Footer */}
               <div className="mt-auto pt-4 border-t border-gray-200/60">
                 <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
@@ -405,6 +453,9 @@ const StudiesPage: React.FC = () => {
                     onRename={handleRename}
                     onDuplicate={handleDuplicate}
                     onDelete={(study) => handleDelete(study._id)}
+                    onLaunch={handleLaunch}
+                    onPause={handlePause}
+                    onViewResults={handleViewResults}
                   />
                 </div>
               </div>
@@ -413,13 +464,6 @@ const StudiesPage: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Study Creation Modal */}
-      <SimplifiedStudyCreationModal
-        isOpen={showStudyModal}
-        onClose={() => setShowStudyModal(false)}
-        onSelectType={handleSelectStudyType}
-      />
 
       {/* Rename Study Modal */}
       <RenameStudyModal

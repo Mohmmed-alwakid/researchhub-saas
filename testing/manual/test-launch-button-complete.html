@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Launch Button Test - ResearchHub</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+        .test-section h3 {
+            margin: 0 0 15px 0;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #6b7280;
+        }
+        .status-indicator.success { background: #10b981; }
+        .status-indicator.error { background: #ef4444; }
+        .status-indicator.loading { background: #f59e0b; animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn.success {
+            background: #10b981;
+        }
+        .btn.error {
+            background: #ef4444;
+        }
+        .result {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success-message {
+            color: #065f46;
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+        }
+        .error-message {
+            color: #991b1b;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .info-card h4 {
+            margin: 0 0 10px 0;
+            color: #374151;
+        }
+        .info-card p {
+            margin: 5px 0;
+            color: #6b7280;
+        }
+        .test-flow {
+            background: #f0f9ff;
+            border: 1px solid #0284c7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .test-flow h3 {
+            color: #0c4a6e;
+            margin: 0 0 15px 0;
+        }
+        .test-flow ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .test-flow li {
+            margin: 8px 0;
+            color: #0c4a6e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Complete Launch Button Test</h1>
+            <p>Comprehensive testing of the Study Builder Launch functionality</p>
+        </div>
+        
+        <div class="content">
+            <div class="test-flow">
+                <h3>🔄 Test Flow Overview</h3>
+                <ol>
+                    <li><strong>Environment Check</strong> - Verify servers and authentication</li>
+                    <li><strong>API Connectivity</strong> - Test research-consolidated endpoint</li>
+                    <li><strong>CORS Validation</strong> - Ensure cross-origin requests work</li>
+                    <li><strong>Study Creation</strong> - Test actual study creation API</li>
+                    <li><strong>End-to-End Test</strong> - Simulate complete Launch button flow</li>
+                </ol>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>🌐 Environment Status</h4>
+                    <p id="environment-info">Checking...</p>
+                </div>
+                <div class="info-card">
+                    <h4>🔐 Authentication</h4>
+                    <p id="auth-info">Checking...</p>
+                </div>
+                <div class="info-card">
+                    <h4>📡 API Endpoints</h4>
+                    <p id="api-info">Checking...</p>
+                </div>
+                <div class="info-card">
+                    <h4>🎯 CORS Status</h4>
+                    <p id="cors-info">Checking...</p>
+                </div>
+            </div>
+
+            <!-- Test 1: Environment Check -->
+            <div class="test-section">
+                <h3>
+                    <div class="status-indicator" id="env-status"></div>
+                    1. Environment & Server Check
+                </h3>
+                <button class="btn" onclick="testEnvironment()">Check Environment</button>
+                <div class="result" id="env-result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 2: Authentication -->
+            <div class="test-section">
+                <h3>
+                    <div class="status-indicator" id="auth-status"></div>
+                    2. Authentication Verification
+                </h3>
+                <button class="btn" onclick="testAuthentication()">Test Auth</button>
+                <div class="result" id="auth-result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 3: CORS Test -->
+            <div class="test-section">
+                <h3>
+                    <div class="status-indicator" id="cors-status"></div>
+                    3. CORS Policy Test
+                </h3>
+                <button class="btn" onclick="testCORS()">Test CORS</button>
+                <div class="result" id="cors-result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 4: API Connectivity -->
+            <div class="test-section">
+                <h3>
+                    <div class="status-indicator" id="api-status"></div>
+                    4. Research API Connectivity
+                </h3>
+                <button class="btn" onclick="testAPIConnectivity()">Test API</button>
+                <div class="result" id="api-result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 5: Study Creation -->
+            <div class="test-section">
+                <h3>
+                    <div class="status-indicator" id="study-status"></div>
+                    5. Study Creation Test
+                </h3>
+                <button class="btn" onclick="testStudyCreation()">Create Test Study</button>
+                <div class="result" id="study-result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 6: Launch Button Simulation -->
+            <div class="test-section">
+                <h3>
+                    <div class="status-indicator" id="launch-status"></div>
+                    6. Launch Button Simulation
+                </h3>
+                <button class="btn" onclick="simulateLaunchButton()">Simulate Launch</button>
+                <div class="result" id="launch-result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 7: Full Integration Test -->
+            <div class="test-section">
+                <h3>
+                    <div class="status-indicator" id="integration-status"></div>
+                    7. Full Integration Test
+                </h3>
+                <button class="btn" onclick="runFullTest()">Run All Tests</button>
+                <button class="btn" onclick="clearResults()">Clear Results</button>
+                <div class="result" id="integration-result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {};
+        
+        // Helper functions
+        function updateStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            element.className = `status-indicator ${status}`;
+        }
+        
+        function showResult(elementId, content, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.textContent = content;
+            element.className = `result ${isSuccess ? 'success-message' : 'error-message'}`;
+        }
+        
+        function log(message) {
+            console.log(`[Launch Test] ${message}`);
+            return message;
+        }
+
+        // Test 1: Environment Check
+        async function testEnvironment() {
+            updateStatus('env-status', 'loading');
+            try {
+                const frontendUrl = window.location.origin;
+                const backendUrl = 'http://localhost:3000';
+                
+                const envInfo = {
+                    frontend: frontendUrl,
+                    backend: backendUrl,
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                };
+                
+                document.getElementById('environment-info').textContent = `✅ Frontend: ${frontendUrl} | Backend: ${backendUrl}`;
+                
+                updateStatus('env-status', 'success');
+                showResult('env-result', JSON.stringify(envInfo, null, 2));
+                testResults.environment = { success: true, data: envInfo };
+                
+                return { success: true, data: envInfo };
+            } catch (error) {
+                updateStatus('env-status', 'error');
+                showResult('env-result', `Error: ${error.message}`, false);
+                testResults.environment = { success: false, error: error.message };
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Test 2: Authentication
+        async function testAuthentication() {
+            updateStatus('auth-status', 'loading');
+            try {
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    throw new Error('No auth token found in localStorage');
+                }
+                
+                const response = await fetch('/api/auth-consolidated?action=status', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Auth check failed: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                document.getElementById('auth-info').textContent = `✅ ${result.user?.email} (${result.user?.role})`;
+                
+                updateStatus('auth-status', 'success');
+                showResult('auth-result', JSON.stringify(result, null, 2));
+                testResults.authentication = { success: true, data: result };
+                
+                return { success: true, data: result };
+            } catch (error) {
+                document.getElementById('auth-info').textContent = `❌ Authentication failed`;
+                updateStatus('auth-status', 'error');
+                showResult('auth-result', `Error: ${error.message}`, false);
+                testResults.authentication = { success: false, error: error.message };
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Test 3: CORS Test
+        async function testCORS() {
+            updateStatus('cors-status', 'loading');
+            try {
+                // Test preflight request
+                const response = await fetch('http://localhost:3000/api/research-consolidated', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'access-control-allow-origin': response.headers.get('access-control-allow-origin'),
+                    'access-control-allow-methods': response.headers.get('access-control-allow-methods'),
+                    'access-control-allow-headers': response.headers.get('access-control-allow-headers')
+                };
+                
+                document.getElementById('cors-info').textContent = corsHeaders['access-control-allow-origin'] ? '✅ CORS Enabled' : '❌ CORS Issues';
+                
+                updateStatus('cors-status', 'success');
+                showResult('cors-result', `CORS Headers:\n${JSON.stringify(corsHeaders, null, 2)}`);
+                testResults.cors = { success: true, data: corsHeaders };
+                
+                return { success: true, data: corsHeaders };
+            } catch (error) {
+                document.getElementById('cors-info').textContent = `❌ CORS Error`;
+                updateStatus('cors-status', 'error');
+                showResult('cors-result', `CORS Error: ${error.message}`, false);
+                testResults.cors = { success: false, error: error.message };
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Test 4: API Connectivity
+        async function testAPIConnectivity() {
+            updateStatus('api-status', 'loading');
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('http://localhost:3000/api/research-consolidated?action=studies', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                document.getElementById('api-info').textContent = `✅ API Connected (${result.studies?.length || 0} studies)`;
+                
+                updateStatus('api-status', 'success');
+                showResult('api-result', JSON.stringify(result, null, 2));
+                testResults.api = { success: true, data: result };
+                
+                return { success: true, data: result };
+            } catch (error) {
+                document.getElementById('api-info').textContent = `❌ API Error`;
+                updateStatus('api-status', 'error');
+                showResult('api-result', `API Error: ${error.message}`, false);
+                testResults.api = { success: false, error: error.message };
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Test 5: Study Creation
+        async function testStudyCreation() {
+            updateStatus('study-status', 'loading');
+            try {
+                const token = localStorage.getItem('auth_token');
+                const testStudyData = {
+                    action: 'create-study',
+                    title: `Test Study - ${new Date().toLocaleString()}`,
+                    description: 'This is a test study created by the Launch Button test suite.',
+                    type: 'unmoderated',
+                    target_participants: 5,
+                    settings: {
+                        recording: { enabled: false },
+                        tasks: []
+                    },
+                    blocks: [
+                        {
+                            type: 'welcome',
+                            title: 'Welcome',
+                            description: 'Welcome to our test study',
+                            order: 0,
+                            settings: {}
+                        },
+                        {
+                            type: 'thank-you',
+                            title: 'Thank You',
+                            description: 'Thank you for participating',
+                            order: 1,
+                            settings: {}
+                        }
+                    ]
+                };
+                
+                const response = await fetch('http://localhost:3000/api/research-consolidated', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testStudyData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Study creation failed: ${response.status} ${response.statusText}\n${errorText}`);
+                }
+                
+                const result = await response.json();
+                
+                updateStatus('study-status', 'success');
+                showResult('study-result', `Study Created Successfully!\n${JSON.stringify(result, null, 2)}`);
+                testResults.studyCreation = { success: true, data: result };
+                
+                return { success: true, data: result };
+            } catch (error) {
+                updateStatus('study-status', 'error');
+                showResult('study-result', `Study Creation Error: ${error.message}`, false);
+                testResults.studyCreation = { success: false, error: error.message };
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Test 6: Launch Button Simulation
+        async function simulateLaunchButton() {
+            updateStatus('launch-status', 'loading');
+            try {
+                // This simulates the exact same code path as LaunchStep.tsx
+                const token = localStorage.getItem('auth_token');
+                const headers = { 'Content-Type': 'application/json' };
+                
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                // Use the same logic as LaunchStep.tsx
+                const apiBaseUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+                const apiUrl = `${apiBaseUrl}/api/research-consolidated`;
+
+                const apiData = {
+                    title: `Launch Test Study - ${new Date().toLocaleString()}`,
+                    description: 'Study created via Launch Button simulation',
+                    type: 'unmoderated',
+                    target_participants: 10,
+                    settings: {
+                        recording: { enabled: false },
+                        tasks: []
+                    },
+                    blocks: [
+                        {
+                            type: 'welcome',
+                            title: 'Welcome to our study',
+                            description: 'Thank you for participating in our research.',
+                            order: 0,
+                            settings: {}
+                        },
+                        {
+                            type: 'thank-you',
+                            title: 'Thank you!',
+                            description: 'Thank you for completing our study.',
+                            order: 1,
+                            settings: {}
+                        }
+                    ]
+                };
+
+                console.log('Launch simulation - Making request to:', apiUrl);
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        action: 'create-study',
+                        ...apiData
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Launch simulation - Response:', result);
+
+                if (!response.ok) {
+                    throw new Error(`Launch failed: ${response.status} ${response.statusText}\n${JSON.stringify(result)}`);
+                }
+
+                updateStatus('launch-status', 'success');
+                showResult('launch-result', `🚀 Launch Button Simulation SUCCESSFUL!\n\nStudy Created:\n${JSON.stringify(result, null, 2)}`);
+                testResults.launchSimulation = { success: true, data: result };
+                
+                return { success: true, data: result };
+            } catch (error) {
+                updateStatus('launch-status', 'error');
+                showResult('launch-result', `❌ Launch Button Simulation FAILED!\n\nError: ${error.message}`, false);
+                testResults.launchSimulation = { success: false, error: error.message };
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Test 7: Full Integration Test
+        async function runFullTest() {
+            updateStatus('integration-status', 'loading');
+            const integrationResults = [];
+            
+            try {
+                showResult('integration-result', 'Running full integration test...\n\n');
+                
+                // Run all tests in sequence
+                const tests = [
+                    { name: 'Environment', fn: testEnvironment },
+                    { name: 'Authentication', fn: testAuthentication },
+                    { name: 'CORS', fn: testCORS },
+                    { name: 'API Connectivity', fn: testAPIConnectivity },
+                    { name: 'Study Creation', fn: testStudyCreation },
+                    { name: 'Launch Simulation', fn: simulateLaunchButton }
+                ];
+                
+                for (const test of tests) {
+                    try {
+                        const result = await test.fn();
+                        integrationResults.push({
+                            test: test.name,
+                            success: result.success,
+                            data: result.data || result.error
+                        });
+                        
+                        document.getElementById('integration-result').textContent += `✅ ${test.name}: PASSED\n`;
+                    } catch (error) {
+                        integrationResults.push({
+                            test: test.name,
+                            success: false,
+                            error: error.message
+                        });
+                        
+                        document.getElementById('integration-result').textContent += `❌ ${test.name}: FAILED - ${error.message}\n`;
+                    }
+                }
+                
+                const successCount = integrationResults.filter(r => r.success).length;
+                const totalCount = integrationResults.length;
+                
+                updateStatus('integration-status', successCount === totalCount ? 'success' : 'error');
+                
+                document.getElementById('integration-result').textContent += `\n🎯 FINAL RESULT: ${successCount}/${totalCount} tests passed\n\n`;
+                document.getElementById('integration-result').textContent += JSON.stringify(integrationResults, null, 2);
+                
+                testResults.integration = { 
+                    success: successCount === totalCount, 
+                    results: integrationResults,
+                    summary: `${successCount}/${totalCount} tests passed`
+                };
+                
+            } catch (error) {
+                updateStatus('integration-status', 'error');
+                showResult('integration-result', `Integration test failed: ${error.message}`, false);
+                testResults.integration = { success: false, error: error.message };
+            }
+        }
+
+        // Clear all results
+        function clearResults() {
+            const resultElements = document.querySelectorAll('.result');
+            resultElements.forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+                el.className = 'result';
+            });
+            
+            const statusElements = document.querySelectorAll('.status-indicator');
+            statusElements.forEach(el => {
+                el.className = 'status-indicator';
+            });
+            
+            testResults = {};
+            
+            // Reset info cards
+            document.getElementById('environment-info').textContent = 'Checking...';
+            document.getElementById('auth-info').textContent = 'Checking...';
+            document.getElementById('api-info').textContent = 'Checking...';
+            document.getElementById('cors-info').textContent = 'Checking...';
+        }
+
+        // Auto-run environment check on page load
+        window.addEventListener('load', () => {
+            setTimeout(testEnvironment, 1000);
+        });
+    </script>
+</body>
+</html>

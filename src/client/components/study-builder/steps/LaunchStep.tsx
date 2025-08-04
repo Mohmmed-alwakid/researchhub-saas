@@ -38,9 +38,9 @@ export const LaunchStep: React.FC<StepProps> = ({
       const apiData = {
         title: formData.title,
         description: formData.description,
-        type: formData.type || 'usability_test',
-        status: 'active', // Set study to active when launching from wizard
-        tasks: formData.blocks?.map((block, index) => ({
+        participantLimit: formData.target_participants || 15,
+        compensation: 25, // Default compensation
+        blocks: formData.blocks?.map((block, index) => ({
           id: block.id,
           order: index + 1,
           type: block.type,
@@ -48,16 +48,7 @@ export const LaunchStep: React.FC<StepProps> = ({
           description: block.description,
           settings: block.settings
         })) || [],
-        settings: {
-          maxParticipants: formData.target_participants || 15,
-          duration: formData.duration || 30,
-          compensation: 25, // Default compensation
-          recording: {
-            screen: true, // Default to screen recording
-            audio: formData.include_audio === true,
-            webcam: false
-          }
-        }
+        status: 'active' // Set study to active when launching from wizard
       };
 
       console.log('Launching study with data:', apiData);
@@ -70,7 +61,13 @@ export const LaunchStep: React.FC<StepProps> = ({
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/studies', {
+      // Use the correct API endpoint that matches our backend routing
+      const apiBaseUrl = window.location.hostname === 'localhost' ? 'http://localhost:3003' : '';
+      const apiUrl = `${apiBaseUrl}/api/research-consolidated?action=create-study`;
+
+      console.log('Making request to:', apiUrl);
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(apiData)
@@ -80,10 +77,10 @@ export const LaunchStep: React.FC<StepProps> = ({
       console.log('Launch response:', result);
 
       if (response.ok && result.success) {
-        setStudyId(result.study?._id || result.study?.id || 'new-study-id');
+        setStudyId(result.study?.id || result.study?._id || 'new-study-id');
         setIsLaunched(true);
       } else {
-        throw new Error(result.error || result.message || 'Failed to launch study');
+        throw new Error(result.error || result.message || `Server responded with status ${response.status}`);
       }
     } catch (error) {
       console.error('Error launching study:', error);

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Launch Button Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .test-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #15803d;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #2563eb;
+            color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Launch Button Fix Test</h1>
+        <p>Testing the fixed Launch button functionality</p>
+
+        <div class="test-section">
+            <h3>🚀 Test Study Launch</h3>
+            <p>This will test the corrected API endpoint and data format</p>
+            
+            <button id="testLaunch" class="test-button">Test Launch Study</button>
+            <button id="checkAuth" class="test-button">Check Auth Status</button>
+            <button id="testAPI" class="test-button">Test API Connection</button>
+        </div>
+
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+        }
+
+        // Test study launch with corrected data format
+        document.getElementById('testLaunch').addEventListener('click', async () => {
+            try {
+                showResult('Testing study launch...', 'info');
+                
+                // Get auth token
+                const authStorage = localStorage.getItem('auth-storage');
+                let token = null;
+                if (authStorage) {
+                    const authData = JSON.parse(authStorage);
+                    token = authData.state?.token;
+                }
+
+                if (!token) {
+                    token = localStorage.getItem('token');
+                }
+
+                if (!token) {
+                    throw new Error('No authentication token found. Please log in first.');
+                }
+
+                // Test data matching the expected format
+                const testData = {
+                    action: 'create-study',
+                    title: 'Test Study Launch Fix',
+                    description: 'Testing the corrected API endpoint and data format',
+                    participantLimit: 10,
+                    compensation: 25,
+                    blocks: [
+                        {
+                            id: 'welcome-1',
+                            order: 1,
+                            type: 'welcome_screen',
+                            title: 'Welcome',
+                            description: 'Welcome to our test study',
+                            settings: {}
+                        },
+                        {
+                            id: 'question-1',
+                            order: 2,
+                            type: 'open_question',
+                            title: 'Test Question',
+                            description: 'What do you think about this interface?',
+                            settings: { required: true }
+                        },
+                        {
+                            id: 'thankyou-1',
+                            order: 3,
+                            type: 'thank_you_screen',
+                            title: 'Thank You',
+                            description: 'Thank you for participating',
+                            settings: {}
+                        }
+                    ],
+                    status: 'active'
+                };
+
+                const response = await fetch('/api/research-consolidated', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showResult(`✅ SUCCESS!\n\nStudy created successfully:\n- ID: ${result.study?.id || 'N/A'}\n- Title: ${result.study?.title || 'N/A'}\n- Status: ${result.study?.status || 'N/A'}\n- Blocks: ${result.study?.blocks?.length || 0}\n\nFull response:\n${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    throw new Error(`API Error: ${result.error || 'Unknown error'}\n\nFull response:\n${JSON.stringify(result, null, 2)}`);
+                }
+                
+            } catch (error) {
+                showResult(`❌ ERROR:\n${error.message}`, 'error');
+            }
+        });
+
+        // Check authentication status
+        document.getElementById('checkAuth').addEventListener('click', async () => {
+            try {
+                showResult('Checking authentication...', 'info');
+                
+                const response = await fetch('/api/auth-consolidated?action=status', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showResult(`✅ AUTHENTICATED!\n\nUser: ${result.user?.firstName} ${result.user?.lastName}\nEmail: ${result.user?.email}\nRole: ${result.user?.role}\n\nFull response:\n${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    showResult(`❌ NOT AUTHENTICATED:\n${result.error || 'Unknown error'}\n\nFull response:\n${JSON.stringify(result, null, 2)}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`❌ ERROR:\n${error.message}`, 'error');
+            }
+        });
+
+        // Test API connection
+        document.getElementById('testAPI').addEventListener('click', async () => {
+            try {
+                showResult('Testing API connection...', 'info');
+                
+                const response = await fetch('/api/research-consolidated?action=studies', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ API CONNECTED!\n\nEndpoint: /api/research-consolidated\nStudies found: ${result.studies?.length || 0}\n\nSample study:\n${JSON.stringify(result.studies?.[0] || 'None', null, 2)}`, 'success');
+                } else {
+                    showResult(`❌ API ERROR:\n${result.error || 'Unknown error'}\n\nFull response:\n${JSON.stringify(result, null, 2)}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`❌ CONNECTION ERROR:\n${error.message}`, 'error');
+            }
+        });
+
+        // Auto-check auth on page load
+        window.addEventListener('load', () => {
+            document.getElementById('checkAuth').click();
+        });
+    </script>
+</body>
+</html>

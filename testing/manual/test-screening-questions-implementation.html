@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Builder Config Step - Screening Questions Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.warning { background: #fef3c7; color: #92400e; }
+        .feature-list {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+        .feature-list li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .feature-list li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Study Builder Config Step - Screening Questions Implementation</h1>
+    
+    <div class="status success">
+        ✅ Implementation Complete - All TypeScript compilation errors resolved
+    </div>
+
+    <div class="test-card">
+        <h2>📝 What Was Implemented</h2>
+        <p>Successfully replaced the "Website Details" section with a comprehensive "Screening Questions" system that allows researchers to add multiple choice questions for participant filtering.</p>
+        
+        <div class="feature-list">
+            <h3>✨ New Features:</h3>
+            <li><strong>Screening Questions Tab</strong> - Replaced "Website Details" with "Screening Questions"</li>
+            <li><strong>Add/Remove Questions</strong> - Dynamic question management with intuitive UI</li>
+            <li><strong>Multiple Choice Options</strong> - Add/remove answer options for each question</li>
+            <li><strong>Required/Optional Toggle</strong> - Mark questions as required or optional</li>
+            <li><strong>Question Management</strong> - Edit question text and reorder options</li>
+            <li><strong>Screening Summary</strong> - Real-time overview of configured questions</li>
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔧 Technical Implementation Details</h2>
+        
+        <h3>📁 Files Modified:</h3>
+        <ul>
+            <li><strong>UsabilityStudyConfig.tsx</strong> - Main component updated with screening questions UI</li>
+            <li><strong>types.ts</strong> - Added ScreeningQuestion interface and updated UsabilityConfig</li>
+        </ul>
+
+        <h3>🧩 New Type Definitions:</h3>
+        <div class="feature-list">
+            <li><strong>ScreeningQuestion Interface</strong> - id, question, options[], required</li>
+            <li><strong>Updated UsabilityConfig</strong> - Added screening_questions?: ScreeningQuestion[]</li>
+            <li><strong>Type Safety</strong> - Full TypeScript support with proper error handling</li>
+        </ul>
+
+        <h3>🎨 UI Components Added:</h3>
+        <div class="feature-list">
+            <li><strong>Question Builder</strong> - Form inputs for question text and options</li>
+            <li><strong>Option Manager</strong> - Add/remove multiple choice options</li>
+            <li><strong>Required Toggle</strong> - Checkbox for required/optional questions</li>
+            <li><strong>Summary Panel</strong> - Overview of all configured screening questions</li>
+            <li><strong>Empty State</strong> - Helpful guidance when no questions are added</li>
+        </ul>
+    </div>
+
+    <div class="test-card">
+        <h2>🧪 Testing Instructions</h2>
+        
+        <h3>How to Test in Study Builder:</h3>
+        <ol>
+            <li><strong>Open Study Builder:</strong> Navigate to <code>http://localhost:5175/app/study-builder</code></li>
+            <li><strong>Select Usability Study:</strong> Choose "Usability Test" as study type</li>
+            <li><strong>Complete Setup:</strong> Fill in study details and proceed to configuration</li>
+            <li><strong>Test Screening Questions:</strong> 
+                <ul>
+                    <li>Click on "Screening Questions" tab</li>
+                    <li>Click "Add Question" to create new screening questions</li>
+                    <li>Enter question text and multiple choice options</li>
+                    <li>Toggle required/optional setting</li>
+                    <li>Add multiple questions to test the UI</li>
+                    <li>Remove questions to test deletion</li>
+                </ul>
+            </li>
+            <li><strong>Verify Data Persistence:</strong> Navigate away and back to ensure data is saved</li>
+        </ol>
+    </div>
+
+    <div class="test-card">
+        <h2>✅ User Requirements Met</h2>
+        
+        <div class="feature-list">
+            <li><strong>❌ Removed Website Details</strong> - "Website Details" section completely removed</li>
+            <li><strong>✅ Added Screening Questions</strong> - Full replacement with screening question builder</li>
+            <li><strong>✅ Multiple Choice Support</strong> - Researchers can add multiple choice questions</li>
+            <li><strong>✅ Dynamic Question Management</strong> - Add, edit, and remove questions as needed</li>
+            <li><strong>✅ Participant Filtering</strong> - Questions designed for application screening</li>
+            <li><strong>✅ Professional UI</strong> - Clean, intuitive interface matching existing design</li>
+        </div>
+    </div>
+
+    <div class="status warning">
+        ⚠️ Note: Make sure to restart your development server to pick up the type changes
+    </div>
+
+    <div class="test-card">
+        <h2>🚀 Ready for Testing</h2>
+        <p>The implementation is complete and ready for testing. The new Screening Questions feature provides researchers with a powerful tool to filter participants before they can access the study, improving study quality and reducing irrelevant responses.</p>
+        
+        <p><strong>Key Benefits:</strong></p>
+        <ul>
+            <li>Better participant targeting</li>
+            <li>Improved study quality</li>
+            <li>Reduced noise in data</li>
+            <li>Flexible question configuration</li>
+            <li>Professional user experience</li>
+        </ul>
+    </div>
+
+    <script>
+        // Simple validation that the page loaded correctly
+        console.log('✅ Screening Questions implementation validation page loaded successfully');
+        
+        // Add current timestamp
+        const timestamp = new Date().toLocaleString();
+        console.log('🕒 Generated at:', timestamp);
+    </script>
+</body>
+</html>

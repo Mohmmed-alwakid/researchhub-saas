@@ -101,25 +101,40 @@ async function handleGetStudies(req, res) {
       timestamp: new Date().toISOString()
     });
 
-    // Get studies with essential fields that the frontend expects
-    const { data: studies, error } = await supabaseAdmin
+    // Check user role to determine filtering
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    const isParticipant = userRole === 'participant';
+    
+    let query = supabaseAdmin
       .from('studies')
       .select(`
         id,
         title,
         description,
         status,
-        type,
         created_at,
         updated_at,
         settings,
-        participants
-      `)
-      .order('created_at', { ascending: false });
+        researcher_id,
+        target_participants,
+        is_public
+      `);
+
+    // Filter studies based on user role
+    if (isParticipant) {
+      // Participants should only see active studies (not draft)
+      // Note: Using 'active' instead of 'recruiting' based on database enum
+      query = query.eq('status', 'active');
+      console.log('🔒 Participant filter applied: only showing active studies');
+    }
+
+    const { data: studies, error } = await query.order('created_at', { ascending: false });
 
     console.log('🔍 Studies query result:', { 
       studyCount: studies?.length || 0, 
       error,
+      userRole,
+      isParticipant,
       sampleStudy: studies?.[0] || null
     });
 
@@ -128,9 +143,16 @@ async function handleGetStudies(req, res) {
       
       // If the full query fails, try the basic query as fallback
       console.log('🔄 Attempting fallback query...');
-      const { data: basicStudies, error: basicError } = await supabaseAdmin
+      let basicQuery = supabaseAdmin
         .from('studies')
-        .select('id, title, description, status, type, created_at')
+        .select('id, title, description, status, created_at, settings');
+        
+      // Apply same filter for participants in fallback
+      if (isParticipant) {
+        basicQuery = basicQuery.eq('status', 'active');
+      }
+      
+      const { data: basicStudies, error: basicError } = await basicQuery
         .order('created_at', { ascending: false });
       
       if (basicError) {
@@ -148,14 +170,14 @@ async function handleGetStudies(req, res) {
         title: study.title || 'Untitled Study',
         description: study.description || 'No description available',
         status: study.status || 'draft',
-        type: study.type || 'usability',
+        type: study.settings?.type || 'usability',
         createdAt: study.created_at,
         // Provide default values for missing fields
         participants: {
           enrolled: 0,
-          target: 10
+          target: study.target_participants || 10
         },
-        settings: {
+        settings: study.settings || {
           maxParticipants: 10,
           duration: 30,
           compensation: 25
@@ -165,7 +187,7 @@ async function handleGetStudies(req, res) {
       return res.status(200).json({
         success: true,
         studies: transformedStudies,
-        message: `Found ${transformedStudies.length} studies (basic mode)`
+        message: `Found ${transformedStudies.length} studies (basic mode, ${userRole} filtered)`
       });
     }
 
@@ -176,15 +198,15 @@ async function handleGetStudies(req, res) {
       title: study.title || 'Untitled Study',
       description: study.description || 'No description available',
       status: study.status || 'draft',
-      type: study.type || 'usability',
+      type: study.settings?.type || 'usability',
       createdAt: study.created_at,
       updatedAt: study.updated_at,
-      participants: study.participants || {
-        enrolled: 0,
-        target: 10
+      participants: {
+        enrolled: 0, // This would need to be calculated from applications table
+        target: study.target_participants || 10
       },
       settings: study.settings || {
-        maxParticipants: 10,
+        maxParticipants: study.target_participants || 10,
         duration: 30,
         compensation: 25
       }
@@ -193,7 +215,7 @@ async function handleGetStudies(req, res) {
     return res.status(200).json({
       success: true,
       studies: transformedStudies,
-      message: `Found ${transformedStudies.length} studies`
+      message: `Found ${transformedStudies.length} studies (${userRole} filtered)`
     });
 
   } catch (error) {
@@ -241,11 +263,17 @@ async function handleCreateStudy(req, res) {
     const studyData = {
       title,
       description,
-      participant_limit: participantLimit || 50,
-      compensation: compensation || 0,
+      target_participants: participantLimit || 50,
       status,
-      creator_id: auth.user.id,
-      blocks: blocks,
+      researcher_id: auth.user.id,
+      settings: {
+        compensation: compensation || 25,
+        blocks: blocks || [],
+        type: 'usability',
+        maxParticipants: participantLimit || 50,
+        duration: 30
+      },
+      is_public: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -296,9 +324,11 @@ async function handleUpdateStudy(req, res) {
       });
     }
 
-    const { study_id } = req.query;
+    const { study_id, studyId, id } = req.query;
+    const studyIdFromBody = req.body?.studyId || req.body?.id;
+    const actualStudyId = study_id || studyId || id || studyIdFromBody;
     
-    if (!study_id) {
+    if (!actualStudyId) {
       return res.status(400).json({
         success: false,
         error: 'Study ID is required'
@@ -308,8 +338,8 @@ async function handleUpdateStudy(req, res) {
     // Check ownership
     const { data: existingStudy, error: checkError } = await supabaseAdmin
       .from('studies')
-      .select('creator_id')
-      .eq('id', study_id)
+      .select('researcher_id')
+      .eq('id', actualStudyId)
       .single();
 
     if (checkError || !existingStudy) {
@@ -320,7 +350,7 @@ async function handleUpdateStudy(req, res) {
     }
 
     const userRole = auth.user.user_metadata?.role || 'participant';
-    if (userRole !== 'admin' && existingStudy.creator_id !== auth.user.id) {
+    if (userRole !== 'admin' && existingStudy.researcher_id !== auth.user.id) {
       return res.status(403).json({
         success: false,
         error: 'You can only update your own studies'
@@ -341,7 +371,7 @@ async function handleUpdateStudy(req, res) {
     const { data: updatedStudy, error } = await supabaseAdmin
       .from('studies')
       .update(updateData)
-      .eq('id', study_id)
+      .eq('id', actualStudyId)
       .select()
       .single();
 
@@ -361,6 +391,233 @@ async function handleUpdateStudy(req, res) {
 
   } catch (error) {
     console.error('Update study exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Delete study
+ */
+async function handleDeleteStudy(req, res) {
+  console.log('🗑️ DELETE HANDLER START - Method:', req.method);
+  console.log('🗑️ DELETE HANDLER - Query params:', req.query);
+  console.log('🗑️ DELETE HANDLER - Body:', req.body);
+  
+  // Consolidated API uses POST with action parameter, not DELETE method
+  if (req.method !== 'POST') {
+    console.log('❌ Method not allowed:', req.method);
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    console.log('🔐 Starting authentication...');
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    console.log('🔐 Auth result:', { success: auth.success, status: auth.status });
+    
+    if (!auth.success) {
+      console.log('❌ Authentication failed:', auth.error);
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    // Get study ID from query, body, or URL path
+    const studyId = req.query.study_id || req.body?.studyId || req.body?.id;
+    console.log('🆔 Study ID extraction:', { 
+      fromQuery: req.query.study_id, 
+      fromBodyStudyId: req.body?.studyId, 
+      fromBodyId: req.body?.id, 
+      final: studyId 
+    });
+    
+    if (!studyId) {
+      console.log('❌ No study ID provided');
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    console.log('🗑️ Starting delete for study:', studyId);
+
+    // Check ownership
+    console.log('🔍 Looking up study in database...');
+    const { data: existingStudy, error: checkError } = await supabaseAdmin
+      .from('studies')
+      .select('researcher_id, title')
+      .eq('id', studyId)
+      .single();
+
+    console.log('🔍 Database lookup complete:', { 
+      foundStudy: !!existingStudy, 
+      hasError: !!checkError, 
+      studyId,
+      studyTitle: existingStudy?.title 
+    });
+
+    if (checkError) {
+      console.error('❌ Study lookup error details:', checkError);
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found',
+        details: checkError.message
+      });
+    }
+
+    if (!existingStudy) {
+      console.error('❌ Study not found in database:', studyId);
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    console.log('👤 Ownership check:', { 
+      userRole, 
+      authUserId: auth.user.id, 
+      studyResearcherId: existingStudy.researcher_id,
+      ownershipMatch: existingStudy.researcher_id === auth.user.id 
+    });
+
+    if (userRole !== 'admin' && existingStudy.researcher_id !== auth.user.id) {
+      console.log('❌ Ownership check failed');
+      return res.status(403).json({
+        success: false,
+        error: 'You can only delete your own studies'
+      });
+    }
+
+    console.log('✅ Ownership verified, proceeding with soft delete...');
+    console.log('✅ Ownership verified, proceeding with soft delete...');
+    // Soft delete by updating status to 'deleted'
+    const { data: deletedStudy, error } = await supabaseAdmin
+      .from('studies')
+      .update({ 
+        status: 'deleted',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', studyId)
+      .select()
+      .single();
+
+    console.log('🗑️ Delete operation result:', { 
+      success: !!deletedStudy, 
+      hasError: !!error,
+      deletedStudyId: deletedStudy?.id,
+      newStatus: deletedStudy?.status 
+    });
+
+    if (error) {
+      console.error('❌ Delete study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete study',
+        details: error.message
+      });
+    }
+
+    console.log('✅ Study successfully deleted:', deletedStudy.id);
+    return res.status(200).json({
+      success: true,
+      study: deletedStudy,
+      message: `Study "${existingStudy.title}" deleted successfully`,
+      method: 'soft-delete'
+    });
+
+  } catch (error) {
+    console.error('❌ Delete study exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message
+    });
+  }
+}
+
+/**
+ * Launch study (change status to active)
+ */
+async function handleLaunchStudy(req, res) {
+  if (req.method !== 'PATCH') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    // Get study ID from query
+    const studyId = req.query.study_id;
+    
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    console.log('Launching study with ID:', studyId);
+
+    // Check ownership
+    const { data: existingStudy, error: checkError } = await supabaseAdmin
+      .from('studies')
+      .select('researcher_id, title, status')
+      .eq('id', studyId)
+      .single();
+
+    if (checkError || !existingStudy) {
+      console.error('Study lookup error:', checkError);
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    if (userRole !== 'admin' && existingStudy.researcher_id !== auth.user.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only launch your own studies'
+      });
+    }
+
+    // Update status to active
+    const { data: launchedStudy, error } = await supabaseAdmin
+      .from('studies')
+      .update({ 
+        status: 'active',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', studyId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Launch study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to launch study'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      study: launchedStudy,
+      message: `Study "${existingStudy.title}" launched successfully`
+    });
+
+  } catch (error) {
+    console.error('Launch study exception:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
@@ -919,6 +1176,12 @@ export default async function handler(req, res) {
       case 'update-study':
         return await handleUpdateStudy(req, res);
       
+      case 'delete-study':
+        return await handleDeleteStudy(req, res);
+      
+      case 'launch-study':
+        return await handleLaunchStudy(req, res);
+      
       // Applications
       case 'get-applications':
       case 'applications':
@@ -953,7 +1216,7 @@ export default async function handler(req, res) {
           success: false,
           error: 'Invalid action',
           availableActions: [
-            'studies', 'create-study', 'update-study',
+            'studies', 'create-study', 'update-study', 'delete-study', 'launch-study',
             'applications', 'apply', 'update-application',
             'blocks', 'block-types',
             'start-session', 'submit-response'

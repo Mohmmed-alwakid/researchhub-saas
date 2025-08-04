@@ -19,12 +19,14 @@ test.describe('ResearchHub Study Creation Flow', () => {
     const title = await page.title();
     expect(title).toContain('Afkar');
     
-    // Look for key elements that should be present
-    const hasLoginForm = await page.locator('input[type="email"]').isVisible();
+    // Look for key elements that should be present on landing page
+    const hasSignInLink = await page.locator('a[href="/login"]').first().isVisible();
+    const hasGetStartedButton = await page.locator('a[href="/register"]').first().isVisible();
+    const hasStartTrialButton = await page.getByText('Start Free Trial').first().isVisible();
     const hasDashboard = await page.locator('[data-testid="dashboard"]').isVisible();
     
-    // One of these should be visible
-    expect(hasLoginForm || hasDashboard).toBeTruthy();
+    // Landing page should have sign in link or get started button, OR user should be on dashboard
+    expect(hasSignInLink || hasGetStartedButton || hasStartTrialButton || hasDashboard).toBeTruthy();
     
     console.log('✅ Landing page loaded successfully');
   });
@@ -61,11 +63,11 @@ test.describe('ResearchHub Study Creation Flow', () => {
   });
 
   test('Navigation to study creation', async ({ page }) => {
-    // First authenticate
-    await page.goto('/');
+    // Navigate to login page for authentication
+    await page.goto('/login');
     await page.waitForLoadState('networkidle');
     
-    // Try to authenticate if needed
+    // Try to authenticate if login form is present
     const emailInput = page.locator('input[type="email"]').first();
     if (await emailInput.isVisible()) {
       await emailInput.fill('abwanwr77+Researcher@gmail.com');
@@ -75,16 +77,16 @@ test.describe('ResearchHub Study Creation Flow', () => {
       await page.waitForTimeout(2000);
     }
     
-    // Look for study creation elements
+    // Should now be on dashboard - look for study creation elements
     const createButtons = [
-      'button:has-text("Create Study")',
-      'button:has-text("New Study")',
       '[data-testid="create-study"]',
-      '.create-study',
-      'a[href*="create"]',
-      'button[title*="Create"]'
+      '[data-testid="create-new-study"]',
+      'button:has-text("New Study")',
+      'button:has-text("Create New Study")',
+      'button:has-text("Create Study")',
+      'a[href*="/app/study-builder"]'
     ];
-    
+
     let createButtonFound = false;
     for (const selector of createButtons) {
       const button = page.locator(selector).first();

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Studies API</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Studies API Proxy Test</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Basic API Availability</h3>
+        <button onclick="testAPIAvailability()">Test API Endpoint</button>
+        <div id="availability-result" class="result info">
+            Click "Test API Endpoint" to check if /api/studies is available
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Login and Get Auth Token</h3>
+        <button onclick="performLogin()">Login as Researcher</button>
+        <div id="login-result" class="result info">
+            Click "Login as Researcher" to get authentication token
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Create Study via Studies API</h3>
+        <button onclick="createStudyViaStudiesAPI()">Create Study</button>
+        <div id="create-result" class="result info">
+            Login first, then click "Create Study" to test the proxy
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 4: Direct Research API Call</h3>
+        <button onclick="createStudyDirectAPI()">Direct API Call</button>
+        <div id="direct-result" class="result info">
+            Test direct call to research-consolidated API
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        let authToken = null;
+
+        function showResult(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${isError ? 'error' : 'success'}`;
+        }
+
+        async function testAPIAvailability() {
+            try {
+                const response = await fetch(`${API_BASE}/api/studies`, {
+                    method: 'OPTIONS'
+                });
+                
+                showResult('availability-result', 
+                    `✅ API endpoint available\n` +
+                    `Status: ${response.status}\n` +
+                    `Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}`
+                );
+            } catch (error) {
+                showResult('availability-result', `❌ API endpoint not available: ${error.message}`, true);
+            }
+        }
+
+        async function performLogin() {
+            try {
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    authToken = data.token;
+                    showResult('login-result', 
+                        `✅ Login successful\n` +
+                        `Token: ${authToken ? 'Received' : 'Missing'}\n` +
+                        `User: ${data.user?.email}`
+                    );
+                } else {
+                    throw new Error(data.error || 'Login failed');
+                }
+            } catch (error) {
+                showResult('login-result', `❌ Login failed: ${error.message}`, true);
+            }
+        }
+
+        async function createStudyViaStudiesAPI() {
+            if (!authToken) {
+                showResult('create-result', '❌ Please login first to get auth token', true);
+                return;
+            }
+
+            try {
+                const studyData = {
+                    title: 'Test Study via Proxy',
+                    description: 'Testing the studies API proxy functionality',
+                    participantLimit: 10,
+                    compensation: 25,
+                    blocks: [
+                        {
+                            id: 'block-1',
+                            type: 'welcome',
+                            title: 'Welcome',
+                            description: 'Welcome to the study',
+                            settings: {}
+                        }
+                    ],
+                    status: 'active'
+                };
+
+                console.log('Making request to /api/studies with data:', studyData);
+
+                const response = await fetch(`${API_BASE}/api/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                console.log('Response from /api/studies:', result);
+
+                if (response.ok && result.success) {
+                    showResult('create-result', 
+                        `✅ Study created successfully via proxy!\n` +
+                        `Study ID: ${result.study?.id || result.study?._id}\n` +
+                        `Response: ${JSON.stringify(result, null, 2)}`
+                    );
+                } else {
+                    throw new Error(result.error || result.message || `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showResult('create-result', `❌ Failed to create study: ${error.message}`, true);
+            }
+        }
+
+        async function createStudyDirectAPI() {
+            if (!authToken) {
+                showResult('direct-result', '❌ Please login first to get auth token', true);
+                return;
+            }
+
+            try {
+                const studyData = {
+                    title: 'Test Study Direct API',
+                    description: 'Testing direct API call to research-consolidated',
+                    participantLimit: 10,
+                    compensation: 25,
+                    blocks: [
+                        {
+                            id: 'block-1',
+                            type: 'welcome',
+                            title: 'Welcome',
+                            description: 'Welcome to the study',
+                            settings: {}
+                        }
+                    ],
+                    status: 'active'
+                };
+
+                console.log('Making direct request to research-consolidated with action=create-study');
+
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                console.log('Response from direct API:', result);
+
+                if (response.ok && result.success) {
+                    showResult('direct-result', 
+                        `✅ Study created successfully via direct API!\n` +
+                        `Study ID: ${result.study?.id || result.study?._id}\n` +
+                        `Response: ${JSON.stringify(result, null, 2)}`
+                    );
+                } else {
+                    throw new Error(result.error || result.message || `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showResult('direct-result', `❌ Failed to create study: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>

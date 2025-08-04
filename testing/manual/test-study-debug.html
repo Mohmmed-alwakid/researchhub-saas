@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Launch & Delete Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 15px; border-radius: 5px; white-space: pre-wrap; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .warning { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; }
+        .primary { background: #007bff; color: white; }
+        .danger { background: #dc3545; color: white; }
+        .secondary { background: #6c757d; color: white; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 12px; }
+        .study-item { padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Study Launch & Delete Debug Tool</h1>
+    
+    <div class="test-section">
+        <h3>🔐 Step 1: Authentication</h3>
+        <button class="primary" onclick="performLogin()">Login as Researcher</button>
+        <button class="secondary" onclick="checkAuthStatus()">Check Auth Status</button>
+        <div id="auth-result" class="result info">
+            Click "Login as Researcher" to authenticate
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Step 2: Test API Endpoints</h3>
+        <button class="primary" onclick="testStudiesAPIEndpoint()">Test /api/studies</button>
+        <button class="primary" onclick="testResearchAPIEndpoint()">Test /api/research-consolidated</button>
+        <div id="api-result" class="result info">
+            Test API endpoint availability
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🚀 Step 3: Study Creation</h3>
+        <button class="primary" onclick="createTestStudy()">Create Test Study</button>
+        <button class="secondary" onclick="createStudyViaDirectAPI()">Create via Direct API</button>
+        <div id="create-result" class="result info">
+            Test study creation functionality
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>📋 Step 4: List Studies</h3>
+        <button class="primary" onclick="loadStudies()">Load All Studies</button>
+        <button class="secondary" onclick="loadStudiesDirectAPI()">Load via Direct API</button>
+        <div id="studies-result" class="result info">
+            View all studies in the system
+        </div>
+        <div id="studies-list"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🗑️ Step 5: Study Deletion</h3>
+        <button class="danger" onclick="deleteTestStudy()">Delete Test Study</button>
+        <button class="danger" onclick="deleteStudyDirectAPI()">Delete via Direct API</button>
+        <div id="delete-result" class="result info">
+            Test study deletion functionality
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        let authToken = null;
+        let testStudyId = null;
+        let allStudies = [];
+
+        function showResult(elementId, message, isError = false, isWarning = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${isError ? 'error' : isWarning ? 'warning' : 'success'}`;
+        }
+
+        async function performLogin() {
+            try {
+                showResult('auth-result', 'Logging in...', false, true);
+                
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const data = await response.json();
+                console.log('Login response:', data);
+                
+                if (response.ok && data.success) {
+                    authToken = data.token;
+                    showResult('auth-result', 
+                        `✅ Login successful!\n` +
+                        `Email: ${data.user?.email}\n` +
+                        `Role: ${data.user?.role}\n` +
+                        `Token: ${authToken ? 'Received' : 'Missing'}`
+                    );
+                } else {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showResult('auth-result', `❌ Login failed: ${error.message}`, true);
+            }
+        }
+
+        async function checkAuthStatus() {
+            try {
+                const headers = {};
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const response = await fetch(`${API_BASE}/api/auth?action=profile`, {
+                    method: 'GET',
+                    headers
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('auth-result', 
+                        `✅ Auth status valid\n` +
+                        `User: ${data.user?.email}\n` +
+                        `Role: ${data.user?.role}\n` +
+                        `ID: ${data.user?.id}`
+                    );
+                } else {
+                    showResult('auth-result', `❌ Auth check failed: ${data.error}`, true);
+                }
+            } catch (error) {
+                showResult('auth-result', `❌ Auth check error: ${error.message}`, true);
+            }
+        }
+
+        async function testStudiesAPIEndpoint() {
+            try {
+                console.log('Testing /api/studies endpoint...');
+                
+                const response = await fetch(`${API_BASE}/api/studies`, {
+                    method: 'OPTIONS'
+                });
+                
+                const headers = Object.fromEntries(response.headers.entries());
+                
+                showResult('api-result', 
+                    `✅ /api/studies endpoint available\n` +
+                    `Status: ${response.status}\n` +
+                    `CORS Headers: ${JSON.stringify(headers, null, 2)}`
+                );
+            } catch (error) {
+                showResult('api-result', `❌ /api/studies not available: ${error.message}`, true);
+            }
+        }
+
+        async function testResearchAPIEndpoint() {
+            try {
+                console.log('Testing /api/research-consolidated endpoint...');
+                
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=studies`, {
+                    method: 'OPTIONS'
+                });
+                
+                showResult('api-result', 
+                    `✅ /api/research-consolidated endpoint available\n` +
+                    `Status: ${response.status}`
+                );
+            } catch (error) {
+                showResult('api-result', `❌ /api/research-consolidated not available: ${error.message}`, true);
+            }
+        }
+
+        async function createTestStudy() {
+            if (!authToken) {
+                showResult('create-result', '❌ Please login first to get auth token', true);
+                return;
+            }
+
+            try {
+                showResult('create-result', 'Creating test study...', false, true);
+
+                const studyData = {
+                    title: 'Debug Test Study - Launch & Delete',
+                    description: 'This is a test study for debugging launch and delete functionality',
+                    participantLimit: 10,
+                    compensation: 25,
+                    blocks: [
+                        {
+                            id: 'welcome-1',
+                            type: 'welcome',
+                            title: 'Welcome to the Study',
+                            description: 'Thank you for participating',
+                            settings: { showProgress: true }
+                        },
+                        {
+                            id: 'question-1',
+                            type: 'open_question',
+                            title: 'Your Opinion',
+                            description: 'What do you think about this?',
+                            settings: { required: true }
+                        }
+                    ],
+                    status: 'active'
+                };
+
+                console.log('Creating study via /api/studies:', studyData);
+
+                const response = await fetch(`${API_BASE}/api/studies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                console.log('Create study response:', result);
+
+                if (response.ok && result.success) {
+                    testStudyId = result.study?._id || result.study?.id;
+                    showResult('create-result', 
+                        `✅ Study created successfully!\n` +
+                        `Study ID: ${testStudyId}\n` +
+                        `Title: ${result.study?.title}\n` +
+                        `Status: ${result.study?.status}\n` +
+                        `Blocks: ${result.study?.blocks?.length || 0}`
+                    );
+                } else {
+                    throw new Error(result.error || result.message || `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showResult('create-result', `❌ Failed to create study: ${error.message}\n\nDetails: ${error.stack}`, true);
+            }
+        }
+
+        async function createStudyViaDirectAPI() {
+            if (!authToken) {
+                showResult('create-result', '❌ Please login first to get auth token', true);
+                return;
+            }
+
+            try {
+                const studyData = {
+                    title: 'Debug Test Study - Direct API',
+                    description: 'This is a test study via direct API call',
+                    participantLimit: 10,
+                    compensation: 25,
+                    blocks: [],
+                    status: 'active'
+                };
+
+                console.log('Creating study via direct API...');
+
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                console.log('Direct API response:', result);
+
+                if (response.ok && result.success) {
+                    showResult('create-result', 
+                        `✅ Study created via direct API!\n` +
+                        `Study ID: ${result.study?._id || result.study?.id}\n` +
+                        `Response: ${JSON.stringify(result, null, 2)}`
+                    );
+                } else {
+                    showResult('create-result', `❌ Direct API failed: ${result.error || result.message}`, true);
+                }
+            } catch (error) {
+                showResult('create-result', `❌ Direct API error: ${error.message}`, true);
+            }
+        }
+
+        async function loadStudies() {
+            if (!authToken) {
+                showResult('studies-result', '❌ Please login first', true);
+                return;
+            }
+
+            try {
+                showResult('studies-result', 'Loading studies...', false, true);
+
+                const response = await fetch(`${API_BASE}/api/studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+                console.log('Load studies response:', result);
+
+                if (response.ok && result.success) {
+                    allStudies = result.studies || result.data || [];
+                    showResult('studies-result', 
+                        `✅ Loaded ${allStudies.length} studies\n` +
+                        `Found studies: ${allStudies.map(s => s.title).join(', ')}`
+                    );
+                    
+                    displayStudiesList(allStudies);
+                } else {
+                    throw new Error(result.error || result.message || `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showResult('studies-result', `❌ Failed to load studies: ${error.message}`, true);
+            }
+        }
+
+        async function loadStudiesDirectAPI() {
+            if (!authToken) {
+                showResult('studies-result', '❌ Please login first', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+                console.log('Direct API load studies:', result);
+
+                if (response.ok && result.success) {
+                    const studies = result.studies || result.data || [];
+                    showResult('studies-result', 
+                        `✅ Direct API loaded ${studies.length} studies\n` +
+                        `Response: ${JSON.stringify(result, null, 2)}`
+                    );
+                } else {
+                    showResult('studies-result', `❌ Direct API load failed: ${result.error}`, true);
+                }
+            } catch (error) {
+                showResult('studies-result', `❌ Direct API error: ${error.message}`, true);
+            }
+        }
+
+        function displayStudiesList(studies) {
+            const listElement = document.getElementById('studies-list');
+            
+            if (studies.length === 0) {
+                listElement.innerHTML = '<p>No studies found</p>';
+                return;
+            }
+
+            listElement.innerHTML = studies.map(study => `
+                <div class="study-item">
+                    <strong>${study.title}</strong> (ID: ${study._id || study.id})<br>
+                    Status: ${study.status} | Blocks: ${study.blocks?.length || 0}<br>
+                    <button class="danger" onclick="deleteSpecificStudy('${study._id || study.id}')">Delete This Study</button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteTestStudy() {
+            if (!testStudyId) {
+                showResult('delete-result', '❌ No test study ID available. Create a study first.', true);
+                return;
+            }
+
+            await deleteSpecificStudy(testStudyId);
+        }
+
+        async function deleteSpecificStudy(studyId) {
+            if (!authToken) {
+                showResult('delete-result', '❌ Please login first', true);
+                return;
+            }
+
+            try {
+                showResult('delete-result', `Deleting study ${studyId}...`, false, true);
+
+                // Try DELETE method first
+                let response = await fetch(`${API_BASE}/api/studies/${studyId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                let result = await response.json();
+                console.log('Delete study response (DELETE):', result);
+
+                if (!response.ok || !result.success) {
+                    // Try PUT method with status update
+                    console.log('DELETE failed, trying PUT method...');
+                    
+                    response = await fetch(`${API_BASE}/api/studies/${studyId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ status: 'deleted' })
+                    });
+
+                    result = await response.json();
+                    console.log('Delete study response (PUT):', result);
+                }
+
+                if (response.ok && result.success) {
+                    showResult('delete-result', 
+                        `✅ Study deleted successfully!\n` +
+                        `Study ID: ${studyId}\n` +
+                        `Method used: ${result.method || 'Unknown'}`
+                    );
+                    
+                    // Reload studies list
+                    await loadStudies();
+                } else {
+                    throw new Error(result.error || result.message || `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showResult('delete-result', `❌ Failed to delete study: ${error.message}`, true);
+            }
+        }
+
+        async function deleteStudyDirectAPI() {
+            if (!testStudyId) {
+                showResult('delete-result', '❌ No test study ID available', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=delete-study`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ studyId: testStudyId })
+                });
+
+                const result = await response.json();
+                console.log('Direct delete response:', result);
+
+                if (response.ok && result.success) {
+                    showResult('delete-result', `✅ Study deleted via direct API!\nResponse: ${JSON.stringify(result, null, 2)}`);
+                } else {
+                    showResult('delete-result', `❌ Direct delete failed: ${result.error}`, true);
+                }
+            } catch (error) {
+                showResult('delete-result', `❌ Direct delete error: ${error.message}`, true);
+            }
+        }
+
+        // Auto-load studies when page loads after login
+        window.addEventListener('load', () => {
+            console.log('Page loaded, ready for testing');
+        });
+    </script>
+</body>
+</html>

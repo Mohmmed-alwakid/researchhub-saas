@@ -1,14 +1,14 @@
 # Component Usage Analysis Report
 
-**Generated**: 2025-07-12T16:22:18.676Z
-**Total Components Analyzed**: 995
+**Generated**: 2025-07-20T06:49:29.543Z
+**Total Components Analyzed**: 890
 
 ## Summary
 
-- 📊 **Total Components**: 995
-- 🗑️ **Unused Components**: 542
-- ⚠️ **Legacy Components**: 106
-- 🎯 **Cleanup Potential**: 614 files
+- 📊 **Total Components**: 890
+- 🗑️ **Unused Components**: 499
+- ⚠️ **Legacy Components**: 75
+- 🎯 **Cleanup Potential**: 552 files
 
 ## Unused Components
 
@@ -16,11 +16,6 @@
 - **File**: `.\src\client\components\admin\AdminSystem.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
-
-### AdminTesting
-- **File**: `.\src\client\components\admin\AdminTesting.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
 
 ### AdminWithdrawalQueue
 - **File**: `.\src\client\components\admin\AdminWithdrawalQueue.tsx`
@@ -34,6 +29,11 @@
 
 ### StudyOversight
 - **File**: `.\src\client\components\admin\StudyOversight.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### AIInsightsDashboard
+- **File**: `.\src\client\components\ai\AIInsightsDashboard.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -97,8 +97,8 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: Yes
 
-### CollaborationSidebar
-- **File**: `.\src\client\components\collaboration\CollaborationSidebar.tsx`
+### CollaborativeStudyBuilder
+- **File**: `.\src\client\components\collaboration\CollaborativeStudyBuilder.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -122,13 +122,18 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### CollaborationAPIDemo
-- **File**: `.\src\client\components\demo\CollaborationAPIDemo.tsx`
+### ResearchJourneyOrchestrator
+- **File**: `.\src\client\components\journey\ResearchJourneyOrchestrator.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### CollaborativeApprovalDemo
-- **File**: `.\src\client\components\demo\CollaborativeApprovalDemo.tsx`
+### NotificationProvider
+- **File**: `.\src\client\components\notifications\NotificationSystem.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### NotificationPanel
+- **File**: `.\src\client\components\notifications\NotificationSystem.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -202,46 +207,6 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### ConversionRateDisplay
-- **File**: `.\src\client\components\payments\ConversionRateDisplay.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### PointPurchaseFlow
-- **File**: `.\src\client\components\payments\PointPurchaseFlow.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### RealTimePaymentStatus
-- **File**: `.\src\client\components\payments\RealTimePaymentStatus.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### WithdrawalRequestForm
-- **File**: `.\src\client\components\payments\WithdrawalRequestForm.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### withPerformanceMonitoring
-- **File**: `.\src\client\components\PerformanceMonitor.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### trackUserInteraction
-- **File**: `.\src\client\components\PerformanceMonitor.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### LazyComponent
-- **File**: `.\src\client\components\PerformanceMonitor.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### ScreenRecorder
-- **File**: `.\src\client\components\recording\ScreenRecorder.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
 ### DragDropTaskList
 - **File**: `.\src\client\components\studies\DragDropTaskList.tsx`
 - **Status**: Unused (safe to remove)
@@ -257,13 +222,13 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### ImprovedBlockLibraryModal
-- **File**: `.\src\client\components\studies\ImprovedBlockLibraryModal.tsx`
+### MobileOptimizedStudyBuilder
+- **File**: `.\src\client\components\studies\MobileOptimizedStudyBuilder.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### MobileOptimizedStudyBuilder
-- **File**: `.\src\client\components\studies\MobileOptimizedStudyBuilder.tsx`
+### SimplifiedStudyCreationModal
+- **File**: `.\src\client\components\studies\SimplifiedStudyCreationModal.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -302,6 +267,11 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
+### ValidationFeedback
+- **File**: `.\src\client\components\studies\ValidationFeedback.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
 ### ValidationSummary
 - **File**: `.\src\client\components\studies\ValidationFeedback.tsx`
 - **Status**: Unused (safe to remove)
@@ -309,6 +279,16 @@
 
 ### FieldValidation
 - **File**: `.\src\client\components\studies\ValidationFeedback.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### EnhancedStudyCreationWizard
+- **File**: `.\src\client\components\study-builder\EnhancedStudyCreationWizard.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### RealTimeBlockPreview
+- **File**: `.\src\client\components\study-builder\RealTimeBlockPreview.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -327,33 +307,13 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### TemplateMarketplace
-- **File**: `.\src\client\components\templates\TemplateMarketplace.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### AuthIntegrationTest
-- **File**: `.\src\client\components\testing\AuthIntegrationTest.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### AccessibleButton
-- **File**: `.\src\client\components\ui\AccessibleComponents-Fixed.tsx`
+### useAriaLiveRegion
+- **File**: `.\src\client\components\ui\AccessibleComponents.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### AccessibleInput
-- **File**: `.\src\client\components\ui\AccessibleComponents-Fixed.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### AccessibleModal
-- **File**: `.\src\client\components\ui\AccessibleComponents-Fixed.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### AccessibleAlert
-- **File**: `.\src\client\components\ui\AccessibleComponents-Fixed.tsx`
+### useFocusManagement
+- **File**: `.\src\client\components\ui\AccessibleComponents.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -393,37 +353,22 @@
 - **Legacy**: No
 
 ### AccessibleAlert
+- **File**: `.\src\client\components\ui\AccessibleComponents.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### useAriaLiveRegion
+- **File**: `.\src\client\components\ui\AccessibleComponents.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### useFocusManagement
 - **File**: `.\src\client\components\ui\AccessibleComponents.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
 ### CardFooter
 - **File**: `.\src\client\components\ui\Card.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### Loading
-- **File**: `.\src\client\components\ui\ConsolidatedComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### Modal
-- **File**: `.\src\client\components\ui\ConsolidatedComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### Modal
-- **File**: `.\src\client\components\ui\ConsolidatedDesignSystem.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### Loading
-- **File**: `.\src\client\components\ui\ConsolidatedDesignSystem.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### UnifiedDesignSystem
-- **File**: `.\src\client\components\ui\ConsolidatedDesignSystem.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -467,6 +412,21 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
+### CardSkeleton
+- **File**: `.\src\client\components\ui\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### ButtonSkeleton
+- **File**: `.\src\client\components\ui\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### InputSkeleton
+- **File**: `.\src\client\components\ui\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
 ### ErrorFeedback
 - **File**: `.\src\client\components\ui\index.ts`
 - **Status**: Unused (safe to remove)
@@ -497,16 +457,6 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### MobileModal
-- **File**: `.\src\client\components\ui\MobileOptimizedComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### MobileForm
-- **File**: `.\src\client\components\ui\MobileOptimizedComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
 ### OptimizedImage
 - **File**: `.\src\client\components\ui\OptimizedImage.tsx`
 - **Status**: Unused (safe to remove)
@@ -522,28 +472,18 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### UnifiedButton
-- **File**: `.\src\client\components\ui\UnifiedComponents.tsx`
+### CardSkeleton
+- **File**: `.\src\client\components\ui\Skeleton.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### UnifiedInput
-- **File**: `.\src\client\components\ui\UnifiedComponents.tsx`
+### ButtonSkeleton
+- **File**: `.\src\client\components\ui\Skeleton.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### UnifiedCard
-- **File**: `.\src\client\components\ui\UnifiedComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### UnifiedModal
-- **File**: `.\src\client\components\ui\UnifiedComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### UnifiedAlert
-- **File**: `.\src\client\components\ui\UnifiedComponents.tsx`
+### InputSkeleton
+- **File**: `.\src\client\components\ui\Skeleton.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -564,6 +504,21 @@
 
 ### Modal
 - **File**: `.\src\client\components\ui\UnifiedDesignSystem.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### ValidationFeedback
+- **File**: `.\src\client\components\ui\ValidationFeedback.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### ValidationSummary
+- **File**: `.\src\client\components\ui\ValidationFeedback.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### FieldValidation
+- **File**: `.\src\client\components\ui\ValidationFeedback.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -587,53 +542,13 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### MobileWallet
-- **File**: `.\src\client\components\wallet\MobileWallet.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### OptimizedWalletOverview
-- **File**: `.\src\client\components\wallet\OptimizedWalletComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### TransactionItem
-- **File**: `.\src\client\components\wallet\OptimizedWalletComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### OptimizedTransactionHistory
-- **File**: `.\src\client\components\wallet\OptimizedWalletComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### WithdrawalStatusBadge
-- **File**: `.\src\client\components\wallet\OptimizedWalletComponents.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
 ### TransactionHistory
 - **File**: `.\src\client\components\wallet\TransactionHistory.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### WalletOverviewSkeleton
-- **File**: `.\src\client\components\wallet\WalletSkeletons.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### TransactionHistorySkeleton
-- **File**: `.\src\client\components\wallet\WalletSkeletons.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### WithdrawalHistorySkeleton
-- **File**: `.\src\client\components\wallet\WalletSkeletons.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### useTouchGestures
-- **File**: `.\src\client\hooks\mobile.ts`
+### useUniqueId
+- **File**: `.\src\client\hooks\accessibility.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -667,18 +582,8 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### AuthAPIClient
-- **File**: `.\src\client\hooks\useEnhancedAuth.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
 ### useStudyBuilder
 - **File**: `.\src\client\hooks\useStudyBuilder.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### useWallet
-- **File**: `.\src\client\hooks\useWallet.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -692,7 +597,17 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
+### EnhancedDashboard
+- **File**: `.\src\client\pages\EnhancedDashboard.tsx`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
 ### getPlatformOverview
+- **File**: `.\src\client\services\admin.service.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### bulkUpdateUsers
 - **File**: `.\src\client\services\admin.service.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
@@ -732,7 +647,22 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
+### adminService
+- **File**: `.\src\client\services\admin.service.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### adminService
+- **File**: `.\src\client\services\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
 ### performanceMonitor
+- **File**: `.\src\client\services\performance.service.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### usePerformanceMonitor
 - **File**: `.\src\client\services\performance.service.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
@@ -772,8 +702,13 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### UserInteractionTracker
-- **File**: `.\src\client\services\userInteractionTracker.js`
+### CURRENCY_CONFIG
+- **File**: `.\src\client\services\wallet.service.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### convertCurrency
+- **File**: `.\src\client\services\wallet.service.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -814,6 +749,11 @@
 
 ### generateBlockId
 - **File**: `.\src\client\utils\blockUtils.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### requestNotificationPermission
+- **File**: `.\src\client\utils\notificationUtils.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -919,6 +859,11 @@
 
 ### createSystemService
 - **File**: `.\src\server\services\BaseService.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### uploadRecording
+- **File**: `.\src\server\services\cloudStorage.js`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -1408,11 +1353,6 @@
 - **Legacy**: No
 
 ### supabaseConfig
-- **File**: `.\src\shared\config\supabase.js`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### supabaseConfig
 - **File**: `.\src\shared\config\supabase.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
@@ -1592,38 +1532,18 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### logApi
-- **File**: `.\src\shared\dev-tools\DevToolsManager.ts`
+### useComponentDebug
+- **File**: `.\src\shared\dev-tools\ReactDevHooks.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### trackComponent
-- **File**: `.\src\shared\dev-tools\DevToolsManager.ts`
+### useApiDebug
+- **File**: `.\src\shared\dev-tools\ReactDevHooks.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### getDevSummary
-- **File**: `.\src\shared\dev-tools\DevToolsManager.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### exportDevData
-- **File**: `.\src\shared\dev-tools\DevToolsManager.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### clearDevData
-- **File**: `.\src\shared\dev-tools\DevToolsManager.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### DEFAULT_DEV_TOOLS_CONFIG
-- **File**: `.\src\shared\dev-tools\index.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### useStateDebug
-- **File**: `.\src\shared\dev-tools\ReactDevHooks.ts`
+### usePerformanceDebug
+- **File**: `.\src\shared\dev-tools\ReactDevHooks.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -1632,63 +1552,18 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### ResearchHubDebugger
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
+### withComponentDebug
+- **File**: `.\src\shared\dev-tools\ReactDevHooks.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### researchHubDebugger
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
+### useEffectDebug
+- **File**: `.\src\shared\dev-tools\ReactDevHooks.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### debugStudy
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### debugBlock
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### debugParticipant
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### debugApi
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### completeApiDebug
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### debugAuth
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### debugStudyBuilder
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### debugTemplate
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### getDebugSummary
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### clearDebugData
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
+### useMemoryDebug
+- **File**: `.\src\shared\dev-tools\ReactDevHooks.tsx`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -1733,6 +1608,11 @@
 - **Legacy**: No
 
 ### createAuthError
+- **File**: `.\src\shared\errors\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### globalLogger
 - **File**: `.\src\shared\errors\index.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
@@ -1837,6 +1717,11 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
+### globalJobManager
+- **File**: `.\src\shared\jobs\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
 ### StudyJobUtils
 - **File**: `.\src\shared\jobs\index.ts`
 - **Status**: Unused (safe to remove)
@@ -1873,6 +1758,11 @@
 - **Legacy**: No
 
 ### JobManager
+- **File**: `.\src\shared\jobs\JobManager.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### globalJobManager
 - **File**: `.\src\shared\jobs\JobManager.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
@@ -2017,8 +1907,18 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
+### globalNotificationManager
+- **File**: `.\src\shared\notifications\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
 ### NotificationClient
 - **File**: `.\src\shared\notifications\NotificationClient.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### globalNotificationManager
+- **File**: `.\src\shared\notifications\NotificationManager.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
@@ -2092,11 +1992,6 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### usePerformanceSession
-- **File**: `.\src\shared\performance\PerformanceHooks.tsx`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
 ### usePerformanceAnalytics
 - **File**: `.\src\shared\performance\PerformanceHooks.tsx`
 - **Status**: Unused (safe to remove)
@@ -2117,47 +2012,12 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### performanceMiddleware
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### measureDatabaseOperation
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### StudyPerformanceWrapper
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### PerformanceAlerting
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### FrontendPerformanceUtils
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### studyPerformanceWrapper
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### performanceAlerting
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
-### frontendPerformanceUtils
-- **File**: `.\src\shared\performance\PerformanceIntegration.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
 ### initializePerformanceMonitor
+- **File**: `.\src\shared\performance\PerformanceMonitor.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
+### globalPerformanceMonitor
 - **File**: `.\src\shared\performance\PerformanceMonitor.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
@@ -2397,11 +2257,6 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
-### AIInsightsEngine
-- **File**: `.\src\shared\services\aiInsightsEngine.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: No
-
 ### getTemplateBlocks
 - **File**: `.\src\shared\templates\enhanced-templates.ts`
 - **Status**: Unused (safe to remove)
@@ -2434,36 +2289,6 @@
 
 ### replaceVariablesInTemplate
 - **File**: `.\src\shared\templates\enhanced-templates.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### globalTestRunner
-- **File**: `.\src\shared\testing\AdvancedTestRunner.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### DEFAULT_TEST_CONFIG
-- **File**: `.\src\shared\testing\AdvancedTestRunner.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### BrowserUtils
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### MockBrowser
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### MockPage
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### E2ETestScenarios
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: Yes
 
@@ -2557,73 +2382,28 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: Yes
 
+### BrowserUtils
+- **File**: `.\src\shared\testing\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: Yes
+
+### AdvancedTestRunner
+- **File**: `.\src\shared\testing\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: Yes
+
+### TestSuiteBuilder
+- **File**: `.\src\shared\testing\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: Yes
+
 ### ResearchHubTestSuites
 - **File**: `.\src\shared\testing\index.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: Yes
 
-### IntegrationTestUtils
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### ApiIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### DatabaseIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### ComponentIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### ServiceIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### PerformanceSecurityTester
-- **File**: `.\src\shared\testing\PerformanceSecurityTester.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### QualityGatesManager
-- **File**: `.\src\shared\testing\QualityGatesManager.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### globalReportGenerator
-- **File**: `.\src\shared\testing\TestReporting.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### TestUtils
-- **File**: `.\src\shared\testing\TestSuiteBuilder.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### defaultTestSuites
-- **File**: `.\src\shared\testing\TestSuiteBuilder.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### Assert
-- **File**: `.\src\shared\testing\UnitTestFramework.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### MockUtils
-- **File**: `.\src\shared\testing\UnitTestFramework.ts`
-- **Status**: Unused (safe to remove)
-- **Legacy**: Yes
-
-### TestUtils
-- **File**: `.\src\shared\testing\UnitTestFramework.ts`
+### TestReportGenerator
+- **File**: `.\src\shared\testing\index.ts`
 - **Status**: Unused (safe to remove)
 - **Legacy**: Yes
 
@@ -2722,20 +2502,13 @@
 - **Status**: Unused (safe to remove)
 - **Legacy**: No
 
+### debugUtils
+- **File**: `.\src\utils\debug\index.ts`
+- **Status**: Unused (safe to remove)
+- **Legacy**: No
+
 
 ## Legacy Components
-
-### AdminOverview
-- **File**: `.\src\client\components\admin\AdminOverview.test.tsx`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
-
-### AdminTesting
-- **File**: `.\src\client\components\admin\AdminTesting.tsx`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
 
 ### FiveSecondTestBlock
 - **File**: `.\src\client\components\blocks\AdvancedStudyBlocks.tsx`
@@ -2839,18 +2612,6 @@
 - **Usage Count**: 1
 - **Status**: Review for modernization
 
-### TemplateMarketplace
-- **File**: `.\src\client\components\templates\TemplateMarketplace.tsx`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### AuthIntegrationTest
-- **File**: `.\src\client\components\testing\AuthIntegrationTest.tsx`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
 ### TemplateManagerPage
 - **File**: `.\src\client\pages\templates\TemplateManagerPage.tsx`
 - **Used**: Yes
@@ -2953,12 +2714,6 @@
 - **Usage Count**: 0
 - **Status**: Safe to remove
 
-### debugTemplate
-- **File**: `.\src\shared\dev-tools\ResearchHubDebugger.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
 ### createStudyJob
 - **File**: `.\src\shared\jobs\index.ts`
 - **Used**: No
@@ -3030,54 +2785,6 @@
 - **Used**: No
 - **Usage Count**: 0
 - **Status**: Safe to remove
-
-### AdvancedTestRunner
-- **File**: `.\src\shared\testing\AdvancedTestRunner.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
-
-### globalTestRunner
-- **File**: `.\src\shared\testing\AdvancedTestRunner.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### DEFAULT_TEST_CONFIG
-- **File**: `.\src\shared\testing\AdvancedTestRunner.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### BrowserUtils
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### MockBrowser
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### MockPage
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### E2ETestScenarios
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### E2ETestFramework
-- **File**: `.\src\shared\testing\E2ETestFramework.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
 
 ### SimplifiedTestRunner
 - **File**: `.\src\shared\testing\index.ts`
@@ -3172,7 +2879,7 @@
 ### default
 - **File**: `.\src\shared\testing\index.ts`
 - **Used**: Yes
-- **Usage Count**: 4
+- **Usage Count**: 8
 - **Status**: Review for modernization
 
 ### Assert
@@ -3196,7 +2903,7 @@
 ### default
 - **File**: `.\src\shared\testing\index.ts`
 - **Used**: Yes
-- **Usage Count**: 4
+- **Usage Count**: 8
 - **Status**: Review for modernization
 
 ### IntegrationTestUtils
@@ -3208,32 +2915,32 @@
 ### default
 - **File**: `.\src\shared\testing\index.ts`
 - **Used**: Yes
-- **Usage Count**: 4
+- **Usage Count**: 8
 - **Status**: Review for modernization
 
 ### BrowserUtils
 - **File**: `.\src\shared\testing\index.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
+- **Used**: No
+- **Usage Count**: 0
+- **Status**: Safe to remove
 
 ### default
 - **File**: `.\src\shared\testing\index.ts`
 - **Used**: Yes
-- **Usage Count**: 4
+- **Usage Count**: 8
 - **Status**: Review for modernization
 
 ### AdvancedTestRunner
 - **File**: `.\src\shared\testing\index.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
+- **Used**: No
+- **Usage Count**: 0
+- **Status**: Safe to remove
 
 ### TestSuiteBuilder
 - **File**: `.\src\shared\testing\index.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
+- **Used**: No
+- **Usage Count**: 0
+- **Status**: Safe to remove
 
 ### ResearchHubTestSuites
 - **File**: `.\src\shared\testing\index.ts`
@@ -3243,117 +2950,9 @@
 
 ### TestReportGenerator
 - **File**: `.\src\shared\testing\index.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
-
-### IntegrationTestUtils
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
 - **Used**: No
 - **Usage Count**: 0
 - **Status**: Safe to remove
-
-### ApiIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### DatabaseIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### ComponentIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### ServiceIntegrationTests
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### IntegrationTestSuite
-- **File**: `.\src\shared\testing\IntegrationTestSuite.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
-
-### PerformanceSecurityTester
-- **File**: `.\src\shared\testing\PerformanceSecurityTester.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### QualityGatesManager
-- **File**: `.\src\shared\testing\QualityGatesManager.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### TestReportGenerator
-- **File**: `.\src\shared\testing\TestReporting.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
-
-### globalReportGenerator
-- **File**: `.\src\shared\testing\TestReporting.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### TestSuiteBuilder
-- **File**: `.\src\shared\testing\TestSuiteBuilder.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
-
-### ResearchHubTestSuites
-- **File**: `.\src\shared\testing\TestSuiteBuilder.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
-
-### TestUtils
-- **File**: `.\src\shared\testing\TestSuiteBuilder.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### defaultTestSuites
-- **File**: `.\src\shared\testing\TestSuiteBuilder.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### Assert
-- **File**: `.\src\shared\testing\UnitTestFramework.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### MockUtils
-- **File**: `.\src\shared\testing\UnitTestFramework.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### TestUtils
-- **File**: `.\src\shared\testing\UnitTestFramework.ts`
-- **Used**: No
-- **Usage Count**: 0
-- **Status**: Safe to remove
-
-### UnitTestFramework
-- **File**: `.\src\shared\testing\UnitTestFramework.ts`
-- **Used**: Yes
-- **Usage Count**: 1
-- **Status**: Review for modernization
 
 ### TEMPLATE_CATEGORIES
 - **File**: `.\src\shared\types\index.ts`
@@ -3367,10 +2966,10 @@
 ```bash
 # Remove unused component files (review before running)
 rm "D:\MAMP\AfakarM\src\client\components\admin\AdminSystem.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\admin\AdminTesting.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\admin\AdminWithdrawalQueue.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\admin\analytics\SystemAnalyticsDashboard.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\admin\StudyOversight.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ai\AIInsightsDashboard.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\blocks\AdvancedStudyBlocks.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\blocks\StudyBlockComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\blocks\StudyBlockComponents.tsx"
@@ -3383,13 +2982,14 @@ rm "D:\MAMP\AfakarM\src\client\components\blocks\StudyBlockComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\blocks\StudyBlockComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\blocks\StudyBlockComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\blocks\StudyBlockComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\collaboration\CollaborationSidebar.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\collaboration\CollaborativeStudyBuilder.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\collaboration\CollaborativeStudyBuilderContainer.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\common\ComingSoon.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\common\ComingSoon.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\common\ErrorBoundary.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\demo\CollaborationAPIDemo.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\demo\CollaborativeApprovalDemo.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\journey\ResearchJourneyOrchestrator.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\notifications\NotificationSystem.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\notifications\NotificationSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\participant\AdvancedBlocks.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\participant\AdvancedBlocks.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\participant\GamificationDashboard.tsx"
@@ -3404,19 +3004,11 @@ rm "D:\MAMP\AfakarM\src\client\components\participant\MobileParticipantExperienc
 rm "D:\MAMP\AfakarM\src\client\components\participant\ParticipantDashboard.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\participant\RealTimeAnalytics.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\participant\StudyExecution.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\payments\ConversionRateDisplay.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\payments\PointPurchaseFlow.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\payments\RealTimePaymentStatus.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\payments\WithdrawalRequestForm.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\PerformanceMonitor.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\PerformanceMonitor.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\PerformanceMonitor.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\recording\ScreenRecorder.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\DragDropTaskList.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\EnhancedStudyCreationModal.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\EnhancedUsabilityStudyBuilder.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\studies\ImprovedBlockLibraryModal.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\MobileOptimizedStudyBuilder.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\studies\SimplifiedStudyCreationModal.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\SmartTemplateGallery.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\StudyBuilderIntegration.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\StudyBuilderProgress.tsx"
@@ -3426,15 +3018,16 @@ rm "D:\MAMP\AfakarM\src\client\components\studies\TaskPreview.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\UsabilityStudyBuilder.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\ValidationFeedback.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\studies\ValidationFeedback.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\studies\ValidationFeedback.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\study-builder\EnhancedStudyCreationWizard.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\study-builder\RealTimeBlockPreview.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\study-builder\steps\EnhancedTemplateSelectionStep.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\study-session\task-types\PrototypeTask.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\study-session\TaskRunner.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\templates\TemplateMarketplace.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\testing\AuthIntegrationTest.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents-Fixed.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents-Fixed.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents-Fixed.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents-Fixed.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
@@ -3444,17 +3037,15 @@ rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\AccessibleComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\Card.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\ConsolidatedComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\ConsolidatedComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\ConsolidatedDesignSystem.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\ConsolidatedDesignSystem.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\ConsolidatedDesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\DesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\DesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\DesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\EnhancedDesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\EnhancedDesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\EnhancedDesignSystem.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
+rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
+rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
 rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
 rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
 rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
@@ -3463,16 +3054,12 @@ rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
 rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
 rm "D:\MAMP\AfakarM\src\client\components\ui\index.ts"
 rm "D:\MAMP\AfakarM\src\client\components\ui\LoadingComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\MobileOptimizedComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\MobileOptimizedComponents.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\OptimizedImage.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\OptimizedImage.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\ProgressBar.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedComponents.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\Skeleton.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\Skeleton.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\Skeleton.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedDesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedDesignSystem.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\UnifiedDesignSystem.tsx"
@@ -3481,27 +3068,21 @@ rm "D:\MAMP\AfakarM\src\client\components\ui\ValidationFeedback.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\ValidationFeedback.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\ValidationFeedback.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\ui\ValidationFeedback.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\MobileWallet.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\OptimizedWalletComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\OptimizedWalletComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\OptimizedWalletComponents.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\OptimizedWalletComponents.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\ValidationFeedback.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\ValidationFeedback.tsx"
+rm "D:\MAMP\AfakarM\src\client\components\ui\ValidationFeedback.tsx"
 rm "D:\MAMP\AfakarM\src\client\components\wallet\TransactionHistory.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\WalletSkeletons.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\WalletSkeletons.tsx"
-rm "D:\MAMP\AfakarM\src\client\components\wallet\WalletSkeletons.tsx"
-rm "D:\MAMP\AfakarM\src\client\hooks\mobile.ts"
+rm "D:\MAMP\AfakarM\src\client\hooks\accessibility.ts"
 rm "D:\MAMP\AfakarM\src\client\hooks\performance.ts"
 rm "D:\MAMP\AfakarM\src\client\hooks\performance.ts"
 rm "D:\MAMP\AfakarM\src\client\hooks\performance.ts"
 rm "D:\MAMP\AfakarM\src\client\hooks\performance.ts"
 rm "D:\MAMP\AfakarM\src\client\hooks\performance.ts"
 rm "D:\MAMP\AfakarM\src\client\hooks\performance.ts"
-rm "D:\MAMP\AfakarM\src\client\hooks\useEnhancedAuth.ts"
 rm "D:\MAMP\AfakarM\src\client\hooks\useStudyBuilder.ts"
-rm "D:\MAMP\AfakarM\src\client\hooks\useWallet.ts"
 rm "D:\MAMP\AfakarM\src\client\pages\collaboration\StudyCollaborationCenter.tsx"
 rm "D:\MAMP\AfakarM\src\client\pages\dashboard\UnifiedWorkspace.tsx"
+rm "D:\MAMP\AfakarM\src\client\pages\EnhancedDashboard.tsx"
 rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
@@ -3510,6 +3091,10 @@ rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
+rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
+rm "D:\MAMP\AfakarM\src\client\services\admin.service.ts"
+rm "D:\MAMP\AfakarM\src\client\services\index.ts"
+rm "D:\MAMP\AfakarM\src\client\services\performance.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\performance.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\studyCreationAnalytics.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\studyCreationAnalytics.service.ts"
@@ -3518,7 +3103,8 @@ rm "D:\MAMP\AfakarM\src\client\services\studyCreationAnalytics.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\studyCreationAnalytics.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\studyCreationAnalytics.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\studyCreationAnalytics.service.ts"
-rm "D:\MAMP\AfakarM\src\client\services\userInteractionTracker.js"
+rm "D:\MAMP\AfakarM\src\client\services\wallet.service.ts"
+rm "D:\MAMP\AfakarM\src\client\services\wallet.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\wallet.service.ts"
 rm "D:\MAMP\AfakarM\src\client\services\WebSocketService.ts"
 rm "D:\MAMP\AfakarM\src\client\services\WebSocketService.ts"
@@ -3527,6 +3113,7 @@ rm "D:\MAMP\AfakarM\src\client\services\WebSocketService.ts"
 rm "D:\MAMP\AfakarM\src\client\services\WebSocketService.ts"
 rm "D:\MAMP\AfakarM\src\client\utils\blockUtils.ts"
 rm "D:\MAMP\AfakarM\src\client\utils\blockUtils.ts"
+rm "D:\MAMP\AfakarM\src\client\utils\notificationUtils.ts"
 rm "D:\MAMP\AfakarM\src\client\utils\taskConversion.ts"
 rm "D:\MAMP\AfakarM\src\client\utils\taskConversion.ts"
 rm "D:\MAMP\AfakarM\src\client\utils\taskConversion.ts"
@@ -3548,6 +3135,7 @@ rm "D:\MAMP\AfakarM\src\server\services\BaseService.ts"
 rm "D:\MAMP\AfakarM\src\server\services\BaseService.ts"
 rm "D:\MAMP\AfakarM\src\server\services\BaseService.ts"
 rm "D:\MAMP\AfakarM\src\server\services\BaseService.ts"
+rm "D:\MAMP\AfakarM\src\server\services\cloudStorage.js"
 rm "D:\MAMP\AfakarM\src\server\services\cloudStorage.js"
 rm "D:\MAMP\AfakarM\src\server\services\cloudStorage.js"
 rm "D:\MAMP\AfakarM\src\server\services\cloudStorage.js"
@@ -3645,7 +3233,6 @@ rm "D:\MAMP\AfakarM\src\shared\config\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\config\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\config\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\config\index.ts"
-rm "D:\MAMP\AfakarM\src\shared\config\supabase.js"
 rm "D:\MAMP\AfakarM\src\shared\config\supabase.ts"
 rm "D:\MAMP\AfakarM\src\shared\design\hooks.ts"
 rm "D:\MAMP\AfakarM\src\shared\design\hooks.ts"
@@ -3682,26 +3269,13 @@ rm "D:\MAMP\AfakarM\src\shared\design\utilities.ts"
 rm "D:\MAMP\AfakarM\src\shared\design\utilities.ts"
 rm "D:\MAMP\AfakarM\src\shared\design\utilities.ts"
 rm "D:\MAMP\AfakarM\src\shared\design\utilities.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\DevToolsManager.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\DevToolsManager.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\DevToolsManager.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\DevToolsManager.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\DevToolsManager.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\index.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.ts"
 rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.tsx"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
-rm "D:\MAMP\AfakarM\src\shared\dev-tools\ResearchHubDebugger.ts"
+rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.tsx"
+rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.tsx"
+rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.tsx"
+rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.tsx"
+rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.tsx"
+rm "D:\MAMP\AfakarM\src\shared\dev-tools\ReactDevHooks.tsx"
 rm "D:\MAMP\AfakarM\src\shared\errors\ErrorBoundary.tsx"
 rm "D:\MAMP\AfakarM\src\shared\errors\ErrorBoundary.tsx"
 rm "D:\MAMP\AfakarM\src\shared\errors\ErrorBoundary.tsx"
@@ -3721,6 +3295,7 @@ rm "D:\MAMP\AfakarM\src\shared\errors\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\errors\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\errors\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\errors\index.ts"
+rm "D:\MAMP\AfakarM\src\shared\errors\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\errors\Logger.ts"
 rm "D:\MAMP\AfakarM\src\shared\errors\Logger.ts"
 rm "D:\MAMP\AfakarM\src\shared\errors\Logger.ts"
@@ -3738,6 +3313,8 @@ rm "D:\MAMP\AfakarM\src\shared\jobs\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\jobs\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\jobs\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\jobs\index.ts"
+rm "D:\MAMP\AfakarM\src\shared\jobs\index.ts"
+rm "D:\MAMP\AfakarM\src\shared\jobs\JobManager.ts"
 rm "D:\MAMP\AfakarM\src\shared\jobs\JobManager.ts"
 rm "D:\MAMP\AfakarM\src\shared\jobs\JobUtils.ts"
 rm "D:\MAMP\AfakarM\src\shared\jobs\JobUtils.ts"
@@ -3767,9 +3344,11 @@ rm "D:\MAMP\AfakarM\src\shared\monitoring\ProductionMonitor.ts"
 rm "D:\MAMP\AfakarM\src\shared\monitoring\ProductionMonitor.ts"
 rm "D:\MAMP\AfakarM\src\shared\notifications\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\notifications\index.ts"
+rm "D:\MAMP\AfakarM\src\shared\notifications\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\notifications\NotificationClient.ts"
 rm "D:\MAMP\AfakarM\src\shared\notifications\NotificationManager.ts"
 rm "D:\MAMP\AfakarM\src\shared\notifications\NotificationManager.ts"
+rm "D:\MAMP\AfakarM\src\shared\notifications\NotificationManager.ts"
 rm "D:\MAMP\AfakarM\src\shared\performance\BrowserPerformance.ts"
 rm "D:\MAMP\AfakarM\src\shared\performance\BrowserPerformance.ts"
 rm "D:\MAMP\AfakarM\src\shared\performance\BrowserPerformance.ts"
@@ -3786,15 +3365,7 @@ rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceHooks.tsx"
 rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceHooks.tsx"
 rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceHooks.tsx"
 rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceHooks.tsx"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceHooks.tsx"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
-rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceIntegration.ts"
+rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceMonitor.ts"
 rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceMonitor.ts"
 rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceUtils.ts"
 rm "D:\MAMP\AfakarM\src\shared\performance\PerformanceUtils.ts"
@@ -3843,7 +3414,6 @@ rm "D:\MAMP\AfakarM\src\shared\security\SecurityUtils.ts"
 rm "D:\MAMP\AfakarM\src\shared\security\SecurityUtils.ts"
 rm "D:\MAMP\AfakarM\src\shared\security\SecurityUtils.ts"
 rm "D:\MAMP\AfakarM\src\shared\security\SecurityUtils.ts"
-rm "D:\MAMP\AfakarM\src\shared\services\aiInsightsEngine.ts"
 rm "D:\MAMP\AfakarM\src\shared\templates\enhanced-templates.ts"
 rm "D:\MAMP\AfakarM\src\shared\templates\enhanced-templates.ts"
 rm "D:\MAMP\AfakarM\src\shared\templates\enhanced-templates.ts"
@@ -3851,12 +3421,6 @@ rm "D:\MAMP\AfakarM\src\shared\templates\enhanced-templates.ts"
 rm "D:\MAMP\AfakarM\src\shared\templates\enhanced-templates.ts"
 rm "D:\MAMP\AfakarM\src\shared\templates\enhanced-templates.ts"
 rm "D:\MAMP\AfakarM\src\shared\templates\enhanced-templates.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\AdvancedTestRunner.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\AdvancedTestRunner.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\E2ETestFramework.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\E2ETestFramework.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\E2ETestFramework.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\E2ETestFramework.ts"
 rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
@@ -3876,19 +3440,10 @@ rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\IntegrationTestSuite.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\IntegrationTestSuite.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\IntegrationTestSuite.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\IntegrationTestSuite.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\IntegrationTestSuite.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\PerformanceSecurityTester.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\QualityGatesManager.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\TestReporting.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\TestSuiteBuilder.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\TestSuiteBuilder.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\UnitTestFramework.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\UnitTestFramework.ts"
-rm "D:\MAMP\AfakarM\src\shared\testing\UnitTestFramework.ts"
+rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
+rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
+rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
+rm "D:\MAMP\AfakarM\src\shared\testing\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\types\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\types\index.ts"
 rm "D:\MAMP\AfakarM\src\shared\types\index.ts"
@@ -3908,6 +3463,7 @@ rm "D:\MAMP\AfakarM\src\shared\utils\logger.ts"
 rm "D:\MAMP\AfakarM\src\shared\utils.ts"
 rm "D:\MAMP\AfakarM\src\shared\utils.ts"
 rm "D:\MAMP\AfakarM\src\shared\utils.ts"
+rm "D:\MAMP\AfakarM\src\utils\debug\index.ts"
 ```
 
 ## Next Steps

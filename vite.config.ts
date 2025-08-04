@@ -29,14 +29,24 @@ export default defineConfig({
       },
       output: {
         manualChunks: {
-          // Vendor chunks
-          'react-vendor': ['react', 'react-dom'],
-          'router-vendor': ['react-router-dom'],
-          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
-          'ui-vendor': ['lucide-react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
-          'chart-vendor': ['recharts'],
-          'date-vendor': ['date-fns'],
-          'query-vendor': ['@tanstack/react-query']
+          // Core React (Most Critical)
+          'react-core': ['react', 'react-dom'],
+          'react-router': ['react-router-dom'],
+          
+          // UI & Forms (Frequently Used)
+          'ui-components': ['lucide-react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+          'form-handling': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          
+          // Data & API (Heavy Libraries)
+          'data-fetching': ['@tanstack/react-query', '@supabase/supabase-js'],
+          'charts-data': ['recharts'],
+          
+          // Utilities (Shared Across App)
+          'utilities': ['date-fns', 'clsx', 'tailwind-merge'],
+          'motion': ['framer-motion'],
+          
+          // Development Tools (Dev Only)
+          'dev-tools': ['axios'] // Only in development
         },
         chunkFileNames: (chunkInfo) => {
           const facadeModuleId = chunkInfo.facadeModuleId ? 

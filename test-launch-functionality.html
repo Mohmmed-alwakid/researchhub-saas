@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launch Functionality Test - ResearchHub</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .test-step {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        .test-step h3 {
+            margin-top: 0;
+            color: #1e293b;
+        }
+        .test-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 8px 8px 8px 0;
+            transition: background 0.2s;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .success {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #15803d;
+        }
+        .warning {
+            background: #fef3c7;
+            border-color: #d97706;
+            color: #a16207;
+        }
+        .error {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #b91c1c;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .feature-list li:before {
+            content: "✅ ";
+            color: #16a34a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🚀 Launch Functionality Test</h1>
+        <p>Manual testing interface for ResearchHub study launch features</p>
+    </div>
+
+    <div class="test-container">
+        <h2>📋 Test Checklist</h2>
+        <p>Follow these steps to verify the launch functionality is working correctly:</p>
+
+        <div class="test-step">
+            <h3>Step 1: Access the Application</h3>
+            <p>Open the ResearchHub application and log in as a researcher.</p>
+            <a href="http://localhost:5175" class="test-button" target="_blank">Open ResearchHub Frontend</a>
+            <p><strong>Login Credentials:</strong></p>
+            <ul>
+                <li>Email: <code>abwanwr77+Researcher@gmail.com</code></li>
+                <li>Password: <code>Testtest123</code></li>
+            </ul>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 2: Navigate to Studies Page</h3>
+            <p>Go to the Studies section to view existing studies.</p>
+            <a href="http://localhost:5175/studies" class="test-button" target="_blank">Open Studies Page</a>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 3: Look for Draft Studies</h3>
+            <p>Find studies with <strong>"Draft"</strong> status. These should display the launch functionality.</p>
+            <p><strong>What to look for:</strong></p>
+            <ul>
+                <li>Study cards with gray "Draft" status badge</li>
+                <li>Green "Start Testing" button (play icon) in the actions area</li>
+                <li>Button should have tooltip saying "Start Testing"</li>
+            </ul>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 4: Test Launch Functionality</h3>
+            <p>Click the "Start Testing" button on a draft study.</p>
+            <p><strong>Expected behavior:</strong></p>
+            <ul>
+                <li>Study status changes from "Draft" to "Active"</li>
+                <li>Alert/notification confirming study is live</li>
+                <li>Button changes to "Pause Study" (if active)</li>
+                <li>Recruitment status becomes "recruiting"</li>
+            </ul>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 5: Verify Active Study Features</h3>
+            <p>Check that active studies show proper functionality.</p>
+            <p><strong>What to verify:</strong></p>
+            <ul>
+                <li>Green "Active" status badge</li>
+                <li>Yellow "Pause Study" button (pause icon)</li>
+                <li>Purple "View Results" button (bar chart icon)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>✅ Implemented Features</h2>
+        <p>The following launch functionality has been implemented:</p>
+        <ul class="feature-list">
+            <li><strong>Study Launch Button</strong>: Green play icon button for draft studies</li>
+            <li><strong>Status Updates</strong>: Automatic status change from draft to active</li>
+            <li><strong>Recruitment Status</strong>: Updates recruitment status to "recruiting"</li>
+            <li><strong>Pause Functionality</strong>: Yellow pause button for active studies</li>
+            <li><strong>Results Access</strong>: Purple results button for active/completed studies</li>
+            <li><strong>Visual Feedback</strong>: Tooltips and confirmation alerts</li>
+            <li><strong>Conditional Logic</strong>: Buttons only appear for appropriate study states</li>
+            <li><strong>API Integration</strong>: Updates persist through backend API calls</li>
+        </ul>
+    </div>
+
+    <div class="test-container">
+        <h2>🔧 Technical Implementation</h2>
+        <p>Key components that were updated:</p>
+        <div class="test-step">
+            <h3>StudyCardActions.tsx</h3>
+            <p>Added conditional action buttons:</p>
+            <ul>
+                <li><code>onLaunch</code> prop for draft studies</li>
+                <li><code>onPause</code> prop for active studies</li>
+                <li><code>onViewResults</code> prop for active/completed studies</li>
+                <li>Proper data-testid attributes for testing</li>
+            </ul>
+        </div>
+
+        <div class="test-step">
+            <h3>StudiesPage.tsx</h3>
+            <p>Added handler functions:</p>
+            <ul>
+                <li><code>handleLaunch()</code>: Changes status to active</li>
+                <li><code>handlePause()</code>: Changes status to paused</li>
+                <li><code>handleViewResults()</code>: Navigate to results page</li>
+                <li>API integration with updateStudy method</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🎯 Testing Results</h2>
+        <p>Record your testing results here:</p>
+        
+        <div class="test-step success">
+            <h3>✅ Working Features</h3>
+            <p><em>Check off features that work correctly during testing:</em></p>
+            <ul>
+                <li>☐ Launch button appears on draft studies</li>
+                <li>☐ Launch button triggers status change</li>
+                <li>☐ Status updates from draft to active</li>
+                <li>☐ Confirmation message appears</li>
+                <li>☐ Pause button appears on active studies</li>
+                <li>☐ Results button appears on active studies</li>
+            </ul>
+        </div>
+
+        <div class="test-step warning">
+            <h3>⚠️ Issues Found</h3>
+            <p><em>Note any problems or improvements needed:</em></p>
+            <textarea style="width: 100%; height: 100px; margin-top: 8px; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;" placeholder="Describe any issues you encounter..."></textarea>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🚀 Next Steps</h2>
+        <p>After manual testing confirms functionality:</p>
+        <div class="test-step">
+            <h3>Fix Test Suite</h3>
+            <p>Update the automated test configuration to properly connect to the backend API.</p>
+        </div>
+        <div class="test-step">
+            <h3>Additional Features</h3>
+            <p>Consider implementing:</p>
+            <ul>
+                <li>Template selection system</li>
+                <li>Participant application management</li>
+                <li>Study analytics dashboard</li>
+                <li>Advanced study settings</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to highlight successful features
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const li = this.closest('li');
+                    if (this.checked) {
+                        li.style.color = '#16a34a';
+                        li.style.fontWeight = 'bold';
+                    } else {
+                        li.style.color = '';
+                        li.style.fontWeight = '';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

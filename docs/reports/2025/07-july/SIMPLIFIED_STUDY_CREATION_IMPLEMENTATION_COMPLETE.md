@@ -3,10 +3,11 @@
 ## 📋 Implementation Summary
 
 **Date**: June 27, 2025  
-**Status**: ✅ **FULLY IMPLEMENTED AND TESTED**  
-**Build Status**: ✅ 0 TypeScript errors
+**Status**: ✅ **FULLY IMPLEMENTED AND TESTED** → ❌ **LEGACY - REPLACED BY DIRECT STUDY BUILDER**  
+**Build Status**: ✅ 0 TypeScript errors  
+**Current Status**: This simplified modal was later removed for even better UX with direct navigation
 
-The simplified study creation flow has been successfully implemented, replacing the complex multi-step modal with a clean, intuitive two-option approach.
+The simplified study creation flow was successfully implemented, then later improved by removing the modal entirely and going directly to the Study Builder for a cleaner user experience.
 
 ## 🎯 What Was Accomplished
 

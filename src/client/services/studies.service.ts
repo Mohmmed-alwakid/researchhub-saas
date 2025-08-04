@@ -93,7 +93,7 @@ export const studiesService = {
    * Get study by ID
    */
   async getStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.get<StudyResponse>(`research-consolidated?action=get-study&id=${studyId}`);
+    return apiService.get<StudyResponse>(`research-consolidated?action=get-study&study_id=${studyId}`);
   },
 
   /**
@@ -107,55 +107,57 @@ export const studiesService = {
    * Update study
    */
   async updateStudy(studyId: string, data: UpdateStudyRequest): Promise<StudyResponse> {
-    return apiService.put<StudyResponse>(`research-consolidated?action=update-study&id=${studyId}`, data);
+    return apiService.put<StudyResponse>(`research-consolidated?action=update-study&study_id=${studyId}`, data);
   },
 
   /**
    * Delete study
    */
   async deleteStudy(studyId: string): Promise<{ success: boolean; message: string }> {
-    return apiService.delete(`research-consolidated?action=delete-study&id=${studyId}`);
+    return apiService.delete(`research-consolidated?action=delete-study`, { 
+      data: { id: studyId }
+    });
   },
   /**
    * Duplicate study
    */
   async duplicateStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.post<StudyResponse>(`research-consolidated?action=duplicate-study&id=${studyId}`);
+    return apiService.post<StudyResponse>(`studies?action=duplicate-study&id=${studyId}`);
   },
 
   /**
    * Launch study (change status to active)
    */
   async launchStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.patch<StudyResponse>(`research-consolidated?action=launch-study&id=${studyId}`);
+    return apiService.patch<StudyResponse>(`research-consolidated?action=launch-study&study_id=${studyId}`);
   },
 
   /**
    * Pause study
    */
   async pauseStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.patch<StudyResponse>(`research-consolidated?action=pause-study&id=${studyId}`);
+    return apiService.patch<StudyResponse>(`studies?action=pause-study&id=${studyId}`);
   },
 
   /**
    * Complete study
    */
   async completeStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.patch<StudyResponse>(`research-consolidated?action=complete-study&id=${studyId}`);
+    return apiService.patch<StudyResponse>(`studies?action=complete-study&id=${studyId}`);
   },
 
   /**
    * Get study analytics
    */
   async getStudyAnalytics(studyId: string): Promise<{ success: boolean; analytics: StudyAnalytics }> {
-    return apiService.get(`research-consolidated?action=get-analytics&id=${studyId}`);
+    return apiService.get(`studies?action=get-analytics&id=${studyId}`);
   },
 
   /**
    * Export study data
    */
   async exportStudyData(studyId: string, format: 'csv' | 'json' = 'csv'): Promise<Blob> {
-    return apiService.get(`research-consolidated?action=export-data&id=${studyId}&format=${format}`, {
+    return apiService.get(`studies?action=export-data&id=${studyId}&format=${format}`, {
       responseType: 'blob',
     });
   },
@@ -173,7 +175,7 @@ export const studiesService = {
       completedAt?: string;
     }>;
   }> {
-    return apiService.get(`research-consolidated?action=get-participants&id=${studyId}`);
+    return apiService.get(`studies?action=get-participants&id=${studyId}`);
   },
 
   /**
@@ -185,7 +187,7 @@ export const studiesService = {
     failed: string[];
     message: string;
   }> {
-    return apiService.post(`research-consolidated?action=invite-participants&id=${studyId}`, { emails });
+    return apiService.post(`studies?action=invite-participants&id=${studyId}`, { emails });
   },
 
   /**
@@ -195,7 +197,7 @@ export const studiesService = {
     success: boolean;
     message: string;
   }> {
-    return apiService.delete(`research-consolidated?action=remove-participant&id=${studyId}&participantId=${participantId}`);
+    return apiService.delete(`studies?action=remove-participant&id=${studyId}&participantId=${participantId}`);
   },
 };
 

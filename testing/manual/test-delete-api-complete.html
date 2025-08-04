@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Delete API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Study Delete API Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Get Auth Token</h2>
+        <button onclick="getAuthToken()">Get Fresh Auth Token</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 2: Create Test Study</h2>
+        <button onclick="createTestStudy()">Create Test Study</button>
+        <div id="create-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 3: Delete Test Study</h2>
+        <button onclick="deleteTestStudy()">Delete Test Study</button>
+        <div id="delete-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 4: Verify Deletion</h2>
+        <button onclick="verifyDeletion()">Check Studies List</button>
+        <div id="verify-result"></div>
+    </div>
+
+    <script>
+        let currentAuthToken = null;
+        let testStudyId = null;
+
+        async function getAuthToken() {
+            const authResult = document.getElementById('auth-result');
+            authResult.innerHTML = '<div class="info">Getting auth token...</div>';
+
+            try {
+                const response = await fetch('http://localhost:3003/api/auth-consolidated?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentAuthToken = result.access_token || result.session?.access_token;
+                    authResult.innerHTML = `
+                        <div class="success">✅ Auth token obtained successfully!</div>
+                        <pre>Token: ${currentAuthToken ? currentAuthToken.substring(0, 50) + '...' : 'Not found'}</pre>
+                    `;
+                } else {
+                    authResult.innerHTML = `
+                        <div class="error">❌ Auth failed: ${result.error}</div>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                authResult.innerHTML = `
+                    <div class="error">❌ Auth error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function createTestStudy() {
+            const createResult = document.getElementById('create-result');
+            
+            if (!currentAuthToken) {
+                createResult.innerHTML = '<div class="error">❌ Please get auth token first</div>';
+                return;
+            }
+
+            createResult.innerHTML = '<div class="info">Creating test study...</div>';
+
+            try {
+                const studyData = {
+                    title: 'Delete Test Study - ' + new Date().toISOString(),
+                    description: 'This study was created to test the delete functionality.',
+                    type: 'usability',
+                    targetParticipants: 5,
+                    duration: 30,
+                    compensation: 25,
+                    isPublic: false,
+                    status: 'draft'
+                };
+
+                const response = await fetch('http://localhost:3003/api/research-consolidated?action=create-study', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentAuthToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    testStudyId = result.study.id;
+                    createResult.innerHTML = `
+                        <div class="success">✅ Study created successfully!</div>
+                        <pre>Study ID: ${testStudyId}</pre>
+                        <pre>Title: ${result.study.title}</pre>
+                    `;
+                } else {
+                    createResult.innerHTML = `
+                        <div class="error">❌ Create failed: ${result.error}</div>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                createResult.innerHTML = `
+                    <div class="error">❌ Create error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function deleteTestStudy() {
+            const deleteResult = document.getElementById('delete-result');
+            
+            if (!currentAuthToken) {
+                deleteResult.innerHTML = '<div class="error">❌ Please get auth token first</div>';
+                return;
+            }
+
+            if (!testStudyId) {
+                deleteResult.innerHTML = '<div class="error">❌ Please create a test study first</div>';
+                return;
+            }
+
+            deleteResult.innerHTML = '<div class="info">Deleting test study...</div>';
+
+            try {
+                const response = await fetch(`http://localhost:3003/api/research-consolidated?action=delete-study`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${currentAuthToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        studyId: testStudyId
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    deleteResult.innerHTML = `
+                        <div class="success">✅ Study deleted successfully!</div>
+                        <pre>Message: ${result.message}</pre>
+                        <pre>Method: ${result.method}</pre>
+                        <pre>Updated Status: ${result.study?.status}</pre>
+                    `;
+                } else {
+                    deleteResult.innerHTML = `
+                        <div class="error">❌ Delete failed: ${result.error}</div>
+                        <pre>Status: ${response.status}</pre>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                deleteResult.innerHTML = `
+                    <div class="error">❌ Delete error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function verifyDeletion() {
+            const verifyResult = document.getElementById('verify-result');
+            
+            if (!currentAuthToken) {
+                verifyResult.innerHTML = '<div class="error">❌ Please get auth token first</div>';
+                return;
+            }
+
+            verifyResult.innerHTML = '<div class="info">Checking studies list...</div>';
+
+            try {
+                const response = await fetch('http://localhost:3003/api/research-consolidated?action=studies', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${currentAuthToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const targetStudy = result.studies.find(study => study.id === testStudyId);
+                    
+                    if (targetStudy) {
+                        verifyResult.innerHTML = `
+                            <div class="info">📋 Study found in list:</div>
+                            <pre>Status: ${targetStudy.status}</pre>
+                            <pre>Title: ${targetStudy.title}</pre>
+                            <pre>Updated: ${targetStudy.updated_at}</pre>
+                            ${targetStudy.status === 'deleted' ? 
+                                '<div class="success">✅ Correctly marked as deleted!</div>' : 
+                                '<div class="error">❌ Status not updated to deleted</div>'
+                            }
+                        `;
+                    } else {
+                        verifyResult.innerHTML = `
+                            <div class="info">📋 Study not found in list (could be filtered out)</div>
+                            <pre>Total studies: ${result.studies.length}</pre>
+                        `;
+                    }
+                } else {
+                    verifyResult.innerHTML = `
+                        <div class="error">❌ Verification failed: ${result.error}</div>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                verifyResult.innerHTML = `
+                    <div class="error">❌ Verification error: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Auto-start the process
+        window.onload = function() {
+            console.log('Delete API test page loaded. Click buttons to test the workflow.');
+        };
+    </script>
+</body>
+</html>

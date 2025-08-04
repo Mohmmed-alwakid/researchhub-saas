@@ -98,19 +98,19 @@ class WalletService {
   }
 
   async getWallet(): Promise<{ success: boolean; data?: WalletData; error?: string }> {
-    return this.makeRequest<WalletData>('/wallets?action=get');
+    return this.makeRequest<WalletData>('/payments-consolidated-full?action=get-wallet');
   }
 
   async getTransactions(): Promise<{ success: boolean; data?: Transaction[]; error?: string }> {
-    return this.makeRequest<Transaction[]>('/wallets?action=transactions');
+    return this.makeRequest<Transaction[]>('/payments-consolidated-full?action=transactions');
   }
 
   async getWithdrawals(): Promise<{ success: boolean; data?: WithdrawalRequest[]; error?: string }> {
-    return this.makeRequest<WithdrawalRequest[]>('/wallets?action=withdrawals');
+    return this.makeRequest<WithdrawalRequest[]>('/payments-consolidated-full?action=withdrawals');
   }
 
   async createWithdrawal(request: CreateWithdrawalRequest): Promise<{ success: boolean; data?: WithdrawalRequest; error?: string }> {
-    return this.makeRequest<WithdrawalRequest>('/wallets?action=request-withdrawal', {
+    return this.makeRequest<WithdrawalRequest>('/payments-consolidated-full?action=request-withdrawal', {
       method: 'POST',
       body: JSON.stringify(request),
     });

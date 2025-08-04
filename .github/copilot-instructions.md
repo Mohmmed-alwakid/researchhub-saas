@@ -137,11 +137,56 @@ CreativeNotifications.tsx   // Meaningless modifier
 - Root directory clutter
 - Conflicting documentation
 - New components when existing ones can be extended
+
+## 📚 **DOCUMENTATION RULES (MANDATORY)**
+
+### 🚫 **NO NEW DOCUMENTATION FILES**
+- **NEVER create new .md files for documentation**
+- **ALWAYS update existing documentation instead**
+- **UPDATE, don't duplicate**: Enhance current files rather than creating new ones
+
+### 📝 **Documentation Update Strategy**
+- **Add to existing sections**: Append new information to relevant existing files
+- **Update timestamps**: Modify "Last Updated" dates in existing documents
+- **Enhance current content**: Improve existing documentation with new details
+- **Use established patterns**: Follow existing documentation structure and format
+
+### 🎯 **Centralized Documentation Locations**
+```
+✅ UPDATE THESE FILES (don't create new ones):
+- README.md (project overview & status)
+- .github/copilot-instructions.md (development guide)
+- docs/DOCUMENTATION_INDEX.md (master index)
+- docs/CHANGELOG.md (project history)
+- docs/requirements/ (system specifications)
+```
+
+### ⚠️ **Exception Cases (Rare)**
+New documentation files are ONLY allowed for:
+- **New system requirements**: `docs/requirements/NEW_SYSTEM.md`
+- **Test interfaces**: `test-*.html` files for manual testing
+- **Archive purposes**: Moving old content to `archive/`
+
+### 🔄 **When You Need to Document Something:**
+1. **First**: Check if it fits in existing documentation
+2. **Update**: Add new section to existing file
+3. **Enhance**: Improve current documentation with new info
+4. **Link**: Cross-reference between existing files
+5. **Never**: Create a new standalone documentation file
+
+**Goal**: Maintain centralized, minimized documentation that's easy to find and maintain.
 - ✅ **Collaboration Features**: Real-time team collaboration fully integrated in Study Builder
 - ✅ **Backend APIs**: Collaboration, approval, and comments APIs with WebSocket server
 - ✅ **Database Schema**: Collaboration tables and RLS policies ready for production
 - ✅ **Comprehensive Testing Framework**: AI-powered automated testing with 0 human testers required
 - 🚧 **Production Deployment**: Working but with Vercel function limits
+
+## ✅ Recent Major Achievements (July 17, 2025)
+- **Launch Button CORS Fix Complete**: Resolved cross-origin resource sharing issues preventing study creation
+- **Study Builder Launch Functionality**: Launch button now fully functional with proper API integration
+- **Comprehensive CORS Configuration**: Updated vercel.json with proper headers for all API endpoints
+- **Advanced Testing Suite**: Created complete test suite for Launch button validation with 6-step verification
+- **API Endpoint Verification**: Confirmed research-consolidated API working with authentication and CORS
 
 ## ✅ Recent Major Achievements (July 7, 2025)
 - **Vibe-Coder-MCP Implementation Complete**: Full implementation of advanced development enhancement system
@@ -737,6 +782,14 @@ When tests fail or need updates:
 3. **Local testing first**: Test everything locally before production
 4. **Use test interfaces**: Utilize provided test HTML files
 
+### 🧪 Testing Interfaces Available
+- **`test-launch-button-complete.html`**: Comprehensive 6-step Launch button validation suite
+- **`test-launch-fix.html`**: Basic Launch button testing interface
+- **`test-enhanced-review-step.html`**: Review step testing interface
+- **`test-study-builder-improvements.html`**: Study builder functionality tests
+- **`test-header-consistency.html`**: Header component testing
+- **`test-admin-functionality.js`**: Admin system testing script
+
 ### 🧪 COMPREHENSIVE TESTING FRAMEWORK (NEW - July 3, 2025)
 **Professional-grade automated testing with ZERO human testers required**
 
@@ -846,12 +899,83 @@ git merge develop
 git push origin main  # Auto-deploys to Vercel
 ```
 
-### 🎯 Current Development Priorities
-1. **Backend block API support**: Add endpoints for block templates and management
-2. **Block session rendering**: Implement participant experience for all block types
-3. **Advanced block features**: AI integration, conditional logic, analytics
-4. **Template creation UI**: Visual template builder for researchers
-5. **Maintain test account integrity**: Keep roles correct for testing
+### 🎯 Current Development Priorities (July 18, 2025)
+1. **Adaptive Test Coverage Implementation**: Comprehensive testing framework that evolves with code changes
+2. **Backend block API support**: Add endpoints for block templates and management
+3. **Block session rendering**: Implement participant experience for all block types
+4. **Advanced block features**: AI integration, conditional logic, analytics
+5. **Template creation UI**: Visual template builder for researchers
+6. **Enhanced CORS configuration**: Extend to production deployment
+7. **Maintain test account integrity**: Keep roles correct for testing
+
+## 🧪 **ADAPTIVE TESTING STRATEGY (NEW - July 18, 2025)**
+**Revolutionary approach to maintain 100% test coverage as codebase evolves**
+
+### **Core Concept: Self-Evolving Test Suite**
+- 🤖 **AI-Powered Test Generation**: Automatically generates tests for new features and code changes
+- 🔄 **Change Detection**: Monitors codebase and requirements for modifications
+- 📊 **Intelligent Coverage**: Ensures comprehensive coverage across all scenarios
+- ⚡ **Zero-Maintenance Testing**: Tests update themselves as code evolves
+
+### **Implementation Components**
+```javascript
+// Adaptive Testing Architecture
+const adaptiveTestingSystem = {
+  changeDetection: 'Monitor file system for code/requirement changes',
+  testGeneration: 'Auto-generate tests for detected changes',
+  coverageTracking: 'Ensure 100% scenario coverage maintained',
+  optimization: 'Continuously improve test suite efficiency'
+};
+```
+
+### **Test Coverage Matrix**
+- ✅ **User Workflows**: Complete researcher/participant/admin journeys
+- ✅ **API Testing**: All endpoints with edge cases and error conditions
+- ✅ **UI/UX Testing**: Cross-browser, responsive, accessibility compliance
+- ✅ **Security Testing**: Input validation, authentication, data protection
+- ✅ **Performance Testing**: Load, stress, endurance scenarios
+- ✅ **Integration Testing**: Database, external services, real-time features
+
+### **Adaptive Testing Commands**
+```bash
+# Development workflow with automatic test generation
+npm run test:adaptive        # Run adaptive test suite
+npm run test:generate        # Generate tests for recent changes
+npm run test:coverage        # Comprehensive coverage analysis
+npm run test:optimize        # Optimize and enhance test suite
+
+# Change detection and monitoring
+npm run test:watch           # Monitor for changes and auto-generate tests
+npm run test:analyze         # Analyze code changes and suggest tests
+npm run test:validate        # Validate test coverage completeness
+```
+
+### **Smart Test Generation Features**
+- 🎯 **Scenario-Based**: Generates tests based on user workflows and business logic
+- 🔍 **Code Analysis**: Analyzes new code to identify test requirements
+- 📋 **Template-Driven**: Uses intelligent templates for common testing patterns
+- 🧠 **Learning System**: Improves test quality based on historical data
+
+### **Key Benefits**
+- 🚀 **Zero Test Maintenance**: Tests automatically update with code changes
+- 📈 **100% Coverage**: Ensures all scenarios are covered as system grows
+- ⚡ **Fast Feedback**: Immediate test generation for new features
+- 🎯 **Quality Assurance**: Catches issues before they reach production
+- 💡 **Developer-Friendly**: Invisible testing that just works
+
+### **Integration with Development Workflow**
+```bash
+# Git hooks automatically trigger test generation
+git commit    # Generates tests for modified code
+git push      # Runs adaptive test suite validation
+
+# Feature development workflow  
+1. Developer writes new feature
+2. AI detects code changes
+3. Tests automatically generated
+4. Coverage validated and maintained
+5. Quality assured before deployment
+```
 
 ## 🏆 Local Development Benefits
 - ⚡ **Ultra-fast iteration**: No deployment cycle needed

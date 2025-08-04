@@ -41,10 +41,10 @@ Current Study Creation Flow:
 6. Launch (LaunchStep)
 
 Existing Template System:
-├── EnhancedTemplateGallery.tsx ✅ (will enhance)
-├── SmartTemplateGallery.tsx ✅ (will integrate)
-├── TemplatePreviewModal.tsx ✅ (will improve)
-└── SimplifiedStudyCreationModal.tsx ✅ (will activate)
+├── EnhancedTemplateGallery.tsx ✅ (enhanced)
+├── SmartTemplateGallery.tsx ✅ (integrated)
+├── TemplatePreviewModal.tsx ✅ (improved)
+└── SimplifiedStudyCreationModal.tsx ❌ (REMOVED - no longer exists)
 ```
 
 ### Enhancement Opportunities
@@ -127,7 +127,7 @@ src/client/components/studies/
 ├── SmartTemplateFilter.tsx                 # NEW - Advanced filtering
 ├── EnhancedTemplateGallery.tsx             # ENHANCED - Better UX
 ├── TemplatePreviewModal.tsx                # ENHANCED - Improved preview
-├── SimplifiedStudyCreationModal.tsx       # ENHANCED - Integrate with new flow
+├── SimplifiedStudyCreationModal.tsx       # REMOVED - no longer exists
 └── StudyCreationWizard.tsx                 # ENHANCED - New entry points
 
 src/client/pages/

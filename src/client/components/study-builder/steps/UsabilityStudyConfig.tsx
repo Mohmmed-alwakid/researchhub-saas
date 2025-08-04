@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { StepProps, UsabilityConfig } from '../types';
-import { Globe, Monitor, Clock, CheckCircle, Settings } from 'lucide-react';
+import { StepProps, UsabilityConfig, ScreeningQuestion } from '../types';
+import { HelpCircle, Monitor, Clock, CheckCircle, Settings, Plus, X } from 'lucide-react';
 
 export const UsabilityStudyConfigStep: React.FC<StepProps> = ({
   formData,
@@ -9,10 +9,10 @@ export const UsabilityStudyConfigStep: React.FC<StepProps> = ({
   onPrevious,
   isFirst
 }) => {
-  const [activeTab, setActiveTab] = useState<'website' | 'recording' | 'completion'>('website');
+  const [activeTab, setActiveTab] = useState<'screening' | 'recording' | 'completion'>('screening');
 
   const usabilityConfig = formData.usability_config || {
-    website_url: '',
+    screening_questions: [] as ScreeningQuestion[],
     recording_settings: {
       screen_recording: true,
       click_tracking: true,
@@ -71,13 +71,13 @@ export const UsabilityStudyConfigStep: React.FC<StepProps> = ({
       <div className="border-b border-gray-200 mb-8">
         <nav className="flex space-x-8">
           {[
-            { id: 'website', label: 'Website Details', icon: Globe },
+            { id: 'screening', label: 'Screening Questions', icon: HelpCircle },
             { id: 'recording', label: 'Recording Settings', icon: Monitor },
             { id: 'completion', label: 'Completion Criteria', icon: CheckCircle }
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id as any)}
+              onClick={() => setActiveTab(id as 'screening' | 'recording' | 'completion')}
               className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === id
                   ? 'border-blue-500 text-blue-600'
@@ -91,39 +91,192 @@ export const UsabilityStudyConfigStep: React.FC<StepProps> = ({
         </nav>
       </div>
 
-      {/* Website Details Tab */}
-      {activeTab === 'website' && (
+      {/* Screening Questions Tab */}
+      {activeTab === 'screening' && (
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Globe className="w-4 h-4 inline mr-1" />
-              Website/App URL (Optional)
-            </label>
-            <input
-              type="url"
-              value={usabilityConfig.website_url}
-              onChange={(e) => updateUsabilityConfig({ website_url: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="https://example.com"
-            />
-            <p className="text-sm text-gray-500 mt-1">
-              If provided, participants can be directed to start their testing from this URL
-            </p>
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="text-sm font-medium text-blue-900 mb-2">Study Blocks Summary</h4>
-            <div className="text-sm text-blue-800">
-              <p>Your study currently has <strong>{formData.blocks?.length || 0} blocks</strong> configured:</p>
-              <ul className="mt-2 space-y-1">
-                <li>• Tasks to complete: <strong>{totalTasks}</strong></li>
-                <li>• Welcome screens: <strong>{formData.blocks?.filter(b => b.type === 'welcome_screen').length || 0}</strong></li>
-                <li>• Rating/feedback blocks: <strong>{formData.blocks?.filter(b => ['rating_scale', 'feedback_collection'].includes(b.type)).length || 0}</strong></li>
-              </ul>
-              {formData.blocks?.length === 0 && (
-                <p className="text-amber-700 mt-2">⚠️ You'll need to add blocks in the next step to create a complete usability study.</p>
-              )}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                  <HelpCircle className="w-5 h-5 mr-2" />
+                  Participant Screening Questions
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Add multiple choice questions to screen participants before they can join your study
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const newQuestion = {
+                    id: Date.now().toString(),
+                    question: '',
+                    options: ['', ''],
+                    required: true
+                  };
+                  const updatedQuestions = [...(usabilityConfig.screening_questions || []), newQuestion];
+                  updateUsabilityConfig({ screening_questions: updatedQuestions });
+                }}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Question</span>
+              </button>
             </div>
+
+            {(usabilityConfig.screening_questions?.length || 0) > 0 ? (
+              <div className="space-y-4">
+                {usabilityConfig.screening_questions!.map((question: ScreeningQuestion, questionIndex: number) => (
+                  <div key={question.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div className="flex items-start justify-between mb-3">
+                      <span className="text-sm font-medium text-gray-700">Question {questionIndex + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updatedQuestions = (usabilityConfig.screening_questions || []).filter((_, i) => i !== questionIndex);
+                          updateUsabilityConfig({ screening_questions: updatedQuestions });
+                        }}
+                        className="text-gray-400 hover:text-red-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {/* Question Input */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Question Text *
+                        </label>
+                        <input
+                          type="text"
+                          value={question.question}
+                          onChange={(e) => {
+                            const updatedQuestions = [...(usabilityConfig.screening_questions || [])];
+                            updatedQuestions[questionIndex] = { ...question, question: e.target.value };
+                            updateUsabilityConfig({ screening_questions: updatedQuestions });
+                          }}
+                          placeholder="Enter your screening question..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+
+                      {/* Options */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-sm font-medium text-gray-700">Answer Options</label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedQuestions = [...(usabilityConfig.screening_questions || [])];
+                              updatedQuestions[questionIndex] = {
+                                ...question,
+                                options: [...question.options, '']
+                              };
+                              updateUsabilityConfig({ screening_questions: updatedQuestions });
+                            }}
+                            className="text-sm text-blue-600 hover:text-blue-700"
+                          >
+                            + Add Option
+                          </button>
+                        </div>
+                        <div className="space-y-2">
+                          {question.options.map((option, optionIndex) => (
+                            <div key={optionIndex} className="flex items-center space-x-2">
+                              <input
+                                type="text"
+                                value={option}
+                                onChange={(e) => {
+                                  const updatedQuestions = [...(usabilityConfig.screening_questions || [])];
+                                  const updatedOptions = [...question.options];
+                                  updatedOptions[optionIndex] = e.target.value;
+                                  updatedQuestions[questionIndex] = { ...question, options: updatedOptions };
+                                  updateUsabilityConfig({ screening_questions: updatedQuestions });
+                                }}
+                                placeholder={`Option ${optionIndex + 1}`}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                              {question.options.length > 2 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updatedQuestions = [...(usabilityConfig.screening_questions || [])];
+                                    const updatedOptions = question.options.filter((_, i) => i !== optionIndex);
+                                    updatedQuestions[questionIndex] = { ...question, options: updatedOptions };
+                                    updateUsabilityConfig({ screening_questions: updatedQuestions });
+                                  }}
+                                  className="text-gray-400 hover:text-red-600 transition-colors"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Required Toggle */}
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={question.required}
+                            onChange={(e) => {
+                              const updatedQuestions = [...(usabilityConfig.screening_questions || [])];
+                              updatedQuestions[questionIndex] = { ...question, required: e.target.checked };
+                              updateUsabilityConfig({ screening_questions: updatedQuestions });
+                            }}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">Required question</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-50 border border-gray-200 rounded-lg">
+                <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <h4 className="text-lg font-medium text-gray-900 mb-2">No screening questions yet</h4>
+                <p className="text-gray-600 mb-4">
+                  Add screening questions to filter participants before they can join your study
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newQuestion = {
+                      id: Date.now().toString(),
+                      question: '',
+                      options: ['', ''],
+                      required: true
+                    };
+                    updateUsabilityConfig({ screening_questions: [newQuestion] });
+                  }}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mx-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Your First Question</span>
+                </button>
+              </div>
+            )}
+
+            {(usabilityConfig.screening_questions?.length || 0) > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                <h4 className="text-sm font-medium text-blue-900 mb-2">Screening Summary</h4>
+                <div className="text-sm text-blue-800">
+                  <p>Your study has <strong>{usabilityConfig.screening_questions?.length || 0}</strong> screening question(s):</p>
+                  <ul className="mt-2 space-y-1">
+                    {usabilityConfig.screening_questions?.map((q: ScreeningQuestion, i: number) => (
+                      <li key={q.id}>• Question {i + 1}: {q.options.length} options{q.required ? ' (required)' : ' (optional)'}</li>
+                    ))}
+                  </ul>
+                  <p className="text-blue-700 mt-2">
+                    ℹ️ Participants will need to answer these questions before accessing your study.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

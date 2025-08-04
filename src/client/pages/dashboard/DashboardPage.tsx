@@ -20,8 +20,26 @@ import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
 import { CollaborationDashboard } from '../../components/collaboration/CollaborationDashboard';
 import { useAuthStore } from '../../stores/authStore';
-import { SimplifiedStudyCreationModal } from '../../components/studies/SimplifiedStudyCreationModal';
 import type { WorkspaceRole } from '../../../shared/types';
+
+// Define interfaces for type safety
+interface StudyData {
+  id: string;
+  title: string;
+  status: string;
+  target_participants: number;
+  updated_at: string;
+  updatedAt?: string;
+}
+
+interface RecentStudyData {
+  id: string;
+  title: string;
+  status: string;
+  participants: number;
+  completionRate: number;
+  lastUpdate: string;
+}
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -29,17 +47,42 @@ const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState<DashboardAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'collaboration' | 'analytics' | 'settings'>('overview');
-  
-  // Study creation modal state
-  const [showStudyModal, setShowStudyModal] = useState(false);
+  const [recentStudies, setRecentStudies] = useState<RecentStudyData[]>([]);
 
   // Fetch real dashboard data on component mount
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        
+        // Fetch dashboard analytics
         const data = await analyticsService.getDashboardAnalytics();
         setDashboardData(data);
+        
+        // Fetch recent studies separately
+        const studiesResponse = await fetch('/api/studies');
+        const studiesResult = await studiesResponse.json();
+        
+        if (studiesResult.success) {
+          // Get the most recent 5 studies and sort by updated_at
+          const allStudies = studiesResult.studies || [];
+          const recentStudiesData = allStudies
+            .sort((a: StudyData, b: StudyData) => {
+              const dateA = new Date(b.updatedAt || b.updated_at).getTime();
+              const dateB = new Date(a.updatedAt || a.updated_at).getTime();
+              return dateA - dateB;
+            })
+            .slice(0, 5)
+            .map((study: StudyData) => ({
+              id: study.id,
+              title: study.title,
+              status: study.status,
+              participants: study.target_participants || 0,
+              completionRate: 85, // Default completion rate
+              lastUpdate: study.updated_at || study.updatedAt
+            }));
+          setRecentStudies(recentStudiesData);
+        }
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
         // Set fallback data if API fails
@@ -59,31 +102,11 @@ const DashboardPage = () => {
     fetchDashboardData();
   }, []);
 
-  // Handle study creation flow - show simplified modal per requirements
+  // Handle study creation flow - go directly to study builder
   const handleCreateNewStudy = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowStudyModal(true);
-  };
-
-  const handleSelectStudyType = (type: 'unmoderated' | 'moderated') => {
-    // Route based on study type selection per requirements
-    if (type === 'unmoderated') {
-      // Navigate to usability study builder per Step 2A requirements
-      navigate('/app/study-builder', { 
-        state: { 
-          studyType: 'usability',
-          fromModal: true 
-        }
-      });
-    } else {
-      // Navigate to interview session configuration per Step 2B requirements  
-      navigate('/app/study-builder', { 
-        state: { 
-          studyType: 'interview',
-          fromModal: true 
-        }
-      });
-    }
+    // Skip the redundant modal and go directly to Study Builder
+    navigate('/app/study-builder');
   };
 
   // Calculate stats for display
@@ -197,7 +220,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6" data-testid="dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         {/* Enhanced Header */}
         <div className="md:flex md:items-center md:justify-between mb-8">
@@ -219,7 +242,7 @@ const DashboardPage = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button onClick={handleCreateNewStudy}>
+            <Button onClick={handleCreateNewStudy} data-testid="create-study">
               <Plus className="h-4 w-4 mr-2" />
               New Study
             </Button>
@@ -239,7 +262,7 @@ const DashboardPage = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'overview' | 'collaboration' | 'analytics' | 'settings')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
@@ -320,7 +343,7 @@ const DashboardPage = () => {
               }
             />            <CardContent>
               <div className="space-y-4">
-                {dashboardData?.recentStudies?.map((study, index) => (
+                {recentStudies?.map((study, index) => (
                   <div 
                     key={study.id} 
                     className="p-4 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200 cursor-pointer animate-slide-up"
@@ -374,6 +397,7 @@ const DashboardPage = () => {
                   variant="primary" 
                   className="w-full justify-start" 
                   onClick={handleCreateNewStudy}
+                  data-testid="create-new-study"
                 >
                   <Plus className="h-4 w-4 mr-3" />
                   Create New Study
@@ -494,13 +518,6 @@ const DashboardPage = () => {
         )}
 
       </div>
-
-      {/* Study Creation Modal */}
-      <SimplifiedStudyCreationModal
-        isOpen={showStudyModal}
-        onClose={() => setShowStudyModal(false)}
-        onSelectType={handleSelectStudyType}
-      />
     </div>
   );
 };

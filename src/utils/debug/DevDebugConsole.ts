@@ -239,7 +239,7 @@ class DevDebugConsole {
     };
 
     document.addEventListener('keydown', (event) => {
-      const key = `${event.ctrlKey ? 'ctrl+' : ''}${event.shiftKey ? 'shift+' : ''}${event.altKey ? 'alt+' : ''}${event.key.toLowerCase()}`;
+      const key = `${event.ctrlKey ? 'ctrl+' : ''}${event.shiftKey ? 'shift+' : ''}${event.altKey ? 'alt+' : ''}${event.key?.toLowerCase() || ''}`;
       
       if (shortcuts[key as keyof typeof shortcuts]) {
         event.preventDefault();

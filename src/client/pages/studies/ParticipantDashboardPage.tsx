@@ -25,7 +25,7 @@ import { WalletOverview } from '../../components/wallet/WalletOverview';
 // import { EnhancedWithdrawalForm } from '../../components/wallet/EnhancedWithdrawalForm';
 import { WithdrawalHistory } from '../../components/wallet/WithdrawalHistory';
 // import { EnhancedTransactionHistory } from '../../components/wallet/EnhancedTransactionHistory';
-import { WithdrawalFormData } from '../../components/wallet/WithdrawalForm';
+// import { WithdrawalFormData } from '../../components/wallet/WithdrawalForm'; // TODO: Will be used when withdrawal form is implemented
 import { useEnhancedWallet } from '../../hooks/useEnhancedWallet';
 import WalletErrorBoundary from '../../components/wallet/WalletErrorBoundary';
 // import { WalletSkeleton } from '../../components/wallet/WalletSkeletons';
@@ -80,37 +80,38 @@ const ParticipantDashboardPage: React.FC = () => {
   // Wallet hook
   const {
     wallet,
-    transactions,
+    // transactions, // TODO: Will be used when transaction history is implemented
     withdrawals,
     loading: walletLoading,
-    refreshWallet,
-    createWithdrawal
+    refreshWallet
+    // createWithdrawal // TODO: Will be used when withdrawal form is implemented
   } = useEnhancedWallet();
 
   // Withdrawal handling
-  const handleWithdrawalSubmit = async (data: WithdrawalFormData) => {
-    try {
-      const result = await createWithdrawal({
-        amount: data.amount,
-        payment_method: data.payment_method,
-        payment_details: data.payment_details
-      });
+  // TODO: These functions will be used when withdrawal form is implemented
+  // const handleWithdrawalSubmit = async (data: WithdrawalFormData) => {
+  //   try {
+  //     const result = await createWithdrawal({
+  //       amount: data.amount,
+  //       payment_method: data.payment_method,
+  //       payment_details: data.payment_details
+  //     });
       
-      if (result.success) {
-        walletToasts.withdrawalSubmitted(data.amount, wallet?.currency);
-        setShowWithdrawalForm(false);
-      } else {
-        walletToasts.withdrawalFailed(result.error);
-      }
-    } catch (error) {
-      console.error('Failed to submit withdrawal:', error);
-      walletToasts.withdrawalFailed();
-    }
-  };
+  //     if (result.success) {
+  //       walletToasts.withdrawalSubmitted(data.amount, wallet?.currency);
+  //       setShowWithdrawalForm(false);
+  //     } else {
+  //       walletToasts.withdrawalFailed(result.error);
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to submit withdrawal:', error);
+  //     walletToasts.withdrawalFailed();
+  //   }
+  // };
 
-  const handleWithdrawalCancel = () => {
-    setShowWithdrawalForm(false);
-  };
+  // const handleWithdrawalCancel = () => {
+  //   setShowWithdrawalForm(false);
+  // };
 
   const handleRequestWithdrawal = () => {
     setShowWithdrawalForm(true);
@@ -131,12 +132,12 @@ const ParticipantDashboardPage: React.FC = () => {
       };
 
       const response = await participantApplicationsService.getMyApplications(filters);
-      if (response.success) {
-        const apps = response.data.applications as unknown as EnhancedApplication[];
+      if (response.success && response.data) {
+        const apps = (response.data.applications || []) as unknown as EnhancedApplication[];
         console.log('🐛 Debug - Received applications data:', apps);
 
         setApplications(apps);
-        setCurrentPage(response.data.pagination.current);
+        setCurrentPage(response.data.pagination?.current || 1);
 
         // Calculate stats
         const newStats = apps.reduce((acc, app) => {
@@ -152,6 +153,9 @@ const ParticipantDashboardPage: React.FC = () => {
         });
         setStats(newStats);
       } else {
+        console.warn('Failed to fetch applications:', response);
+        setApplications([]);
+        setStats({ total: 0, pending: 0, approved: 0, rejected: 0, withdrawn: 0 });
         toast.error('Failed to fetch applications');
       }
     } catch (error: unknown) {

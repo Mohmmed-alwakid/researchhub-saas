@@ -5,7 +5,7 @@
   },
   "performance": {},
   "combined": {},
-  "timestamp": "2025-07-08T11:28:11.021Z",
+  "timestamp": "2025-07-20T06:55:50.116Z",
   "summary": {
     "totalTests": 0,
     "passed": 0,
@@ -17,29 +17,29 @@
     {
       "name": "API Health",
       "status": "healthy",
-      "responseTime": 54.57336325395383,
-      "timestamp": "2025-07-08T11:28:11.027Z"
+      "responseTime": 176.27765315323512,
+      "timestamp": "2025-07-20T06:55:50.121Z"
     },
     {
       "name": "Database Check",
       "status": "healthy",
-      "responseTime": 148.22632401570098,
-      "timestamp": "2025-07-08T11:28:11.028Z"
+      "responseTime": 198.8828733178913,
+      "timestamp": "2025-07-20T06:55:50.122Z"
     },
     {
       "name": "Auth Service",
       "status": "healthy",
-      "responseTime": 160.83302402318367,
-      "timestamp": "2025-07-08T11:28:11.028Z"
+      "responseTime": 186.07908944730283,
+      "timestamp": "2025-07-20T06:55:50.122Z"
     },
     {
       "name": "Studies API",
       "status": "healthy",
-      "responseTime": 114.69165409557714,
-      "timestamp": "2025-07-08T11:28:11.028Z"
+      "responseTime": 130.32473236647118,
+      "timestamp": "2025-07-20T06:55:50.122Z"
     }
   ],
-  "generatedAt": "2025-07-08T11:28:11.029Z",
+  "generatedAt": "2025-07-20T06:55:50.123Z",
   "version": "1.0.0",
   "framework": "UAT Performance Integration"
 }

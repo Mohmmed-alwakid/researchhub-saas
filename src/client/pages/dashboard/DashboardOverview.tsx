@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  BarChart3,
   Users,
   FileText,
   Plus,
@@ -39,50 +38,59 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ studyId }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // If studyId provided, get study-specific data, otherwise get overview
+        if (studyId) {
+          // Fetch study-specific dashboard data
+          const response = await fetch(`/api/studies/${studyId}/dashboard`);
+          const result = await response.json();
+          
+          if (result.success) {
+            setDashboardData(result.data);
+          }
+        } else {
+          // Fetch general dashboard analytics
+          const data = await analyticsService.getDashboardAnalytics();
+          setDashboardData(data);
+          
+          // Fetch recent studies
+          const studiesResponse = await fetch('/api/studies');
+          const studiesResult = await studiesResponse.json();
+          
+          if (studiesResult.success) {
+            // Get the most recent 5 studies and sort by updated_at
+            const allStudies = studiesResult.studies || [];
+            const recentStudies = allStudies
+              .sort((a: StudyData, b: StudyData) => {
+                const dateA = new Date(b.updated_at).getTime();
+                const dateB = new Date(a.updated_at).getTime();
+                return dateA - dateB;
+              })
+              .slice(0, 5);
+            setRecentStudies(recentStudies);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+        // Set fallback data if API fails
+        setDashboardData({
+          totalStudies: 0,
+          activeParticipants: 0,
+          completionRate: 0,
+          avgSessionTime: 0,
+          activeStudies: 0,
+          recentStudies: []
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchDashboardData();
   }, [studyId]);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      
-      // If studyId provided, get study-specific data, otherwise get overview
-      if (studyId) {
-        // Fetch study-specific dashboard data
-        const response = await fetch(`/api/studies/${studyId}/dashboard`);
-        const result = await response.json();
-        
-        if (result.success) {
-          setDashboardData(result.data);
-        }
-      } else {
-        // Fetch general dashboard analytics
-        const data = await analyticsService.getDashboardAnalytics();
-        setDashboardData(data);
-        
-        // Fetch recent studies
-        const studiesResponse = await fetch('/api/studies?limit=5&sort=updated_at');
-        const studiesResult = await studiesResponse.json();
-        
-        if (studiesResult.success) {
-          setRecentStudies(studiesResult.data || []);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
-      // Set fallback data if API fails
-      setDashboardData({
-        totalStudies: 0,
-        activeParticipants: 0,
-        completionRate: 0,
-        avgSessionTime: 0,
-        activeStudies: 0,
-        recentStudies: []
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const stats = dashboardData ? [
     { 

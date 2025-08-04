@@ -68,9 +68,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ currentPage = 'home'
             >
               Sign in
             </Link>
-            <Button size="sm">
-              Get Started
-            </Button>
+            <Link to="/register">
+              <Button size="sm">
+                Get Started
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

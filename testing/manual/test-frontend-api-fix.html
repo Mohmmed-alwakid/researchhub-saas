@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend API Endpoint Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Frontend API Endpoint Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Frontend Delete via Consolidated Endpoint</h2>
+        <button onclick="testFrontendDelete()">Test Frontend Delete Call</button>
+        <div id="frontend-result"></div>
+    </div>
+
+    <script>
+        async function testFrontendDelete() {
+            const result = document.getElementById('frontend-result');
+            result.innerHTML = '<div class="info">Testing frontend delete call...</div>';
+            
+            try {
+                // Simulate the frontend API call structure
+                const baseURL = '/api';
+                const endpoint = `research-consolidated?action=delete-study&study_id=test-id-123`;
+                
+                console.log('Testing endpoint:', `${baseURL}/${endpoint}`);
+                
+                // Test if the URL construction works
+                const testUrl = new URL(`${baseURL}/${endpoint}`, window.location.origin);
+                console.log('Constructed URL:', testUrl.toString());
+                
+                result.innerHTML = `
+                    <div class="success">✅ Frontend API Path Test</div>
+                    <pre>Base URL: ${baseURL}
+Endpoint: ${endpoint}
+Full URL: ${testUrl.toString()}
+Method: DELETE
+Expected: /api/research-consolidated?action=delete-study&study_id=test-id-123</pre>
+                    <div class="info">This matches the consolidated endpoint structure!</div>
+                `;
+                
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

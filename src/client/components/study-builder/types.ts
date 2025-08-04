@@ -91,6 +91,7 @@ export interface InterviewQuestion {
 // Usability study configuration
 export interface UsabilityConfig {
   website_url?: string;
+  screening_questions?: ScreeningQuestion[];
   recording_settings: {
     screen_recording: boolean;
     click_tracking: boolean;
@@ -101,6 +102,14 @@ export interface UsabilityConfig {
     min_tasks_completed: number;
     auto_submit: boolean;
   };
+}
+
+// Screening question for participant filtering
+export interface ScreeningQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  required: boolean;
 }
 
 export interface WizardStep {

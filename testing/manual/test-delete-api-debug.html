@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Delete API</title>
+</head>
+<body>
+    <h1>Debug Delete API Test</h1>
+    <button id="testDelete">Test Delete Study</button>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        document.getElementById('testDelete').addEventListener('click', async () => {
+            try {
+                output.innerHTML = '<p>🧪 Testing delete API...</p>';
+                
+                // First, let's create a test study to delete
+                const createResponse = await fetch('http://localhost:3003/api/research-consolidated?action=create-study', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQGFma2FyLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczNjgwNjY1N30.dummy-test-token'
+                    },
+                    body: JSON.stringify({
+                        title: 'Test Study for Deletion',
+                        description: 'This is a test study created for deletion testing',
+                        type: 'usability',
+                        settings: {}
+                    })
+                });
+                
+                if (!createResponse.ok) {
+                    output.innerHTML += `<p>❌ Failed to create test study: ${createResponse.status}</p>`;
+                    return;
+                }
+                
+                const created = await createResponse.json();
+                output.innerHTML += `<p>✅ Created test study with ID: ${created.data?.id}</p>`;
+                
+                if (!created.data?.id) {
+                    output.innerHTML += '<p>❌ No study ID returned from create</p>';
+                    return;
+                }
+                
+                // Now test the delete
+                output.innerHTML += '<p>🗑️ Attempting to delete study...</p>';
+                
+                const deleteResponse = await fetch('http://localhost:3003/api/research-consolidated?action=delete-study', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQGFma2FyLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczNjgwNjY1N30.dummy-test-token'
+                    },
+                    body: JSON.stringify({
+                        id: created.data.id
+                    })
+                });
+                
+                output.innerHTML += `<p>📡 Delete response status: ${deleteResponse.status}</p>`;
+                
+                const deleteResult = await deleteResponse.json();
+                output.innerHTML += `<p>📋 Delete response: ${JSON.stringify(deleteResult, null, 2)}</p>`;
+                
+            } catch (error) {
+                output.innerHTML += `<p>💥 Error: ${error.message}</p>`;
+                console.error('Delete test error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

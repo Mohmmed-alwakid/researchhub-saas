@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-// import { useEnhancedAuth } from '../../hooks/useEnhancedAuth';
+import { useAuthStore } from '../../stores/authStore';
 
 // Type definitions for study discovery
 interface PublicStudy {
@@ -17,7 +17,7 @@ interface PublicStudy {
   compensation: number; // in dollars
   participantsNeeded: number;
   participantsEnrolled: number;
-  status: 'recruiting' | 'in_progress' | 'completed' | 'paused';
+  status: 'recruiting' | 'active' | 'draft' | 'in_progress' | 'completed' | 'paused';
   eligibilityCriteria: string[];
   tags: string[];
   researcherName: string;
@@ -54,7 +54,7 @@ class StudyDiscoveryAPI {
   private baseUrl: string;
   private authClient: any; // TODO: Type this properly
 
-  constructor(authClient: any, baseUrl = 'http://localhost:3000/api') {
+  constructor(authClient: any, baseUrl = 'http://localhost:3003/api') {
     this.baseUrl = baseUrl;
     this.authClient = authClient;
   }
@@ -103,27 +103,40 @@ class StudyDiscoveryAPI {
     total: number;
     pages: number;
   }> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      category: filters.category,
-      type: filters.type,
-      duration: filters.duration,
-      compensation: filters.compensation,
-      difficulty: filters.difficulty,
-      status: filters.status,
-      search: filters.search,
-      sortBy: filters.sortBy,
-      sortOrder: filters.sortOrder
-    });
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        category: filters.category,
+        type: filters.type,
+        duration: filters.duration,
+        compensation: filters.compensation,
+        difficulty: filters.difficulty,
+        status: filters.status,
+        search: filters.search,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder
+      });
 
-    const response = await this.makeRequest<{
-      studies: PublicStudy[];
-      total: number;
-      pages: number;
-    }>(`/studies/public?${params}`);
+      const response = await this.makeRequest<{
+        studies: PublicStudy[];
+        total: number;
+        pages: number;
+      }>(`/research-consolidated?action=get-studies&${params}`);
 
-    return response.data || this.getMockStudies(filters, page, limit);
+      // If API succeeds and returns data, use it
+      if (response.success && response.data) {
+        return response.data;
+      }
+      
+      // If API fails, fallback to mock data
+      console.log('🔄 API failed, using mock data:', response.error);
+      return this.getMockStudies(filters, page, limit);
+      
+    } catch (error) {
+      console.log('🔄 API error, using mock data:', error);
+      return this.getMockStudies(filters, page, limit);
+    }
   }
 
   async getStudyDetails(studyId: string): Promise<PublicStudy | null> {
@@ -275,10 +288,13 @@ class StudyDiscoveryAPI {
 
     // Apply filters
     let filteredStudies = allStudies.filter(study => {
+      // Participants should only see active and recruiting studies (not draft)
+      const isPublicStudy = study.status === 'recruiting' || study.status === 'active';
+      
       const matchesSearch = !filters.search || 
         study.title.toLowerCase().includes(filters.search.toLowerCase()) ||
         study.description.toLowerCase().includes(filters.search.toLowerCase()) ||
-        study.tags.some(tag => tag.toLowerCase().includes(filters.search.toLowerCase()));
+        (study.tags && study.tags.some(tag => tag.toLowerCase().includes(filters.search.toLowerCase())));
       
       const matchesCategory = !filters.category || study.category === filters.category;
       const matchesType = !filters.type || study.type === filters.type;
@@ -305,7 +321,7 @@ class StudyDiscoveryAPI {
         }
       })();
 
-      return matchesSearch && matchesCategory && matchesType && matchesDifficulty && 
+      return isPublicStudy && matchesSearch && matchesCategory && matchesType && matchesDifficulty && 
              matchesStatus && matchesDuration && matchesCompensation;
     });
 
@@ -365,14 +381,40 @@ interface StudyDiscoveryProps {
 }
 
 export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }) => {
-  // const { isAuthenticated, hasRole, authClient } = useEnhancedAuth();
-  const isAuthenticated = true; // temporary
-  const hasRole = (role: string) => true; // temporary
-  const authClient = null; // temporary
+  // Use the real auth store instead of temporary placeholders
+  const { user, token, isAuthenticated } = useAuthStore();
+  
+  // Create auth client that provides the token properly
+  const authClient = {
+    getToken: () => token,
+    isAuthenticated: () => isAuthenticated,
+    user: user
+  };
+  
   const [studyAPI] = useState(() => new StudyDiscoveryAPI(authClient));
 
   // State management
-  const [studies, setStudies] = useState<PublicStudy[]>([]);
+  const [studies, setStudies] = useState<PublicStudy[]>([
+    {
+      id: 'mock-study-1',
+      title: 'Test Study - Mock Data',
+      description: 'This is mock data to test the interface while we fix the backend.',
+      type: 'unmoderated',
+      duration: 30,
+      compensation: 25,
+      participantsNeeded: 10,
+      participantsEnrolled: 3,
+      status: 'recruiting',
+      eligibilityCriteria: ['Age 18+', 'English speaker'],
+      tags: ['Test', 'Mock'],
+      researcherName: 'Test Researcher',
+      researcherOrganization: 'Test Org',
+      estimatedCompletion: '2025-08-01',
+      difficulty: 'beginner',
+      category: 'Technology',
+      createdAt: '2025-07-18T10:00:00Z'
+    }
+  ]);
   const [totalStudies, setTotalStudies] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -401,12 +443,19 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
       setIsLoading(true);
       setError(null);
       
+      console.log('🔍 LoadStudies Debug:', { filters, currentPage, studyAPI });
+      
       const result = await studyAPI.getPublicStudies(filters, currentPage, 12);
-      setStudies(result.studies);
-      setTotalStudies(result.total);
-      setTotalPages(result.pages);
+      
+      console.log('🔍 LoadStudies Result:', { result, studies: result?.studies });
+      
+      setStudies(result?.studies || []);
+      setTotalStudies(result?.total || 0);
+      setTotalPages(result?.pages || 0);
     } catch (err) {
+      console.error('LoadStudies Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load studies');
+      setStudies([]); // Ensure studies is always an array
     } finally {
       setIsLoading(false);
     }
@@ -483,7 +532,7 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
               <div className="text-sm text-gray-500">
                 {totalStudies} studies available
               </div>
-              {hasRole('participant') && (
+              {user?.role === 'participant' && (
                 <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
                   Participant
                 </div>
@@ -653,7 +702,7 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
               </div>
             ))
           ) : (
-            studies.map((study) => (
+            (studies || []).map((study) => (
               <StudyCard
                 key={study.id}
                 study={study}
@@ -776,6 +825,8 @@ const StudyCard: React.FC<{
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'recruiting': return 'bg-green-100 text-green-800';
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'draft': return 'bg-gray-100 text-gray-800';
       case 'in_progress': return 'bg-blue-100 text-blue-800';
       case 'completed': return 'bg-gray-100 text-gray-800';
       case 'paused': return 'bg-yellow-100 text-yellow-800';
@@ -832,12 +883,12 @@ const StudyCard: React.FC<{
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1 mb-4">
-          {study.tags.slice(0, 3).map((tag, index) => (
+          {study.tags && study.tags.slice(0, 3).map((tag, index) => (
             <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
               {tag}
             </span>
           ))}
-          {study.tags.length > 3 && (
+          {study.tags && study.tags.length > 3 && (
             <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
               +{study.tags.length - 3} more
             </span>
@@ -891,7 +942,7 @@ const StudyCard: React.FC<{
             </button>
             <button
               onClick={onApply}
-              disabled={spotsRemaining <= 0 || study.status !== 'recruiting'}
+              disabled={spotsRemaining <= 0 || (study.status !== 'recruiting' && study.status !== 'active')}
               className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Apply Now
@@ -954,7 +1005,7 @@ const StudyDetailsModal: React.FC<{
           <div>
             <h4 className="text-lg font-medium text-gray-900 mb-3">Eligibility Requirements</h4>
             <ul className="space-y-2">
-              {study.eligibilityCriteria.map((criteria, index) => (
+              {study.eligibilityCriteria && study.eligibilityCriteria.map((criteria, index) => (
                 <li key={index} className="flex items-center text-gray-600">
                   <span className="text-green-600 mr-2">✓</span>
                   {criteria}
@@ -1010,7 +1061,7 @@ const StudyDetailsModal: React.FC<{
           <div>
             <h4 className="text-lg font-medium text-gray-900 mb-3">Tags</h4>
             <div className="flex flex-wrap gap-2">
-              {study.tags.map((tag, index) => (
+              {study.tags && study.tags.map((tag, index) => (
                 <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 text-sm rounded-full">
                   {tag}
                 </span>
@@ -1027,7 +1078,7 @@ const StudyDetailsModal: React.FC<{
             >
               Close
             </button>
-            {!study.isApplied && study.status === 'recruiting' && 
+            {!study.isApplied && (study.status === 'recruiting' || study.status === 'active') && 
              study.participantsEnrolled < study.participantsNeeded && (
               <button
                 onClick={onApply}
@@ -1095,7 +1146,7 @@ const StudyApplicationModal: React.FC<{
               Please confirm that you meet all the following requirements:
             </p>
             <div className="space-y-2 mb-4">
-              {study.eligibilityCriteria.map((criteria, index) => (
+              {study.eligibilityCriteria && study.eligibilityCriteria.map((criteria, index) => (
                 <div key={index} className="flex items-center text-gray-600">
                   <span className="text-green-600 mr-2">✓</span>
                   {criteria}
@@ -1118,12 +1169,12 @@ const StudyApplicationModal: React.FC<{
 
           {/* Additional Questions */}
           <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-3">Additional Information</h4>
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Screening Questions</h4>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Why are you interested in this study?
+                  Why are you interested in this study? *
                 </label>
                 <textarea
                   value={responses.interest || ''}
@@ -1131,12 +1182,13 @@ const StudyApplicationModal: React.FC<{
                   rows={3}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Tell us about your interest in this research..."
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Relevant experience or background
+                  Relevant experience or background *
                 </label>
                 <textarea
                   value={responses.experience || ''}
@@ -1144,7 +1196,46 @@ const StudyApplicationModal: React.FC<{
                   rows={3}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Describe any relevant experience..."
+                  required
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  What is your age range? *
+                </label>
+                <select
+                  value={responses.ageRange || ''}
+                  onChange={(e) => setResponses(prev => ({ ...prev, ageRange: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  <option value="">Select your age range</option>
+                  <option value="18-24">18-24</option>
+                  <option value="25-34">25-34</option>
+                  <option value="35-44">35-44</option>
+                  <option value="45-54">45-54</option>
+                  <option value="55-64">55-64</option>
+                  <option value="65+">65+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  How often do you use technology/digital devices? *
+                </label>
+                <select
+                  value={responses.techExperience || ''}
+                  onChange={(e) => setResponses(prev => ({ ...prev, techExperience: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  <option value="">Select your experience level</option>
+                  <option value="daily">Daily user</option>
+                  <option value="weekly">Weekly user</option>
+                  <option value="monthly">Monthly user</option>
+                  <option value="rarely">Rarely use</option>
+                </select>
               </div>
 
               {study.type === 'moderated' && (

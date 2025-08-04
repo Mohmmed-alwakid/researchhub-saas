@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Auth Test - Port 3000</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status { 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0; 
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+        }
+        button:hover { background: #0056b3; }
+        pre { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Quick Auth Test - Port 3000</h1>
+        <p><strong>Backend is running on PORT 3000</strong> (not 3003)</p>
+        
+        <div id="status"></div>
+        
+        <button onclick="testPort3000()">Test Port 3000 API</button>
+        <button onclick="testPort3003()">Test Port 3003 API</button>
+        <button onclick="testLocalAuth()">Test Local Auth (Researcher)</button>
+        <button onclick="testDirectLogin()">Direct Login Test</button>
+        
+        <div id="results" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            results.innerHTML += `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function testPort3000() {
+            showResult('Testing http://localhost:3000/api/auth-local?action=test-accounts', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth-local?action=test-accounts');
+                const data = await response.json();
+                showResult(`✅ Port 3000: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ Port 3000 failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPort3003() {
+            showResult('Testing http://localhost:3003/api/auth-local?action=test-accounts', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/auth-local?action=test-accounts');
+                const data = await response.json();
+                showResult(`✅ Port 3003: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ Port 3003 failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLocalAuth() {
+            showResult('Testing local auth with researcher account...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth-local?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(`✅ Local Auth Success!<br>User: ${data.user.email}<br>Role: ${data.user.role}`, 'success');
+                    localStorage.setItem('auth-token', data.session.access_token);
+                    showStatus('🎉 Authentication successful! You can now use the app.', 'success');
+                } else {
+                    showResult(`❌ Local Auth Failed: ${data.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`❌ Local Auth Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDirectLogin() {
+            showResult('Testing direct login to main auth endpoint...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth-consolidated?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(`✅ Main Auth Success!<br>User: ${data.user.email}<br>Role: ${data.user.role}`, 'success');
+                } else {
+                    showResult(`❌ Main Auth Failed: ${data.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`❌ Main Auth Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            showStatus('Testing both ports to determine correct backend location...', 'info');
+            setTimeout(() => {
+                testPort3000();
+                setTimeout(() => testPort3003(), 1000);
+            }, 500);
+        };
+    </script>
+</body>
+</html>

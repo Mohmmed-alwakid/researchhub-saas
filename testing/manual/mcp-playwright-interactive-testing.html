@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Playwright Interactive Testing Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 30px;
+        }
+        .command-section {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .command-title {
+            color: #1e293b;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .command-item {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Fira Code', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .command-item:hover {
+            background: #334155;
+            transform: translateX(5px);
+        }
+        .command-item::before {
+            content: "💬 ";
+            color: #10b981;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        .steps {
+            counter-reset: step;
+        }
+        .step {
+            counter-increment: step;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            border-left: 4px solid #8b5cf6;
+            position: relative;
+        }
+        .step::before {
+            content: counter(step);
+            position: absolute;
+            left: -12px;
+            top: 15px;
+            background: #8b5cf6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        .target-url {
+            background: #fef3c7;
+            padding: 10px 15px;
+            border-radius: 6px;
+            color: #92400e;
+            font-family: monospace;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 MCP Playwright Interactive Testing</h1>
+            <p>Test your ResearchHub app with real browser interactions</p>
+        </div>
+
+        <div class="target-url">
+            🎯 Target: http://localhost:5175/
+        </div>
+
+        <div class="status status-success">
+            ✅ Your development server is running and ready for testing!
+        </div>
+
+        <div class="command-section">
+            <div class="command-title">🚀 Setup Steps</div>
+            <div class="steps">
+                <div class="step">
+                    <strong>Restart VS Code</strong> - Close completely and reopen to load MCP configuration
+                </div>
+                <div class="step">
+                    <strong>Open Chat</strong> - Press Ctrl+Alt+I to open GitHub Copilot Chat
+                </div>
+                <div class="step">
+                    <strong>Select Agent Mode</strong> - Choose "Agent mode" from the dropdown
+                </div>
+                <div class="step">
+                    <strong>Enable Tools</strong> - Click "Tools" button and ensure Playwright is selected
+                </div>
+                <div class="step">
+                    <strong>Start Testing</strong> - Use the commands below!
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <div class="command-title">🌐 Basic Navigation Commands</div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Navigate to http://localhost:5175/ and take a screenshot
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Go to my ResearchHub app and tell me what you see on the homepage
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Open localhost:5175 and check if the page loads correctly
+            </div>
+        </div>
+
+        <div class="command-section">
+            <div class="command-title">🖱️ Click & Interaction Commands</div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Navigate to http://localhost:5175/ and click on any login or sign up buttons
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Go to my app and click through all the navigation menu items
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Open localhost:5175 and click on the study creation button if it exists
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Navigate to my ResearchHub app and interact with any forms you find
+            </div>
+        </div>
+
+        <div class="command-section">
+            <div class="command-title">🧪 Testing Workflows</div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Test the complete user registration flow on http://localhost:5175/
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Go to my app and test the study creation workflow by clicking through it step by step
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Navigate to localhost:5175 and test all the main user interactions
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Open my ResearchHub app and test the participant experience workflow
+            </div>
+        </div>
+
+        <div class="command-section">
+            <div class="command-title">📝 Form Testing Commands</div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Go to http://localhost:5175/ and fill out any forms with test data
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Navigate to my app and test form validation by submitting empty forms
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Open localhost:5175 and test the login form with the test account credentials
+            </div>
+        </div>
+
+        <div class="command-section">
+            <div class="command-title">🔍 Analysis Commands</div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Navigate to http://localhost:5175/ and analyze the UI components and layout
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Go to my app and check for any broken links or UI issues
+            </div>
+            <div class="command-item" onclick="copyCommand(this)">
+                Open localhost:5175 and test the responsive design by changing browser size
+            </div>
+        </div>
+
+        <div class="status status-info">
+            💡 <strong>Pro Tip:</strong> Click on any command above to copy it, then paste it into GitHub Copilot Chat!
+        </div>
+
+        <div class="command-section">
+            <div class="command-title">🎯 What MCP Playwright Can Do</div>
+            <ul>
+                <li>✅ Open real browsers (Chrome, Firefox, Safari)</li>
+                <li>✅ Navigate to any URL (including localhost)</li>
+                <li>✅ Click buttons, links, and interactive elements</li>
+                <li>✅ Fill out forms and input fields</li>
+                <li>✅ Take screenshots and screen recordings</li>
+                <li>✅ Wait for page loads and dynamic content</li>
+                <li>✅ Test responsive design and mobile views</li>
+                <li>✅ Extract text and data from pages</li>
+                <li>✅ Simulate user workflows and interactions</li>
+                <li>✅ Test multiple browsers and devices</li>
+            </ul>
+        </div>
+
+        <div class="status status-success" style="margin-top: 30px;">
+            🎉 <strong>Ready to Test!</strong> Your MCP Playwright server can now perform real browser automation and testing on your ResearchHub application at http://localhost:5175/
+        </div>
+    </div>
+
+    <script>
+        function copyCommand(element) {
+            const text = element.textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                element.style.background = '#10b981';
+                element.style.color = 'white';
+                setTimeout(() => {
+                    element.style.background = '#1e293b';
+                    element.style.color = '#e2e8f0';
+                }, 1000);
+            });
+        }
+
+        // Check if localhost:5175 is accessible
+        async function checkServer() {
+            try {
+                const response = await fetch('http://localhost:5175/');
+                if (response.ok) {
+                    console.log('✅ ResearchHub server is accessible');
+                    document.querySelector('.status-success').innerHTML = 
+                        '✅ <strong>Server Online:</strong> Your ResearchHub app is running and ready for MCP Playwright testing!';
+                }
+            } catch (error) {
+                console.log('⚠️ Server check failed:', error);
+                document.querySelector('.status-success').innerHTML = 
+                    '⚠️ <strong>Server Status:</strong> Make sure your dev server is running with npm run dev:fullstack';
+                document.querySelector('.status-success').className = 'status status-warning';
+            }
+        }
+
+        checkServer();
+    </script>
+</body>
+</html>

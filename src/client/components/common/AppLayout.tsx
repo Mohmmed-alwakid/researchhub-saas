@@ -8,7 +8,6 @@ import {
   Settings,
   HelpCircle,
   Bell,
-  Search,
   Menu,
   X,
   LogOut,
@@ -78,10 +77,7 @@ const AppLayout = () => {
     }
     
     if (userRole === 'researcher') {
-<<<<<<< HEAD
       console.log('✅ AppLayout - Returning researcher navigation');
-=======
->>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
       return [
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
         { name: 'Studies', href: '/app/studies', icon: FileText },
@@ -93,10 +89,7 @@ const AppLayout = () => {
     
     // For admins and super_admins - include all features
     if (userRole === 'admin' || userRole === 'super_admin') {
-<<<<<<< HEAD
       console.log('✅ AppLayout - Returning admin navigation');
-=======
->>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
       return [
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
         { name: 'Studies', href: '/app/studies', icon: FileText },
@@ -109,11 +102,8 @@ const AppLayout = () => {
     }
     
     // Default fallback (should not happen with proper role assignment)
-<<<<<<< HEAD
     console.warn('🚨 AppLayout - Using default navigation fallback for role:', userRole);
     console.warn('🚨 AppLayout - This indicates an issue with role detection!');
-=======
->>>>>>> 0143a82207ffa6b8799d53ba39a6d3cfa1f2b452
     return [
       { name: 'Dashboard', href: '/app/dashboard', icon: Home },
       { name: 'Settings', href: '/app/settings', icon: Settings },
@@ -139,7 +129,9 @@ const AppLayout = () => {
               <X className="h-6 w-6 text-white" />
             </button>
           </div>          <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">            <div className="flex-shrink-0 flex items-center px-4">
-              <AfkarLogo variant="full" className="h-8 w-auto" />
+              <Link to="/app/dashboard" className="flex items-center">
+                <AfkarLogo variant="full" className="h-8 w-auto" />
+              </Link>
             </div><nav className="mt-5 px-2 space-y-1">
               {currentNavigation.map((item) => {
                 const Icon = item.icon;
@@ -169,7 +161,9 @@ const AppLayout = () => {
         <div className="flex flex-col w-64">
           <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">              <div className="flex items-center flex-shrink-0 px-4">
-                <AfkarLogo variant="full" className="h-8 w-auto" />
+                <Link to="/app/dashboard" className="flex items-center">
+                  <AfkarLogo variant="full" className="h-8 w-auto" />
+                </Link>
               </div><nav className="mt-5 flex-1 px-2 space-y-1">
                 {currentNavigation.map((item) => {
                   const Icon = item.icon;
@@ -189,20 +183,6 @@ const AppLayout = () => {
                   );
                 })}
               </nav>
-            </div>            <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-              <div className="flex items-center">
-                <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">
-                    {user?.firstName?.charAt(0) || 'U'}{user?.lastName?.charAt(0) || ''}
-                  </span>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700">
-                    {user?.firstName || 'User'} {user?.lastName || ''}
-                  </p>
-                  <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -221,26 +201,11 @@ const AppLayout = () => {
             <Menu className="h-6 w-6" />
           </button>
           <div className="flex-1 px-4 flex justify-between">
-            <div className="flex-1 flex">
-              <div className="w-full flex md:ml-0">
-                <label htmlFor="search-field" className="sr-only">
-                  Search
-                </label>
-                <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-                  <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5" />
-                  </div>                  <input
-                    id="search-field"
-                    className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
-                    placeholder="Global search coming soon..."
-                    type="search"
-                    disabled
-                    title="Global search functionality will be available in a future update"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="ml-4 flex items-center md:ml-6">
+            {/* Empty left space - search was removed */}
+            <div></div>
+            
+            {/* Right side - Notifications, Help, Profile */}
+            <div className="flex items-center space-x-3">
               {/* Notifications */}
               <button className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <Bell className="h-6 w-6" />

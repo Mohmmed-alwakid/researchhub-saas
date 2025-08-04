@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   PlayCircle, 
   Users, 
@@ -10,35 +11,13 @@ import {
   Sparkles,
   TrendingUp,
   Award,
-  Globe,
-  Clock,
-  BarChart3,
-  Target,
-  Lightbulb,
-  Headphones,
-  Lock,
-  Download,
-  MessageCircle,
-  Mail,
-  Twitter,
-  Github,
-  Linkedin,
   ChevronRight,
-  Eye,
-  MousePointer,
-  Smartphone,
-  Database,
-  Cloud,
-  FileText,
-  Building2,
-  Quote,
   Monitor,
   Activity,
   PieChart
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
-import { PricingCTA } from '../components/pricing/PricingCTA';
 import { PublicHeader } from '../components/common/PublicHeader';
 
 const EnhancedLandingPage = () => {
@@ -193,9 +172,11 @@ const EnhancedLandingPage = () => {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  <Button size="lg" rightIcon={<ArrowRight className="h-5 w-5" />}>
-                    Start Free Trial
-                  </Button>
+                  <Link to="/register">
+                    <Button size="lg" rightIcon={<ArrowRight className="h-5 w-5" />}>
+                      Start Free Trial
+                    </Button>
+                  </Link>
                   <Button variant="secondary" size="lg" leftIcon={<PlayCircle className="h-5 w-5" />}>
                     Watch Demo
                   </Button>
@@ -411,9 +392,11 @@ const EnhancedLandingPage = () => {
             Join thousands of researchers who trust Afkar for their user testing needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg" className="bg-white text-primary-700 hover:bg-gray-50">
-              Start Free Trial
-            </Button>
+            <Link to="/register">
+              <Button variant="secondary" size="lg" className="bg-white text-primary-700 hover:bg-gray-50">
+                Start Free Trial
+              </Button>
+            </Link>
             <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
               <PlayCircle className="h-5 w-5 mr-2" />
               Watch Demo

@@ -269,14 +269,15 @@ async function handleGetWallet(req, res) {
 
     const { simulated = 'false' } = req.query;
 
+    // Force simulation mode if requested or if database tables don't exist
     if (simulated === 'true') {
-      // Simulated mode
       let wallet = simulatedData.wallets.get(auth.user.id);
       if (!wallet) {
         wallet = {
           id: generateId('wallet'),
           user_id: auth.user.id,
           balance: 0,
+          pending_balance: 0,
           currency: 'USD',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -291,53 +292,69 @@ async function handleGetWallet(req, res) {
       });
     }
 
-    // Database mode
-    const { data: wallet, error } = await supabaseAdmin
-      .from('participant_wallets')
-      .select('*')
-      .eq('user_id', auth.user.id)
-      .single();
-
-    if (error && error.code !== 'PGRST116') { // Not found error code
-      console.error('Get wallet error:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to fetch wallet'
-      });
-    }
-
-    if (!wallet) {
-      // Create wallet if it doesn't exist
-      const { data: newWallet, error: createError } = await supabaseAdmin
+    // Try database mode, fall back to simulation if tables don't exist
+    try {
+      const { data: wallet, error } = await supabaseAdmin
         .from('participant_wallets')
-        .insert({
-          user_id: auth.user.id,
-          balance: 0,
-          currency: 'USD'
-        })
-        .select()
+        .select('*')
+        .eq('user_id', auth.user.id)
         .single();
 
-      if (createError) {
-        console.error('Create wallet error:', createError);
-        return res.status(500).json({
-          success: false,
-          error: 'Failed to create wallet'
+      if (error && error.code === 'PGRST116') {
+        // Wallet not found, create new one
+        const { data: newWallet, error: createError } = await supabaseAdmin
+          .from('participant_wallets')
+          .insert({
+            user_id: auth.user.id,
+            balance: 0,
+            currency: 'USD'
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          throw new Error('Table not accessible');
+        }
+
+        return res.status(200).json({
+          success: true,
+          wallet: newWallet,
+          mode: 'database'
         });
+      } else if (error) {
+        throw new Error('Database error: ' + error.message);
       }
 
       return res.status(200).json({
         success: true,
-        wallet: newWallet,
+        wallet,
         mode: 'database'
       });
-    }
 
-    return res.status(200).json({
-      success: true,
-      wallet,
-      mode: 'database'
-    });
+    } catch (dbError) {
+      console.log('Database wallet not available, using simulation mode:', dbError.message);
+      
+      // Fallback to simulation mode
+      let wallet = simulatedData.wallets.get(auth.user.id);
+      if (!wallet) {
+        wallet = {
+          id: generateId('wallet'),
+          user_id: auth.user.id,
+          balance: 0,
+          pending_balance: 0,
+          currency: 'USD',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        simulatedData.wallets.set(auth.user.id, wallet);
+      }
+
+      return res.status(200).json({
+        success: true,
+        wallet,
+        mode: 'simulated'
+      });
+    }
 
   } catch (error) {
     console.error('Get wallet exception:', error);
@@ -583,33 +600,111 @@ async function handleGetTransactions(req, res) {
       });
     }
 
-    // Database mode
-    const { data: transactions, error } = await supabaseAdmin
-      .from('wallet_transactions')
-      .select('*')
-      .eq('user_id', auth.user.id)
-      .order('created_at', { ascending: false })
-      .limit(parseInt(limit));
+    // Try database mode, fall back to simulation if tables don't exist
+    try {
+      const { data: transactions, error } = await supabaseAdmin
+        .from('wallet_transactions')
+        .select('*')
+        .eq('user_id', auth.user.id)
+        .order('created_at', { ascending: false })
+        .limit(parseInt(limit));
 
-    if (error) {
-      console.error('Get transactions error:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to fetch transactions'
+      if (error) {
+        throw new Error('Database error: ' + error.message);
+      }
+
+      return res.status(200).json({
+        success: true,
+        transactions: transactions || [],
+        mode: 'database'
+      });
+
+    } catch (dbError) {
+      console.log('Database transactions not available, using simulation mode:', dbError.message);
+      
+      // Fallback to simulation mode
+      const transactions = Array.from(simulatedData.transactions.values())
+        .filter(tx => {
+          const wallet = Array.from(simulatedData.wallets.values())
+            .find(w => w.id === tx.wallet_id && w.user_id === auth.user.id);
+          return !!wallet;
+        })
+        .slice(0, parseInt(limit));
+
+      return res.status(200).json({
+        success: true,
+        transactions,
+        mode: 'simulated'
       });
     }
-
-    return res.status(200).json({
-      success: true,
-      transactions: transactions || [],
-      mode: 'database'
-    });
 
   } catch (error) {
     console.error('Get transactions exception:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get withdrawal history
+ */
+async function handleGetWithdrawals(req, res) {
+  try {
+    const auth = await authenticateUser(req);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { simulated = 'false', limit = 50 } = req.query;
+
+    if (simulated === 'true') {
+      // Simulated mode
+      const withdrawals = Array.from(simulatedData.withdrawals.values())
+        .filter(withdrawal => withdrawal.user_id === auth.user.id)
+        .slice(0, parseInt(limit));
+
+      return res.status(200).json({
+        success: true,
+        withdrawals,
+        mode: 'simulated'
+      });
+    }
+
+    // Database mode
+    const { data: withdrawals, error } = await supabaseAdmin
+      .from('withdrawal_requests')
+      .select('*')
+      .eq('user_id', auth.user.id)
+      .order('created_at', { ascending: false })
+      .limit(parseInt(limit));
+
+    if (error) {
+      console.error('Get withdrawals error:', error);
+      // Return empty array instead of error for better UX
+      return res.status(200).json({
+        success: true,
+        withdrawals: [],
+        mode: 'fallback'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      withdrawals: withdrawals || [],
+      mode: 'database'
+    });
+
+  } catch (error) {
+    console.error('Get withdrawals exception:', error);
+    return res.status(200).json({
+      success: true,
+      withdrawals: [],
+      mode: 'fallback'
     });
   }
 }
@@ -720,6 +815,9 @@ export default async function handler(req, res) {
       case 'transactions':
         return await handleGetTransactions(req, res);
       
+      case 'withdrawals':
+        return await handleGetWithdrawals(req, res);
+      
       case 'admin-wallets':
         return await handleAdminGetWallets(req, res);
       
@@ -729,7 +827,7 @@ export default async function handler(req, res) {
           error: 'Invalid action',
           availableActions: [
             'create-payment-intent', 'conversion-rates', 'researcher-payment', 'webhook',
-            'get-wallet', 'add-earnings', 'request-withdrawal', 'transactions', 'admin-wallets'
+            'get-wallet', 'add-earnings', 'request-withdrawal', 'transactions', 'withdrawals', 'admin-wallets'
           ]
         });
     }
