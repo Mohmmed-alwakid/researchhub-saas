@@ -1,4 +1,4 @@
-# Ignore ALL files in api directory EXCEPT consolidated functions
+# Ignore ALL files in api directory EXCEPT consolidated functions and production endpoints
 
 api/*
 !api/auth-consolidated.js
@@ -8,6 +8,10 @@ api/*
 !api/system-consolidated.js
 !api/research-consolidated.js
 !api/admin-consolidated.js
+!api/health.js
+!api/auth.js
+!api/research.js
+!api/setup.js
 
 ## Ignore subdirectories completely
 
