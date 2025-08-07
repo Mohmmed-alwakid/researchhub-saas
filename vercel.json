@@ -8,6 +8,14 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/auth-consolidated",
+      "destination": "/api/auth-vercel"
+    },
+    {
+      "source": "/api/research-consolidated", 
+      "destination": "/api/research-vercel"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
@@ -72,6 +80,9 @@
     "VITE_API_URL": "https://researchhub-saas.vercel.app/api"
   },
   "functions": {
+    "api/health.js": { "maxDuration": 10 },
+    "api/auth-vercel.js": { "maxDuration": 30 },
+    "api/research-vercel.js": { "maxDuration": 30 },
     "api/auth-consolidated.js": { "maxDuration": 30 },
     "api/templates-consolidated.js": { "maxDuration": 30 },
     "api/payments-consolidated-full.js": { "maxDuration": 30 },
