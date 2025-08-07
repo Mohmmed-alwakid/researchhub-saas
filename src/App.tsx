@@ -53,12 +53,15 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const { checkAuth } = useAuthStore();
+  const { checkAuth, hasHydrated } = useAuthStore();
 
   useEffect(() => {
-    // Check authentication status on app start
-    checkAuth();
-  }, [checkAuth]);
+    // Only check authentication after the store has been rehydrated from localStorage
+    if (hasHydrated) {
+      console.log('🔄 App - Store has rehydrated, checking auth...');
+      checkAuth();
+    }
+  }, [checkAuth, hasHydrated]);
 
   // Component for role-based redirect
   const RoleBasedRedirect = () => {

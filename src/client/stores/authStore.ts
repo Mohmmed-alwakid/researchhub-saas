@@ -23,6 +23,7 @@ interface AuthState {
   requiresTwoFactor: boolean;
   isLoading: boolean;
   isAuthenticated: boolean;
+  hasHydrated: boolean;
   login: (email: string, password: string) => Promise<{ requiresTwoFactor?: boolean; tempToken?: string }>;
   verify2FALogin: (tempToken: string, code: string) => Promise<void>;
   verifyBackupCodeLogin: (tempToken: string, backupCode: string) => Promise<void>;
@@ -43,6 +44,7 @@ export const useAuthStore = create<AuthState>()(
       requiresTwoFactor: false,
       isLoading: false,
       isAuthenticated: false,
+      hasHydrated: false,
 
       login: async (email: string, password: string) => {
         set({ isLoading: true });
@@ -65,8 +67,27 @@ export const useAuthStore = create<AuthState>()(
 
           // Extract data from Supabase response structure
           const user = response.user;
+          
+          // DEBUG: Log response structure before token extraction
+          console.log('🔍 Auth Store - Response structure debugging:', {
+            hasSession: !!response.session,
+            sessionKeys: response.session ? Object.keys(response.session) : [],
+            sessionAccessToken: response.session?.access_token,
+            hasTokens: !!response.tokens,
+            tokensKeys: response.tokens ? Object.keys(response.tokens) : [],
+            tokensAuthToken: response.tokens?.authToken
+          });
+          
           const token = response.session?.access_token || response.tokens?.authToken;
           const refreshToken = response.session?.refresh_token || response.tokens?.refreshToken;
+          
+          // DEBUG: Log token extraction results
+          console.log('🔍 Auth Store - Token extraction results:', {
+            extractedToken: token,
+            extractedRefreshToken: refreshToken,
+            tokenLength: token ? token.length : 0,
+            tokenPreview: token ? token.substring(0, 50) + '...' : null
+          });
           
           // DEBUG: Log the received user data
           console.log('🔍 Auth Store - Login Response Data:', {
@@ -90,6 +111,15 @@ export const useAuthStore = create<AuthState>()(
           // DEBUG: Log the final user object being stored
           console.log('💾 Auth Store - Final User Object:', supabaseUser);
           
+          // DEBUG: Log what we're about to store
+          console.log('💾 Auth Store - About to store in Zustand:', {
+            user: supabaseUser,
+            token: token,
+            refreshToken: refreshToken,
+            isAuthenticated: true,
+            tokenLength: token ? token.length : 0
+          });
+          
           set({ 
             user: supabaseUser, 
             token, 
@@ -99,6 +129,18 @@ export const useAuthStore = create<AuthState>()(
             requiresTwoFactor: false,
             tempToken: null
           });
+          
+          // DEBUG: Verify what was actually stored
+          setTimeout(() => {
+            const currentState = get();
+            console.log('💾 Auth Store - Verification of stored state:', {
+              hasUser: !!currentState.user,
+              hasToken: !!currentState.token,
+              tokenPreview: currentState.token ? currentState.token.substring(0, 50) + '...' : null,
+              isAuthenticated: currentState.isAuthenticated,
+              localStorage: localStorage.getItem('auth-storage')
+            });
+          }, 100);
           
           toast.success('Login successful!');
           return {};
@@ -265,16 +307,39 @@ export const useAuthStore = create<AuthState>()(
           toast.error(message);
           throw error;
         }      },      checkAuth: async () => {
-        const { token, refreshToken } = get();
+        const { token, refreshToken, hasHydrated } = get();
         
         // DEBUG: Enhanced checkAuth logging
         console.log('🔄 Auth Store - checkAuth started:', {
           hasToken: !!token,
           hasRefreshToken: !!refreshToken,
+          hasHydrated,
           tokenPreview: token ? `${token.substring(0, 20)}...` : null,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          fromLocalStorage: !!localStorage.getItem('auth-storage')
         });
         
+        // Don't proceed if we haven't rehydrated yet - tokens might still be loading
+        if (!hasHydrated) {
+          console.log('⏳ Auth Store - Not yet rehydrated, skipping checkAuth');
+          return;
+        }
+        
+        // DEBUG: Check what's in localStorage right now
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          try {
+            const parsed = JSON.parse(authStorage);
+            console.log('🔄 Auth Store - localStorage state during checkAuth:', {
+              hasStoredToken: !!parsed.state.token,
+              storedTokenPreview: parsed.state.token ? parsed.state.token.substring(0, 20) + '...' : null,
+              isStoredAuthenticated: parsed.state.isAuthenticated
+            });
+          } catch (e) {
+            console.log('🔄 Auth Store - Failed to parse localStorage:', e);
+          }
+        }
+
         if (!token) {
           console.log('❌ Auth Store - No token found, setting unauthenticated state');
           set({ isLoading: false, isAuthenticated: false, user: null });
@@ -386,15 +451,34 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ 
-        user: state.user, 
-        token: state.token,
-        refreshToken: state.refreshToken,
-        isAuthenticated: state.isAuthenticated,
-        // Don't persist 2FA temporary state for security
-        tempToken: null,
-        requiresTwoFactor: false
-      }),
+      // Temporary simplified partialize for debugging
+      partialize: (state) => {
+        console.log('🔧 Persist partialize called with state:', {
+          hasUser: !!state.user,
+          hasToken: !!state.token,
+          tokenLength: state.token ? state.token.length : 0,
+          isAuthenticated: state.isAuthenticated
+        });
+        
+        return {
+          user: state.user, 
+          token: state.token,
+          refreshToken: state.refreshToken,
+          isAuthenticated: state.isAuthenticated
+        };
+      },
+      onRehydrateStorage: () => (state) => {
+        console.log('🔄 Auth Store - Rehydration complete:', {
+          hasState: !!state,
+          hasToken: state?.token ? true : false,
+          tokenPreview: state?.token ? state.token.substring(0, 20) + '...' : null,
+          isAuthenticated: state?.isAuthenticated || false
+        });
+        
+        if (state) {
+          state.hasHydrated = true;
+        }
+      },
     }
   )
 );

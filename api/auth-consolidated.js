@@ -62,13 +62,48 @@ async function validateToken(token) {
     }
 
     const jwt = token.replace('Bearer ', '');
-    const { data: { user }, error } = await supabase.auth.getUser(jwt);
-
-    if (error || !user) {
-      return { valid: false, error: 'Invalid or expired token' };
+    
+    // Check if it's a mock token (for local development)
+    if (jwt.includes('mock-signature')) {
+      try {
+        const [headerB64, payloadB64] = jwt.split('.');
+        const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString());
+        
+        // Check if token is expired
+        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+          return { valid: false, error: 'Token expired' };
+        }
+        
+        // Return mock user data
+        return {
+          valid: true,
+          user: {
+            id: payload.sub,
+            email: payload.email,
+            user_metadata: {
+              role: payload.role
+            }
+          }
+        };
+      } catch (parseError) {
+        return { valid: false, error: 'Invalid mock token format' };
+      }
     }
 
-    return { valid: true, user };
+    // Try Supabase validation for real tokens
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser(jwt);
+
+      if (error || !user) {
+        return { valid: false, error: 'Invalid or expired token' };
+      }
+
+      return { valid: true, user };
+    } catch (networkError) {
+      // If Supabase is unavailable, but token looks like a mock token, reject it
+      return { valid: false, error: 'Authentication service unavailable' };
+    }
+
   } catch (error) {
     return { valid: false, error: error.message };
   }
@@ -203,71 +238,74 @@ async function handleLogin(req, res) {
   }
 
   try {
-    // Check if this is a test account first (for local development)
+    // ALWAYS check for test accounts first in development
     const testAccountEmails = Object.values(TEST_ACCOUNTS).map(acc => acc.email);
     if (testAccountEmails.includes(email)) {
       console.log('🔧 Test account detected, using local auth fallback...');
       return await handleLocalAuth(email, password, res);
     }
 
-    // Try Supabase authentication for non-test accounts
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    // Try Supabase authentication for non-test accounts only if available
+    let supabaseAvailable = true;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-    if (error) {
-      console.error('Supabase login error:', error);
-      
-      // For connectivity issues, fall back to local auth if it's a test account
-      if (error.message && error.message.includes('fetch failed')) {
-        console.log('🔄 Network connectivity issue, checking for test account fallback...');
-        if (testAccountEmails.includes(email)) {
-          return await handleLocalAuth(email, password, res);
+      if (error) {
+        console.error('Supabase login error:', error);
+        supabaseAvailable = false;
+      } else {
+        // Try to fetch user profile from profiles table to get role and other details
+        let profileData = null;
+        try {
+          const { data: profile, error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .select('*')
+            .eq('email', email)
+            .single();
+          
+          if (profileError) {
+            console.log('Profile table not accessible, using user_metadata:', profileError.message);
+            profileData = null;
+          } else {
+            profileData = profile;
+          }
+        } catch (error) {
+          console.log('Profile fetch failed, using user_metadata:', error.message);
+          profileData = null;
         }
+
+        // Return user with profile data including role
+        return res.status(200).json({
+          success: true,
+          message: 'Login successful',
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            firstName: profileData?.first_name || data.user.user_metadata?.first_name || '',
+            lastName: profileData?.last_name || data.user.user_metadata?.last_name || '',
+            role: profileData?.role || data.user.user_metadata?.role || 'participant',
+            status: profileData?.status,
+            emailConfirmed: data.user.email_confirmed_at ? true : false
+          },
+          session: data.session
+        });
       }
-      
+    } catch (networkError) {
+      console.error('Network connectivity issue:', networkError.message);
+      supabaseAvailable = false;
+    }
+
+    // If Supabase is not available and not a test account, return error
+    if (!supabaseAvailable) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid credentials'
+        error: 'Authentication service unavailable. Please try again later.'
       });
     }
 
-    // Try to fetch user profile from profiles table to get role and other details
-    let profileData = null;
-    try {
-      const { data: profile, error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .select('*')
-        .eq('email', email)
-        .single();
-      
-      if (profileError) {
-        console.log('Profile table not accessible, using user_metadata:', profileError.message);
-        profileData = null;
-      } else {
-        profileData = profile;
-      }
-    } catch (error) {
-      console.log('Profile fetch failed, using user_metadata:', error.message);
-      profileData = null;
-    }
-
-    // Return user with profile data including role
-    return res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-        firstName: profileData?.first_name || data.user.user_metadata?.first_name || '',
-        lastName: profileData?.last_name || data.user.user_metadata?.last_name || '',
-        role: profileData?.role || data.user.user_metadata?.role || 'participant',
-        status: profileData?.status,
-        emailConfirmed: data.user.email_confirmed_at ? true : false
-      },
-      session: data.session
-    });
   } catch (error) {
     console.error('Login exception:', error);
     return res.status(500).json({

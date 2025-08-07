@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { margin: 5px; padding: 10px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        input { margin: 5px; padding: 8px; width: 200px; border: 1px solid #ddd; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 ResearchHub Auth Debug Test</h1>
+    <p>Testing authentication endpoints to debug the 401 Unauthorized issue</p>
+
+    <div class="test-section">
+        <h3>📍 Test Environment Status</h3>
+        <p><strong>Frontend:</strong> http://localhost:5175</p>
+        <p><strong>Backend (Direct):</strong> http://localhost:3003</p>
+        <p><strong>Backend (Proxy):</strong> http://localhost:5175/api</p>
+        <div id="env-status">Checking environment...</div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔐 Authentication Test</h3>
+        <div>
+            <label>Email:</label><br>
+            <input type="email" id="email" value="abwanwr77+Researcher@gmail.com">
+        </div>
+        <div>
+            <label>Password:</label><br>
+            <input type="password" id="password" value="Testtest123">
+        </div>
+        <br>
+        <button onclick="testDirectBackend()">Test Direct Backend (port 3003)</button>
+        <button onclick="testViteProxy()">Test Via Vite Proxy (port 5175)</button>
+        <button onclick="testFrontendAuthService()">Test Frontend Auth Service</button>
+        <div id="auth-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Request Analysis</h3>
+        <button onclick="analyzeRequests()">Analyze Network Requests</button>
+        <div id="request-analysis"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            console.log(message);
+            const timestamp = new Date().toLocaleTimeString();
+            return `[${timestamp}] ${message}`;
+        }
+
+        function displayResult(elementId, content, isError = false) {
+            const element = document.getElementById(elementId);
+            element.className = `test-section ${isError ? 'error' : 'success'}`;
+            element.innerHTML = content;
+        }
+
+        async function checkEnvironment() {
+            const results = [];
+            
+            // Test frontend
+            try {
+                const response = await fetch('http://localhost:5175');
+                results.push(`✅ Frontend (5175): Running`);
+            } catch (error) {
+                results.push(`❌ Frontend (5175): ${error.message}`);
+            }
+
+            // Test backend direct
+            try {
+                const response = await fetch('http://localhost:3003/api/health');
+                results.push(`✅ Backend Direct (3003): Running`);
+            } catch (error) {
+                results.push(`❌ Backend Direct (3003): ${error.message}`);
+            }
+
+            // Test backend via proxy
+            try {
+                const response = await fetch('http://localhost:5175/api/health');
+                results.push(`✅ Backend Proxy (5175/api): Running`);
+            } catch (error) {
+                results.push(`❌ Backend Proxy (5175/api): ${error.message}`);
+            }
+
+            displayResult('env-status', results.join('<br>'));
+        }
+
+        async function testDirectBackend() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:3003/api/auth-consolidated?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                const result = `
+                    <h4>Direct Backend Test Results</h4>
+                    <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                    <p><strong>Success:</strong> ${data.success}</p>
+                    <p><strong>Message:</strong> ${data.message || 'No message'}</p>
+                    <p><strong>User Role:</strong> ${data.user?.role || 'No role'}</p>
+                    <p><strong>Local Auth:</strong> ${data.local_auth || 'false'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                displayResult('auth-results', result, !data.success);
+            } catch (error) {
+                displayResult('auth-results', `
+                    <h4>Direct Backend Test - ERROR</h4>
+                    <p>${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `, true);
+            }
+        }
+
+        async function testViteProxy() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth-consolidated?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                const result = `
+                    <h4>Vite Proxy Test Results</h4>
+                    <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                    <p><strong>Success:</strong> ${data.success}</p>
+                    <p><strong>Message:</strong> ${data.message || 'No message'}</p>
+                    <p><strong>User Role:</strong> ${data.user?.role || 'No role'}</p>
+                    <p><strong>Local Auth:</strong> ${data.local_auth || 'false'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                displayResult('auth-results', result, !data.success);
+            } catch (error) {
+                displayResult('auth-results', `
+                    <h4>Vite Proxy Test - ERROR</h4>
+                    <p>${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `, true);
+            }
+        }
+
+        async function testFrontendAuthService() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Simulate the exact frontend auth service call
+            try {
+                const response = await fetch('/api/auth-consolidated?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                // Show what the auth store would receive
+                const authStoreData = {
+                    user: data.user,
+                    session: data.session,
+                    tokens: data.tokens || null,
+                    requiresTwoFactor: data.requiresTwoFactor || false
+                };
+                
+                const result = `
+                    <h4>Frontend Auth Service Simulation</h4>
+                    <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                    <p><strong>What Auth Store Receives:</strong></p>
+                    <pre>${JSON.stringify(authStoreData, null, 2)}</pre>
+                    <p><strong>Access Token:</strong> ${data.session?.access_token ? 'Present' : 'Missing'}</p>
+                    <p><strong>Refresh Token:</strong> ${data.session?.refresh_token ? 'Present' : 'Missing'}</p>
+                    <p><strong>User ID:</strong> ${data.user?.id || 'Missing'}</p>
+                    <p><strong>User Role:</strong> ${data.user?.role || 'Missing'}</p>
+                `;
+                
+                displayResult('auth-results', result, !data.success);
+            } catch (error) {
+                displayResult('auth-results', `
+                    <h4>Frontend Auth Service - ERROR</h4>
+                    <p>${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `, true);
+            }
+        }
+
+        async function analyzeRequests() {
+            const analysis = `
+                <h4>Request Analysis</h4>
+                <p><strong>Expected Flow:</strong></p>
+                <ol>
+                    <li>Frontend sends POST to /api/auth-consolidated?action=login</li>
+                    <li>Vite proxy forwards to http://localhost:3003/api/auth-consolidated?action=login</li>
+                    <li>Backend processes login and returns user + session data</li>
+                    <li>Frontend auth store processes response</li>
+                </ol>
+                
+                <p><strong>Potential Issues:</strong></p>
+                <ul>
+                    <li>❓ CORS headers missing or incorrect</li>
+                    <li>❓ Vite proxy configuration not working</li>
+                    <li>❓ Backend server not running on port 3003</li>
+                    <li>❓ Auth store expecting different response format</li>
+                    <li>❓ Network timing or race condition</li>
+                </ul>
+                
+                <p><strong>Debug Steps:</strong></p>
+                <ol>
+                    <li>Open browser DevTools → Network tab</li>
+                    <li>Run the tests above</li>
+                    <li>Check for failed requests or CORS errors</li>
+                    <li>Verify response format matches auth store expectations</li>
+                </ol>
+            `;
+            
+            displayResult('request-analysis', analysis);
+        }
+
+        // Initialize environment check on page load
+        window.addEventListener('load', checkEnvironment);
+    </script>
+</body>
+</html>

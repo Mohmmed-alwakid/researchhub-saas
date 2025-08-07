@@ -73,9 +73,27 @@ class ApiService {
               }
             }
           } catch (refreshError) {
-            // Refresh failed, clear auth and redirect to login
-            localStorage.removeItem('auth-storage');
-            window.location.href = '/login';
+            // Check if this is local/mock authentication before clearing
+            const authStorage = localStorage.getItem('auth-storage');
+            let isLocalAuth = false;
+            if (authStorage) {
+              try {
+                const { state } = JSON.parse(authStorage);
+                // Check if this is a mock token (they contain "mock-signature")
+                isLocalAuth = state?.token?.includes('mock-signature');
+              } catch (e) {
+                // Invalid storage, safe to clear
+              }
+            }
+            
+            if (!isLocalAuth) {
+              // Only clear auth for real authentication failures
+              localStorage.removeItem('auth-storage');
+              window.location.href = '/login';
+            } else {
+              console.warn('🔧 Auth interceptor: Skipping logout for local/mock authentication');
+            }
+            
             return Promise.reject(refreshError);
           }
         }
