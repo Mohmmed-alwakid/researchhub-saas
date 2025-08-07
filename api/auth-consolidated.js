@@ -56,7 +56,7 @@ const TEST_ACCOUNTS = {
     role: 'participant'
   },
   researcher: {
-    email: 'abwanwr77+Researcher@gmail.com',
+    email: 'abwanwr77+researcher@gmail.com', // Fixed case sensitivity
     password: 'Testtest123',
     role: 'researcher'
   },
@@ -401,6 +401,20 @@ async function handleRefresh(req, res) {
   }
 
   try {
+    // Check if we have Supabase available
+    if (!supabaseConnected || useLocalAuth) {
+      // For fallback auth, we don't need to do anything special for refresh
+      // Just return success since tokens are handled differently
+      return res.status(200).json({
+        success: true,
+        message: 'Token refreshed successfully (fallback mode)',
+        session: {
+          access_token: `fallback-token-refresh-${Date.now()}`,
+          refresh_token: `fallback-refresh-${Date.now()}`
+        }
+      });
+    }
+
     const { data, error } = await supabase.auth.refreshSession({ refresh_token });
 
     if (error) {
@@ -443,6 +457,16 @@ async function handleLogout(req, res) {
   }
 
   try {
+    // Check if we have Supabase available
+    if (!supabaseConnected || useLocalAuth) {
+      // For fallback auth, we don't need to do anything special for logout
+      // Just return success since tokens are handled differently
+      return res.status(200).json({
+        success: true,
+        message: 'Logout successful (fallback mode)'
+      });
+    }
+
     const token = authHeader.replace('Bearer ', '');
     const { error } = await supabase.auth.setSession({
       access_token: token,

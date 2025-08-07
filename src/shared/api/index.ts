@@ -52,7 +52,7 @@ import type { ApiRequest, ApiResponse } from './ApiClient';
  * Default API optimization configuration for ResearchHub
  */
 export const DEFAULT_API_CONFIG = {
-  baseUrl: process.env.NODE_ENV === 'development' ? 'http://localhost:3003/api' : '/api',
+  baseUrl: '/api', // Use Vite proxy for all environments
   timeout: 10000,
   retryAttempts: 3,
   retryDelay: 1000,

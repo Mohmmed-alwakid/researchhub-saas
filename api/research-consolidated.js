@@ -36,6 +36,91 @@ async function authenticateUser(req, requiredRoles = []) {
     }
 
     const token = authHeader.replace('Bearer ', '');
+    
+    // Check if this is a fallback token
+    if (token.startsWith('fallback-token-')) {
+      // Handle fallback authentication (local development)
+      // Token format: fallback-token-{userId}-{timestamp}
+      const tokenParts = token.replace('fallback-token-', '').split('-');
+      
+      // Reconstruct userId (everything except the last part which is timestamp)
+      const timestampPart = tokenParts[tokenParts.length - 1];
+      const userIdParts = tokenParts.slice(0, -1);
+      const userId = userIdParts.join('-');
+      
+      console.log('🔧 Fallback token parsing:', {
+        originalToken: token.substring(0, 40) + '...',
+        tokenParts: tokenParts,
+        timestampPart: timestampPart,
+        reconstructedUserId: userId
+      });
+      
+      // For fallback tokens, create a mock user object based on the actual userId
+      let fallbackUser;
+      
+      if (userId === 'test-researcher-001') {
+        fallbackUser = {
+          id: 'test-researcher-001',
+          email: 'abwanwr77+researcher@gmail.com',
+          user_metadata: { role: 'researcher' }
+        };
+      } else if (userId === 'test-participant-001') {
+        fallbackUser = {
+          id: 'test-participant-001',
+          email: 'abwanwr77+participant@gmail.com',
+          user_metadata: { role: 'participant' }
+        };
+      } else if (userId === 'test-admin-001') {
+        fallbackUser = {
+          id: 'test-admin-001',
+          email: 'abwanwr77+admin@gmail.com',
+          user_metadata: { role: 'admin' }
+        };
+      } else {
+        // Default fallback - try to guess from userId content
+        if (userId.includes('researcher')) {
+          fallbackUser = {
+            id: userId,
+            email: 'abwanwr77+researcher@gmail.com',
+            user_metadata: { role: 'researcher' }
+          };
+        } else if (userId.includes('admin')) {
+          fallbackUser = {
+            id: userId,
+            email: 'abwanwr77+admin@gmail.com',
+            user_metadata: { role: 'admin' }
+          };
+        } else {
+          fallbackUser = {
+            id: userId,
+            email: 'abwanwr77+participant@gmail.com',
+            user_metadata: { role: 'participant' }
+          };
+        }
+      }
+      
+      console.log('🔧 Fallback authentication - User resolved:', {
+        userId: userId,
+        resolvedRole: fallbackUser.user_metadata.role,
+        resolvedEmail: fallbackUser.email
+      });
+      
+      // Check role if specified
+      if (requiredRoles.length > 0) {
+        const userRole = fallbackUser.user_metadata?.role || 'participant';
+        if (!requiredRoles.includes(userRole)) {
+          return { 
+            success: false, 
+            error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+            status: 403 
+          };
+        }
+      }
+      
+      return { success: true, user: fallbackUser };
+    }
+
+    // Handle regular Supabase tokens
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
