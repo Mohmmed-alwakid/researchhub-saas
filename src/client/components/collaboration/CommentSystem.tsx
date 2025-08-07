@@ -144,6 +144,7 @@ export const CommentSystem: React.FC<CommentSystemProps> = ({
       studyId: entityId,
       blockId,
       parentCommentId: parentId,
+      userId: currentUser.id,
       authorId: currentUser.id,
       content: content.trim(),
       type: 'comment',

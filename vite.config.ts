@@ -6,10 +6,11 @@ export default defineConfig({
   plugins: [react()],
   root: '.',
   server: {
-    port: 5175,
+    port: 5175, // YOUR PREFERRED PORT - LOCKED!
+    strictPort: true, // Fail if port is in use instead of auto-switching
     proxy: {
       '/api': {
-        target: 'http://localhost:3003',
+        target: 'http://localhost:3003', // API server port
         changeOrigin: true,
         secure: false
       }

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchHub Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        .success { border-color: #4CAF50; background: #f8fff8; }
+        .error { border-color: #f44336; background: #fff8f8; }
+        .pending { border-color: #ff9800; background: #fff8f0; }
+        input, button { padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .log { background: #f0f0f0; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; font-weight: bold; }
+        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 ResearchHub Authentication Test</h1>
+        <p>Testing login functionality with the ResearchHub API</p>
+
+        <div id="status-display" class="status info">
+            🔄 Initializing authentication test...
+        </div>
+
+        <div class="test-section">
+            <h3>Test Authentication</h3>
+            <div>
+                <label>Email:</label>
+                <input type="email" id="email" value="abwanwr77+Researcher@gmail.com" style="width: 300px;">
+            </div>
+            <div>
+                <label>Password:</label>
+                <input type="password" id="password" value="Testtest123" style="width: 300px;">
+            </div>
+            <div>
+                <button onclick="testLogin()" id="login-btn">🚀 Test Login</button>
+                <button onclick="testLogout()" id="logout-btn">🚪 Test Logout</button>
+                <button onclick="checkStatus()" id="status-btn">📊 Check Status</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>API Response Log</h3>
+            <div id="response-log" class="log">Waiting for API calls...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>Token Information</h3>
+            <div id="token-info" class="log">No tokens available</div>
+        </div>
+
+        <div class="test-section">
+            <h3>User Information</h3>
+            <div id="user-info" class="log">No user logged in</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3005/api'; // Updated to fixed port
+        
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status-display');
+            statusEl.className = `status ${type}`;
+            statusEl.innerHTML = message;
+        }
+
+        function log(message) {
+            const logEl = document.getElementById('response-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function updateTokenInfo(session) {
+            const tokenEl = document.getElementById('token-info');
+            if (session) {
+                tokenEl.textContent = `Access Token: ${session.access_token?.substring(0, 50)}...
+Refresh Token: ${session.refresh_token?.substring(0, 50)}...
+Expires In: ${session.expires_in} seconds
+Local Auth: ${session.local_auth || false}`;
+            } else {
+                tokenEl.textContent = 'No tokens available';
+            }
+        }
+
+        function updateUserInfo(user) {
+            const userEl = document.getElementById('user-info');
+            if (user) {
+                userEl.textContent = `ID: ${user.id}
+Email: ${user.email}
+Role: ${user.role}
+Name: ${user.user_metadata?.first_name} ${user.user_metadata?.last_name}`;
+            } else {
+                userEl.textContent = 'No user logged in';
+            }
+        }
+
+        async function testLogin() {
+            updateStatus('🔄 Testing login...', 'info');
+            log('Starting login test...');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                log(`Sending login request for: ${email}`);
+                
+                const response = await fetch(`${API_BASE}/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+                log(`Response Status: ${response.status}`);
+                log(`Response Data: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success) {
+                    updateStatus('✅ Login successful!', 'success');
+                    updateTokenInfo(data.session);
+                    updateUserInfo(data.user);
+                    
+                    // Store tokens in localStorage for testing
+                    if (data.session) {
+                        localStorage.setItem('access_token', data.session.access_token);
+                        localStorage.setItem('refresh_token', data.session.refresh_token);
+                        localStorage.setItem('user_info', JSON.stringify(data.user));
+                    }
+                } else {
+                    updateStatus(`❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`);
+                updateStatus(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogout() {
+            updateStatus('🔄 Testing logout...', 'info');
+            log('Starting logout test...');
+            
+            try {
+                const token = localStorage.getItem('access_token');
+                
+                const response = await fetch(`${API_BASE}/auth-consolidated?action=logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                log(`Logout Response: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.success) {
+                    updateStatus('✅ Logout successful!', 'success');
+                    localStorage.clear();
+                    updateTokenInfo(null);
+                    updateUserInfo(null);
+                } else {
+                    updateStatus(`❌ Logout failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`);
+                updateStatus(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkStatus() {
+            updateStatus('🔄 Checking authentication status...', 'info');
+            log('Checking authentication status...');
+            
+            try {
+                const token = localStorage.getItem('access_token');
+                
+                if (!token) {
+                    updateStatus('❌ No token found', 'error');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE}/auth-consolidated?action=status`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                log(`Status Response: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.authenticated) {
+                    updateStatus('✅ User is authenticated', 'success');
+                    updateUserInfo(data.user);
+                } else {
+                    updateStatus('❌ User is not authenticated', 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`);
+                updateStatus(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            updateStatus('✅ Authentication test page ready', 'success');
+            log('Authentication test page initialized');
+            
+            // Check if we have stored tokens
+            const token = localStorage.getItem('access_token');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (token) {
+                updateTokenInfo({
+                    access_token: token,
+                    refresh_token: localStorage.getItem('refresh_token'),
+                    expires_in: 'Unknown',
+                    local_auth: true
+                });
+            }
+            
+            if (userInfo) {
+                updateUserInfo(JSON.parse(userInfo));
+            }
+        };
+    </script>
+</body>
+</html>

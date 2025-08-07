@@ -1,4 +1,4 @@
-import { useCallback, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 
 interface ApiCallLog {
   method: string;
@@ -155,14 +155,12 @@ export function useComponentMemory(componentName: string) {
 
   useEffect(() => {
     if ('memory' in performance) {
-      const memory = (performance as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
-      if (memory) {
-        memoryUsage.current = memory.usedJSHeapSize;
-        console.log(`💾 Memory usage for ${componentName}:`, {
-          used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`,
-          limit: `${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB`
-        });
-      }
+      const memory = (performance as any).memory;
+      memoryUsage.current = memory.usedJSHeapSize;
+      console.log(`💾 Memory usage for ${componentName}:`, {
+        used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`,
+        limit: `${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB`
+      });
     }
   }, [componentName]);
 

@@ -1,0 +1,556 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useAuthStore } from '../../stores/authStore';
+import { 
+  CollaboratorPresence,
+  EditingStatus,
+  CollaborationActivity,
+  WorkspaceRole
+} from '../../../shared/types';
+
+interface WebSocketMessage {
+  type: string;
+  roomId?: string;
+  user?: {
+    id: string;
+    email: string;
+    metadata?: {
+      name?: string;
+      avatar?: string;
+      [key: string]: unknown;
+    };
+  };
+  data?: {
+    status?: 'active' | 'idle' | 'away' | 'offline';
+    currentLocation?: {
+      studyId?: string;
+      blockId?: string;
+      section?: string;
+    };
+    currentElement?: string;
+    x?: number;
+    y?: number;
+    element?: string;
+    elementType?: 'block' | 'setting' | 'participant' | 'template';
+    elementId?: string;
+    action?: 'editing' | 'viewing' | 'commenting' | 'stopped';
+    field?: string;
+    content?: string;
+    type?: string;
+    entityType?: string;
+    entityId?: string;
+    priority?: string;
+    category?: string;
+    metadata?: Record<string, unknown>;
+    members?: Array<{
+      id: string;
+      email: string;
+      lastSeen: string;
+      metadata?: {
+        name?: string;
+        avatar?: string;
+      };
+    }>;
+    [key: string]: unknown;
+  };
+  timestamp?: string;
+}
+
+interface LiveCollaborationManagerProps {
+  studyId: string;
+  onCollaboratorsUpdate: (collaborators: CollaboratorPresence[]) => void;
+  onEditingStatusUpdate: (editing: EditingStatus[]) => void;
+  onActivityUpdate: (activity: CollaborationActivity[]) => void;
+  onConnectionUpdate: (connected: boolean) => void;
+  children: React.ReactNode;
+}
+
+interface CursorPosition {
+  x: number;
+  y: number;
+  element: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+}
+
+interface LiveEditingData {
+  blockId: string;
+  field: string;
+  content: string;
+}
+
+const LiveCollaborationManager: React.FC<LiveCollaborationManagerProps> = ({
+  studyId,
+  onCollaboratorsUpdate,
+  onEditingStatusUpdate,
+  onActivityUpdate,
+  onConnectionUpdate,
+  children
+}) => {
+  const { user, token } = useAuthStore();
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const [collaborators, setCollaborators] = useState<CollaboratorPresence[]>([]);
+  const [editingSessions, setEditingSessions] = useState<EditingStatus[]>([]);
+  const [activities, setActivities] = useState<CollaborationActivity[]>([]);
+  const [cursorPositions, setCursorPositions] = useState<Map<string, CursorPosition>>(new Map());
+  const [liveEditing, setLiveEditing] = useState<Map<string, LiveEditingData>>(new Map());
+
+  const sendMessage = useCallback((message: Omit<WebSocketMessage, 'timestamp'>) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        ...message,
+        timestamp: new Date().toISOString()
+      }));
+    }
+  }, []);
+
+  const addActivity = useCallback((activityData: Omit<CollaborationActivity, 'id' | 'timestamp' | 'entityName'>) => {
+    const activity: CollaborationActivity = {
+      id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date(),
+      entityName: `Study: ${studyId}`,
+      ...activityData
+    };
+
+    setActivities(prev => {
+      const updated = [activity, ...prev].slice(0, 50); // Keep last 50 activities
+      onActivityUpdate(updated);
+      return updated;
+    });
+  }, [studyId, onActivityUpdate]);
+
+  const startHeartbeat = useCallback(() => {
+    heartbeatIntervalRef.current = setInterval(() => {
+      sendMessage({ type: 'ping' });
+    }, 30000); // Ping every 30 seconds
+  }, [sendMessage]);
+
+  const stopHeartbeat = useCallback(() => {
+    if (heartbeatIntervalRef.current) {
+      clearInterval(heartbeatIntervalRef.current);
+      heartbeatIntervalRef.current = null;
+    }
+  }, []);
+
+  const handleUserJoined = useCallback((message: WebSocketMessage) => {
+    if (message.user) {
+      const newCollaborator: CollaboratorPresence = {
+        id: message.user.id,
+        name: (message.user.metadata?.name as string) || message.user.email,
+        email: message.user.email,
+        avatar: (message.user.metadata?.avatar as string) || '',
+        role: 'editor' as WorkspaceRole,
+        status: 'active' as const,
+        lastActive: new Date(),
+        currentLocation: {
+          studyId: studyId
+        },
+        sessionId: `session-${message.user.id}-${Date.now()}`
+      };
+
+      setCollaborators(prev => {
+        const existing = prev.find(c => c.id === message.user?.id);
+        if (existing) return prev; // Don't duplicate
+
+        const updated = [...prev, newCollaborator];
+        onCollaboratorsUpdate(updated);
+        return updated;
+      });
+
+      addActivity({
+        type: 'user_joined',
+        userId: message.user.id,
+        userName: (message.user.metadata?.name as string) || message.user.email,
+        action: 'joined the study workspace',
+        entityType: 'study',
+        entityId: studyId,
+        priority: 'low',
+        category: 'collaboration'
+      });
+    }
+  }, [studyId, onCollaboratorsUpdate, addActivity]);
+
+  const handleUserLeft = useCallback((message: WebSocketMessage) => {
+    if (message.user) {
+      setCollaborators(prev => {
+        const updated = prev.filter(c => c.id !== message.user?.id);
+        onCollaboratorsUpdate(updated);
+        return updated;
+      });
+
+      // Remove cursor if exists
+      setCursorPositions(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(message.user?.id || '');
+        return newMap;
+      });
+    }
+  }, [onCollaboratorsUpdate]);
+
+  const handlePresenceUpdate = useCallback((message: WebSocketMessage) => {
+    if (message.user && message.data) {
+      setCollaborators(prev => {
+        const updated = prev.map(c => 
+          c.id === message.user?.id 
+            ? { 
+                ...c, 
+                status: (message.data?.status as 'active' | 'idle' | 'away' | 'offline') || c.status,
+                lastActive: new Date(),
+                currentLocation: message.data?.currentLocation || c.currentLocation
+              }
+            : c
+        );
+        onCollaboratorsUpdate(updated);
+        return updated;
+      });
+    }
+  }, [onCollaboratorsUpdate]);
+
+  const handleCursorUpdate = useCallback((message: WebSocketMessage) => {
+    if (message.user && message.data && typeof message.data.x === 'number' && typeof message.data.y === 'number') {
+      const collaborator = collaborators.find(c => c.id === message.user?.id);
+      if (collaborator) {
+        setCursorPositions(prev => {
+          const newMap = new Map(prev);
+          newMap.set(message.user?.id || '', {
+            x: message.data?.x as number,
+            y: message.data?.y as number,
+            element: (message.data?.element as string) || '',
+            user: {
+              id: message.user?.id || '',
+              name: collaborator.name,
+              avatar: collaborator.avatar
+            }
+          });
+          return newMap;
+        });
+      }
+    }
+  }, [collaborators]);
+
+  const handleEditOperation = useCallback((message: WebSocketMessage) => {
+    if (message.user && message.data) {
+      const editingSession: EditingStatus = {
+        collaboratorId: message.user.id,
+        elementType: (message.data.elementType as 'block' | 'setting' | 'participant' | 'template') || 'block',
+        elementId: message.data.elementId as string,
+        action: (message.data.action as 'editing' | 'viewing' | 'commenting') || 'editing',
+        startedAt: new Date(message.timestamp || Date.now()),
+        lastUpdate: new Date()
+      };
+
+      setEditingSessions(prev => {
+        const filtered = prev.filter(e => 
+          !(e.collaboratorId === message.user?.id && e.elementId === message.data?.elementId)
+        );
+        const updated = message.data?.action === 'stopped' ? filtered : [...filtered, editingSession];
+        onEditingStatusUpdate(updated);
+        return updated;
+      });
+
+      // Update live editing map
+      if (message.data.action === 'editing') {
+        setLiveEditing(prev => {
+          const newMap = new Map(prev);
+          newMap.set(message.user?.id || '', {
+            blockId: (message.data?.elementId as string) || '',
+            field: (message.data?.field as string) || 'content',
+            content: (message.data?.content as string) || ''
+          });
+          return newMap;
+        });
+      } else if (message.data.action === 'stopped') {
+        setLiveEditing(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(message.user?.id || '');
+          return newMap;
+        });
+      }
+    }
+  }, [onEditingStatusUpdate]);
+
+  const handleActivityUpdate = useCallback((message: WebSocketMessage) => {
+    if (message.data) {
+      addActivity({
+        type: (message.data.type as string) || 'unknown',
+        userId: message.user?.id || 'system',
+        userName: (message.user?.metadata?.name as string) || message.user?.email || 'System',
+        action: (message.data.action as string) || 'performed an action',
+        entityType: (message.data.entityType as 'study' | 'block' | 'participant' | 'template' | 'workspace') || 'study',
+        entityId: (message.data.entityId as string) || studyId,
+        priority: (message.data.priority as 'low' | 'medium' | 'high') || 'medium',
+        category: (message.data.category as string) || 'content',
+        metadata: message.data.metadata
+      });
+    }
+  }, [studyId, addActivity]);
+
+  const handleRoomState = useCallback((message: WebSocketMessage) => {
+    if (message.data?.members) {
+      const roomCollaborators: CollaboratorPresence[] = (message.data.members as Array<{
+        id: string;
+        email: string;
+        lastSeen: string;
+        metadata?: { name?: string; avatar?: string };
+      }>).map((member) => ({
+        id: member.id,
+        name: member.metadata?.name || member.email,
+        email: member.email,
+        avatar: member.metadata?.avatar || '',
+        role: 'editor' as WorkspaceRole,
+        status: 'active' as const,
+        lastActive: new Date(member.lastSeen),
+        currentLocation: {
+          studyId: studyId
+        },
+        sessionId: `session-${member.id}-${Date.now()}`
+      }));
+
+      setCollaborators(roomCollaborators);
+      onCollaboratorsUpdate(roomCollaborators);
+    }
+  }, [studyId, onCollaboratorsUpdate]);
+
+  const handleWebSocketMessage = useCallback((event: MessageEvent) => {
+    try {
+      const message: WebSocketMessage = JSON.parse(event.data);
+      
+      switch (message.type) {
+        case 'user_joined':
+          handleUserJoined(message);
+          break;
+        case 'user_left':
+          handleUserLeft(message);
+          break;
+        case 'presence_update':
+          handlePresenceUpdate(message);
+          break;
+        case 'cursor_update':
+          handleCursorUpdate(message);
+          break;
+        case 'edit_operation':
+          handleEditOperation(message);
+          break;
+        case 'activity_update':
+          handleActivityUpdate(message);
+          break;
+        case 'room_state':
+          handleRoomState(message);
+          break;
+        case 'pong':
+          // Heartbeat response
+          break;
+        default:
+          console.log('Unknown message type:', message.type);
+      }
+    } catch (error) {
+      console.error('Error parsing WebSocket message:', error);
+    }
+  }, [
+    handleUserJoined,
+    handleUserLeft,
+    handlePresenceUpdate,
+    handleCursorUpdate,
+    handleEditOperation,
+    handleActivityUpdate,
+    handleRoomState
+  ]);
+
+  const connectWebSocket = useCallback(() => {
+    if (!user || !token) return;
+
+    try {
+      const wsUrl = `ws://localhost:8080?token=${token}&studyId=${studyId}`;
+      wsRef.current = new WebSocket(wsUrl);
+
+      wsRef.current.onopen = () => {
+        console.log('WebSocket connected');
+        setIsConnected(true);
+        setReconnectAttempts(0);
+        onConnectionUpdate(true);
+        startHeartbeat();
+
+        // Join the study room
+        sendMessage({
+          type: 'join_room',
+          roomId: `study:${studyId}`
+        });
+      };
+
+      wsRef.current.onmessage = handleWebSocketMessage;
+
+      wsRef.current.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason);
+        setIsConnected(false);
+        onConnectionUpdate(false);
+        stopHeartbeat();
+
+        // Attempt to reconnect
+        if (event.code !== 1000 && reconnectAttempts < 5) {
+          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+          reconnectTimeoutRef.current = setTimeout(() => {
+            setReconnectAttempts(prev => prev + 1);
+            connectWebSocket();
+          }, delay);
+        }
+      };
+
+      wsRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+    } catch (error) {
+      console.error('Failed to connect WebSocket:', error);
+    }
+  }, [
+    user,
+    token,
+    studyId,
+    reconnectAttempts,
+    handleWebSocketMessage,
+    onConnectionUpdate,
+    sendMessage,
+    startHeartbeat,
+    stopHeartbeat
+  ]);
+
+  // Public API functions
+  const updateCursor = useCallback((x: number, y: number, element: string) => {
+    sendMessage({
+      type: 'cursor_update',
+      roomId: `study:${studyId}`,
+      data: { x, y, element }
+    });
+  }, [studyId, sendMessage]);
+
+  const startEditing = useCallback((elementType: string, elementId: string, field?: string) => {
+    sendMessage({
+      type: 'edit_operation',
+      roomId: `study:${studyId}`,
+      data: {
+        action: 'editing',
+        elementType,
+        elementId,
+        field
+      }
+    });
+  }, [studyId, sendMessage]);
+
+  const stopEditing = useCallback((elementType: string, elementId: string) => {
+    sendMessage({
+      type: 'edit_operation',
+      roomId: `study:${studyId}`,
+      data: {
+        action: 'stopped',
+        elementType,
+        elementId
+      }
+    });
+  }, [studyId, sendMessage]);
+
+  const updatePresence = useCallback((status: 'active' | 'away' | 'idle', currentElement?: string) => {
+    sendMessage({
+      type: 'presence_update',
+      roomId: `study:${studyId}`,
+      data: {
+        status,
+        currentElement
+      }
+    });
+  }, [studyId, sendMessage]);
+
+  const broadcastActivity = useCallback((activityType: string, action: string, metadata?: Record<string, unknown>) => {
+    sendMessage({
+      type: 'activity_update',
+      roomId: `study:${studyId}`,
+      data: {
+        type: activityType,
+        action,
+        entityType: 'study',
+        entityId: studyId,
+        metadata
+      }
+    });
+  }, [studyId, sendMessage]);
+
+  // Effects
+  useEffect(() => {
+    connectWebSocket();
+
+    return () => {
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      stopHeartbeat();
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, [connectWebSocket, stopHeartbeat]);
+
+  // Mouse tracking for cursor updates
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (isConnected) {
+        const element = event.target as HTMLElement;
+        const elementId = element.id || element.className || 'unknown';
+        updateCursor(event.clientX, event.clientY, elementId);
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [isConnected, updateCursor]);
+
+  return (
+    <div className="live-collaboration-manager">
+      {/* Live Cursor Indicators */}
+      {Array.from(cursorPositions.values()).map((cursor) => (
+        <div
+          key={cursor.user.id}
+          className="fixed pointer-events-none z-50 transition-all duration-100"
+          style={{
+            left: cursor.x,
+            top: cursor.y,
+            transform: 'translate(-2px, -2px)'
+          }}
+        >
+          <div className="flex items-center space-x-1">
+            <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>
+            <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded shadow-lg">
+              {cursor.user.name}
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Connection Status Indicator */}
+      <div className="fixed top-4 right-4 z-40">
+        <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg shadow-lg ${
+          isConnected 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-red-100 text-red-800 border border-red-200'
+        }`}>
+          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+          <span className="text-sm font-medium">
+            {isConnected ? 'Live Collaboration' : 'Disconnected'}
+          </span>
+          {collaborators.length > 0 && (
+            <span className="text-xs bg-white bg-opacity-50 px-1 rounded">
+              {collaborators.length} online
+            </span>
+          )}
+        </div>
+      </div>
+
+      {children}
+    </div>
+  );
+};
+
+export default LiveCollaborationManager;

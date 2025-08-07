@@ -203,7 +203,14 @@ async function handleLogin(req, res) {
   }
 
   try {
-    // First try Supabase authentication
+    // Check if this is a test account first (for local development)
+    const testAccountEmails = Object.values(TEST_ACCOUNTS).map(acc => acc.email);
+    if (testAccountEmails.includes(email)) {
+      console.log('🔧 Test account detected, using local auth fallback...');
+      return await handleLocalAuth(email, password, res);
+    }
+
+    // Try Supabase authentication for non-test accounts
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -212,10 +219,12 @@ async function handleLogin(req, res) {
     if (error) {
       console.error('Supabase login error:', error);
       
-      // Check if it's a connectivity issue or if this is a test account
-      if (email in Object.values(TEST_ACCOUNTS).map(acc => acc.email)) {
-        console.log('🔄 Attempting local auth fallback for test account...');
-        return await handleLocalAuth(email, password, res);
+      // For connectivity issues, fall back to local auth if it's a test account
+      if (error.message && error.message.includes('fetch failed')) {
+        console.log('🔄 Network connectivity issue, checking for test account fallback...');
+        if (testAccountEmails.includes(email)) {
+          return await handleLocalAuth(email, password, res);
+        }
       }
       
       return res.status(401).json({

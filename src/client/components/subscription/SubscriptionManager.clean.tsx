@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Coins, 
+  Check, 
+  Download,
   AlertCircle,
+  Crown,
+  Zap,
+  Sparkles,
   Plus,
   Minus,
   History,
@@ -76,9 +81,14 @@ export const PointsManager: React.FC<PointsManagerProps> = () => {
         <CardContent>
           <div className="text-center py-6">
             <div className="text-3xl font-bold text-gray-900">
-              {balance?.currentBalance || 0}
+              {balance?.available || 0}
             </div>
             <p className="text-sm text-gray-600 mt-1">Available Points</p>
+            {balance && balance.pending > 0 && (
+              <p className="text-sm text-yellow-600 mt-1">
+                {balance.pending} points pending
+              </p>
+            )}
           </div>
           
           {/* Usage Stats */}
@@ -92,7 +102,7 @@ export const PointsManager: React.FC<PointsManagerProps> = () => {
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold text-gray-900">
-                  {usageStats.pointsSpent}
+                  {usageStats.totalSpent}
                 </div>
                 <p className="text-sm text-gray-600">Points Spent</p>
               </div>
@@ -130,23 +140,23 @@ export const PointsManager: React.FC<PointsManagerProps> = () => {
                 >
                   <div className="flex items-center space-x-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      (transaction.type === 'earned' || transaction.type === 'admin_assigned')
+                      transaction.type === 'credit' 
                         ? 'bg-green-100 text-green-600' 
                         : 'bg-red-100 text-red-600'
                     }`}>
-                      {(transaction.type === 'earned' || transaction.type === 'admin_assigned') ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+                      {transaction.type === 'credit' ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{transaction.description}</p>
                       <p className="text-sm text-gray-500">
-                        {new Date(transaction.timestamp).toLocaleDateString()}
+                        {new Date(transaction.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <div className={`font-semibold ${
-                    (transaction.type === 'earned' || transaction.type === 'admin_assigned') ? 'text-green-600' : 'text-red-600'
+                    transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {(transaction.type === 'earned' || transaction.type === 'admin_assigned') ? '+' : '-'}{transaction.amount}
+                    {transaction.type === 'credit' ? '+' : '-'}{transaction.amount}
                   </div>
                 </div>
               ))}

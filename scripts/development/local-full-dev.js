@@ -221,8 +221,8 @@ app.listen(API_PORT, () => {
   console.log('🧪 Use test accounts from TESTING_RULES_MANDATORY.md');
 });
 
-// Start frontend development server
-const frontendProcess = spawn('npm', ['run', 'dev'], {
+// Start frontend development server (directly call Vite to avoid conflicts)
+const frontendProcess = spawn('npm', ['run', 'dev:client'], {
   cwd: path.join(__dirname, '../..'),
   stdio: 'inherit',
   shell: true

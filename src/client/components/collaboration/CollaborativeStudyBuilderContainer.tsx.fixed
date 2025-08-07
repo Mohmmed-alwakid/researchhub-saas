@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../stores/authStore';
+import { collaborationService } from '../../services/collaborationService';
 import { commentsService } from '../../services/commentsService';
 import { CollaborationHeader } from './CollaborationHeader';
 import { CollaborationIndicators } from './CollaborationIndicators';
@@ -14,13 +15,16 @@ import {
   CollaboratorPresence,
   EditingStatus,
   CollaborationActivity,
+  WorkspaceRole,
   StudyBuilderBlock
 } from '../../../shared/types';
+import { ActivityType } from './types';
 import { MessageCircle, Activity, Users, Eye, EyeOff } from 'lucide-react';
 
 interface CollaborativeStudyBuilderContainerProps {
   studyId: string;
   studyTitle: string;
+  workspaceId?: string;
   children: React.ReactNode;
   className?: string;
   studyBlocks?: StudyBuilderBlock[];
@@ -30,6 +34,7 @@ interface CollaborativeStudyBuilderContainerProps {
 export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuilderContainerProps> = ({
   studyId,
   studyTitle,
+  workspaceId = 'workspace-1',
   children,
   className = '',
   studyBlocks = [],
@@ -41,6 +46,7 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
   const [activeCollaborators, setActiveCollaborators] = useState<CollaboratorPresence[]>([]);
   const [editingStatus, setEditingStatus] = useState<EditingStatus[]>([]);
   const [recentActivity, setRecentActivity] = useState<CollaborationActivity[]>([]);
+  const [isCollaborationConnected, setIsCollaborationConnected] = useState(false);
   
   // Advanced collaboration metrics
   const [collaborationMetrics, setCollaborationMetrics] = useState({
@@ -52,6 +58,7 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
   
   // Comments state
   const [comments, setComments] = useState<IStudyComment[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
   
   // UI state
   const [activeTab, setActiveTab] = useState<'team' | 'comments' | 'activity'>('team');
@@ -91,7 +98,7 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
   }, []);
 
   const handleConnectionUpdate = useCallback((connected: boolean) => {
-    console.log('Collaboration connection status:', connected);
+    setIsCollaborationConnected(connected);
   }, []);
 
   // Advanced collaboration functions
@@ -134,17 +141,28 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
     }, 5000);
   }, [activeCollaborators]);
 
+  const handleBlockChange = useCallback((updatedBlock: StudyBuilderBlock) => {
+    if (onBlocksChange) {
+      const updatedBlocks = studyBlocks.map(block => 
+        block.id === updatedBlock.id ? updatedBlock : block
+      );
+      onBlocksChange(updatedBlocks);
+    }
+  }, [onBlocksChange, studyBlocks]);
+
   // Load comments
   useEffect(() => {
     const loadComments = async () => {
       if (!user) return;
       
+      setIsLoadingComments(true);
       try {
         const studyComments = await commentsService.getComments('study', studyId);
-        // Extract just the comments array from the service response
-        setComments(studyComments.comments || []);
+        setComments(studyComments);
       } catch (error) {
         console.error('Failed to load comments:', error);
+      } finally {
+        setIsLoadingComments(false);
       }
     };
 
@@ -180,14 +198,16 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
           entityType="study"
           entityId={studyId}
           entityTitle={studyTitle}
+          collaborators={activeCollaborators}
+          editingStatus={editingStatus}
           onShowComments={() => setActiveTab('comments')}
           onShowActivity={() => setActiveTab('activity')}
         />
 
         {/* Live Collaboration Indicators */}
         <CollaborationIndicators
-          activeCollaborators={activeCollaborators}
           editingStatus={editingStatus}
+          isConnected={isCollaborationConnected}
         />
 
         {/* Live Editing Status */}
@@ -410,65 +430,18 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
                   <CommentSystem
                     entityType="study"
                     entityId={studyId}
-                    currentUser={{
-                      id: '1', // TODO: Get from auth context
-                      name: 'Current User',
-                      avatar: '',
-                      role: 'researcher'
-                    }}
                     comments={comments}
-                    teamMembers={activeCollaborators}
-                    onAddComment={() => {}}
-                    onUpdateComment={() => {}}
-                    onDeleteComment={() => {}}
-                    onAddReaction={() => {}}
-                    onRemoveReaction={() => {}}
+                    onCommentAdd={() => {}}
+                    onCommentUpdate={() => {}}
+                    onCommentDelete={() => {}}
                   />
                 )}
 
                 {activeTab === 'activity' && (
                   <ActivityFeed
-                    activities={recentActivity.map(activity => {
-                      // Map CollaborationActivity type to local ActivityType
-                      const mappedType: 'study_created' | 'study_updated' | 'study_approved' | 'study_rejected' | 'comment_added' | 'user_joined' | 'template_created' | 'block_added' | 'block_updated' | 'collaboration_started' = 
-                        activity.type === 'block_edited' ? 'block_updated' :
-                        activity.type === 'template_applied' ? 'template_created' :
-                        activity.type === 'study_published' ? 'study_updated' :
-                        activity.type === 'settings_changed' ? 'study_updated' :
-                        'collaboration_started'; // Default fallback
-                      
-                      return {
-                        id: activity.id,
-                        type: mappedType,
-                        user: {
-                          id: activity.userId,
-                          name: activity.userName || 'Unknown User',
-                          email: '', // Default value
-                          avatar: activity.userAvatar || '',
-                          role: 'collaborator' as const
-                        },
-                        timestamp: activity.timestamp,
-                        target: {
-                          id: activity.entityId || studyId,
-                          title: activity.entityName || studyTitle,
-                          type: 'study' as const
-                        },
-                        metadata: activity.metadata ? {
-                          previousValue: String(activity.metadata.oldValue || ''),
-                          newValue: String(activity.metadata.newValue || ''),
-                          blockType: activity.metadata.blockType,
-                          comment: activity.metadata.location
-                        } : undefined
-                      };
-                    })}
-                    currentUser={{
-                      id: '1', // TODO: Get from auth context
-                      name: 'Current User',
-                      email: 'user@example.com',
-                      avatar: '',
-                      role: 'collaborator'
-                    }}
+                    activities={recentActivity}
                     isLoading={false}
+                    onLoadMore={() => {}}
                   />
                 )}
               </div>
@@ -502,7 +475,9 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
               description: 'This is a demo block for testing collaboration features',
               settings: {}
             }}
-            mode="edit"
+            collaborators={activeCollaborators}
+            onBlockChange={handleBlockChange}
+            context="collaboration-demo"
           />
         </div>
 

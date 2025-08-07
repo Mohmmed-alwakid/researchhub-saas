@@ -46,8 +46,14 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (email: string, password: string) => {
         set({ isLoading: true });
-        try {          const response = await authService.login({ email, password });
-            if (response.requiresTwoFactor) {
+        try {
+          console.log('🔍 Auth Store - Starting login with:', { email });
+          
+          const response = await authService.login({ email, password });
+          
+          console.log('🔍 Auth Store - Login response received:', response);
+          
+          if (response.requiresTwoFactor) {
             set({ 
               tempToken: response.tempToken,
               tempEmail: email,
@@ -55,7 +61,9 @@ export const useAuthStore = create<AuthState>()(
               isLoading: false 
             });
             return { requiresTwoFactor: true, tempToken: response.tempToken };
-          }          // Extract data from Supabase response structure
+          }
+
+          // Extract data from Supabase response structure
           const user = response.user;
           const token = response.session?.access_token || response.tokens?.authToken;
           const refreshToken = response.session?.refresh_token || response.tokens?.refreshToken;
@@ -96,6 +104,13 @@ export const useAuthStore = create<AuthState>()(
           return {};
         } catch (error: unknown) {
           set({ isLoading: false });
+          console.error('❌ Auth Store - Login error details:', {
+            error,
+            errorMessage: error instanceof Error ? error.message : 'Unknown error',
+            errorStack: error instanceof Error ? error.stack : 'No stack',
+            errorType: typeof error,
+            errorStringified: JSON.stringify(error, null, 2)
+          });
           const message = error instanceof Error ? error.message : 'Login failed';
           toast.error(message);
           throw error;

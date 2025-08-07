@@ -18,7 +18,7 @@ export const getCurrentEnvironment = (): Environment => {
 export const environmentDefaults = {
   development: {
     api: {
-      baseUrl: 'http://localhost:3003',
+      baseUrl: 'http://localhost:3005', // Fixed port to prevent conflicts
       timeout: 10000,
       retryAttempts: 1,
     },
