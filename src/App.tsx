@@ -39,7 +39,7 @@ const SettingsPage = lazy(() => import('./client/pages/settings/SettingsPage'));
 const AdminDashboard = lazy(() => import('./client/pages/admin/AdminDashboard'));
 const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPaymentPage.tsx'));
 const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage.tsx'));
-const ProfessionalStudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage').then(module => ({ default: module.StudyBuilderPage })));
+const ProfessionalStudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage'));
 const OrganizationDashboard = lazy(() => import('./client/pages/organization/OrganizationDashboard'));
 
 // Create a client

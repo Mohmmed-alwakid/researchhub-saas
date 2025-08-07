@@ -10,7 +10,7 @@ export default defineConfig({
     strictPort: true, // Fail if port is in use instead of auto-switching
     proxy: {
       '/api': {
-        target: 'http://localhost:3003', // API server port
+        target: 'http://localhost:3003', // API server port (Fixed: was 3000, now 3003)
         changeOrigin: true,
         secure: false
       }
