@@ -5,23 +5,48 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { 
+  checkSupabaseConnectivity, 
+  initializeFallbackDatabase 
+} from '../scripts/development/network-resilient-fallback.js';
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
 
-let supabase, supabaseAdmin;
+let supabase, supabaseAdmin, fallbackDb;
 let useLocalAuth = false;
+let supabaseConnected = false;
 
-// Initialize Supabase with fallback
-try {
-  supabase = createClient(supabaseUrl, supabaseKey);
-  supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-} catch (error) {
-  console.warn('⚠️ Supabase initialization failed, using local auth fallback');
-  useLocalAuth = true;
+// Initialize Supabase with automatic fallback
+async function initializeSupabaseWithFallback() {
+  try {
+    console.log('🔧 Initializing database connections...');
+    
+    // Check Supabase connectivity
+    supabaseConnected = await checkSupabaseConnectivity(supabaseUrl);
+    
+    if (supabaseConnected) {
+      console.log('✅ Using Supabase (remote database)');
+      supabase = createClient(supabaseUrl, supabaseKey);
+      supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+      useLocalAuth = false;
+    } else {
+      console.log('🔧 Supabase unavailable, switching to local fallback database');
+      fallbackDb = await initializeFallbackDatabase();
+      useLocalAuth = true;
+    }
+    
+  } catch (error) {
+    console.warn('⚠️ Database initialization failed, using local fallback');
+    fallbackDb = await initializeFallbackDatabase();
+    useLocalAuth = true;
+  }
 }
+
+// Initialize on module load
+await initializeSupabaseWithFallback();
 
 // Test accounts for development (from TESTING_RULES_MANDATORY.md)
 const TEST_ACCOUNTS = {
@@ -221,7 +246,7 @@ async function handleRegister(req, res) {
 }
 
 /**
- * Login user
+ * Login user with automatic fallback
  */
 async function handleLogin(req, res) {
   if (req.method !== 'POST') {
@@ -241,76 +266,119 @@ async function handleLogin(req, res) {
     // ALWAYS check for test accounts first in development
     const testAccountEmails = Object.values(TEST_ACCOUNTS).map(acc => acc.email);
     if (testAccountEmails.includes(email)) {
-      console.log('🔧 Test account detected, using local auth fallback...');
-      return await handleLocalAuth(email, password, res);
+      console.log('🔧 Test account detected, using appropriate auth method...');
+      
+      if (useLocalAuth || !supabaseConnected) {
+        console.log('🔧 Using fallback database for test account');
+        return await handleFallbackAuth(email, password, res);
+      } else {
+        console.log('🔧 Using local auth fallback for test account');
+        return await handleLocalAuth(email, password, res);
+      }
     }
 
-    // Try Supabase authentication for non-test accounts only if available
-    let supabaseAvailable = true;
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+    // For non-test accounts, use Supabase if available, otherwise fallback
+    if (supabaseConnected && !useLocalAuth) {
+      console.log('🔧 Attempting Supabase authentication...');
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
 
-      if (error) {
-        console.error('Supabase login error:', error);
-        supabaseAvailable = false;
-      } else {
-        // Try to fetch user profile from profiles table to get role and other details
-        let profileData = null;
-        try {
-          const { data: profile, error: profileError } = await supabaseAdmin
-            .from('profiles')
-            .select('*')
-            .eq('email', email)
-            .single();
-          
-          if (profileError) {
-            console.log('Profile table not accessible, using user_metadata:', profileError.message);
-            profileData = null;
-          } else {
-            profileData = profile;
-          }
-        } catch (error) {
-          console.log('Profile fetch failed, using user_metadata:', error.message);
-          profileData = null;
+        if (error) {
+          console.error('Supabase login error:', error);
+          // If Supabase fails, try fallback
+          console.log('🔧 Supabase failed, trying fallback database...');
+          return await handleFallbackAuth(email, password, res);
         }
 
-        // Return user with profile data including role
-        return res.status(200).json({
-          success: true,
-          message: 'Login successful',
-          user: {
-            id: data.user.id,
-            email: data.user.email,
-            firstName: profileData?.first_name || data.user.user_metadata?.first_name || '',
-            lastName: profileData?.last_name || data.user.user_metadata?.last_name || '',
-            role: profileData?.role || data.user.user_metadata?.role || 'participant',
-            status: profileData?.status,
-            emailConfirmed: data.user.email_confirmed_at ? true : false
-          },
-          session: data.session
-        });
+        if (data.user) {
+          console.log('✅ Supabase authentication successful');
+          return await handleSuccessfulAuth(data, res);
+        }
+      } catch (supabaseError) {
+        console.error('Supabase connection error:', supabaseError);
+        // Fall back to local database
+        console.log('🔧 Supabase unavailable, using fallback database...');
+        return await handleFallbackAuth(email, password, res);
       }
-    } catch (networkError) {
-      console.error('Network connectivity issue:', networkError.message);
-      supabaseAvailable = false;
+    } else {
+      console.log('🔧 Using fallback database (Supabase unavailable)...');
+      return await handleFallbackAuth(email, password, res);
     }
 
-    // If Supabase is not available and not a test account, return error
-    if (!supabaseAvailable) {
-      return res.status(401).json({
-        success: false,
-        error: 'Authentication service unavailable. Please try again later.'
-      });
-    }
+    // If we reach here, authentication failed
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication failed'
+    });
 
   } catch (error) {
     console.error('Login exception:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Handle fallback database authentication
+ */
+async function handleFallbackAuth(email, password, res) {
+  try {
+    console.log(`🔧 Using fallback database for: ${email}`);
+    
+    const authResult = await fallbackDb.signInWithPassword({ email, password });
+    
+    if (authResult.data && authResult.data.user) {
+      console.log('✅ Fallback authentication successful');
+      return await handleSuccessfulAuth(authResult.data, res);
+    } else {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+    }
+    
+  } catch (error) {
+    console.error('Fallback auth error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Authentication service unavailable'
+    });
+  }
+}
+
+/**
+ * Handle successful authentication response
+ */
+async function handleSuccessfulAuth(authData, res) {
+  try {
+    const user = authData.user;
+    const profile = user.profile;
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: profile?.first_name || user.user_metadata?.first_name || '',
+        lastName: profile?.last_name || user.user_metadata?.last_name || '',
+        role: profile?.role || user.user_metadata?.role || 'participant',
+        status: profile?.status || 'active',
+        emailConfirmed: user.email_confirmed_at ? true : false
+      },
+      session: authData.session
+    });
+    
+  } catch (error) {
+    console.error('Error formatting auth response:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Authentication processing failed'
     });
   }
 }

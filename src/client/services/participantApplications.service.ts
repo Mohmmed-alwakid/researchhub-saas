@@ -1,29 +1,29 @@
-import { apiService } from './api.service';
+import { apiService } from './api-network-resilient.service';
 import type { ParticipantApplication, IParticipantApplication } from '../../shared/types';
 
-// Local development configuration
-const DEVELOPMENT_CONFIG = {
-  FORCE_LOCAL_MODE: false, // DISABLED: Use real APIs only
-  MOCK_DELAY: 300 // Keep for future use if needed
+// Network-resilient configuration
+const NETWORK_CONFIG = {
+  AUTO_FALLBACK: true, // Automatic fallback to local database
+  CONNECTIVITY_CHECK: true // Check network before API calls
 };
 
-// Helper function to detect if we're in local development mode
-const isLocalDevelopment = (): boolean => {
+// Helper function to detect if we're in fallback mode
+const isFallbackMode = (): boolean => {
   try {
     const authStorage = localStorage.getItem('auth-storage');
     if (authStorage) {
       const { state } = JSON.parse(authStorage);
       const token = state?.token;
-      return DEVELOPMENT_CONFIG.FORCE_LOCAL_MODE || (token && token.includes('mock-signature'));
+      return Boolean(token && (token.includes('mock-signature') || token.includes('fallback-token')));
     }
   } catch (error) {
     console.warn('Failed to parse auth storage:', error);
   }
-  return DEVELOPMENT_CONFIG.FORCE_LOCAL_MODE;
+  return false;
 };
 
 // Helper function to simulate API delay
-const simulateDelay = (ms: number = DEVELOPMENT_CONFIG.MOCK_DELAY) => {
+const simulateDelay = (ms: number = 300) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
@@ -284,9 +284,9 @@ export const participantApplicationsService = {
     limit?: number;
     status?: string;
   } = {}): Promise<ApplicationsResponse> {
-    // Check if we should use mock data (local development mode)
-    if (isLocalDevelopment()) {
-      console.log('🔧 Participant Applications Service - Using mock data for local development');
+    // Check if we should use fallback data
+    if (isFallbackMode()) {
+      console.log('🔧 Participant Applications Service - Using fallback data');
       await simulateDelay();
       
       const mockApps = getMockApplications();

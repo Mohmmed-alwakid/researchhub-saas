@@ -1,0 +1,20 @@
+[
+  {
+    "id": "app-001",
+    "study_id": "study-001",
+    "participant_id": "test-participant-001",
+    "status": "approved",
+    "applied_at": "2025-08-07T16:54:15.585Z",
+    "reviewed_at": "2025-08-07T16:54:15.585Z",
+    "notes": "Qualified participant"
+  },
+  {
+    "id": "app-002",
+    "study_id": "study-002",
+    "participant_id": "test-participant-001",
+    "status": "pending",
+    "applied_at": "2025-08-07T16:54:15.585Z",
+    "reviewed_at": null,
+    "notes": null
+  }
+]

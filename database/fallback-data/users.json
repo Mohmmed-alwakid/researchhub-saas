@@ -1,0 +1,26 @@
+[
+  {
+    "id": "test-researcher-001",
+    "email": "abwanwr77+Researcher@gmail.com",
+    "raw_user_meta_data": "{\"role\":\"researcher\"}",
+    "raw_app_meta_data": "{}",
+    "created_at": "2025-08-07T16:54:15.584Z",
+    "updated_at": "2025-08-07T16:54:15.585Z"
+  },
+  {
+    "id": "test-participant-001",
+    "email": "abwanwr77+participant@gmail.com",
+    "raw_user_meta_data": "{\"role\":\"participant\"}",
+    "raw_app_meta_data": "{}",
+    "created_at": "2025-08-07T16:54:15.585Z",
+    "updated_at": "2025-08-07T16:54:15.585Z"
+  },
+  {
+    "id": "test-admin-001",
+    "email": "abwanwr77+admin@gmail.com",
+    "raw_user_meta_data": "{\"role\":\"admin\"}",
+    "raw_app_meta_data": "{}",
+    "created_at": "2025-08-07T16:54:15.585Z",
+    "updated_at": "2025-08-07T16:54:15.585Z"
+  }
+]

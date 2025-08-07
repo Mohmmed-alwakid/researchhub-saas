@@ -1,4 +1,4 @@
-import { apiService } from './api.service';
+import { apiService } from './api-network-resilient.service';
 import type { Study, StudyStatus, StudyType, Task } from '../../shared/types';
 
 export interface CreateStudyRequest {

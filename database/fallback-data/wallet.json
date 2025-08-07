@@ -1,0 +1,11 @@
+[
+  {
+    "id": "wallet-test-participant-001",
+    "user_id": "test-participant-001",
+    "balance": 125.5,
+    "total_earned": 567.25,
+    "pending_amount": 15,
+    "created_at": "2025-08-07T16:54:15.585Z",
+    "updated_at": "2025-08-07T16:54:15.585Z"
+  }
+]
