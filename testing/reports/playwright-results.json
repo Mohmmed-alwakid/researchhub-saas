@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 5
+      "actualWorkers": 4
     },
     "preserveOutput": "always",
     "reporter": [
@@ -45,7 +45,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 5
+          "actualWorkers": 4
         },
         "id": "chromium",
         "name": "chromium",
@@ -61,7 +61,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 5
+          "actualWorkers": 4
         },
         "id": "firefox",
         "name": "firefox",
@@ -77,7 +77,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 5
+          "actualWorkers": 4
         },
         "id": "webkit",
         "name": "webkit",
@@ -93,7 +93,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 5
+          "actualWorkers": 4
         },
         "id": "mobile-chrome",
         "name": "mobile-chrome",
@@ -114,25 +114,25 @@
   },
   "suites": [
     {
-      "title": "researcher-use-cases-comprehensive.spec.js",
-      "file": "researcher-use-cases-comprehensive.spec.js",
+      "title": "enhanced-participant-profile.spec.js",
+      "file": "enhanced-participant-profile.spec.js",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "UC-01 to UC-08: Study Design & Creation",
-          "file": "researcher-use-cases-comprehensive.spec.js",
-          "line": 120,
+          "title": "Enhanced Participant Profile & Study Matching",
+          "file": "enhanced-participant-profile.spec.js",
+          "line": 16,
           "column": 6,
           "specs": [
             {
-              "title": "UC-01: Create New Usability Study from Scratch",
-              "ok": true,
+              "title": "should update participant demographics and filter studies accordingly",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -141,136 +141,72 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4059,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Testing UC-01: Create New Usability Study from Scratch\n"
+                      "status": "failed",
+                      "duration": 13137,
+                      "error": {
+                        "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================",
+                        "stack": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:28:16",
+                        "location": {
+                          "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                          "column": 16,
+                          "line": 28
                         },
+                        "snippet": "\u001b[0m \u001b[90m 26 |\u001b[39m     \n \u001b[90m 27 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \n \u001b[90m 30 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
                         {
-                          "text": "❌ UC-01 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
+                          "location": {
+                            "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                            "column": 16,
+                            "line": 28
+                          },
+                          "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n\n\u001b[0m \u001b[90m 26 |\u001b[39m     \n \u001b[90m 27 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \n \u001b[90m 30 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:28:16\u001b[22m"
                         }
                       ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-20T07:36:49.468Z",
+                      "startTime": "2025-08-08T22:14:16.675Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                        "column": 16,
+                        "line": 28
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "fdd45cb8a143a88b78b5-68154246659b98458dc5",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 122,
+              "id": "fa67459c0aef2a044903-27bbef7771c0d422b71e",
+              "file": "enhanced-participant-profile.spec.js",
+              "line": 18,
               "column": 3
             },
             {
-              "title": "UC-03: Use Pre-built Research Template",
+              "title": "should show demographics tab only for participants",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 45000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2304,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Testing UC-03: Use Pre-built Research Template\n"
-                        },
-                        {
-                          "text": "❌ UC-03 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n================================================================================\n"
-                        },
-                        {
-                          "text": "🎯 RESEARCHER USE CASES TESTING COMPLETE\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        },
-                        {
-                          "text": "\n✅ PASSED (0):\n"
-                        },
-                        {
-                          "text": "\n⚠️ PARTIALLY WORKING (0):\n"
-                        },
-                        {
-                          "text": "\n❌ FAILED (2):\n"
-                        },
-                        {
-                          "text": "   - UC-01: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "   - UC-03: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n🚧 NOT IMPLEMENTED (0):\n"
-                        },
-                        {
-                          "text": "\n📊 SUMMARY:\n"
-                        },
-                        {
-                          "text": "   Total Use Cases Tested: 2/32\n"
-                        },
-                        {
-                          "text": "   Success Rate: 0%\n"
-                        },
-                        {
-                          "text": "   Partial Implementation: 0%\n"
-                        },
-                        {
-                          "text": "   Implementation Gaps: 0%\n"
-                        },
-                        {
-                          "text": "\n📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-20T07:36:53.995Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fdd45cb8a143a88b78b5-0a3e3088fbff31f2f3f5",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 326,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "UC-09 to UC-14: Participant Management",
-          "file": "researcher-use-cases-comprehensive.spec.js",
-          "line": 411,
-          "column": 6,
-          "specs": [
-            {
-              "title": "UC-09: Review and Approve Participant Applications",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 45000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -280,19 +216,16 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 3857,
+                      "duration": 3180,
                       "errors": [],
                       "stdout": [
                         {
-                          "text": "🧪 Testing UC-09: Review and Approve Participant Applications\n"
-                        },
-                        {
-                          "text": "❌ UC-09 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
+                          "text": "✅ Demographics tab correctly hidden for researcher role\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-20T07:36:49.516Z",
+                      "startTime": "2025-08-08T22:14:16.650Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -300,115 +233,18 @@
                   "status": "expected"
                 }
               ],
-              "id": "fdd45cb8a143a88b78b5-3af60efb0a4149efd016",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 413,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "UC-15 to UC-19: Study Execution & Monitoring",
-          "file": "researcher-use-cases-comprehensive.spec.js",
-          "line": 504,
-          "column": 6,
-          "specs": [
-            {
-              "title": "UC-15: Launch Study and Begin Participant Recruitment",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 45000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2361,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Testing UC-15: Launch Study and Begin Participant Recruitment\n"
-                        },
-                        {
-                          "text": "❌ UC-15 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n================================================================================\n"
-                        },
-                        {
-                          "text": "🎯 RESEARCHER USE CASES TESTING COMPLETE\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        },
-                        {
-                          "text": "\n✅ PASSED (0):\n"
-                        },
-                        {
-                          "text": "\n⚠️ PARTIALLY WORKING (0):\n"
-                        },
-                        {
-                          "text": "\n❌ FAILED (2):\n"
-                        },
-                        {
-                          "text": "   - UC-09: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "   - UC-15: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n🚧 NOT IMPLEMENTED (0):\n"
-                        },
-                        {
-                          "text": "\n📊 SUMMARY:\n"
-                        },
-                        {
-                          "text": "   Total Use Cases Tested: 2/32\n"
-                        },
-                        {
-                          "text": "   Success Rate: 0%\n"
-                        },
-                        {
-                          "text": "   Partial Implementation: 0%\n"
-                        },
-                        {
-                          "text": "   Implementation Gaps: 0%\n"
-                        },
-                        {
-                          "text": "\n📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-20T07:36:53.716Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fdd45cb8a143a88b78b5-2135ee085f7585e1d22e",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 506,
+              "id": "fa67459c0aef2a044903-3a7a34cc400d5db07cc9",
+              "file": "enhanced-participant-profile.spec.js",
+              "line": 120,
               "column": 3
             },
             {
-              "title": "UC-16: Monitor Live Study Performance",
-              "ok": true,
+              "title": "should require mandatory demographic fields",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 45000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -417,144 +253,72 @@
                     {
                       "workerIndex": 2,
                       "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 3624,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Testing UC-16: Monitor Live Study Performance\n"
+                      "status": "failed",
+                      "duration": 12790,
+                      "error": {
+                        "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================",
+                        "stack": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:158:16",
+                        "location": {
+                          "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                          "column": 16,
+                          "line": 158
                         },
+                        "snippet": "\u001b[0m \u001b[90m 156 |\u001b[39m     \n \u001b[90m 157 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 158 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 159 |\u001b[39m     \n \u001b[90m 160 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 161 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
                         {
-                          "text": "❌ UC-16 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
+                          "location": {
+                            "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                            "column": 16,
+                            "line": 158
+                          },
+                          "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n\n\u001b[0m \u001b[90m 156 |\u001b[39m     \n \u001b[90m 157 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 158 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 159 |\u001b[39m     \n \u001b[90m 160 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 161 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:158:16\u001b[22m"
                         }
                       ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-20T07:36:49.484Z",
+                      "startTime": "2025-08-08T22:14:16.626Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                        "column": 16,
+                        "line": 158
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "fdd45cb8a143a88b78b5-bf7aa67039de43480892",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 575,
+              "id": "fa67459c0aef2a044903-b20401acd849257b46d4",
+              "file": "enhanced-participant-profile.spec.js",
+              "line": 148,
               "column": 3
-            }
-          ]
-        },
-        {
-          "title": "UC-20 to UC-26: Results & Analytics",
-          "file": "researcher-use-cases-comprehensive.spec.js",
-          "line": 631,
-          "column": 6,
-          "specs": [
+            },
             {
-              "title": "UC-20: Access Real-time Study Results Dashboard",
-              "ok": true,
+              "title": "should demonstrate automatic study matching",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 45000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 2353,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Testing UC-20: Access Real-time Study Results Dashboard\n"
-                        },
-                        {
-                          "text": "❌ UC-20 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n================================================================================\n"
-                        },
-                        {
-                          "text": "🎯 RESEARCHER USE CASES TESTING COMPLETE\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        },
-                        {
-                          "text": "\n✅ PASSED (0):\n"
-                        },
-                        {
-                          "text": "\n⚠️ PARTIALLY WORKING (0):\n"
-                        },
-                        {
-                          "text": "\n❌ FAILED (2):\n"
-                        },
-                        {
-                          "text": "   - UC-16: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "   - UC-20: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n🚧 NOT IMPLEMENTED (0):\n"
-                        },
-                        {
-                          "text": "\n📊 SUMMARY:\n"
-                        },
-                        {
-                          "text": "   Total Use Cases Tested: 2/32\n"
-                        },
-                        {
-                          "text": "   Success Rate: 0%\n"
-                        },
-                        {
-                          "text": "   Partial Implementation: 0%\n"
-                        },
-                        {
-                          "text": "   Implementation Gaps: 0%\n"
-                        },
-                        {
-                          "text": "\n📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-20T07:36:53.388Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fdd45cb8a143a88b78b5-bdd0a29152a54cfff51b",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 633,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "UC-27 to UC-29: Template & Asset Management",
-          "file": "researcher-use-cases-comprehensive.spec.js",
-          "line": 720,
-          "column": 6,
-          "specs": [
-            {
-              "title": "UC-27: Create and Save Custom Study Templates",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 45000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -563,221 +327,63 @@
                     {
                       "workerIndex": 3,
                       "parallelIndex": 3,
-                      "status": "passed",
-                      "duration": 3650,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Testing UC-27: Create and Save Custom Study Templates\n"
+                      "status": "failed",
+                      "duration": 13344,
+                      "error": {
+                        "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================",
+                        "stack": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:208:16",
+                        "location": {
+                          "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                          "column": 16,
+                          "line": 208
                         },
+                        "snippet": "\u001b[0m \u001b[90m 206 |\u001b[39m     \n \u001b[90m 207 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 208 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 209 |\u001b[39m     \n \u001b[90m 210 |\u001b[39m     \u001b[90m// Set specific demographics to test matching\u001b[39m\n \u001b[90m 211 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
                         {
-                          "text": "❌ UC-27 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
+                          "location": {
+                            "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                            "column": 16,
+                            "line": 208
+                          },
+                          "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n\n\u001b[0m \u001b[90m 206 |\u001b[39m     \n \u001b[90m 207 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 208 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 209 |\u001b[39m     \n \u001b[90m 210 |\u001b[39m     \u001b[90m// Set specific demographics to test matching\u001b[39m\n \u001b[90m 211 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:208:16\u001b[22m"
                         }
                       ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-20T07:36:49.485Z",
+                      "startTime": "2025-08-08T22:14:16.660Z",
                       "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fdd45cb8a143a88b78b5-be04bff30200f191cf9b",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 722,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "UC-30 to UC-31: Collaboration & Team Management",
-          "file": "researcher-use-cases-comprehensive.spec.js",
-          "line": 801,
-          "column": 6,
-          "specs": [
-            {
-              "title": "UC-30: Collaborate on Study Design with Team Members",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 45000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "passed",
-                      "duration": 2436,
-                      "errors": [],
-                      "stdout": [
+                      "attachments": [
                         {
-                          "text": "🧪 Testing UC-30: Collaborate on Study Design with Team Members\n"
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\\test-failed-1.png"
                         },
                         {
-                          "text": "❌ UC-30 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\\video.webm"
                         },
                         {
-                          "text": "\n================================================================================\n"
-                        },
-                        {
-                          "text": "🎯 RESEARCHER USE CASES TESTING COMPLETE\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        },
-                        {
-                          "text": "\n✅ PASSED (0):\n"
-                        },
-                        {
-                          "text": "\n⚠️ PARTIALLY WORKING (0):\n"
-                        },
-                        {
-                          "text": "\n❌ FAILED (2):\n"
-                        },
-                        {
-                          "text": "   - UC-27: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "   - UC-30: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n🚧 NOT IMPLEMENTED (0):\n"
-                        },
-                        {
-                          "text": "\n📊 SUMMARY:\n"
-                        },
-                        {
-                          "text": "   Total Use Cases Tested: 2/32\n"
-                        },
-                        {
-                          "text": "   Success Rate: 0%\n"
-                        },
-                        {
-                          "text": "   Partial Implementation: 0%\n"
-                        },
-                        {
-                          "text": "   Implementation Gaps: 0%\n"
-                        },
-                        {
-                          "text": "\n📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\\error-context.md"
                         }
                       ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-20T07:36:53.424Z",
-                      "annotations": [],
-                      "attachments": []
+                      "errorLocation": {
+                        "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
+                        "column": 16,
+                        "line": 208
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "fdd45cb8a143a88b78b5-afc0acb58e210487c7a0",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 803,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "UC-32: Account & Platform Management",
-          "file": "researcher-use-cases-comprehensive.spec.js",
-          "line": 859,
-          "column": 6,
-          "specs": [
-            {
-              "title": "UC-32: Manage Account Settings and Billing",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 45000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 4,
-                      "parallelIndex": 4,
-                      "status": "passed",
-                      "duration": 3586,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Testing UC-32: Manage Account Settings and Billing\n"
-                        },
-                        {
-                          "text": "❌ UC-32 FAILED: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n================================================================================\n"
-                        },
-                        {
-                          "text": "🎯 RESEARCHER USE CASES TESTING COMPLETE\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        },
-                        {
-                          "text": "\n✅ PASSED (0):\n"
-                        },
-                        {
-                          "text": "\n⚠️ PARTIALLY WORKING (0):\n"
-                        },
-                        {
-                          "text": "\n❌ FAILED (1):\n"
-                        },
-                        {
-                          "text": "   - UC-32: Login failed: {\"error\":\"Failed to fetch\"}\n"
-                        },
-                        {
-                          "text": "\n🚧 NOT IMPLEMENTED (0):\n"
-                        },
-                        {
-                          "text": "\n📊 SUMMARY:\n"
-                        },
-                        {
-                          "text": "   Total Use Cases Tested: 1/32\n"
-                        },
-                        {
-                          "text": "   Success Rate: 0%\n"
-                        },
-                        {
-                          "text": "   Partial Implementation: 0%\n"
-                        },
-                        {
-                          "text": "   Implementation Gaps: 0%\n"
-                        },
-                        {
-                          "text": "\n📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/\n"
-                        },
-                        {
-                          "text": "================================================================================\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-20T07:36:49.514Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fdd45cb8a143a88b78b5-b9c7eb03ad4141a37bed",
-              "file": "researcher-use-cases-comprehensive.spec.js",
-              "line": 861,
+              "id": "fa67459c0aef2a044903-4260af4dbf38f7fcf968",
+              "file": "enhanced-participant-profile.spec.js",
+              "line": 198,
               "column": 3
             }
           ]
@@ -787,11 +393,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-07-20T07:36:48.497Z",
-    "duration": 8079.231,
-    "expected": 9,
+    "startTime": "2025-08-08T22:14:15.044Z",
+    "duration": 15657.066,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 3,
     "flaky": 0
   }
 }

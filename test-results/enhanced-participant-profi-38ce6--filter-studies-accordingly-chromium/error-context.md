@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- link "Afkar":
+  - /url: /app/dashboard
+  - img "Afkar"
+- navigation:
+  - link "My Applications":
+    - /url: /app/participant-dashboard
+  - link "Discover Studies":
+    - /url: /app/discover
+  - link "Settings":
+    - /url: /app/settings
+- button
+- button
+- button "PU"
+- main:
+  - heading "Participant Dashboard" [level=1]
+  - paragraph: Manage your study applications and track your earnings
+  - navigation:
+    - button "Applications"
+    - button "Wallet"
+  - paragraph: Total Applications
+  - paragraph: "3"
+  - paragraph: Pending
+  - paragraph: "1"
+  - paragraph: Approved
+  - paragraph: "1"
+  - paragraph: Rejected
+  - paragraph: "1"
+  - paragraph: Withdrawn
+  - paragraph: "0"
+  - textbox "Search studies..."
+  - combobox:
+    - option "All Status" [selected]
+    - option "Pending"
+    - option "Approved"
+    - option "Rejected"
+    - option "Withdrawn"
+  - button "Refresh"
+  - heading "mock-study-001" [level=3]
+  - status: approved
+  - text: "Applied: Aug 7, 2025 Compensation: $0.00 Duration: N/A min"
+  - paragraph: "Notes: Great fit for our study requirements"
+  - link "View Study":
+    - /url: /studies/
+    - button "View Study"
+  - heading "mock-study-002" [level=3]
+  - status: pending
+  - text: "Applied: Aug 8, 2025 Compensation: $0.00 Duration: N/A min"
+  - link "View Study":
+    - /url: /studies/
+    - button "View Study"
+  - button "Withdraw"
+  - heading "mock-study-003" [level=3]
+  - status: rejected
+  - text: "Applied: Aug 4, 2025 Compensation: $0.00 Duration: N/A min"
+  - paragraph: "Notes: Does not meet age criteria"
+  - link "View Study":
+    - /url: /studies/
+    - button "View Study"
+```

@@ -236,6 +236,23 @@ class FallbackDatabaseService {
     }
   }
   
+  // Write data to JSON file
+  writeData(table, data) {
+    try {
+      const filename = FALLBACK_CONFIG.files[table];
+      if (!filename) {
+        throw new Error(`Unknown table: ${table}`);
+      }
+      
+      const filePath = path.join(FALLBACK_CONFIG.dataDir, filename);
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+      return true;
+    } catch (error) {
+      console.error(`Error writing ${table}:`, error);
+      return false;
+    }
+  }
+  
   // Authentication methods
   async signInWithPassword(credentials) {
     const users = this.readData('users');
@@ -282,11 +299,14 @@ class FallbackDatabaseService {
     
     const userId = tokenParts[2];
     const users = this.readData('users');
+    const profiles = this.readData('profiles');
     const user = users.find(u => u.id === userId);
     
     if (!user) {
       throw new Error('User not found');
     }
+
+    const profile = profiles.find(p => p.user_id === userId);
     
     return {
       data: {
@@ -294,11 +314,50 @@ class FallbackDatabaseService {
           id: user.id,
           email: user.email,
           user_metadata: JSON.parse(user.raw_user_meta_data || '{}'),
-          app_metadata: JSON.parse(user.raw_app_meta_data || '{}')
+          app_metadata: JSON.parse(user.raw_app_meta_data || '{}'),
+          profile: profile
         }
       },
       error: null
     };
+  }
+
+  async updateProfile(userId, updateData) {
+    try {
+      const profiles = this.readData('profiles');
+      const profileIndex = profiles.findIndex(p => p.user_id === userId);
+      
+      if (profileIndex === -1) {
+        console.error(`Profile not found for user ID: ${userId}`);
+        return { success: false, error: 'Profile not found' };
+      }
+      
+      // Update the profile with new data
+      profiles[profileIndex] = {
+        ...profiles[profileIndex],
+        ...updateData,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Save updated profiles back to file
+      const writeSuccess = this.writeData('profiles', profiles);
+      
+      if (writeSuccess) {
+        console.log('✅ Profile updated successfully in fallback database:', {
+          userId: userId,
+          updatedData: updateData
+        });
+        return { 
+          success: true, 
+          profile: profiles[profileIndex] 
+        };
+      } else {
+        throw new Error('Failed to write to file');
+      }
+    } catch (error) {
+      console.error('❌ Error updating profile in fallback database:', error);
+      return { success: false, error: error.message };
+    }
   }
   
   // Database query methods
@@ -338,8 +397,40 @@ class FallbackQueryBuilder {
     return this;
   }
   
+  single() {
+    this.limitCount = 1;
+    this.returnSingle = true;
+    return this;
+  }
+  
+  insert(data) {
+    this.insertData = data;
+    return this;
+  }
+  
   async execute() {
     try {
+      // Handle insert operations
+      if (this.insertData) {
+        const data = this.db.readData(this.table);
+        
+        // Add the new record
+        if (Array.isArray(this.insertData)) {
+          data.push(...this.insertData);
+        } else {
+          data.push(this.insertData);
+        }
+        
+        // Write back to file
+        this.db.writeData(this.table, data);
+        
+        return {
+          data: this.returnSingle ? (Array.isArray(this.insertData) ? this.insertData[0] : this.insertData) : this.insertData,
+          error: null
+        };
+      }
+      
+      // Handle select operations
       let data = this.db.readData(this.table);
       
       // Apply filters
@@ -384,6 +475,14 @@ class FallbackQueryBuilder {
           });
           return newRow;
         });
+      }
+      
+      // Return single record if requested
+      if (this.returnSingle) {
+        return {
+          data: data.length > 0 ? data[0] : null,
+          error: data.length === 0 ? { message: 'No data found' } : null
+        };
       }
       
       return {

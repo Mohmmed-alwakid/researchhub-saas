@@ -8,6 +8,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { createClient } from '@supabase/supabase-js';
+import { 
+  checkSupabaseConnectivity, 
+  initializeFallbackDatabase 
+} from '../scripts/development/network-resilient-fallback.js';
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
@@ -21,8 +25,38 @@ console.log('🔑 Research API - Supabase Config Debug:', {
   envServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? `${process.env.SUPABASE_SERVICE_ROLE_KEY.substring(0, 20)}...` : 'NOT_SET'
 });
 
-const supabase = createClient(supabaseUrl, supabaseKey);
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+let supabase, supabaseAdmin, fallbackDb;
+let useLocalDatabase = false;
+let supabaseConnected = false;
+
+// Initialize Supabase with automatic fallback
+async function initializeSupabaseWithFallback() {
+  try {
+    console.log('🔧 Initializing database connections...');
+    
+    // Check Supabase connectivity
+    supabaseConnected = await checkSupabaseConnectivity(supabaseUrl);
+    
+    if (supabaseConnected) {
+      console.log('✅ Using Supabase (remote database)');
+      supabase = createClient(supabaseUrl, supabaseKey);
+      supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+      useLocalDatabase = false;
+    } else {
+      console.log('🔧 Supabase unavailable, switching to local fallback database');
+      fallbackDb = await initializeFallbackDatabase();
+      useLocalDatabase = true;
+    }
+    
+  } catch (error) {
+    console.warn('⚠️ Database initialization failed, using local fallback');
+    fallbackDb = await initializeFallbackDatabase();
+    useLocalDatabase = true;
+  }
+}
+
+// Initialize on module load
+await initializeSupabaseWithFallback();
 
 /**
  * Helper function to authenticate user
@@ -190,30 +224,50 @@ async function handleGetStudies(req, res) {
     const userRole = auth.user.user_metadata?.role || 'participant';
     const isParticipant = userRole === 'participant';
     
-    let query = supabaseAdmin
-      .from('studies')
-      .select(`
-        id,
-        title,
-        description,
-        status,
-        created_at,
-        updated_at,
-        settings,
-        researcher_id,
-        target_participants,
-        is_public
-      `);
+    let studies, error;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Using fallback database for studies');
+      const studiesResult = await fallbackDb.from('studies').select('*').execute();
+      if (studiesResult.error) {
+        studies = null;
+        error = studiesResult.error;
+      } else {
+        studies = studiesResult.data;
+        // Filter for participants in fallback
+        if (isParticipant) {
+          studies = studies.filter(study => study.status === 'active');
+          console.log('🔒 Participant filter applied: only showing active studies');
+        }
+        error = null;
+      }
+    } else {
+      let query = supabaseAdmin
+        .from('studies')
+        .select(`
+          id,
+          title,
+          description,
+          status,
+          created_at,
+          updated_at,
+          settings,
+          researcher_id,
+          target_participants,
+          is_public
+        `);
 
-    // Filter studies based on user role
-    if (isParticipant) {
-      // Participants should only see active studies (not draft)
-      // Note: Using 'active' instead of 'recruiting' based on database enum
-      query = query.eq('status', 'active');
-      console.log('🔒 Participant filter applied: only showing active studies');
+      // Filter studies based on user role
+      if (isParticipant) {
+        // Participants should only see active studies (not draft)
+        query = query.eq('status', 'active');
+        console.log('🔒 Participant filter applied: only showing active studies');
+      }
+
+      const response = await query.order('created_at', { ascending: false });
+      studies = response.data;
+      error = response.error;
     }
-
-    const { data: studies, error } = await query.order('created_at', { ascending: false });
 
     console.log('🔍 Studies query result:', { 
       studyCount: studies?.length || 0, 
@@ -225,54 +279,10 @@ async function handleGetStudies(req, res) {
 
     if (error) {
       console.error('Get studies error:', error);
-      
-      // If the full query fails, try the basic query as fallback
-      console.log('🔄 Attempting fallback query...');
-      let basicQuery = supabaseAdmin
-        .from('studies')
-        .select('id, title, description, status, created_at, settings');
-        
-      // Apply same filter for participants in fallback
-      if (isParticipant) {
-        basicQuery = basicQuery.eq('status', 'active');
-      }
-      
-      const { data: basicStudies, error: basicError } = await basicQuery
-        .order('created_at', { ascending: false });
-      
-      if (basicError) {
-        return res.status(500).json({
-          success: false,
-          error: 'Failed to fetch studies',
-          details: basicError
-        });
-      }
-
-      // Transform basic data to match frontend expectations
-      const transformedStudies = (basicStudies || []).map(study => ({
-        _id: study.id,
-        id: study.id,
-        title: study.title || 'Untitled Study',
-        description: study.description || 'No description available',
-        status: study.status || 'draft',
-        type: study.settings?.type || 'usability',
-        createdAt: study.created_at,
-        // Provide default values for missing fields
-        participants: {
-          enrolled: 0,
-          target: study.target_participants || 10
-        },
-        settings: study.settings || {
-          maxParticipants: 10,
-          duration: 30,
-          compensation: 25
-        }
-      }));
-
-      return res.status(200).json({
-        success: true,
-        studies: transformedStudies,
-        message: `Found ${transformedStudies.length} studies (basic mode, ${userRole} filtered)`
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch studies',
+        details: error
       });
     }
 
@@ -316,7 +326,7 @@ async function handleGetStudies(req, res) {
  * Create new study
  */
 async function handleCreateStudy(req, res) {
-  console.log('🔧 DEBUG: handleCreateStudy called - SIMPLE VERSION');
+  console.log('🔧 DEBUG: handleCreateStudy called');
   
   if (req.method !== 'POST') {
     console.log('🔧 DEBUG: Method not allowed:', req.method);
@@ -324,9 +334,13 @@ async function handleCreateStudy(req, res) {
   }
 
   try {
-    // SIMPLE VERSION - Skip complex authentication for now
-    console.log('🔧 DEBUG: Request body:', req.body);
-    console.log('🔧 DEBUG: Request headers:', req.headers);
+    const auth = await authenticateUser(req, ['researcher']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
     
     const {
       title = 'Default Test Study',
@@ -334,22 +348,24 @@ async function handleCreateStudy(req, res) {
       participantLimit = 10,
       compensation = 25,
       blocks = [],
-      status = 'active'
+      status = 'active',
+      screeningQuestions = []
     } = req.body;
     
-    console.log('🔧 DEBUG: Parsed data:', { title, description, participantLimit });
+    console.log('🔧 DEBUG: Parsed data:', { title, description, participantLimit, screeningQuestions });
 
-    // Create simple study object
-    const simpleStudy = {
+    // Create study object
+    const studyData = {
       id: `simple-study-${Date.now()}`,
       title,
       description,
       status,
       target_participants: participantLimit,
-      researcher_id: 'test-researcher-001',
+      researcher_id: auth.user.id,
       settings: {
         compensation: compensation,
         blocks: blocks,
+        screeningQuestions: screeningQuestions,
         type: 'usability',
         maxParticipants: participantLimit,
         duration: 30
@@ -359,13 +375,42 @@ async function handleCreateStudy(req, res) {
       updated_at: new Date().toISOString()
     };
     
-    console.log('✅ DEBUG: Simple study created:', simpleStudy);
+    let study, error;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Creating study in fallback database');
+      const result = await fallbackDb.from('studies').insert(studyData).execute();
+      if (result.error) {
+        study = null;
+        error = result.error;
+      } else {
+        study = studyData; // Use the original data since insert doesn't return the created record
+        error = null;
+      }
+    } else {
+      const response = await supabaseAdmin
+        .from('studies')
+        .insert(studyData)
+        .select()
+        .single();
+      study = response.data;
+      error = response.error;
+    }
+    
+    if (error) {
+      console.error('Create study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create study'
+      });
+    }
+    
+    console.log('✅ Study created successfully:', study);
 
     return res.status(201).json({
       success: true,
-      study: simpleStudy,
-      message: 'Study created successfully (simple mode)',
-      source: 'simple'
+      study: study,
+      message: 'Study created successfully'
     });
 
   } catch (error) {
@@ -794,7 +839,12 @@ async function handleApplyToStudy(req, res) {
 
     const { study_id } = req.body;
 
+    console.log('🔧 DEBUG: Apply request body:', req.body);
+    console.log('🔧 DEBUG: Extracted study_id:', study_id);
+    console.log('🔧 DEBUG: Type of study_id:', typeof study_id);
+
     if (!study_id) {
+      console.log('🔧 DEBUG: Study ID check failed - returning error');
       return res.status(400).json({
         success: false,
         error: 'Study ID is required'
@@ -802,11 +852,22 @@ async function handleApplyToStudy(req, res) {
     }
 
     // Check if study exists and is active
-    const { data: study, error: studyError } = await supabaseAdmin
-      .from('studies')
-      .select('id, status, participant_limit')
-      .eq('id', study_id)
-      .single();
+    let study, studyError;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Using fallback database for study lookup');
+      const response = await fallbackDb.from('studies').select('*').eq('id', study_id).single().execute();
+      study = response.data;
+      studyError = response.error;
+    } else {
+      const response = await supabaseAdmin
+        .from('studies')
+        .select('id, status, participant_limit')
+        .eq('id', study_id)
+        .single();
+      study = response.data;
+      studyError = response.error;
+    }
 
     if (studyError || !study) {
       return res.status(404).json({
@@ -823,12 +884,20 @@ async function handleApplyToStudy(req, res) {
     }
 
     // Check if already applied
-    const { data: existingApplication } = await supabaseAdmin
-      .from('study_applications')
-      .select('id')
-      .eq('user_id', auth.user.id)
-      .eq('study_id', study_id)
-      .single();
+    let existingApplication;
+    
+    if (useLocalDatabase) {
+      const response = await fallbackDb.from('applications').select('*').eq('user_id', auth.user.id).eq('study_id', study_id).single().execute();
+      existingApplication = response.data;
+    } else {
+      const { data } = await supabaseAdmin
+        .from('study_applications')
+        .select('id')
+        .eq('user_id', auth.user.id)
+        .eq('study_id', study_id)
+        .single();
+      existingApplication = data;
+    }
 
     if (existingApplication) {
       return res.status(400).json({
@@ -842,14 +911,29 @@ async function handleApplyToStudy(req, res) {
       user_id: auth.user.id,
       study_id: study_id,
       status: 'pending',
-      applied_at: new Date().toISOString()
+      applied_at: new Date().toISOString(),
+      screening_answers: req.body.screening_answers || {},
+      eligibility_confirmed: req.body.eligibility_confirmed || false
     };
 
-    const { data: application, error } = await supabaseAdmin
-      .from('study_applications')
-      .insert(applicationData)
-      .select()
-      .single();
+    let application, error;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Creating application in fallback database');
+      // Add an ID to the application data
+      applicationData.id = `app-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const result = await fallbackDb.from('applications').insert(applicationData).select().single().execute();
+      application = result.data;
+      error = result.error;
+    } else {
+      const response = await supabaseAdmin
+        .from('study_applications')
+        .insert(applicationData)
+        .select()
+        .single();
+      application = response.data;
+      error = response.error;
+    }
 
     if (error) {
       console.error('Apply to study error:', error);
@@ -862,11 +946,277 @@ async function handleApplyToStudy(req, res) {
     return res.status(201).json({
       success: true,
       application,
-      message: 'Application submitted successfully'
+      message: 'Application submitted successfully! You can track your application status in My Applications.'
     });
 
   } catch (error) {
     console.error('Apply to study exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get participant's applications (My Applications)
+ */
+async function handleGetMyApplications(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['participant']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    if (useLocalDatabase) {
+      // Fallback: return realistic Saudi Arabian applications
+      const mockApplications = [
+        {
+          id: 'app-001',
+          study_id: 'study-001',
+          studyTitle: 'Mobile Banking App UX Study - Saudi Market',
+          studyDescription: 'Evaluate mobile banking interfaces for Saudi users',
+          compensation: 150,
+          status: 'pending',
+          applied_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          researcher_notes: null,
+          estimated_duration: 45
+        },
+        {
+          id: 'app-002',
+          study_id: 'study-002', 
+          studyTitle: 'E-commerce Platform Usability - Riyadh Focus',
+          studyDescription: 'Test e-commerce shopping experience for Saudi consumers',
+          compensation: 100,
+          status: 'approved',
+          applied_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          researcher_notes: 'Great profile match. Looking forward to your participation.',
+          estimated_duration: 60
+        }
+      ];
+
+      return res.status(200).json({
+        success: true,
+        applications: mockApplications,
+        message: 'Applications retrieved successfully (local database)'
+      });
+    }
+
+    // Supabase query
+    const { data: applications, error } = await supabase
+      .from('study_applications')
+      .select(`
+        id,
+        study_id,
+        status,
+        applied_at,
+        researcher_notes,
+        studies!inner(
+          id,
+          title,
+          description,
+          compensation,
+          estimated_duration
+        )
+      `)
+      .eq('user_id', auth.user.id)
+      .order('applied_at', { ascending: false });
+
+    if (error) {
+      console.error('Get my applications error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve applications'
+      });
+    }
+
+    // Transform data for frontend
+    const transformedApplications = applications.map(app => ({
+      id: app.id,
+      study_id: app.study_id,
+      studyTitle: app.studies.title,
+      studyDescription: app.studies.description,
+      compensation: app.studies.compensation,
+      estimated_duration: app.studies.estimated_duration,
+      status: app.status,
+      applied_at: app.applied_at,
+      researcher_notes: app.researcher_notes
+    }));
+
+    return res.status(200).json({
+      success: true,
+      applications: transformedApplications,
+      message: 'Applications retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Get my applications exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get study applications for researchers
+ */
+async function handleGetStudyApplications(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { study_id } = req.query;
+
+    if (!study_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    if (useLocalDatabase) {
+      // Fallback: return realistic Saudi Arabian applications
+      const mockApplications = [
+        {
+          id: 'app-001',
+          study_id: study_id,
+          participant_id: 'user-001',
+          participantEmail: 'abwanwr77+participant@gmail.com',
+          participantName: 'Ahmed Al-Rashid',
+          demographics: {
+            ageRange: '25-34',
+            gender: 'male',
+            country: 'SA',
+            specialization: 'Technology & Software'
+          },
+          status: 'pending',
+          applied_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          screening_answers: {
+            experience: 'I use mobile banking daily for all my transactions',
+            interest: 'Very interested in improving banking UX',
+            availability: 'Available weekdays after 6 PM'
+          }
+        },
+        {
+          id: 'app-002',
+          study_id: study_id,
+          participant_id: 'user-002',
+          participantEmail: 'sara.almutairi@example.com',
+          participantName: 'Sara Al-Mutairi',
+          demographics: {
+            ageRange: '18-24',
+            gender: 'female',
+            country: 'SA',
+            specialization: 'Business & Finance'
+          },
+          status: 'approved',
+          applied_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          screening_answers: {
+            experience: 'Regular online shopper, familiar with e-commerce',
+            interest: 'Want to contribute to better shopping experiences',
+            availability: 'Flexible schedule, can participate anytime'
+          }
+        }
+      ];
+
+      return res.status(200).json({
+        success: true,
+        applications: mockApplications,
+        message: 'Study applications retrieved successfully (local database)'
+      });
+    }
+
+    // First verify user owns the study (unless admin)
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    if (userRole !== 'admin') {
+      const { data: study, error: studyError } = await supabase
+        .from('studies')
+        .select('creator_id')
+        .eq('id', study_id)
+        .single();
+
+      if (studyError || !study) {
+        return res.status(404).json({
+          success: false,
+          error: 'Study not found'
+        });
+      }
+
+      if (study.creator_id !== auth.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'You can only view applications for your studies'
+        });
+      }
+    }
+
+    // Get applications with participant info
+    const { data: applications, error } = await supabase
+      .from('study_applications')
+      .select(`
+        id,
+        user_id,
+        status,
+        applied_at,
+        screening_answers,
+        researcher_notes,
+        profiles!inner(
+          id,
+          email,
+          full_name,
+          demographics
+        )
+      `)
+      .eq('study_id', study_id)
+      .order('applied_at', { ascending: false });
+
+    if (error) {
+      console.error('Get study applications error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve study applications'
+      });
+    }
+
+    // Transform data for frontend
+    const transformedApplications = applications.map(app => ({
+      id: app.id,
+      study_id: study_id,
+      participant_id: app.user_id,
+      participantEmail: app.profiles.email,
+      participantName: app.profiles.full_name,
+      demographics: app.profiles.demographics,
+      status: app.status,
+      applied_at: app.applied_at,
+      screening_answers: app.screening_answers,
+      researcher_notes: app.researcher_notes
+    }));
+
+    return res.status(200).json({
+      success: true,
+      applications: transformedApplications,
+      message: 'Study applications retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Get study applications exception:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
@@ -1263,6 +1613,12 @@ export default async function handler(req, res) {
       case 'applications':
         return await handleGetApplications(req, res);
       
+      case 'get-my-applications':
+        return await handleGetMyApplications(req, res);
+      
+      case 'get-study-applications':
+        return await handleGetStudyApplications(req, res);
+      
       case 'apply':
         return await handleApplyToStudy(req, res);
       
@@ -1293,7 +1649,7 @@ export default async function handler(req, res) {
           error: 'Invalid action',
           availableActions: [
             'studies', 'create-study', 'update-study', 'delete-study', 'launch-study',
-            'applications', 'apply', 'update-application',
+            'applications', 'get-my-applications', 'get-study-applications', 'apply', 'update-application',
             'blocks', 'block-types',
             'start-session', 'submit-response'
           ]

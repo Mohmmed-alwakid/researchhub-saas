@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Tracking API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px 4px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Application Tracking API Test</h1>
+        <p><strong>Purpose:</strong> Test the new application tracking endpoints</p>
+        <p><strong>New Endpoints:</strong> get-my-applications, get-study-applications, enhanced apply</p>
+    </div>
+
+    <div class="grid">
+        <!-- Participant Testing -->
+        <div class="container">
+            <h2>👤 Participant Tests</h2>
+            
+            <div class="test-section">
+                <h3>🔐 Login as Participant</h3>
+                <button onclick="testParticipantLogin()" id="participantLoginBtn">Login as Participant</button>
+                <div id="participantLoginResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📤 Apply to Study</h3>
+                <p><strong>Expected:</strong> Enhanced application with screening answers and success message</p>
+                <button onclick="testApplyToStudy()" id="applyBtn" disabled>Apply to Study</button>
+                <div id="applyResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🚫 Prevent Duplicate Application</h3>
+                <button onclick="testPreventDuplicate()" id="preventBtn" disabled>Try Duplicate Application</button>
+                <div id="preventResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📋 Get My Applications</h3>
+                <p><strong>Expected:</strong> List of participant's applications with status tracking</p>
+                <button onclick="testGetMyApplications()" id="myAppsBtn" disabled>Get My Applications</button>
+                <div id="myAppsResult" class="response"></div>
+            </div>
+        </div>
+
+        <!-- Researcher Testing -->
+        <div class="container">
+            <h2>👨‍🔬 Researcher Tests</h2>
+            
+            <div class="test-section">
+                <h3>🔐 Login as Researcher</h3>
+                <button onclick="testResearcherLogin()" id="researcherLoginBtn" disabled>Login as Researcher</button>
+                <div id="researcherLoginResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📥 Get Study Applications</h3>
+                <p><strong>Expected:</strong> List of applications for researcher's studies</p>
+                <button onclick="testGetStudyApplications()" id="studyAppsBtn" disabled>Get Study Applications</button>
+                <div id="studyAppsResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>✅ Update Application Status</h3>
+                <button onclick="testUpdateStatus()" id="updateStatusBtn" disabled>Approve Application</button>
+                <div id="updateStatusResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🔄 Verify Status Update</h3>
+                <p><strong>Expected:</strong> Check if status change reflects in participant's view</p>
+                <button onclick="testVerifyStatusUpdate()" id="verifyBtn" disabled>Verify Status Update</button>
+                <div id="verifyResult" class="response"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="container">
+        <h2>📊 API Test Summary</h2>
+        <div id="testSummary">
+            <p>No tests run yet...</p>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button onclick="runFullAPITest()" id="runFullBtn">🚀 Run Full API Test</button>
+            <button onclick="resetTests()" id="resetBtn">🔄 Reset Tests</button>
+            <button onclick="openApp()" id="openAppBtn">🌐 Open Main App</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let participantToken = null;
+        let researcherToken = null;
+        let testResults = {};
+        let applicationId = null;
+
+        function logResult(testName, success, message, data = null) {
+            testResults[testName] = { success, message, data, timestamp: new Date() };
+            
+            const resultDiv = document.getElementById(testName + 'Result');
+            if (resultDiv) {
+                resultDiv.textContent = JSON.stringify({
+                    success,
+                    message,
+                    data,
+                    timestamp: new Date().toISOString()
+                }, null, 2);
+                
+                resultDiv.parentElement.className = success ? 'test-section success' : 'test-section error';
+            }
+            
+            updateTestSummary();
+        }
+
+        function updateTestSummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            const results = Object.entries(testResults);
+            const passed = results.filter(([k, v]) => v.success).length;
+            const total = results.length;
+            
+            const summaryHTML = `
+                <p><strong>Tests Completed:</strong> ${total}/8</p>
+                <p><strong>Tests Passed:</strong> ${passed}/${total}</p>
+                <p><strong>Success Rate:</strong> ${total > 0 ? Math.round((passed/total) * 100) : 0}%</p>
+                ${results.map(([test, result]) => `
+                    <div style="margin: 10px 0; padding: 10px; border-radius: 4px; ${result.success ? 'background-color: #d4edda;' : 'background-color: #f8d7da;'}">
+                        <strong>${test}:</strong> ${result.success ? '✅ PASSED' : '❌ FAILED'} - ${result.message}
+                    </div>
+                `).join('')}
+            `;
+            
+            summaryDiv.innerHTML = summaryHTML;
+        }
+
+        async function makeRequest(endpoint, method = 'GET', body = null, token = null) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            const config = { method, headers };
+            if (body) config.body = JSON.stringify(body);
+            
+            const response = await fetch(`${API_BASE}${endpoint}`, config);
+            const data = await response.json();
+            
+            return { response, data };
+        }
+
+        async function testParticipantLogin() {
+            try {
+                document.getElementById('participantLoginBtn').disabled = true;
+                
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email: 'abwanwr77+participant@gmail.com',
+                    password: 'Testtest123'
+                });
+                
+                if (data.success && data.session?.access_token) {
+                    participantToken = data.session.access_token;
+                    logResult('participantLogin', true, 'Participant login successful', {
+                        user: data.user,
+                        hasToken: !!participantToken
+                    });
+                    
+                    document.getElementById('applyBtn').disabled = false;
+                } else {
+                    logResult('participantLogin', false, 'Participant login failed', data);
+                }
+            } catch (error) {
+                logResult('participantLogin', false, 'Participant login error: ' + error.message);
+            } finally {
+                document.getElementById('participantLoginBtn').disabled = false;
+            }
+        }
+
+        async function testApplyToStudy() {
+            try {
+                document.getElementById('applyBtn').disabled = true;
+                
+                const { response, data } = await makeRequest('/research-consolidated?action=apply', 'POST', {
+                    study_id: 'study-001',
+                    screening_answers: {
+                        experience: 'I use mobile banking apps daily',
+                        interest: 'Very interested in UX research',
+                        availability: 'Available weekdays after 6 PM'
+                    },
+                    eligibility_confirmed: true
+                }, participantToken);
+                
+                if (data.success) {
+                    applicationId = data.application?.id;
+                    logResult('apply', true, 'Application submitted successfully', {
+                        application: data.application,
+                        message: data.message
+                    });
+                    
+                    document.getElementById('preventBtn').disabled = false;
+                    document.getElementById('myAppsBtn').disabled = false;
+                    document.getElementById('researcherLoginBtn').disabled = false;
+                } else {
+                    logResult('apply', false, 'Application submission failed', data);
+                }
+            } catch (error) {
+                logResult('apply', false, 'Application error: ' + error.message);
+            } finally {
+                document.getElementById('applyBtn').disabled = false;
+            }
+        }
+
+        async function testPreventDuplicate() {
+            try {
+                document.getElementById('preventBtn').disabled = true;
+                
+                const { response, data } = await makeRequest('/research-consolidated?action=apply', 'POST', {
+                    study_id: 'study-001',
+                    screening_answers: {
+                        experience: 'Trying to apply again'
+                    },
+                    eligibility_confirmed: true
+                }, participantToken);
+                
+                // Should fail
+                if (!data.success && data.error?.includes('already applied')) {
+                    logResult('prevent', true, 'Duplicate application correctly prevented', data);
+                } else {
+                    logResult('prevent', false, 'Duplicate prevention failed', data);
+                }
+            } catch (error) {
+                logResult('prevent', false, 'Duplicate prevention error: ' + error.message);
+            } finally {
+                document.getElementById('preventBtn').disabled = false;
+            }
+        }
+
+        async function testGetMyApplications() {
+            try {
+                document.getElementById('myAppsBtn').disabled = true;
+                
+                const { response, data } = await makeRequest('/research-consolidated?action=get-my-applications', 'GET', null, participantToken);
+                
+                if (data.success && data.applications) {
+                    logResult('myApps', true, 'My applications retrieved successfully', {
+                        applicationCount: data.applications.length,
+                        applications: data.applications
+                    });
+                } else {
+                    logResult('myApps', false, 'Failed to get my applications', data);
+                }
+            } catch (error) {
+                logResult('myApps', false, 'Get my applications error: ' + error.message);
+            } finally {
+                document.getElementById('myAppsBtn').disabled = false;
+            }
+        }
+
+        async function testResearcherLogin() {
+            try {
+                document.getElementById('researcherLoginBtn').disabled = true;
+                
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email: 'abwanwr77+Researcher@gmail.com',
+                    password: 'Testtest123'
+                });
+                
+                if (data.success && data.session?.access_token) {
+                    researcherToken = data.session.access_token;
+                    logResult('researcherLogin', true, 'Researcher login successful', {
+                        user: data.user,
+                        role: data.user?.role
+                    });
+                    
+                    document.getElementById('studyAppsBtn').disabled = false;
+                } else {
+                    logResult('researcherLogin', false, 'Researcher login failed', data);
+                }
+            } catch (error) {
+                logResult('researcherLogin', false, 'Researcher login error: ' + error.message);
+            } finally {
+                document.getElementById('researcherLoginBtn').disabled = false;
+            }
+        }
+
+        async function testGetStudyApplications() {
+            try {
+                document.getElementById('studyAppsBtn').disabled = true;
+                
+                const { response, data } = await makeRequest('/research-consolidated?action=get-study-applications&study_id=study-001', 'GET', null, researcherToken);
+                
+                if (data.success && data.applications) {
+                    logResult('studyApps', true, 'Study applications retrieved successfully', {
+                        applicationCount: data.applications.length,
+                        applications: data.applications
+                    });
+                    
+                    document.getElementById('updateStatusBtn').disabled = false;
+                } else {
+                    logResult('studyApps', false, 'Failed to get study applications', data);
+                }
+            } catch (error) {
+                logResult('studyApps', false, 'Get study applications error: ' + error.message);
+            } finally {
+                document.getElementById('studyAppsBtn').disabled = false;
+            }
+        }
+
+        async function testUpdateStatus() {
+            try {
+                document.getElementById('updateStatusBtn').disabled = true;
+                
+                // Use the application ID from the applied study or fallback
+                const updateApplicationId = applicationId || 'app-001';
+                
+                const { response, data } = await makeRequest('/research-consolidated?action=update-application', 'PUT', {
+                    application_id: updateApplicationId,
+                    status: 'approved'
+                }, researcherToken);
+                
+                if (data.success) {
+                    logResult('updateStatus', true, 'Application status updated successfully', {
+                        application: data.application,
+                        message: data.message
+                    });
+                    
+                    document.getElementById('verifyBtn').disabled = false;
+                } else {
+                    logResult('updateStatus', false, 'Failed to update application status', data);
+                }
+            } catch (error) {
+                logResult('updateStatus', false, 'Update status error: ' + error.message);
+            } finally {
+                document.getElementById('updateStatusBtn').disabled = false;
+            }
+        }
+
+        async function testVerifyStatusUpdate() {
+            try {
+                document.getElementById('verifyBtn').disabled = true;
+                
+                // Switch back to participant and check applications
+                const { response, data } = await makeRequest('/research-consolidated?action=get-my-applications', 'GET', null, participantToken);
+                
+                if (data.success && data.applications) {
+                    const approvedApp = data.applications.find(app => app.status === 'approved');
+                    
+                    if (approvedApp) {
+                        logResult('verify', true, 'Status update verified - application shows as approved', {
+                            approvedApplication: approvedApp
+                        });
+                    } else {
+                        logResult('verify', false, 'Status update not reflected in participant view', data);
+                    }
+                } else {
+                    logResult('verify', false, 'Failed to verify status update', data);
+                }
+            } catch (error) {
+                logResult('verify', false, 'Verify status error: ' + error.message);
+            } finally {
+                document.getElementById('verifyBtn').disabled = false;
+            }
+        }
+
+        async function runFullAPITest() {
+            document.getElementById('runFullBtn').disabled = true;
+            document.getElementById('runFullBtn').textContent = 'Running Tests...';
+            
+            try {
+                await testParticipantLogin();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testApplyToStudy();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testPreventDuplicate();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testGetMyApplications();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testResearcherLogin();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testGetStudyApplications();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testUpdateStatus();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testVerifyStatusUpdate();
+                
+            } catch (error) {
+                console.error('API test suite error:', error);
+            } finally {
+                document.getElementById('runFullBtn').disabled = false;
+                document.getElementById('runFullBtn').textContent = '🚀 Run Full API Test';
+            }
+        }
+
+        function resetTests() {
+            testResults = {};
+            participantToken = null;
+            researcherToken = null;
+            applicationId = null;
+            
+            // Reset UI
+            document.querySelectorAll('.test-section').forEach(section => {
+                section.className = 'test-section';
+            });
+            
+            document.querySelectorAll('.response').forEach(response => {
+                response.textContent = '';
+            });
+            
+            // Reset buttons
+            document.querySelectorAll('button').forEach(btn => {
+                if (!['runFullBtn', 'resetBtn', 'openAppBtn', 'participantLoginBtn'].includes(btn.id)) {
+                    btn.disabled = true;
+                }
+            });
+            
+            updateTestSummary();
+        }
+
+        function openApp() {
+            window.open('http://localhost:5175', '_blank');
+        }
+
+        // Initialize
+        updateTestSummary();
+    </script>
+</body>
+</html>

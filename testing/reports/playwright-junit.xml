@@ -1,179 +1,134 @@
-<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="8.079231">
-<testsuite name="researcher-use-cases-comprehensive.spec.js" timestamp="2025-07-20T07:36:48.554Z" hostname="chromium" tests="9" failures="0" skipped="0" time="28.23" errors="0">
-<testcase name="UC-01 to UC-08: Study Design &amp; Creation › UC-01: Create New Usability Study from Scratch" classname="researcher-use-cases-comprehensive.spec.js" time="4.059">
+<testsuites id="" name="" tests="4" failures="3" skipped="0" errors="0" time="15.657066">
+<testsuite name="enhanced-participant-profile.spec.js" timestamp="2025-08-08T22:14:15.372Z" hostname="chromium" tests="4" failures="3" skipped="0" time="42.451" errors="0">
+<testcase name="Enhanced Participant Profile &amp; Study Matching › should update participant demographics and filter studies accordingly" classname="enhanced-participant-profile.spec.js" time="13.137">
+<failure message="enhanced-participant-profile.spec.js:18:3 should update participant demographics and filter studies accordingly" type="FAILURE">
+<![CDATA[  [chromium] › enhanced-participant-profile.spec.js:18:3 › Enhanced Participant Profile & Study Matching › should update participant demographics and filter studies accordingly 
+
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/participant/**" until "load"
+      navigated to "http://localhost:5175/app"
+      navigated to "http://localhost:5175/app/participant-dashboard"
+      navigated to "http://localhost:5175/app/participant-dashboard"
+    ============================================================
+
+      26 |     
+      27 |     // Wait for redirect
+    > 28 |     await page.waitForURL('**/participant/**', { timeout: 10000 });
+         |                ^
+      29 |     
+      30 |     // Navigate to settings
+      31 |     await page.goto('http://localhost:5175/settings');
+        at D:\MAMP\AfakarM\testing\playwright-mcp\enhanced-participant-profile.spec.js:28:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\error-context.md
+]]>
+</failure>
 <system-out>
-<![CDATA[🧪 Testing UC-01: Create New Usability Study from Scratch
-❌ UC-01 FAILED: Login failed: {"error":"Failed to fetch"}
+<![CDATA[
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\error-context.md]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="UC-01 to UC-08: Study Design &amp; Creation › UC-03: Use Pre-built Research Template" classname="researcher-use-cases-comprehensive.spec.js" time="2.304">
+<testcase name="Enhanced Participant Profile &amp; Study Matching › should show demographics tab only for participants" classname="enhanced-participant-profile.spec.js" time="3.18">
 <system-out>
-<![CDATA[🧪 Testing UC-03: Use Pre-built Research Template
-❌ UC-03 FAILED: Login failed: {"error":"Failed to fetch"}
-
-================================================================================
-🎯 RESEARCHER USE CASES TESTING COMPLETE
-================================================================================
-
-✅ PASSED (0):
-
-⚠️ PARTIALLY WORKING (0):
-
-❌ FAILED (2):
-   - UC-01: Login failed: {"error":"Failed to fetch"}
-   - UC-03: Login failed: {"error":"Failed to fetch"}
-
-🚧 NOT IMPLEMENTED (0):
-
-📊 SUMMARY:
-   Total Use Cases Tested: 2/32
-   Success Rate: 0%
-   Partial Implementation: 0%
-   Implementation Gaps: 0%
-
-📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/
-================================================================================
+<![CDATA[✅ Demographics tab correctly hidden for researcher role
 ]]>
 </system-out>
 </testcase>
-<testcase name="UC-09 to UC-14: Participant Management › UC-09: Review and Approve Participant Applications" classname="researcher-use-cases-comprehensive.spec.js" time="3.857">
+<testcase name="Enhanced Participant Profile &amp; Study Matching › should require mandatory demographic fields" classname="enhanced-participant-profile.spec.js" time="12.79">
+<failure message="enhanced-participant-profile.spec.js:148:3 should require mandatory demographic fields" type="FAILURE">
+<![CDATA[  [chromium] › enhanced-participant-profile.spec.js:148:3 › Enhanced Participant Profile & Study Matching › should require mandatory demographic fields 
+
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/participant/**" until "load"
+      navigated to "http://localhost:5175/app"
+      navigated to "http://localhost:5175/app/participant-dashboard"
+      navigated to "http://localhost:5175/app/participant-dashboard"
+    ============================================================
+
+      156 |     
+      157 |     // Wait for redirect
+    > 158 |     await page.waitForURL('**/participant/**', { timeout: 10000 });
+          |                ^
+      159 |     
+      160 |     // Navigate to settings
+      161 |     await page.goto('http://localhost:5175/settings');
+        at D:\MAMP\AfakarM\testing\playwright-mcp\enhanced-participant-profile.spec.js:158:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\error-context.md
+]]>
+</failure>
 <system-out>
-<![CDATA[🧪 Testing UC-09: Review and Approve Participant Applications
-❌ UC-09 FAILED: Login failed: {"error":"Failed to fetch"}
+<![CDATA[
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\error-context.md]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="UC-15 to UC-19: Study Execution &amp; Monitoring › UC-15: Launch Study and Begin Participant Recruitment" classname="researcher-use-cases-comprehensive.spec.js" time="2.361">
-<system-out>
-<![CDATA[🧪 Testing UC-15: Launch Study and Begin Participant Recruitment
-❌ UC-15 FAILED: Login failed: {"error":"Failed to fetch"}
+<testcase name="Enhanced Participant Profile &amp; Study Matching › should demonstrate automatic study matching" classname="enhanced-participant-profile.spec.js" time="13.344">
+<failure message="enhanced-participant-profile.spec.js:198:3 should demonstrate automatic study matching" type="FAILURE">
+<![CDATA[  [chromium] › enhanced-participant-profile.spec.js:198:3 › Enhanced Participant Profile & Study Matching › should demonstrate automatic study matching 
 
-================================================================================
-🎯 RESEARCHER USE CASES TESTING COMPLETE
-================================================================================
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/participant/**" until "load"
+      navigated to "http://localhost:5175/app"
+      navigated to "http://localhost:5175/app/participant-dashboard"
+      navigated to "http://localhost:5175/app/participant-dashboard"
+    ============================================================
 
-✅ PASSED (0):
+      206 |     
+      207 |     // Wait for redirect
+    > 208 |     await page.waitForURL('**/participant/**', { timeout: 10000 });
+          |                ^
+      209 |     
+      210 |     // Set specific demographics to test matching
+      211 |     await page.goto('http://localhost:5175/settings');
+        at D:\MAMP\AfakarM\testing\playwright-mcp\enhanced-participant-profile.spec.js:208:16
 
-⚠️ PARTIALLY WORKING (0):
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
 
-❌ FAILED (2):
-   - UC-09: Login failed: {"error":"Failed to fetch"}
-   - UC-15: Login failed: {"error":"Failed to fetch"}
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
 
-🚧 NOT IMPLEMENTED (0):
-
-📊 SUMMARY:
-   Total Use Cases Tested: 2/32
-   Success Rate: 0%
-   Partial Implementation: 0%
-   Implementation Gaps: 0%
-
-📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/
-================================================================================
+    Error Context: ..\..\test-results\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\error-context.md
 ]]>
-</system-out>
-</testcase>
-<testcase name="UC-15 to UC-19: Study Execution &amp; Monitoring › UC-16: Monitor Live Study Performance" classname="researcher-use-cases-comprehensive.spec.js" time="3.624">
+</failure>
 <system-out>
-<![CDATA[🧪 Testing UC-16: Monitor Live Study Performance
-❌ UC-16 FAILED: Login failed: {"error":"Failed to fetch"}
-]]>
-</system-out>
-</testcase>
-<testcase name="UC-20 to UC-26: Results &amp; Analytics › UC-20: Access Real-time Study Results Dashboard" classname="researcher-use-cases-comprehensive.spec.js" time="2.353">
-<system-out>
-<![CDATA[🧪 Testing UC-20: Access Real-time Study Results Dashboard
-❌ UC-20 FAILED: Login failed: {"error":"Failed to fetch"}
+<![CDATA[
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\test-failed-1.png]]
 
-================================================================================
-🎯 RESEARCHER USE CASES TESTING COMPLETE
-================================================================================
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\video.webm]]
 
-✅ PASSED (0):
-
-⚠️ PARTIALLY WORKING (0):
-
-❌ FAILED (2):
-   - UC-16: Login failed: {"error":"Failed to fetch"}
-   - UC-20: Login failed: {"error":"Failed to fetch"}
-
-🚧 NOT IMPLEMENTED (0):
-
-📊 SUMMARY:
-   Total Use Cases Tested: 2/32
-   Success Rate: 0%
-   Partial Implementation: 0%
-   Implementation Gaps: 0%
-
-📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/
-================================================================================
-]]>
-</system-out>
-</testcase>
-<testcase name="UC-27 to UC-29: Template &amp; Asset Management › UC-27: Create and Save Custom Study Templates" classname="researcher-use-cases-comprehensive.spec.js" time="3.65">
-<system-out>
-<![CDATA[🧪 Testing UC-27: Create and Save Custom Study Templates
-❌ UC-27 FAILED: Login failed: {"error":"Failed to fetch"}
-]]>
-</system-out>
-</testcase>
-<testcase name="UC-30 to UC-31: Collaboration &amp; Team Management › UC-30: Collaborate on Study Design with Team Members" classname="researcher-use-cases-comprehensive.spec.js" time="2.436">
-<system-out>
-<![CDATA[🧪 Testing UC-30: Collaborate on Study Design with Team Members
-❌ UC-30 FAILED: Login failed: {"error":"Failed to fetch"}
-
-================================================================================
-🎯 RESEARCHER USE CASES TESTING COMPLETE
-================================================================================
-
-✅ PASSED (0):
-
-⚠️ PARTIALLY WORKING (0):
-
-❌ FAILED (2):
-   - UC-27: Login failed: {"error":"Failed to fetch"}
-   - UC-30: Login failed: {"error":"Failed to fetch"}
-
-🚧 NOT IMPLEMENTED (0):
-
-📊 SUMMARY:
-   Total Use Cases Tested: 2/32
-   Success Rate: 0%
-   Partial Implementation: 0%
-   Implementation Gaps: 0%
-
-📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/
-================================================================================
-]]>
-</system-out>
-</testcase>
-<testcase name="UC-32: Account &amp; Platform Management › UC-32: Manage Account Settings and Billing" classname="researcher-use-cases-comprehensive.spec.js" time="3.586">
-<system-out>
-<![CDATA[🧪 Testing UC-32: Manage Account Settings and Billing
-❌ UC-32 FAILED: Login failed: {"error":"Failed to fetch"}
-
-================================================================================
-🎯 RESEARCHER USE CASES TESTING COMPLETE
-================================================================================
-
-✅ PASSED (0):
-
-⚠️ PARTIALLY WORKING (0):
-
-❌ FAILED (1):
-   - UC-32: Login failed: {"error":"Failed to fetch"}
-
-🚧 NOT IMPLEMENTED (0):
-
-📊 SUMMARY:
-   Total Use Cases Tested: 1/32
-   Success Rate: 0%
-   Partial Implementation: 0%
-   Implementation Gaps: 0%
-
-📁 Screenshots saved to: testing/playwright-mcp/use-case-screenshots/
-================================================================================
+[[ATTACHMENT|..\..\test-results\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\error-context.md]]
 ]]>
 </system-out>
 </testcase>

@@ -16,5 +16,42 @@
     "applied_at": "2025-08-07T16:54:15.585Z",
     "reviewed_at": null,
     "notes": null
+  },
+  {
+    "user_id": "test-participant-001",
+    "study_id": "simple-study-1754680655312",
+    "status": "pending",
+    "applied_at": "2025-08-08T19:17:57.376Z",
+    "id": "app-1754680677376-7jpfzmal3"
+  },
+  {
+    "user_id": "test-participant-001",
+    "study_id": "simple-study-1754680840026",
+    "status": "pending",
+    "applied_at": "2025-08-08T19:20:53.979Z",
+    "id": "app-1754680853979-4gj3lf2t9"
+  },
+  {
+    "user_id": "test-participant-001",
+    "study_id": "study-001",
+    "status": "pending",
+    "applied_at": "2025-08-09T22:51:34.669Z",
+    "id": "app-1754779894669-n4i7xvc3p"
+  },
+  {
+    "user_id": "test-participant-001",
+    "study_id": "study-002",
+    "status": "pending",
+    "applied_at": "2025-08-09T22:53:11.945Z",
+    "id": "app-1754779991945-q4t3u4335"
+  },
+  {
+    "user_id": "test-participant-001",
+    "study_id": "simple-study-1754786519414",
+    "status": "pending",
+    "applied_at": "2025-08-10T02:44:02.909Z",
+    "screening_answers": "{\"sq_test_question_1\":\"bvcnnfghf\"}",
+    "eligibility_confirmed": true,
+    "id": "app-1754793842909-55mcoj0q1"
   }
 ]

@@ -52,8 +52,18 @@ class ApiService {
             const authStorage = localStorage.getItem('auth-storage');
             if (authStorage) {
               const { state } = JSON.parse(authStorage);
+              const currentToken = state?.token;
               const refreshToken = state?.refreshToken;
-                if (refreshToken) {
+              
+              // Check if this is a fallback token - don't try to refresh fallback tokens
+              if (currentToken && currentToken.startsWith('fallback-token-')) {
+                console.warn('🔧 Auth interceptor: Fallback token detected, not attempting refresh');
+                // For fallback tokens, just retry with the same token
+                originalRequest.headers.Authorization = `Bearer ${currentToken}`;
+                return this.api(originalRequest);
+              }
+              
+              if (refreshToken) {
                 const response = await axios.post(`${this.api.defaults.baseURL}/auth-consolidated?action=refresh`, {
                   refreshToken,
                 });
@@ -73,25 +83,27 @@ class ApiService {
               }
             }
           } catch (refreshError) {
-            // Check if this is local/mock authentication before clearing
+            console.error('🔧 Auth interceptor: Token refresh failed:', refreshError);
+            
+            // Check if this is local/fallback authentication before clearing
             const authStorage = localStorage.getItem('auth-storage');
-            let isLocalAuth = false;
+            let isFallbackAuth = false;
             if (authStorage) {
               try {
                 const { state } = JSON.parse(authStorage);
-                // Check if this is a mock token (they contain "mock-signature")
-                isLocalAuth = state?.token?.includes('mock-signature');
-              } catch (e) {
+                // Check if this is a fallback token
+                isFallbackAuth = state?.token?.startsWith('fallback-token-');
+              } catch {
                 // Invalid storage, safe to clear
               }
             }
             
-            if (!isLocalAuth) {
+            if (!isFallbackAuth) {
               // Only clear auth for real authentication failures
               localStorage.removeItem('auth-storage');
               window.location.href = '/login';
             } else {
-              console.warn('🔧 Auth interceptor: Skipping logout for local/mock authentication');
+              console.warn('🔧 Auth interceptor: Skipping logout for fallback authentication');
             }
             
             return Promise.reject(refreshError);

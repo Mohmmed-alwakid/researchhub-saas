@@ -88,6 +88,39 @@ async function validateToken(token) {
 
     const jwt = token.replace('Bearer ', '');
     
+    // Check if it's a fallback token (for local development)
+    if (jwt.startsWith('fallback-token-')) {
+      try {
+        // Parse fallback token format: fallback-token-test-participant-001-timestamp
+        const tokenParts = jwt.split('-');
+        if (tokenParts.length < 5) {
+          return { valid: false, error: 'Invalid fallback token format' };
+        }
+
+        const userType = tokenParts[2]; // 'test'
+        const userRole = tokenParts[3]; // 'participant', 'researcher', 'admin'
+        const userNumber = tokenParts[4]; // '001'
+        const userId = `${userType}-${userRole}-${userNumber}`;
+
+        // Return fallback user data
+        return {
+          valid: true,
+          user: {
+            id: userId,
+            email: `abwanwr77+${userRole}@gmail.com`,
+            user_metadata: {
+              role: userRole,
+              first_name: userRole.charAt(0).toUpperCase() + userRole.slice(1),
+              last_name: 'User'
+            },
+            email_confirmed_at: new Date().toISOString()
+          }
+        };
+      } catch (parseError) {
+        return { valid: false, error: 'Invalid fallback token format' };
+      }
+    }
+    
     // Check if it's a mock token (for local development)
     if (jwt.includes('mock-signature')) {
       try {
@@ -359,18 +392,28 @@ async function handleSuccessfulAuth(authData, res) {
     const user = authData.user;
     const profile = user.profile;
     
+    // Prepare user response with demographics if available
+    const userResponse = {
+      id: user.id,
+      email: user.email,
+      firstName: profile?.first_name || user.user_metadata?.first_name || '',
+      lastName: profile?.last_name || user.user_metadata?.last_name || '',
+      role: profile?.role || user.user_metadata?.role || 'participant',
+      status: profile?.status || 'active',
+      emailConfirmed: user.email_confirmed_at ? true : false
+    };
+
+    // Include demographics if available in profile
+    if (profile?.demographics) {
+      userResponse.demographics = profile.demographics;
+    }
+    
+    console.log('✅ Auth response includes demographics:', !!profile?.demographics);
+    
     return res.status(200).json({
       success: true,
       message: 'Login successful',
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: profile?.first_name || user.user_metadata?.first_name || '',
-        lastName: profile?.last_name || user.user_metadata?.last_name || '',
-        role: profile?.role || user.user_metadata?.role || 'participant',
-        status: profile?.status || 'active',
-        emailConfirmed: user.email_confirmed_at ? true : false
-      },
+      user: userResponse,
       session: authData.session
     });
     
@@ -387,13 +430,21 @@ async function handleSuccessfulAuth(authData, res) {
  * Refresh token
  */
 async function handleRefresh(req, res) {
+  console.log('🔄 Refresh Handler - Request received:', {
+    method: req.method,
+    hasRefreshToken: !!(req.body.refresh_token || req.body.refreshToken),
+    bodyKeys: Object.keys(req.body)
+  });
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
-  const { refresh_token } = req.body;
+  // Accept both refresh_token and refreshToken for compatibility
+  const refresh_token = req.body.refresh_token || req.body.refreshToken;
 
   if (!refresh_token) {
+    console.log('❌ Refresh Handler - No refresh token found in request');
     return res.status(400).json({
       success: false,
       error: 'Refresh token is required'
@@ -401,37 +452,67 @@ async function handleRefresh(req, res) {
   }
 
   try {
-    // Check if we have Supabase available
-    if (!supabaseConnected || useLocalAuth) {
-      // For fallback auth, we don't need to do anything special for refresh
-      // Just return success since tokens are handled differently
+    console.log('🔄 Refresh Handler - Processing refresh token:', {
+      tokenPreview: refresh_token.substring(0, 30) + '...',
+      isFallbackToken: refresh_token.startsWith('fallback-refresh-'),
+      useLocalAuth
+    });
+
+    // Check if this is a fallback refresh token
+    if (refresh_token.startsWith('fallback-refresh-') || useLocalAuth) {
+      console.log('🔧 Refresh Handler - Using fallback refresh for local development');
+      
+      // For fallback tokens, preserve the user identity
+      let userId = 'test-participant-001'; // default
+      
+      if (refresh_token.startsWith('fallback-refresh-test-')) {
+        const parts = refresh_token.split('-');
+        if (parts.length >= 4) {
+          const userType = parts[2]; // 'test'
+          const userRole = parts[3]; // 'participant', 'researcher', 'admin'  
+          const userNumber = parts[4]; // '001'
+          userId = `${userType}-${userRole}-${userNumber}`;
+        }
+      }
+      
+      const timestamp = Date.now();
+      const newToken = `fallback-token-${userId}-${timestamp}`;
+      const newRefreshToken = `fallback-refresh-${userId}-${timestamp}`;
+      
+      console.log('✅ Refresh Handler - Generated new fallback tokens:', {
+        newTokenPreview: newToken.substring(0, 30) + '...',
+        newRefreshTokenPreview: newRefreshToken.substring(0, 30) + '...'
+      });
+      
       return res.status(200).json({
         success: true,
         message: 'Token refreshed successfully (fallback mode)',
         session: {
-          access_token: `fallback-token-refresh-${Date.now()}`,
-          refresh_token: `fallback-refresh-${Date.now()}`
+          access_token: newToken,
+          refresh_token: newRefreshToken
         }
       });
     }
 
+    console.log('🔄 Refresh Handler - Using Supabase refresh');
     const { data, error } = await supabase.auth.refreshSession({ refresh_token });
 
     if (error) {
-      console.error('Token refresh error:', error);
+      console.error('❌ Refresh Handler - Supabase refresh error:', error);
       return res.status(401).json({
         success: false,
         error: 'Invalid refresh token'
       });
     }
 
+    console.log('✅ Refresh Handler - Supabase refresh successful');
     return res.status(200).json({
       success: true,
       message: 'Token refreshed successfully',
       session: data.session
     });
   } catch (error) {
-    console.error('Token refresh exception:', error);
+    console.error('❌ Refresh Handler - Exception:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
@@ -494,6 +575,12 @@ async function handleLogout(req, res) {
  * Get user status/profile
  */
 async function handleStatus(req, res) {
+  console.log('🔍 Status Handler - Request received:', {
+    method: req.method,
+    hasAuthHeader: !!req.headers.authorization,
+    authHeaderPreview: req.headers.authorization ? req.headers.authorization.substring(0, 50) + '...' : null
+  });
+
   if (req.method !== 'GET') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
@@ -501,6 +588,7 @@ async function handleStatus(req, res) {
   const authHeader = getAuthHeader(req);
   
   if (!authHeader) {
+    console.log('❌ Status Handler - No auth header found');
     return res.status(401).json({
       success: false,
       error: 'Authorization header required'
@@ -508,35 +596,46 @@ async function handleStatus(req, res) {
   }
 
   try {
+    console.log('🔍 Status Handler - Validating token...');
     const validation = await validateToken(authHeader);
     
     if (!validation.valid) {
+      console.log('❌ Status Handler - Token validation failed:', validation.error);
       return res.status(401).json({
         success: false,
         error: validation.error
       });
     }
 
+    console.log('✅ Status Handler - Token validation successful');
     const supabaseUser = validation.user;
 
-    // Try to fetch user profile from profiles table to get role and other details
+    // Check if this is a fallback/test user (skip database queries)
+    const isFallbackUser = supabaseUser.id && supabaseUser.id.startsWith('test-');
+    
     let profileData = null;
-    try {
-      const { data: profile, error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .select('*')
-        .eq('email', supabaseUser.email)
-        .single();
-      
-      if (profileError) {
-        console.log('Profile table not accessible, using user_metadata:', profileError.message);
+    
+    // Only fetch from database if not a fallback user
+    if (!isFallbackUser) {
+      try {
+        const { data: profile, error: profileError } = await supabaseAdmin
+          .from('profiles')
+          .select('*')
+          .eq('email', supabaseUser.email)
+          .single();
+        
+        if (profileError) {
+          console.log('Profile table not accessible, using user_metadata:', profileError.message);
+          profileData = null;
+        } else {
+          profileData = profile;
+        }
+      } catch (error) {
+        console.log('Profile fetch failed, using user_metadata:', error.message);
         profileData = null;
-      } else {
-        profileData = profile;
       }
-    } catch (error) {
-      console.log('Profile fetch failed, using user_metadata:', error.message);
-      profileData = null;
+    } else {
+      console.log('🔧 Status - Skipping database query for fallback user:', supabaseUser.id);
     }
 
     // Format user data consistently with login response
@@ -555,6 +654,13 @@ async function handleStatus(req, res) {
       profileData: profileData,
       formattedUser: formattedUser,
       timestamp: new Date().toISOString()
+    });
+
+    console.log('✅ Status Handler - Sending successful response:', {
+      success: true,
+      hasUser: !!formattedUser,
+      userEmail: formattedUser.email,
+      userRole: formattedUser.role
     });
 
     return res.status(200).json({

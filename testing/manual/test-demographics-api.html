@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demographics API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Demographics API Test</h1>
+        <p>Test the demographics update functionality with the participant test account.</p>
+        
+        <h2>Login First</h2>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="email" value="abwanwr77+participant@gmail.com">
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="password" value="Testtest123">
+        </div>
+        <button onclick="login()">Login</button>
+        
+        <h2>Update Demographics</h2>
+        <div class="form-group">
+            <label>Age Range:</label>
+            <select id="ageRange">
+                <option value="">Select age range</option>
+                <option value="18-24">18-24</option>
+                <option value="25-34">25-34</option>
+                <option value="35-44">35-44</option>
+                <option value="45-54">45-54</option>
+                <option value="55-64">55-64</option>
+                <option value="65+">65+</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Gender:</label>
+            <select id="gender">
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Country:</label>
+            <select id="country">
+                <option value="">Select country</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="JP">Japan</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Phone Number:</label>
+            <input type="tel" id="phoneNumber" placeholder="+1 (555) 123-4567">
+        </div>
+        <div class="form-group">
+            <label>Specialization/Expertise:</label>
+            <input type="text" id="specialization" placeholder="e.g., Software Development, Marketing, Design">
+        </div>
+        <button onclick="updateDemographics()">Update Demographics</button>
+        
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        let authToken = '';
+        const API_BASE = 'http://localhost:3003/api';
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                showResult(JSON.stringify(data, null, 2), response.ok);
+                
+                if (data.success && data.session?.access_token) {
+                    authToken = data.session.access_token;
+                    showResult('✅ Login successful! Token saved for demographics update.', true);
+                }
+            } catch (error) {
+                showResult(`❌ Login error: ${error.message}`, false);
+            }
+        }
+
+        async function updateDemographics() {
+            if (!authToken) {
+                showResult('❌ Please login first to get an auth token.', false);
+                return;
+            }
+
+            const demographics = {
+                ageRange: document.getElementById('ageRange').value,
+                gender: document.getElementById('gender').value,
+                country: document.getElementById('country').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                specialization: document.getElementById('specialization').value,
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/user-profile-consolidated?action=update-demographics`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ demographics })
+                });
+                
+                const data = await response.json();
+                showResult(`Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`, response.ok);
+                
+                if (data.success) {
+                    showResult('✅ Demographics updated successfully!', true);
+                }
+            } catch (error) {
+                showResult(`❌ Demographics update error: ${error.message}`, false);
+            }
+        }
+
+        function showResult(message, isSuccess) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.style.display = 'block';
+        }
+
+        // Test API health on page load
+        window.onload = async () => {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                showResult(`🏥 API Health Check: ${JSON.stringify(data, null, 2)}`, response.ok);
+            } catch (error) {
+                showResult(`❌ API Health Check failed: ${error.message}`, false);
+            }
+        };
+    </script>
+</body>
+</html>

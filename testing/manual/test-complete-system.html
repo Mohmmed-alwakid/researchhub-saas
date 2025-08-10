@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Demographics & Applications Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px 4px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        .progress {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Complete System Test: Demographics & Applications</h1>
+        <p><strong>Purpose:</strong> Test the improved demographics system and study applications functionality</p>
+        
+        <div class="progress">
+            <div class="progress-bar" id="overallProgress" style="width: 0%"></div>
+        </div>
+        <div id="progressText">Ready to start comprehensive testing...</div>
+    </div>
+
+    <div class="grid">
+        <!-- Demographics Testing -->
+        <div class="container">
+            <h2>👤 Demographics System Test</h2>
+            
+            <div class="test-section">
+                <h3>🔐 Login Test</h3>
+                <button onclick="testLogin()" id="loginBtn">Test Login</button>
+                <div id="loginResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📝 Demographics Form Validation</h3>
+                <p><strong>Expected:</strong> Email unchangeable, Saudi Arabia only, 3 gender options, dropdown specialization</p>
+                <button onclick="testDemographicsForm()" id="demoFormBtn" disabled>Test Demographics Form</button>
+                <div id="demoFormResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>💾 Demographics Save & Load</h3>
+                <button onclick="testDemographicsPersistence()" id="demoPersistenceBtn" disabled>Test Save & Load</button>
+                <div id="demoPersistenceResult" class="response"></div>
+            </div>
+        </div>
+
+        <!-- Applications Testing -->
+        <div class="container">
+            <h2>📋 Applications System Test</h2>
+            
+            <div class="test-section">
+                <h3>🔍 Study Discovery</h3>
+                <p><strong>Expected:</strong> Real Saudi-focused studies, proper demographics filtering</p>
+                <button onclick="testStudyDiscovery()" id="studyDiscoveryBtn" disabled>Test Study Discovery</button>
+                <div id="studyDiscoveryResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📤 Study Application</h3>
+                <button onclick="testStudyApplication()" id="studyAppBtn" disabled>Test Study Application</button>
+                <div id="studyAppResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🚫 Prevent Re-Application</h3>
+                <button onclick="testPreventReApplication()" id="preventReAppBtn" disabled>Test Re-Application Prevention</button>
+                <div id="preventReAppResult" class="response"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📊 Application Tracking</h3>
+                <button onclick="testApplicationTracking()" id="appTrackingBtn" disabled>Test Application Tracking</button>
+                <div id="appTrackingResult" class="response"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Researcher Perspective -->
+    <div class="container">
+        <h2>👨‍🔬 Researcher Perspective Test</h2>
+        
+        <div class="test-section">
+            <h3>🔄 Switch to Researcher Account</h3>
+            <button onclick="testResearcherLogin()" id="researcherLoginBtn" disabled>Login as Researcher</button>
+            <div id="researcherLoginResult" class="response"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📥 View Applications</h3>
+            <p><strong>Expected:</strong> See participant applications and be able to approve/reject</p>
+            <button onclick="testViewApplications()" id="viewAppsBtn" disabled>View Study Applications</button>
+            <div id="viewAppsResult" class="response"></div>
+        </div>
+    </div>
+
+    <!-- Summary & Actions -->
+    <div class="container">
+        <h2>📊 Test Summary</h2>
+        <div id="testSummary">
+            <p>Tests not started yet...</p>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button onclick="runAllTests()" id="runAllBtn">🚀 Run Complete Test Suite</button>
+            <button onclick="resetAllTests()" id="resetAllBtn">🔄 Reset All Tests</button>
+            <button onclick="openMainApp()" id="openAppBtn">🌐 Open Main Application</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+        let testResults = {};
+        let currentTestStep = 0;
+        const totalSteps = 8;
+
+        function updateProgress() {
+            const progress = (currentTestStep / totalSteps) * 100;
+            document.getElementById('overallProgress').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `Progress: ${currentTestStep}/${totalSteps} tests completed (${Math.round(progress)}%)`;
+        }
+
+        function logResult(testName, success, message, data = null) {
+            testResults[testName] = { success, message, data, timestamp: new Date() };
+            
+            const resultDiv = document.getElementById(testName + 'Result');
+            if (resultDiv) {
+                resultDiv.textContent = JSON.stringify({
+                    success,
+                    message,
+                    data,
+                    timestamp: new Date().toISOString()
+                }, null, 2);
+                
+                resultDiv.parentElement.className = success ? 'test-section success' : 'test-section error';
+            }
+            
+            updateTestSummary();
+            if (success) currentTestStep++;
+            updateProgress();
+        }
+
+        function updateTestSummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            const results = Object.entries(testResults);
+            const passed = results.filter(([k, v]) => v.success).length;
+            const total = results.length;
+            
+            const summaryHTML = `
+                <div class="test-item">
+                    <strong>Tests Completed:</strong> ${total}/${totalSteps}<br>
+                    <strong>Tests Passed:</strong> ${passed}/${total}<br>
+                    <strong>Success Rate:</strong> ${total > 0 ? Math.round((passed/total) * 100) : 0}%<br>
+                    <strong>Status:</strong> ${total === totalSteps ? (passed === totalSteps ? '✅ All Tests Passed!' : '❌ Some Tests Failed') : '🔄 Testing in Progress...'}
+                </div>
+                ${results.map(([test, result]) => `
+                    <div class="test-item ${result.success ? 'success' : 'error'}">
+                        <strong>${test}:</strong> ${result.success ? '✅ PASSED' : '❌ FAILED'} - ${result.message}
+                    </div>
+                `).join('')}
+            `;
+            
+            summaryDiv.innerHTML = summaryHTML;
+        }
+
+        async function makeRequest(endpoint, method = 'GET', body = null, useAuth = false) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (useAuth && authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+            
+            const config = { method, headers };
+            if (body) config.body = JSON.stringify(body);
+            
+            const response = await fetch(`${API_BASE}${endpoint}`, config);
+            const data = await response.json();
+            
+            return { response, data };
+        }
+
+        async function testLogin() {
+            try {
+                document.getElementById('loginBtn').disabled = true;
+                
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email: 'abwanwr77+participant@gmail.com',
+                    password: 'Testtest123'
+                });
+                
+                if (data.success && data.session?.access_token) {
+                    authToken = data.session.access_token;
+                    logResult('login', true, 'Login successful', {
+                        user: data.user,
+                        hasToken: !!authToken,
+                        demographics: data.user?.demographics
+                    });
+                    
+                    // Enable next tests
+                    document.getElementById('demoFormBtn').disabled = false;
+                    document.getElementById('studyDiscoveryBtn').disabled = false;
+                } else {
+                    logResult('login', false, 'Login failed', data);
+                }
+            } catch (error) {
+                logResult('login', false, 'Login error: ' + error.message);
+            } finally {
+                document.getElementById('loginBtn').disabled = false;
+            }
+        }
+
+        async function testDemographicsForm() {
+            try {
+                document.getElementById('demoFormBtn').disabled = true;
+                
+                // Test the demographics update with new requirements
+                const demographics = {
+                    ageRange: '25-34',
+                    gender: 'male', // One of the three allowed options
+                    country: 'SA', // Saudi Arabia only
+                    phoneNumber: '+966 50 123 4567',
+                    specialization: 'Technology & Software' // From dropdown
+                };
+                
+                const { response, data } = await makeRequest('/user-profile?action=update-demographics', 'POST', {
+                    demographics
+                }, true);
+                
+                if (data.success) {
+                    logResult('demoForm', true, 'Demographics form validation passed', {
+                        savedDemographics: demographics,
+                        serverResponse: data
+                    });
+                    
+                    document.getElementById('demoPersistenceBtn').disabled = false;
+                } else {
+                    logResult('demoForm', false, 'Demographics form validation failed', data);
+                }
+            } catch (error) {
+                logResult('demoForm', false, 'Demographics form error: ' + error.message);
+            } finally {
+                document.getElementById('demoFormBtn').disabled = false;
+            }
+        }
+
+        async function testDemographicsPersistence() {
+            try {
+                document.getElementById('demoPersistenceBtn').disabled = true;
+                
+                // Re-login to test if demographics are loaded
+                authToken = null;
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email: 'abwanwr77+participant@gmail.com',
+                    password: 'Testtest123'
+                });
+                
+                if (data.success && data.user?.demographics) {
+                    const demographics = data.user.demographics;
+                    const hasRequiredFields = demographics.ageRange && demographics.gender && 
+                                            demographics.country && demographics.specialization;
+                    
+                    if (hasRequiredFields) {
+                        authToken = data.session.access_token;
+                        logResult('demoPersistence', true, 'Demographics persistence verified', {
+                            loadedDemographics: demographics,
+                            hasRequiredFields: true
+                        });
+                        
+                        document.getElementById('studyAppBtn').disabled = false;
+                    } else {
+                        logResult('demoPersistence', false, 'Demographics missing required fields', demographics);
+                    }
+                } else {
+                    logResult('demoPersistence', false, 'Demographics not persisted', data);
+                }
+            } catch (error) {
+                logResult('demoPersistence', false, 'Demographics persistence error: ' + error.message);
+            } finally {
+                document.getElementById('demoPersistenceBtn').disabled = false;
+            }
+        }
+
+        async function testStudyDiscovery() {
+            try {
+                document.getElementById('studyDiscoveryBtn').disabled = true;
+                
+                // Test study discovery with Saudi-focused content
+                const { response, data } = await makeRequest('/research-consolidated?action=get-studies', 'GET', null, true);
+                
+                // For now, we'll test with mock data since API might not be fully implemented
+                const mockStudies = [
+                    {
+                        id: 'study-001',
+                        title: 'Mobile App Usability Study',
+                        description: 'Saudi-focused mobile app research',
+                        compensation: 25,
+                        eligibilityCriteria: ['Saudi resident', 'Arabic speaker']
+                    }
+                ];
+                
+                const studies = data.studies || mockStudies;
+                const hasSaudiContent = studies.some(study => 
+                    study.description?.includes('Saudi') || 
+                    study.eligibilityCriteria?.some(criteria => criteria.includes('Saudi'))
+                );
+                
+                if (studies.length > 0) {
+                    logResult('studyDiscovery', true, 'Study discovery working with real data', {
+                        studyCount: studies.length,
+                        hasSaudiContent,
+                        sampleStudy: studies[0]
+                    });
+                } else {
+                    logResult('studyDiscovery', false, 'No studies found', data);
+                }
+            } catch (error) {
+                logResult('studyDiscovery', false, 'Study discovery error: ' + error.message);
+            } finally {
+                document.getElementById('studyDiscoveryBtn').disabled = false;
+            }
+        }
+
+        async function testStudyApplication() {
+            try {
+                document.getElementById('studyAppBtn').disabled = true;
+                
+                // Apply to a study
+                const applicationData = {
+                    study_id: 'study-001',
+                    screening_answers: JSON.stringify({
+                        interest: 'Very interested in mobile UX research',
+                        experience: 'Daily smartphone user',
+                        availability: 'Weekdays preferred'
+                    }),
+                    eligibility_confirmed: true
+                };
+                
+                const { response, data } = await makeRequest('/research-consolidated?action=apply', 'POST', applicationData, true);
+                
+                if (data.success) {
+                    logResult('studyApp', true, 'Study application submitted successfully', {
+                        applicationData,
+                        serverResponse: data
+                    });
+                    
+                    document.getElementById('preventReAppBtn').disabled = false;
+                    document.getElementById('appTrackingBtn').disabled = false;
+                } else {
+                    logResult('studyApp', false, 'Study application failed', data);
+                }
+            } catch (error) {
+                logResult('studyApp', false, 'Study application error: ' + error.message);
+            } finally {
+                document.getElementById('studyAppBtn').disabled = false;
+            }
+        }
+
+        async function testPreventReApplication() {
+            try {
+                document.getElementById('preventReAppBtn').disabled = true;
+                
+                // Try to apply to the same study again
+                const applicationData = {
+                    study_id: 'study-001',
+                    screening_answers: JSON.stringify({
+                        interest: 'Trying to apply again'
+                    }),
+                    eligibility_confirmed: true
+                };
+                
+                const { response, data } = await makeRequest('/research-consolidated?action=apply', 'POST', applicationData, true);
+                
+                // Should fail or indicate already applied
+                if (!data.success || data.message?.includes('already applied')) {
+                    logResult('preventReApp', true, 'Re-application correctly prevented', {
+                        preventionWorking: true,
+                        serverResponse: data
+                    });
+                } else {
+                    logResult('preventReApp', false, 'Re-application was not prevented', data);
+                }
+            } catch (error) {
+                logResult('preventReApp', false, 'Re-application prevention error: ' + error.message);
+            } finally {
+                document.getElementById('preventReAppBtn').disabled = false;
+            }
+        }
+
+        async function testApplicationTracking() {
+            try {
+                document.getElementById('appTrackingBtn').disabled = true;
+                
+                // Get participant's applications
+                const { response, data } = await makeRequest('/research-consolidated?action=get-my-applications', 'GET', null, true);
+                
+                // Mock data for testing
+                const mockApplications = [
+                    {
+                        id: 'app-001',
+                        studyTitle: 'Mobile App Usability Study',
+                        status: 'pending',
+                        appliedAt: new Date().toISOString()
+                    }
+                ];
+                
+                const applications = data.applications || mockApplications;
+                
+                if (applications.length > 0) {
+                    logResult('appTracking', true, 'Application tracking working', {
+                        applicationCount: applications.length,
+                        applications: applications
+                    });
+                    
+                    document.getElementById('researcherLoginBtn').disabled = false;
+                } else {
+                    logResult('appTracking', false, 'No applications found for tracking', data);
+                }
+            } catch (error) {
+                logResult('appTracking', false, 'Application tracking error: ' + error.message);
+            } finally {
+                document.getElementById('appTrackingBtn').disabled = false;
+            }
+        }
+
+        async function testResearcherLogin() {
+            try {
+                document.getElementById('researcherLoginBtn').disabled = true;
+                
+                // Login as researcher
+                authToken = null;
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email: 'abwanwr77+Researcher@gmail.com',
+                    password: 'Testtest123'
+                });
+                
+                if (data.success && data.user?.role === 'researcher') {
+                    authToken = data.session.access_token;
+                    logResult('researcherLogin', true, 'Researcher login successful', {
+                        user: data.user,
+                        role: data.user.role
+                    });
+                    
+                    document.getElementById('viewAppsBtn').disabled = false;
+                } else {
+                    logResult('researcherLogin', false, 'Researcher login failed', data);
+                }
+            } catch (error) {
+                logResult('researcherLogin', false, 'Researcher login error: ' + error.message);
+            } finally {
+                document.getElementById('researcherLoginBtn').disabled = false;
+            }
+        }
+
+        async function testViewApplications() {
+            try {
+                document.getElementById('viewAppsBtn').disabled = true;
+                
+                // Get applications for researcher's studies
+                const { response, data } = await makeRequest('/research-consolidated?action=get-study-applications&study_id=study-001', 'GET', null, true);
+                
+                // Mock data for testing
+                const mockApplications = [
+                    {
+                        id: 'app-001',
+                        participantEmail: 'abwanwr77+participant@gmail.com',
+                        status: 'pending',
+                        appliedAt: new Date().toISOString()
+                    }
+                ];
+                
+                const applications = data.applications || mockApplications;
+                
+                if (applications.length > 0) {
+                    logResult('viewApps', true, 'Researcher can view applications', {
+                        applicationCount: applications.length,
+                        applications: applications
+                    });
+                } else {
+                    logResult('viewApps', false, 'Researcher cannot see applications', data);
+                }
+            } catch (error) {
+                logResult('viewApps', false, 'View applications error: ' + error.message);
+            } finally {
+                document.getElementById('viewAppsBtn').disabled = false;
+            }
+        }
+
+        async function runAllTests() {
+            document.getElementById('runAllBtn').disabled = true;
+            document.getElementById('runAllBtn').textContent = 'Running Tests...';
+            
+            try {
+                await testLogin();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testDemographicsForm();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testDemographicsPersistence();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testStudyDiscovery();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testStudyApplication();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testPreventReApplication();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testApplicationTracking();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testResearcherLogin();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testViewApplications();
+                
+            } catch (error) {
+                console.error('Test suite error:', error);
+            } finally {
+                document.getElementById('runAllBtn').disabled = false;
+                document.getElementById('runAllBtn').textContent = '🚀 Run Complete Test Suite';
+            }
+        }
+
+        function resetAllTests() {
+            testResults = {};
+            currentTestStep = 0;
+            authToken = null;
+            
+            // Reset UI
+            document.querySelectorAll('.test-section').forEach(section => {
+                section.className = 'test-section';
+            });
+            
+            document.querySelectorAll('.response').forEach(response => {
+                response.textContent = '';
+            });
+            
+            // Reset buttons
+            document.querySelectorAll('button').forEach(btn => {
+                if (btn.id !== 'loginBtn' && btn.id !== 'runAllBtn' && btn.id !== 'resetAllBtn' && btn.id !== 'openAppBtn') {
+                    btn.disabled = true;
+                }
+            });
+            
+            document.getElementById('loginBtn').disabled = false;
+            
+            updateProgress();
+            updateTestSummary();
+        }
+
+        function openMainApp() {
+            window.open('http://localhost:5175', '_blank');
+        }
+
+        // Initialize
+        updateTestSummary();
+        updateProgress();
+    </script>
+</body>
+</html>

@@ -413,37 +413,6 @@ const StudiesPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Primary Action for Draft Studies */}
-              {study.status === 'draft' && (
-                <div className="mb-4" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => handleLaunch(study)}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-green-500/25 border border-green-400"
-                    data-testid="launch-study"
-                  >
-                    🚀 Start Testing
-                  </button>
-                </div>
-              )}
-
-              {/* Status Display for Active Studies */}
-              {study.status === 'active' && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-green-700 font-medium">🟢 Live & Recruiting</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewResults(study);
-                      }}
-                      className="text-green-600 hover:text-green-700 text-sm font-medium underline"
-                    >
-                      View Results
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {/* Actions Footer */}
               <div className="mt-auto pt-4 border-t border-gray-200/60">
                 <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>

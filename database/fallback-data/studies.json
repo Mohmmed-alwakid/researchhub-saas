@@ -20,5 +20,392 @@
     "settings": "{\"duration\":20,\"payment\":15}",
     "created_at": "2025-08-07T16:54:15.585Z",
     "updated_at": "2025-08-07T16:54:15.585Z"
+  },
+  {
+    "id": "simple-study-1754680655312",
+    "title": "Default Test Study",
+    "description": "Default description",
+    "status": "active",
+    "target_participants": 10,
+    "researcher_id": "test-researcher-001",
+    "settings": {
+      "compensation": 25,
+      "blocks": [],
+      "screeningQuestions": [],
+      "type": "usability",
+      "maxParticipants": 10,
+      "duration": 30
+    },
+    "is_public": false,
+    "created_at": "2025-08-08T19:17:35.312Z",
+    "updated_at": "2025-08-08T19:17:35.312Z"
+  },
+  {
+    "id": "simple-study-1754680738520",
+    "title": "Default Test Study",
+    "description": "Default description",
+    "status": "active",
+    "target_participants": 10,
+    "researcher_id": "test-researcher-001",
+    "settings": {
+      "compensation": 25,
+      "blocks": [],
+      "screeningQuestions": [],
+      "type": "usability",
+      "maxParticipants": 10,
+      "duration": 30
+    },
+    "is_public": false,
+    "created_at": "2025-08-08T19:18:58.520Z",
+    "updated_at": "2025-08-08T19:18:58.520Z"
+  },
+  {
+    "id": "simple-study-1754680840026",
+    "title": "Default Test Study",
+    "description": "Default description",
+    "status": "active",
+    "target_participants": 10,
+    "researcher_id": "test-researcher-001",
+    "settings": {
+      "compensation": 25,
+      "blocks": [],
+      "screeningQuestions": [],
+      "type": "usability",
+      "maxParticipants": 10,
+      "duration": 30
+    },
+    "is_public": false,
+    "created_at": "2025-08-08T19:20:40.026Z",
+    "updated_at": "2025-08-08T19:20:40.026Z"
+  },
+  {
+    "id": "simple-study-1754781543198",
+    "title": "Mobile App Usability Study",
+    "description": "Test the usability of our mobile application",
+    "status": "active",
+    "target_participants": 15,
+    "researcher_id": "test-researcher-001",
+    "settings": {
+      "compensation": 25,
+      "blocks": [
+        {
+          "id": "block_1754781534492_welcome",
+          "order": 1,
+          "type": "welcome_screen",
+          "title": "Welcome",
+          "description": "Welcome to our study!",
+          "settings": {
+            "title": "Welcome to our usability study",
+            "message": "Thank you for participating in our usability research. Your feedback will help us improve our product.",
+            "showContinueButton": true
+          }
+        },
+        {
+          "id": "block_1754781535781",
+          "order": 2,
+          "type": "rating_scale",
+          "title": "Rating Scale",
+          "description": "Rate your experience from 1 to 10",
+          "settings": {
+            "question": "How would you rate the ease of completing this task?",
+            "scaleType": "numeric",
+            "minValue": 1,
+            "maxValue": 10,
+            "minLabel": "Very Difficult",
+            "maxLabel": "Very Easy",
+            "required": true
+          }
+        },
+        {
+          "id": "block_1754781536149",
+          "order": 3,
+          "type": "website_navigation",
+          "title": "Website Navigation",
+          "description": "Navigate to a specific page or section",
+          "settings": {
+            "title": "Navigation Task",
+            "startUrl": "https://example.com",
+            "targetUrl": "https://example.com/contact",
+            "instruction": "Navigate to the contact page",
+            "trackClicks": true,
+            "trackTime": true
+          }
+        },
+        {
+          "id": "block_1754781534492_thank_you",
+          "order": 4,
+          "type": "thank_you_screen",
+          "title": "Thank You",
+          "description": "Thank you for participating!",
+          "settings": {
+            "title": "Thank you for your participation!",
+            "message": "Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.",
+            "showCompletionCode": false,
+            "redirectUrl": ""
+          }
+        }
+      ],
+      "screeningQuestions": [],
+      "type": "usability",
+      "maxParticipants": 15,
+      "duration": 30
+    },
+    "is_public": false,
+    "created_at": "2025-08-09T23:19:03.198Z",
+    "updated_at": "2025-08-09T23:19:03.198Z"
+  },
+  {
+    "id": "simple-study-1754781554303",
+    "title": "Mobile App Usability Study",
+    "description": "Test the usability of our mobile application",
+    "status": "active",
+    "target_participants": 15,
+    "researcher_id": "test-researcher-001",
+    "settings": {
+      "compensation": 25,
+      "blocks": [
+        {
+          "id": "block_1754781549216_welcome",
+          "order": 1,
+          "type": "welcome_screen",
+          "title": "Welcome",
+          "description": "Welcome to our study!",
+          "settings": {
+            "title": "Welcome to our usability study",
+            "message": "Thank you for participating in our usability research. Your feedback will help us improve our product.",
+            "showContinueButton": true
+          }
+        },
+        {
+          "id": "block_1754781550160",
+          "order": 2,
+          "type": "website_navigation",
+          "title": "Website Navigation",
+          "description": "Navigate to a specific page or section",
+          "settings": {
+            "title": "Navigation Task",
+            "startUrl": "https://example.com",
+            "targetUrl": "https://example.com/contact",
+            "instruction": "Navigate to the contact page",
+            "trackClicks": true,
+            "trackTime": true
+          }
+        },
+        {
+          "id": "block_1754781550728",
+          "order": 3,
+          "type": "comparison_test",
+          "title": "A/B Comparison",
+          "description": "Compare two options and choose one",
+          "settings": {
+            "title": "Compare These Options",
+            "question": "Which option do you prefer?",
+            "optionA": {
+              "title": "Option A",
+              "description": "First option",
+              "imageUrl": ""
+            },
+            "optionB": {
+              "title": "Option B",
+              "description": "Second option",
+              "imageUrl": ""
+            },
+            "required": true
+          }
+        },
+        {
+          "id": "block_1754781551208",
+          "order": 4,
+          "type": "feedback_collection",
+          "title": "Feedback Collection",
+          "description": "Share your thoughts and feedback",
+          "settings": {
+            "question": "Please share your thoughts about this task",
+            "placeholder": "Describe your experience, any difficulties you encountered, or suggestions for improvement...",
+            "required": false,
+            "maxLength": 1000
+          }
+        },
+        {
+          "id": "block_1754781549216_thank_you",
+          "order": 5,
+          "type": "thank_you_screen",
+          "title": "Thank You",
+          "description": "Thank you for participating!",
+          "settings": {
+            "title": "Thank you for your participation!",
+            "message": "Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.",
+            "showCompletionCode": false,
+            "redirectUrl": ""
+          }
+        }
+      ],
+      "screeningQuestions": [],
+      "type": "usability",
+      "maxParticipants": 15,
+      "duration": 30
+    },
+    "is_public": false,
+    "created_at": "2025-08-09T23:19:14.303Z",
+    "updated_at": "2025-08-09T23:19:14.303Z"
+  },
+  {
+    "id": "simple-study-1754786519414",
+    "title": "Test - 1",
+    "description": "NSNSNSNNSLKJASDLKFJSAFLFODSj",
+    "status": "active",
+    "target_participants": 1,
+    "researcher_id": "test-researcher-001",
+    "settings": {
+      "compensation": 25,
+      "blocks": [
+        {
+          "id": "block_1754786514098_welcome",
+          "order": 1,
+          "type": "welcome_screen",
+          "title": "Welcome",
+          "description": "Welcome to our study!",
+          "settings": {
+            "title": "Welcome to our usability study",
+            "message": "Thank you for participating in our usability research. Your feedback will help us improve our product.",
+            "showContinueButton": true
+          }
+        },
+        {
+          "id": "block_1754786515246",
+          "order": 2,
+          "type": "website_navigation",
+          "title": "Website Navigation",
+          "description": "Navigate to a specific page or section",
+          "settings": {
+            "title": "Navigation Task",
+            "startUrl": "https://example.com",
+            "targetUrl": "https://example.com/contact",
+            "instruction": "Navigate to the contact page",
+            "trackClicks": true,
+            "trackTime": true
+          }
+        },
+        {
+          "id": "block_1754786515682",
+          "order": 3,
+          "type": "rating_scale",
+          "title": "Rating Scale",
+          "description": "Rate your experience from 1 to 10",
+          "settings": {
+            "question": "How would you rate the ease of completing this task?",
+            "scaleType": "numeric",
+            "minValue": 1,
+            "maxValue": 10,
+            "minLabel": "Very Difficult",
+            "maxLabel": "Very Easy",
+            "required": true
+          }
+        },
+        {
+          "id": "block_1754786514098_thank_you",
+          "order": 4,
+          "type": "thank_you_screen",
+          "title": "Thank You",
+          "description": "Thank you for participating!",
+          "settings": {
+            "title": "Thank you for your participation!",
+            "message": "Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.",
+            "showCompletionCode": false,
+            "redirectUrl": ""
+          }
+        }
+      ],
+      "screeningQuestions": [
+        {
+          "id": "sq_test_question_1",
+          "question": "What is your experience with usability testing?",
+          "type": "text",
+          "required": true
+        }
+      ],
+      "type": "usability",
+      "maxParticipants": 1,
+      "duration": 30
+    },
+    "is_public": false,
+    "created_at": "2025-08-10T00:41:59.414Z",
+    "updated_at": "2025-08-10T00:41:59.414Z"
+  },
+  {
+    "id": "simple-study-1754795568714",
+    "title": "Test2",
+    "description": "Tsdjkasdfkldsf",
+    "status": "active",
+    "target_participants": 15,
+    "researcher_id": "test-researcher-001",
+    "settings": {
+      "compensation": 25,
+      "blocks": [
+        {
+          "id": "block_1754795563269_welcome",
+          "order": 1,
+          "type": "welcome_screen",
+          "title": "Welcome",
+          "description": "Welcome to our study!",
+          "settings": {
+            "title": "Welcome to our usability study",
+            "message": "Thank you for participating in our usability research. Your feedback will help us improve our product.",
+            "showContinueButton": true
+          }
+        },
+        {
+          "id": "block_1754795564496",
+          "order": 2,
+          "type": "website_navigation",
+          "title": "Website Navigation",
+          "description": "Navigate to a specific page or section",
+          "settings": {
+            "title": "Navigation Task",
+            "startUrl": "https://example.com",
+            "targetUrl": "https://example.com/contact",
+            "instruction": "Navigate to the contact page",
+            "trackClicks": true,
+            "trackTime": true
+          }
+        },
+        {
+          "id": "block_1754795564871",
+          "order": 3,
+          "type": "rating_scale",
+          "title": "Rating Scale",
+          "description": "Rate your experience from 1 to 10",
+          "settings": {
+            "question": "How would you rate the ease of completing this task?",
+            "scaleType": "numeric",
+            "minValue": 1,
+            "maxValue": 10,
+            "minLabel": "Very Difficult",
+            "maxLabel": "Very Easy",
+            "required": true
+          }
+        },
+        {
+          "id": "block_1754795563269_thank_you",
+          "order": 4,
+          "type": "thank_you_screen",
+          "title": "Thank You",
+          "description": "Thank you for participating!",
+          "settings": {
+            "title": "Thank you for your participation!",
+            "message": "Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.",
+            "showCompletionCode": false,
+            "redirectUrl": ""
+          }
+        }
+      ],
+      "screeningQuestions": [],
+      "type": "usability",
+      "maxParticipants": 15,
+      "duration": 30
+    },
+    "is_public": false,
+    "created_at": "2025-08-10T03:12:48.714Z",
+    "updated_at": "2025-08-10T03:12:48.714Z"
   }
 ]

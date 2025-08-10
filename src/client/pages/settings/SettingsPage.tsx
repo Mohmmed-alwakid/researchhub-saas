@@ -8,7 +8,8 @@ import {
   Download,
   Trash2,
   Upload,
-  Loader2
+  Loader2,
+  UserCheck
 } from 'lucide-react';
 import { SecuritySettings } from '../../components/settings/SecuritySettings';
 import { PointsManager } from '../../components/subscription/PointsManager';
@@ -17,7 +18,7 @@ import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { apiService } from '../../services/api.service';
 
-type SettingsTab = 'profile' | 'security' | 'billing' | 'notifications' | 'preferences';
+type SettingsTab = 'profile' | 'demographics' | 'security' | 'billing' | 'notifications' | 'preferences';
 
 const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
@@ -90,8 +91,31 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  // Handle demographics update
+  const handleDemographicsUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    
+    const demographics = {
+      ageRange: formData.get('ageRange') as string,
+      gender: formData.get('gender') as string,
+      country: formData.get('country') as string,
+      phoneNumber: formData.get('phoneNumber') as string,
+      specialization: formData.get('specialization') as string,
+    };
+
+    try {
+      await updateProfile({ demographics });
+      alert('Demographics updated successfully!');
+    } catch (error) {
+      console.error('Failed to update demographics:', error);
+      alert('Failed to update demographics. Please try again.');
+    }
+  };
+
   const tabs = [
     { id: 'profile' as SettingsTab, label: 'Profile', icon: User },
+    ...(user?.role === 'participant' ? [{ id: 'demographics' as SettingsTab, label: 'Demographics', icon: UserCheck }] : []),
     { id: 'security' as SettingsTab, label: 'Security', icon: Shield },
     { id: 'billing' as SettingsTab, label: 'Billing', icon: CreditCard },
     { id: 'notifications' as SettingsTab, label: 'Notifications', icon: Bell },
@@ -130,15 +154,6 @@ const SettingsPage: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      defaultValue={user?.email || ''}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Role
                     </label>
@@ -233,9 +248,148 @@ const SettingsPage: React.FC = () => {
               </CardContent>
             </Card>
           </div>
-        );      case 'security':
+        );
+      
+      case 'demographics':
+        return user?.role === 'participant' ? (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <h3 className="text-lg font-semibold">Demographics Information</h3>
+                <p className="text-sm text-gray-600">
+                  Help us match you with relevant studies by providing some basic information.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleDemographicsUpdate}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={user?.email || ''}
+                        disabled
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Email cannot be changed. Contact support if needed.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Age Range
+                      </label>
+                      <select 
+                        name="ageRange"
+                        defaultValue={user?.demographics?.ageRange || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select age range</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45-54">45-54</option>
+                        <option value="55-64">55-64</option>
+                        <option value="65+">65+</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Gender
+                      </label>
+                      <select 
+                        name="gender"
+                        defaultValue={user?.demographics?.gender || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Country
+                      </label>
+                      <select 
+                        name="country"
+                        defaultValue={user?.demographics?.country || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select country</option>
+                        <option value="SA">Saudi Arabia</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Currently only available in Saudi Arabia. More countries coming soon.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        defaultValue={user?.demographics?.phoneNumber || ''}
+                        placeholder="+966 XX XXX XXXX"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Specialization/Expertise
+                      </label>
+                      <select 
+                        name="specialization"
+                        defaultValue={user?.demographics?.specialization || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select your specialization</option>
+                        <option value="Technology & Software">Technology & Software</option>
+                        <option value="Design & User Experience">Design & User Experience</option>
+                        <option value="Marketing & Advertising">Marketing & Advertising</option>
+                        <option value="Healthcare & Medical">Healthcare & Medical</option>
+                        <option value="Education & Training">Education & Training</option>
+                        <option value="Finance & Banking">Finance & Banking</option>
+                        <option value="Retail & E-commerce">Retail & E-commerce</option>
+                        <option value="Business & Management">Business & Management</option>
+                        <option value="Engineering & Manufacturing">Engineering & Manufacturing</option>
+                        <option value="Media & Communications">Media & Communications</option>
+                        <option value="Legal & Consulting">Legal & Consulting</option>
+                        <option value="Transportation & Logistics">Transportation & Logistics</option>
+                        <option value="Student">Student</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        This helps us match you with studies in your field of expertise.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <Button type="submit">Save Demographics</Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Demographics settings are only available for participants.</p>
+          </div>
+        );
+
+      case 'security':
         return <SecuritySettings user={user ? {
-          id: user._id,
+          id: user.id || user._id || '',
           email: user.email,
           twoFactorEnabled: false // This would come from user profile or settings
         } : undefined} />;

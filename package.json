@@ -27,6 +27,7 @@
     "debug:flow": "node scripts/debug/show-flow-analytics.js",
     "debug:errors": "node scripts/debug/show-errors.js",
     "debug:all": "node scripts/debug/complete-report.js",
+    "test:api": "powershell -ExecutionPolicy Bypass -File scripts/test-api.ps1",
     "build": "npm run build:client",
     "build:client": "vite build",
     "build:server": "tsc -p tsconfig.server.json && node generate-server-package.cjs",

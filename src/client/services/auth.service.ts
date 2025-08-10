@@ -95,6 +95,13 @@ export interface ProfileUpdateRequest {
   email?: string;
   organization?: string;
   profileImage?: string;
+  demographics?: {
+    ageRange?: string;
+    gender?: string;
+    country?: string;
+    phoneNumber?: string;
+    specialization?: string;
+  };
 }
 
 /**
@@ -142,7 +149,12 @@ export const authService = {  /**
    * Update user profile
    */
   async updateProfile(data: ProfileUpdateRequest): Promise<{ success: boolean; user: SupabaseUser; message: string }> {
-    return apiService.put('profile', data);
+    // If demographics data is being updated, use the specific demographics endpoint
+    if (data.demographics) {
+      return apiService.put('user-profile-consolidated?action=update-demographics', data);
+    }
+    // Otherwise use the general profile update endpoint
+    return apiService.put('user-profile-consolidated?action=update', data);
   },  /**
    * Change password
    */

@@ -6,12 +6,24 @@ import { authService, type RegisterRequest } from '../services';
 // Supabase-compatible user type
 interface SupabaseUser {
   id: string;
+  _id?: string; // For compatibility
   email: string;
   firstName: string;
   lastName: string;
   role: string;
   status?: string;
   emailConfirmed?: boolean;
+  avatar?: string;
+  demographics?: {
+    ageRange?: string;
+    gender?: string;
+    country?: string;
+    phoneNumber?: string;
+    specialization?: string;
+    occupation?: string;
+    educationLevel?: string;
+    techExperience?: string;
+  };
 }
 
 interface AuthState {
@@ -348,7 +360,48 @@ export const useAuthStore = create<AuthState>()(
 
         set({ isLoading: true });
         
+        // Special handling for fallback tokens - they don't expire
+        if (token.startsWith('fallback-token-')) {
+          console.log('🔧 Auth Store - Fallback token detected, validating locally...');
+          
+          try {
+            // Parse fallback token to get user info
+            const tokenParts = token.split('-');
+            if (tokenParts.length >= 5) {
+              const userType = tokenParts[2]; // 'test'
+              const userRole = tokenParts[3]; // 'participant', 'researcher', 'admin'
+              const userNumber = tokenParts[4]; // '001'
+              
+              const fallbackUser: SupabaseUser = {
+                id: `${userType}-${userRole}-${userNumber}`,
+                email: `abwanwr77+${userRole}@gmail.com`,
+                firstName: userRole.charAt(0).toUpperCase() + userRole.slice(1),
+                lastName: 'User',
+                role: userRole,
+                emailConfirmed: true
+              };
+              
+              console.log('✅ Auth Store - Fallback token valid, setting user:', fallbackUser);
+              set({ 
+                user: fallbackUser, 
+                isAuthenticated: true, 
+                isLoading: false 
+              });
+              return;
+            } else {
+              console.log('❌ Auth Store - Invalid fallback token format');
+              set({ isLoading: false, isAuthenticated: false, user: null });
+              return;
+            }
+          } catch (error) {
+            console.log('❌ Auth Store - Failed to parse fallback token:', error);
+            set({ isLoading: false, isAuthenticated: false, user: null });
+            return;
+          }
+        }
+        
         try {
+          console.log('🔍 Auth Store - About to call getCurrentUser for real token...');
           const response = await authService.getCurrentUser();
           
           console.log('🔍 Auth Store - getCurrentUser response:', {
@@ -376,10 +429,13 @@ export const useAuthStore = create<AuthState>()(
             console.log('✅ Auth Store - Setting authenticated user:', supabaseUser);
             set({ user: supabaseUser, isAuthenticated: true, isLoading: false });
           } else {
+            console.log('❌ Auth Store - getCurrentUser failed, response not successful or no user');
             throw new Error('Invalid response format');
-          }        } catch {
+          }        } catch (error) {
+          console.log('❌ Auth Store - getCurrentUser failed with error:', error);
           // Token is invalid, try to refresh
           if (refreshToken) {
+            console.log('🔄 Auth Store - Attempting token refresh...');
             try {
               const refreshResponse = await authService.refreshToken(refreshToken);
               

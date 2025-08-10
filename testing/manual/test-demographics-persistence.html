@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demographics Persistence Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Demographics Persistence Test Suite</h1>
+        <p><strong>Purpose:</strong> Comprehensive test to verify demographics data is saved and loaded correctly</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div id="currentStep">Ready to start testing...</div>
+
+        <!-- Test Configuration -->
+        <div class="step">
+            <h3>📋 Test Configuration</h3>
+            <div class="form-group">
+                <label>API Base URL:</label>
+                <input type="text" id="apiUrl" value="http://localhost:3003/api" />
+            </div>
+            <div class="form-group">
+                <label>Test Account:</label>
+                <select id="testAccount">
+                    <option value="abwanwr77+participant@gmail.com">Participant (abwanwr77+participant@gmail.com)</option>
+                    <option value="abwanwr77+Researcher@gmail.com">Researcher (abwanwr77+Researcher@gmail.com)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" value="Testtest123" />
+            </div>
+        </div>
+
+        <!-- Test Steps -->
+        <div class="step" id="step1">
+            <h3>🔐 Step 1: Login Test</h3>
+            <button onclick="runStep1()" id="step1Btn">Run Login Test</button>
+            <div id="step1Result" class="response"></div>
+        </div>
+
+        <div class="step" id="step2">
+            <h3>📝 Step 2: Save Demographics</h3>
+            <div class="form-group">
+                <label>Age Range:</label>
+                <select id="ageRange">
+                    <option value="18-24">18-24</option>
+                    <option value="25-34">25-34</option>
+                    <option value="35-44">35-44</option>
+                    <option value="45-54">45-54</option>
+                    <option value="55-64">55-64</option>
+                    <option value="65+">65+</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Gender:</label>
+                <select id="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="non-binary">Non-binary</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Country:</label>
+                <input type="text" id="country" value="United States" />
+            </div>
+            <div class="form-group">
+                <label>Phone Number:</label>
+                <input type="tel" id="phoneNumber" value="+1-555-123-4567" />
+            </div>
+            <div class="form-group">
+                <label>Specialization:</label>
+                <input type="text" id="specialization" value="Software Development" />
+            </div>
+            <button onclick="runStep2()" id="step2Btn" disabled>Save Demographics</button>
+            <div id="step2Result" class="response"></div>
+        </div>
+
+        <div class="step" id="step3">
+            <h3>🔄 Step 3: Simulate Refresh (Re-login)</h3>
+            <button onclick="runStep3()" id="step3Btn" disabled>Re-login to Test Persistence</button>
+            <div id="step3Result" class="response"></div>
+        </div>
+
+        <div class="step" id="step4">
+            <h3>✅ Step 4: Verify Demographics Loaded</h3>
+            <button onclick="runStep4()" id="step4Btn" disabled>Check Demographics Data</button>
+            <div id="step4Result" class="response"></div>
+        </div>
+
+        <div class="step" id="step5">
+            <h3>🧪 Step 5: Update Demographics</h3>
+            <div class="form-group">
+                <label>New Age Range:</label>
+                <select id="newAgeRange">
+                    <option value="35-44">35-44</option>
+                    <option value="45-54">45-54</option>
+                    <option value="55-64">55-64</option>
+                </select>
+            </div>
+            <button onclick="runStep5()" id="step5Btn" disabled>Update Demographics</button>
+            <div id="step5Result" class="response"></div>
+        </div>
+
+        <div class="step" id="step6">
+            <h3>🔄 Step 6: Final Persistence Check</h3>
+            <button onclick="runStep6()" id="step6Btn" disabled>Final Re-login Check</button>
+            <div id="step6Result" class="response"></div>
+        </div>
+
+        <!-- Test Results Summary -->
+        <div class="test-results" id="testResults">
+            <h3>📊 Test Results Summary</h3>
+            <div id="resultsSummary">Tests not started yet...</div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="margin-top: 20px;">
+            <button onclick="runAllTests()" id="runAllBtn">🚀 Run All Tests</button>
+            <button onclick="resetTests()" id="resetBtn">🔄 Reset Tests</button>
+            <button onclick="clearAuth()" id="clearAuthBtn">🗑️ Clear Auth Data</button>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let testResults = {
+            step1: null,
+            step2: null,
+            step3: null,
+            step4: null,
+            step5: null,
+            step6: null
+        };
+
+        function updateProgress(step) {
+            const progress = (step / 6) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('currentStep').textContent = `Step ${step}/6 completed`;
+        }
+
+        function logResult(step, success, message, data = null) {
+            testResults[step] = { success, message, data, timestamp: new Date().toISOString() };
+            
+            const resultDiv = document.getElementById(`${step}Result`);
+            resultDiv.textContent = JSON.stringify({
+                success,
+                message,
+                data,
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
+            const stepDiv = document.getElementById(step);
+            stepDiv.className = success ? 'step success' : 'step error';
+            
+            updateResultsSummary();
+        }
+
+        function updateResultsSummary() {
+            const summary = document.getElementById('resultsSummary');
+            const results = Object.entries(testResults).filter(([k, v]) => v !== null);
+            const passed = results.filter(([k, v]) => v.success).length;
+            const total = results.length;
+            
+            summary.innerHTML = `
+                <strong>Tests Completed:</strong> ${total}/6<br>
+                <strong>Tests Passed:</strong> ${passed}/${total}<br>
+                <strong>Success Rate:</strong> ${total > 0 ? Math.round((passed/total) * 100) : 0}%<br>
+                <strong>Status:</strong> ${total === 6 ? (passed === 6 ? '✅ All Tests Passed!' : '❌ Some Tests Failed') : '🔄 Testing in Progress...'}
+            `;
+        }
+
+        async function makeRequest(endpoint, method = 'GET', body = null, useAuth = false) {
+            const apiUrl = document.getElementById('apiUrl').value;
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            if (useAuth && authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+            
+            const config = {
+                method,
+                headers
+            };
+            
+            if (body) {
+                config.body = JSON.stringify(body);
+            }
+            
+            const response = await fetch(`${apiUrl}${endpoint}`, config);
+            const data = await response.json();
+            
+            return { response, data };
+        }
+
+        async function runStep1() {
+            try {
+                document.getElementById('step1Btn').disabled = true;
+                document.getElementById('step1Result').textContent = 'Logging in...';
+                
+                const email = document.getElementById('testAccount').value;
+                const password = document.getElementById('password').value;
+                
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email,
+                    password
+                });
+                
+                if (data.success && data.session?.access_token) {
+                    authToken = data.session.access_token;
+                    logResult('step1', true, 'Login successful', {
+                        user: data.user,
+                        hasToken: !!authToken,
+                        demographics: data.user?.demographics
+                    });
+                    
+                    // Enable next step
+                    document.getElementById('step2Btn').disabled = false;
+                    updateProgress(1);
+                } else {
+                    logResult('step1', false, 'Login failed', data);
+                }
+            } catch (error) {
+                logResult('step1', false, 'Login error: ' + error.message, null);
+            } finally {
+                document.getElementById('step1Btn').disabled = false;
+            }
+        }
+
+        async function runStep2() {
+            try {
+                document.getElementById('step2Btn').disabled = true;
+                document.getElementById('step2Result').textContent = 'Saving demographics...';
+                
+                const demographics = {
+                    ageRange: document.getElementById('ageRange').value,
+                    gender: document.getElementById('gender').value,
+                    country: document.getElementById('country').value,
+                    phoneNumber: document.getElementById('phoneNumber').value,
+                    specialization: document.getElementById('specialization').value
+                };
+                
+                const { response, data } = await makeRequest('/user-profile?action=update-demographics', 'POST', {
+                    demographics
+                }, true);
+                
+                if (data.success) {
+                    logResult('step2', true, 'Demographics saved successfully', {
+                        savedDemographics: demographics,
+                        response: data
+                    });
+                    
+                    // Enable next step
+                    document.getElementById('step3Btn').disabled = false;
+                    updateProgress(2);
+                } else {
+                    logResult('step2', false, 'Failed to save demographics', data);
+                }
+            } catch (error) {
+                logResult('step2', false, 'Demographics save error: ' + error.message, null);
+            } finally {
+                document.getElementById('step2Btn').disabled = false;
+            }
+        }
+
+        async function runStep3() {
+            try {
+                document.getElementById('step3Btn').disabled = true;
+                document.getElementById('step3Result').textContent = 'Re-logging in...';
+                
+                // Clear auth token to simulate refresh
+                authToken = null;
+                
+                const email = document.getElementById('testAccount').value;
+                const password = document.getElementById('password').value;
+                
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email,
+                    password
+                });
+                
+                if (data.success && data.session?.access_token) {
+                    authToken = data.session.access_token;
+                    logResult('step3', true, 'Re-login successful', {
+                        user: data.user,
+                        hasToken: !!authToken,
+                        demographicsInResponse: data.user?.demographics,
+                        hasDemographics: !!data.user?.demographics
+                    });
+                    
+                    // Enable next step
+                    document.getElementById('step4Btn').disabled = false;
+                    updateProgress(3);
+                } else {
+                    logResult('step3', false, 'Re-login failed', data);
+                }
+            } catch (error) {
+                logResult('step3', false, 'Re-login error: ' + error.message, null);
+            } finally {
+                document.getElementById('step3Btn').disabled = false;
+            }
+        }
+
+        async function runStep4() {
+            try {
+                document.getElementById('step4Btn').disabled = true;
+                document.getElementById('step4Result').textContent = 'Checking demographics...';
+                
+                // Check if demographics are available from login response
+                const savedDemographics = testResults.step2?.data?.savedDemographics;
+                const loginDemographics = testResults.step3?.data?.demographicsInResponse;
+                
+                const match = loginDemographics && 
+                             loginDemographics.ageRange === savedDemographics.ageRange &&
+                             loginDemographics.gender === savedDemographics.gender &&
+                             loginDemographics.country === savedDemographics.country;
+                
+                if (match) {
+                    logResult('step4', true, 'Demographics persistence verified', {
+                        savedDemographics,
+                        loadedDemographics: loginDemographics,
+                        match: true
+                    });
+                    
+                    // Enable next step
+                    document.getElementById('step5Btn').disabled = false;
+                    updateProgress(4);
+                } else {
+                    logResult('step4', false, 'Demographics not persisted correctly', {
+                        savedDemographics,
+                        loadedDemographics: loginDemographics,
+                        match: false
+                    });
+                }
+            } catch (error) {
+                logResult('step4', false, 'Demographics check error: ' + error.message, null);
+            } finally {
+                document.getElementById('step4Btn').disabled = false;
+            }
+        }
+
+        async function runStep5() {
+            try {
+                document.getElementById('step5Btn').disabled = true;
+                document.getElementById('step5Result').textContent = 'Updating demographics...';
+                
+                const newDemographics = {
+                    ageRange: document.getElementById('newAgeRange').value,
+                    gender: 'non-binary', // Change gender too
+                    country: 'Canada', // Change country
+                    phoneNumber: '+1-555-987-6543', // Change phone
+                    specialization: 'Data Science' // Change specialization
+                };
+                
+                const { response, data } = await makeRequest('/user-profile?action=update-demographics', 'POST', {
+                    demographics: newDemographics
+                }, true);
+                
+                if (data.success) {
+                    logResult('step5', true, 'Demographics updated successfully', {
+                        newDemographics,
+                        response: data
+                    });
+                    
+                    // Enable next step
+                    document.getElementById('step6Btn').disabled = false;
+                    updateProgress(5);
+                } else {
+                    logResult('step5', false, 'Failed to update demographics', data);
+                }
+            } catch (error) {
+                logResult('step5', false, 'Demographics update error: ' + error.message, null);
+            } finally {
+                document.getElementById('step5Btn').disabled = false;
+            }
+        }
+
+        async function runStep6() {
+            try {
+                document.getElementById('step6Btn').disabled = true;
+                document.getElementById('step6Result').textContent = 'Final persistence check...';
+                
+                // Clear auth token and re-login
+                authToken = null;
+                
+                const email = document.getElementById('testAccount').value;
+                const password = document.getElementById('password').value;
+                
+                const { response, data } = await makeRequest('/auth?action=login', 'POST', {
+                    email,
+                    password
+                });
+                
+                if (data.success && data.session?.access_token) {
+                    authToken = data.session.access_token;
+                    
+                    const updatedDemographics = testResults.step5?.data?.newDemographics;
+                    const finalDemographics = data.user?.demographics;
+                    
+                    const finalMatch = finalDemographics && 
+                                     finalDemographics.ageRange === updatedDemographics.ageRange &&
+                                     finalDemographics.gender === updatedDemographics.gender &&
+                                     finalDemographics.country === updatedDemographics.country;
+                    
+                    if (finalMatch) {
+                        logResult('step6', true, 'Final demographics persistence verified', {
+                            updatedDemographics,
+                            finalDemographics,
+                            match: true
+                        });
+                        updateProgress(6);
+                    } else {
+                        logResult('step6', false, 'Final demographics persistence failed', {
+                            updatedDemographics,
+                            finalDemographics,
+                            match: false
+                        });
+                    }
+                } else {
+                    logResult('step6', false, 'Final re-login failed', data);
+                }
+            } catch (error) {
+                logResult('step6', false, 'Final check error: ' + error.message, null);
+            } finally {
+                document.getElementById('step6Btn').disabled = false;
+            }
+        }
+
+        async function runAllTests() {
+            const runAllBtn = document.getElementById('runAllBtn');
+            runAllBtn.disabled = true;
+            runAllBtn.textContent = 'Running Tests...';
+            
+            try {
+                await runStep1();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await runStep2();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await runStep3();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await runStep4();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await runStep5();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await runStep6();
+            } catch (error) {
+                console.error('Test suite error:', error);
+            } finally {
+                runAllBtn.disabled = false;
+                runAllBtn.textContent = '🚀 Run All Tests';
+            }
+        }
+
+        function resetTests() {
+            testResults = {
+                step1: null,
+                step2: null,
+                step3: null,
+                step4: null,
+                step5: null,
+                step6: null
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.step').forEach(step => {
+                step.className = 'step';
+            });
+            
+            document.querySelectorAll('.response').forEach(response => {
+                response.textContent = '';
+            });
+            
+            // Reset buttons
+            document.getElementById('step2Btn').disabled = true;
+            document.getElementById('step3Btn').disabled = true;
+            document.getElementById('step4Btn').disabled = true;
+            document.getElementById('step5Btn').disabled = true;
+            document.getElementById('step6Btn').disabled = true;
+            
+            // Reset progress
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('currentStep').textContent = 'Ready to start testing...';
+            
+            updateResultsSummary();
+        }
+
+        function clearAuth() {
+            authToken = null;
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('Auth data cleared');
+        }
+
+        // Initialize
+        updateResultsSummary();
+    </script>
+</body>
+</html>
