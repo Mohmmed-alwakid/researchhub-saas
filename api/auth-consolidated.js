@@ -1,7 +1,6 @@
 /**
- * CONSOLIDATED AUTHENTICATION API
- * Merges: auth.js + auth-enhanced.js + auth-debug.js
- * Handles: login, register, refresh, verify, debug, enhanced flows
+ * PRODUCTION-SAFE AUTHENTICATION API
+ * Supabase-only authentication for Vercel deployment
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -11,370 +10,73 @@ const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.su
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.I_4j2vgcu2aR9Pw1d-QG2hpKunbmNKD8tWg3Psl0GNc';
 
-let supabase, supabaseAdmin;
-let supabaseConnected = false;
+// Initialize Supabase clients
+const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-// Production-safe Supabase connectivity check
-async function checkSupabaseConnectivity(url) {
+console.log('🔑 Production Authentication API initialized with Supabase');
+
+/**
+ * Main API handler
+ */
+export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  const { action } = req.query;
+
   try {
-    const response = await fetch(`${url}/rest/v1/`, {
-      headers: {
-        'apikey': supabaseKey
-      }
-    });
-    return response.ok;
+    switch (action) {
+      case 'login':
+        return await handleLogin(req, res);
+      case 'register':
+        return await handleRegister(req, res);
+      case 'refresh':
+        return await handleRefresh(req, res);
+      case 'verify':
+        return await handleVerify(req, res);
+      case 'status':
+        return await handleStatus(req, res);
+      case 'logout':
+        return await handleLogout(req, res);
+      default:
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid action. Supported: login, register, refresh, verify, status, logout'
+        });
+    }
   } catch (error) {
-    console.log('⚠️ Supabase connectivity check failed:', error.message);
-    return false;
-  }
-}
-
-// Initialize Supabase with production fallback
-async function initializeSupabase() {
-  try {
-    console.log('🔧 Initializing Supabase connection...');
-    
-    // Check Supabase connectivity
-    supabaseConnected = await checkSupabaseConnectivity(supabaseUrl);
-    
-    if (supabaseConnected) {
-      console.log('✅ Using Supabase (remote database)');
-      supabase = createClient(supabaseUrl, supabaseKey);
-      supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-    } else {
-      console.log('⚠️ Supabase unavailable, authentication limited to production mode');
-      // In production, we expect Supabase to be available
-      supabase = createClient(supabaseUrl, supabaseKey);
-      supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-    }
-    
-  } catch (error) {
-    console.warn('⚠️ Database initialization warning:', error.message);
-    // Initialize clients anyway for production
-    supabase = createClient(supabaseUrl, supabaseKey);
-    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-  }
-}
-
-// Initialize on module load
-await initializeSupabase();
-
-// Test accounts for development (from TESTING_RULES_MANDATORY.md)
-const TEST_ACCOUNTS = {
-  participant: {
-    email: 'abwanwr77+participant@gmail.com',
-    password: 'Testtest123',
-    role: 'participant'
-  },
-  researcher: {
-    email: 'abwanwr77+researcher@gmail.com', // Fixed case sensitivity
-    password: 'Testtest123',
-    role: 'researcher'
-  },
-  admin: {
-    email: 'abwanwr77+admin@gmail.com',
-    password: 'Testtest123',
-    role: 'admin'
-  }
-};
-
-/**
- * Helper function to get authorization header (multiple methods)
- */
-function getAuthHeader(req) {
-  return req.headers.authorization || 
-         req.headers.Authorization || 
-         req.headers['authorization'] || 
-         req.headers['Authorization'];
-}
-
-/**
- * Helper function to validate JWT token
- */
-async function validateToken(token) {
-  try {
-    if (!token || !token.startsWith('Bearer ')) {
-      return { valid: false, error: 'Invalid token format' };
-    }
-
-    const jwt = token.replace('Bearer ', '');
-    
-    // Check if it's a fallback token (for local development)
-    if (jwt.startsWith('fallback-token-')) {
-      try {
-        // Parse fallback token format: fallback-token-test-participant-001-timestamp
-        const tokenParts = jwt.split('-');
-        if (tokenParts.length < 5) {
-          return { valid: false, error: 'Invalid fallback token format' };
-        }
-
-        const userType = tokenParts[2]; // 'test'
-        const userRole = tokenParts[3]; // 'participant', 'researcher', 'admin'
-        const userNumber = tokenParts[4]; // '001'
-        const userId = `${userType}-${userRole}-${userNumber}`;
-
-        // Return fallback user data
-        return {
-          valid: true,
-          user: {
-            id: userId,
-            email: `abwanwr77+${userRole}@gmail.com`,
-            user_metadata: {
-              role: userRole,
-              first_name: userRole.charAt(0).toUpperCase() + userRole.slice(1),
-              last_name: 'User'
-            },
-            email_confirmed_at: new Date().toISOString()
-          }
-        };
-      } catch (parseError) {
-        return { valid: false, error: 'Invalid fallback token format' };
-      }
-    }
-    
-    // Check if it's a mock token (for local development)
-    if (jwt.includes('mock-signature')) {
-      try {
-        const [headerB64, payloadB64] = jwt.split('.');
-        const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString());
-        
-        // Check if token is expired
-        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-          return { valid: false, error: 'Token expired' };
-        }
-        
-        // Return mock user data
-        return {
-          valid: true,
-          user: {
-            id: payload.sub,
-            email: payload.email,
-            user_metadata: {
-              role: payload.role
-            }
-          }
-        };
-      } catch (parseError) {
-        return { valid: false, error: 'Invalid mock token format' };
-      }
-    }
-
-    // Try Supabase validation for real tokens
-    try {
-      const { data: { user }, error } = await supabase.auth.getUser(jwt);
-
-      if (error || !user) {
-        return { valid: false, error: 'Invalid or expired token' };
-      }
-
-      return { valid: true, user };
-    } catch (networkError) {
-      // If Supabase is unavailable, but token looks like a mock token, reject it
-      return { valid: false, error: 'Authentication service unavailable' };
-    }
-
-  } catch (error) {
-    return { valid: false, error: error.message };
-  }
-}
-
-/**
- * Helper function to generate mock JWT token for local development
- */
-function generateMockToken(user) {
-  const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64');
-  const payload = Buffer.from(JSON.stringify({
-    sub: user.id,
-    email: user.email,
-    role: user.role,
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
-  })).toString('base64');
-  return `${header}.${payload}.mock-signature`;
-}
-
-/**
- * Local authentication fallback for development
- */
-async function handleLocalAuth(email, password, res) {
-  console.log('🔧 Using local auth fallback for:', email);
-  
-  // Find test account
-  const testAccount = Object.values(TEST_ACCOUNTS).find(acc => acc.email === email);
-  
-  if (!testAccount || testAccount.password !== password) {
-    return res.status(401).json({
+    console.error('Auth API error:', error);
+    return res.status(500).json({
       success: false,
-      error: 'Invalid test account credentials'
+      error: 'Authentication service error'
     });
   }
-  
-  // Create mock user data
-  const mockUser = {
-    id: `mock-${testAccount.role}-${Date.now()}`,
-    email: testAccount.email,
-    role: testAccount.role,
-    user_metadata: {
-      first_name: testAccount.role.charAt(0).toUpperCase() + testAccount.role.slice(1),
-      last_name: 'User',
-      role: testAccount.role
-    }
-  };
-  
-  const mockToken = generateMockToken(mockUser);
-  
-  return res.status(200).json({
-    success: true,
-    message: 'Local authentication successful',
-    user: mockUser,
-    session: {
-      access_token: mockToken,
-      refresh_token: `refresh-${mockToken}`,
-      expires_in: 86400
-    },
-    local_auth: true
-  });
 }
 
 /**
- * Register new user
+ * Handle login
  */
-async function handleRegister(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  const { email, password, firstName, lastName, role = 'participant' } = req.body;
-  
-  if (!email || !password || !firstName || !lastName) {
-    return res.status(400).json({
-      success: false,
-      error: 'Email, password, first name, and last name are required'
-    });
-  }
-
+async function handleLogin(req, res) {
   try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          role: role
-        }
-      }
-    });
+    const { email, password } = req.body;
 
-    if (error) {
-      console.error('Registration error:', error);
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        error: error.message
+        error: 'Email and password are required'
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      message: 'Registration successful',
-      user: data.user,
-      session: data.session
-    });
-  } catch (error) {
-    console.error('Registration exception:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
-  }
-}
+    console.log(`🔑 Login attempt for: ${email}`);
 
-/**
- * Login user with automatic fallback
- */
-async function handleLogin(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      error: 'Email and password are required'
-    });
-  }
-
-  try {
-    // ALWAYS check for test accounts first in development
-    const testAccountEmails = Object.values(TEST_ACCOUNTS).map(acc => acc.email);
-    if (testAccountEmails.includes(email)) {
-      console.log('🔧 Test account detected, using appropriate auth method...');
-      
-      if (useLocalAuth || !supabaseConnected) {
-        console.log('🔧 Using fallback database for test account');
-        return await handleFallbackAuth(email, password, res);
-      } else {
-        console.log('🔧 Using local auth fallback for test account');
-        return await handleLocalAuth(email, password, res);
-      }
-    }
-
-    // For non-test accounts, use Supabase if available, otherwise fallback
-    if (supabaseConnected && !useLocalAuth) {
-      console.log('🔧 Attempting Supabase authentication...');
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) {
-          console.error('Supabase login error:', error);
-          // If Supabase fails, try fallback
-          console.log('🔧 Supabase failed, trying fallback database...');
-          return await handleFallbackAuth(email, password, res);
-        }
-
-        if (data.user) {
-          console.log('✅ Supabase authentication successful');
-          return await handleSuccessfulAuth(data, res);
-        }
-      } catch (supabaseError) {
-        console.error('Supabase connection error:', supabaseError);
-        // Fall back to local database
-        console.log('🔧 Supabase unavailable, using fallback database...');
-        return await handleFallbackAuth(email, password, res);
-      }
-    } else {
-      console.log('🔧 Using fallback database (Supabase unavailable)...');
-      return await handleFallbackAuth(email, password, res);
-    }
-
-    // If we reach here, authentication failed
-    return res.status(401).json({
-      success: false,
-      error: 'Authentication failed'
-    });
-
-  } catch (error) {
-    console.error('Login exception:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
-  }
-}
-
-/**
- * Handle production authentication with Supabase
- */
-async function handleLogin(email, password, res) {
-  try {
-    console.log(`� Attempting login for: ${email}`);
-    
-    // Use Supabase for authentication
+    // Authenticate with Supabase
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -390,430 +92,65 @@ async function handleLogin(email, password, res) {
 
     if (authData?.user) {
       console.log('✅ Authentication successful');
-      return await handleSuccessfulAuth(authData, res);
-    } else {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials'
+      
+      // Get user profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      const userResponse = {
+        id: authData.user.id,
+        email: authData.user.email,
+        firstName: profile?.first_name || authData.user.user_metadata?.first_name || '',
+        lastName: profile?.last_name || authData.user.user_metadata?.last_name || '',
+        role: profile?.role || authData.user.user_metadata?.role || 'participant',
+        status: profile?.status || 'active',
+        emailConfirmed: authData.user.email_confirmed_at ? true : false
+      };
+
+      return res.status(200).json({
+        success: true,
+        user: userResponse,
+        session: {
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token
+        }
       });
     }
-    
+
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid credentials'
+    });
+
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({
       success: false,
-      error: 'Authentication service unavailable'
+      error: 'Authentication service error'
     });
   }
 }
 
 /**
- * Handle successful authentication response
+ * Handle registration
  */
-async function handleSuccessfulAuth(authData, res) {
+async function handleRegister(req, res) {
   try {
-    const user = authData.user;
-    const profile = user.profile;
-    
-    // Prepare user response with demographics if available
-    const userResponse = {
-      id: user.id,
-      email: user.email,
-      firstName: profile?.first_name || user.user_metadata?.first_name || '',
-      lastName: profile?.last_name || user.user_metadata?.last_name || '',
-      role: profile?.role || user.user_metadata?.role || 'participant',
-      status: profile?.status || 'active',
-      emailConfirmed: user.email_confirmed_at ? true : false
-    };
+    const { email, password, firstName, lastName, role = 'participant' } = req.body;
 
-    // Include demographics if available in profile
-    if (profile?.demographics) {
-      userResponse.demographics = profile.demographics;
-    }
-    
-    console.log('✅ Auth response includes demographics:', !!profile?.demographics);
-    
-    return res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      user: userResponse,
-      session: authData.session
-    });
-    
-  } catch (error) {
-    console.error('Error formatting auth response:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Authentication processing failed'
-    });
-  }
-}
-
-/**
- * Refresh token
- */
-async function handleRefresh(req, res) {
-  console.log('🔄 Refresh Handler - Request received:', {
-    method: req.method,
-    hasRefreshToken: !!(req.body.refresh_token || req.body.refreshToken),
-    bodyKeys: Object.keys(req.body)
-  });
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  // Accept both refresh_token and refreshToken for compatibility
-  const refresh_token = req.body.refresh_token || req.body.refreshToken;
-
-  if (!refresh_token) {
-    console.log('❌ Refresh Handler - No refresh token found in request');
-    return res.status(400).json({
-      success: false,
-      error: 'Refresh token is required'
-    });
-  }
-
-  try {
-    console.log('🔄 Refresh Handler - Processing refresh token:', {
-      tokenPreview: refresh_token.substring(0, 30) + '...',
-      isFallbackToken: refresh_token.startsWith('fallback-refresh-'),
-      useLocalAuth
-    });
-
-    // Check if this is a fallback refresh token
-    if (refresh_token.startsWith('fallback-refresh-') || useLocalAuth) {
-      console.log('🔧 Refresh Handler - Using fallback refresh for local development');
-      
-      // For fallback tokens, preserve the user identity
-      let userId = 'test-participant-001'; // default
-      
-      if (refresh_token.startsWith('fallback-refresh-test-')) {
-        const parts = refresh_token.split('-');
-        if (parts.length >= 4) {
-          const userType = parts[2]; // 'test'
-          const userRole = parts[3]; // 'participant', 'researcher', 'admin'  
-          const userNumber = parts[4]; // '001'
-          userId = `${userType}-${userRole}-${userNumber}`;
-        }
-      }
-      
-      const timestamp = Date.now();
-      const newToken = `fallback-token-${userId}-${timestamp}`;
-      const newRefreshToken = `fallback-refresh-${userId}-${timestamp}`;
-      
-      console.log('✅ Refresh Handler - Generated new fallback tokens:', {
-        newTokenPreview: newToken.substring(0, 30) + '...',
-        newRefreshTokenPreview: newRefreshToken.substring(0, 30) + '...'
-      });
-      
-      return res.status(200).json({
-        success: true,
-        message: 'Token refreshed successfully (fallback mode)',
-        session: {
-          access_token: newToken,
-          refresh_token: newRefreshToken
-        }
-      });
-    }
-
-    console.log('🔄 Refresh Handler - Using Supabase refresh');
-    const { data, error } = await supabase.auth.refreshSession({ refresh_token });
-
-    if (error) {
-      console.error('❌ Refresh Handler - Supabase refresh error:', error);
-      return res.status(401).json({
+    if (!email || !password) {
+      return res.status(400).json({
         success: false,
-        error: 'Invalid refresh token'
+        error: 'Email and password are required'
       });
     }
 
-    console.log('✅ Refresh Handler - Supabase refresh successful');
-    return res.status(200).json({
-      success: true,
-      message: 'Token refreshed successfully',
-      session: data.session
-    });
-  } catch (error) {
-    console.error('❌ Refresh Handler - Exception:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
-  }
-}
+    console.log(`👤 Registration attempt for: ${email}`);
 
-/**
- * Logout user
- */
-async function handleLogout(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  const authHeader = getAuthHeader(req);
-  
-  if (!authHeader) {
-    return res.status(401).json({
-      success: false,
-      error: 'Authorization header required'
-    });
-  }
-
-  try {
-    // Check if we have Supabase available
-    if (!supabaseConnected || useLocalAuth) {
-      // For fallback auth, we don't need to do anything special for logout
-      // Just return success since tokens are handled differently
-      return res.status(200).json({
-        success: true,
-        message: 'Logout successful (fallback mode)'
-      });
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { error } = await supabase.auth.setSession({
-      access_token: token,
-      refresh_token: req.body.refresh_token || ''
-    });
-
-    if (!error) {
-      await supabase.auth.signOut();
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'Logout successful'
-    });
-  } catch (error) {
-    console.error('Logout exception:', error);
-    return res.status(200).json({
-      success: true,
-      message: 'Logout successful'
-    });
-  }
-}
-
-/**
- * Get user status/profile
- */
-async function handleStatus(req, res) {
-  console.log('🔍 Status Handler - Request received:', {
-    method: req.method,
-    hasAuthHeader: !!req.headers.authorization,
-    authHeaderPreview: req.headers.authorization ? req.headers.authorization.substring(0, 50) + '...' : null
-  });
-
-  if (req.method !== 'GET') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  const authHeader = getAuthHeader(req);
-  
-  if (!authHeader) {
-    console.log('❌ Status Handler - No auth header found');
-    return res.status(401).json({
-      success: false,
-      error: 'Authorization header required'
-    });
-  }
-
-  try {
-    console.log('🔍 Status Handler - Validating token...');
-    const validation = await validateToken(authHeader);
-    
-    if (!validation.valid) {
-      console.log('❌ Status Handler - Token validation failed:', validation.error);
-      return res.status(401).json({
-        success: false,
-        error: validation.error
-      });
-    }
-
-    console.log('✅ Status Handler - Token validation successful');
-    const supabaseUser = validation.user;
-
-    // Check if this is a fallback/test user (skip database queries)
-    const isFallbackUser = supabaseUser.id && supabaseUser.id.startsWith('test-');
-    
-    let profileData = null;
-    
-    // Only fetch from database if not a fallback user
-    if (!isFallbackUser) {
-      try {
-        const { data: profile, error: profileError } = await supabaseAdmin
-          .from('profiles')
-          .select('*')
-          .eq('email', supabaseUser.email)
-          .single();
-        
-        if (profileError) {
-          console.log('Profile table not accessible, using user_metadata:', profileError.message);
-          profileData = null;
-        } else {
-          profileData = profile;
-        }
-      } catch (error) {
-        console.log('Profile fetch failed, using user_metadata:', error.message);
-        profileData = null;
-      }
-    } else {
-      console.log('🔧 Status - Skipping database query for fallback user:', supabaseUser.id);
-    }
-
-    // Format user data consistently with login response
-    const formattedUser = {
-      id: supabaseUser.id,
-      email: supabaseUser.email,
-      firstName: profileData?.first_name || supabaseUser.user_metadata?.first_name || '',
-      lastName: profileData?.last_name || supabaseUser.user_metadata?.last_name || '',
-      role: profileData?.role || supabaseUser.user_metadata?.role || 'participant',
-      status: profileData?.status,
-      emailConfirmed: supabaseUser.email_confirmed_at ? true : false
-    };
-
-    console.log('🔍 Status Response - Formatted User:', {
-      originalUser: supabaseUser,
-      profileData: profileData,
-      formattedUser: formattedUser,
-      timestamp: new Date().toISOString()
-    });
-
-    console.log('✅ Status Handler - Sending successful response:', {
-      success: true,
-      hasUser: !!formattedUser,
-      userEmail: formattedUser.email,
-      userRole: formattedUser.role
-    });
-
-    return res.status(200).json({
-      success: true,
-      user: formattedUser
-    });
-  } catch (error) {
-    console.error('Status check exception:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
-  }
-}
-
-/**
- * Verify token (enhanced validation)
- */
-async function handleVerify(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  const { token } = req.body;
-  const authHeader = getAuthHeader(req) || `Bearer ${token}`;
-
-  if (!authHeader) {
-    return res.status(400).json({
-      success: false,
-      error: 'Token required'
-    });
-  }
-
-  try {
-    const validation = await validateToken(authHeader);
-    
-    if (!validation.valid) {
-      return res.status(401).json({
-        success: false,
-        valid: false,
-        error: validation.error
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      valid: true,
-      user: validation.user
-    });
-  } catch (error) {
-    console.error('Token verification exception:', error);
-    return res.status(500).json({
-      success: false,
-      valid: false,
-      error: 'Internal server error'
-    });
-  }
-}
-
-/**
- * Debug authentication (development helper)
- */
-async function handleDebug(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  try {
-    const authHeader = getAuthHeader(req);
-    
-    const debugInfo = {
-      timestamp: new Date().toISOString(),
-      method: req.method,
-      url: req.url,
-      headers: {
-        authorization: req.headers.authorization,
-        'content-type': req.headers['content-type'],
-        origin: req.headers.origin,
-        referer: req.headers.referer
-      },
-      query: req.query,
-      environment: {
-        nodeEnv: process.env.NODE_ENV,
-        vercelEnv: process.env.VERCEL_ENV,
-        hasSupabaseUrl: !!process.env.SUPABASE_URL,
-        hasSupabaseKey: !!process.env.SUPABASE_ANON_KEY
-      },
-      authHeader: {
-        present: !!authHeader,
-        value: authHeader ? `${authHeader.substring(0, 20)}...` : null
-      }
-    };
-
-    // If auth header present, validate it
-    if (authHeader) {
-      const validation = await validateToken(authHeader);
-      debugInfo.tokenValidation = {
-        valid: validation.valid,
-        error: validation.error,
-        userId: validation.user?.id || null,
-        userEmail: validation.user?.email || null
-      };
-    }
-
-    return res.status(200).json({
-      success: true,
-      debug: debugInfo
-    });
-  } catch (error) {
-    console.error('Debug exception:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Debug failed',
-      details: error.message
-    });
-  }
-}
-
-/**
- * Enhanced registration with role management
- */
-async function handleEnhancedRegister(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  const { email, password, firstName, lastName, role = 'participant', organizationId } = req.body;
-
-  try {
-    // Create user with Supabase Auth
+    // Register with Supabase
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -827,133 +164,202 @@ async function handleEnhancedRegister(req, res) {
     });
 
     if (authError) {
+      console.log('❌ Registration failed:', authError.message);
       return res.status(400).json({
         success: false,
         error: authError.message
       });
     }
 
-    // Create user profile in database
-    if (authData.user) {
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .insert({
+    if (authData?.user) {
+      console.log('✅ Registration successful');
+
+      return res.status(200).json({
+        success: true,
+        user: {
           id: authData.user.id,
           email: authData.user.email,
-          first_name: firstName,
-          last_name: lastName,
+          firstName: firstName || '',
+          lastName: lastName || '',
           role: role,
-          organization_id: organizationId || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
+          emailConfirmed: false
+        },
+        message: 'Registration successful. Please check your email for verification.'
+      });
+    }
 
-      if (profileError) {
-        console.error('Profile creation error:', profileError);
-        // User created in auth but profile failed - handle gracefully
-      }
+    return res.status(400).json({
+      success: false,
+      error: 'Registration failed'
+    });
+
+  } catch (error) {
+    console.error('Registration error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Registration service error'
+    });
+  }
+}
+
+/**
+ * Handle token refresh
+ */
+async function handleRefresh(req, res) {
+  try {
+    const { refresh_token } = req.body;
+
+    if (!refresh_token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Refresh token is required'
+      });
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.refreshSession({
+      refresh_token
+    });
+
+    if (authError) {
+      return res.status(401).json({
+        success: false,
+        error: authError.message
+      });
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Enhanced registration successful',
-      user: authData.user,
-      session: authData.session
+      session: {
+        access_token: authData.session.access_token,
+        refresh_token: authData.session.refresh_token
+      }
     });
+
   } catch (error) {
-    console.error('Enhanced registration exception:', error);
+    console.error('Refresh error:', error);
     return res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: 'Token refresh failed'
     });
   }
 }
 
 /**
- * Test accounts management
+ * Handle email verification
  */
-async function handleTestAccounts(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  // Only allow in development
-  if (process.env.NODE_ENV === 'production') {
-    return res.status(403).json({
-      success: false,
-      error: 'Test accounts not available in production'
-    });
-  }
-
-  return res.status(200).json({
-    success: true,
-    testAccounts: TEST_ACCOUNTS,
-    note: 'Use these accounts for testing (development only)'
-  });
-}
-
-/**
- * Main handler - routes to appropriate sub-handler
- */
-export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  const { action } = req.query;
-
+async function handleVerify(req, res) {
   try {
-    console.log(`=== AUTH ACTION: ${action} ===`);
+    const { token, type } = req.query;
 
-    switch (action) {
-      case 'register':
-        return await handleRegister(req, res);
-      
-      case 'login':
-        return await handleLogin(req, res);
-      
-      case 'refresh':
-        return await handleRefresh(req, res);
-      
-      case 'logout':
-        return await handleLogout(req, res);
-      
-      case 'status':
-        return await handleStatus(req, res);
-      
-      case 'verify':
-        return await handleVerify(req, res);
-      
-      case 'debug':
-        return await handleDebug(req, res);
-      
-      case 'enhanced-register':
-        return await handleEnhancedRegister(req, res);
-      
-      case 'test-accounts':
-        return await handleTestAccounts(req, res);
-      
-      default:
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid action',
-          availableActions: [
-            'register', 'login', 'refresh', 'logout', 'status', 
-            'verify', 'debug', 'enhanced-register', 'test-accounts'
-          ]
-        });
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Verification token is required'
+      });
     }
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: token,
+      type: type || 'signup'
+    });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Email verified successfully'
+    });
+
   } catch (error) {
-    console.error('Auth handler exception:', error);
+    console.error('Verification error:', error);
     return res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: 'Email verification failed'
+    });
+  }
+}
+
+/**
+ * Handle auth status check
+ */
+async function handleStatus(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        error: 'No valid authorization token'
+      });
+    }
+
+    const token = authHeader.substring(7);
+    
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired token'
+      });
+    }
+
+    // Get user profile
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: profile?.first_name || user.user_metadata?.first_name || '',
+        lastName: profile?.last_name || user.user_metadata?.last_name || '',
+        role: profile?.role || user.user_metadata?.role || 'participant',
+        status: profile?.status || 'active',
+        emailConfirmed: user.email_confirmed_at ? true : false
+      }
+    });
+
+  } catch (error) {
+    console.error('Status check error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Status check failed'
+    });
+  }
+}
+
+/**
+ * Handle logout
+ */
+async function handleLogout(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      await supabase.auth.admin.signOut(token);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+
+  } catch (error) {
+    console.error('Logout error:', error);
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out (with errors)'
     });
   }
 }
