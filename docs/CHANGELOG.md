@@ -1,5 +1,53 @@
 # ResearchHub - Project Changelog
 
+## [2025.08.10] - ESLint Cleanup & Screening Questions Bug Resolution
+
+### 🧹 Code Quality Improvements
+
+#### ESLint Error Resolution
+
+- **Fixed All TypeScript Errors**: Resolved 8 ESLint violations in `StudyDiscovery.tsx`
+- **Unused Variables**: Removed unused parameters `_study`, `_userCountry`, and catch variable `e`
+- **Type Safety**: Replaced all `any` types with proper TypeScript interfaces
+- **Method Signature**: Updated `checkCountryEligibility()` to remove unused parameters
+
+#### Type Safety Enhancements
+
+- **New Interfaces Added**:
+  - `StudyWithSettings`: Extended study type with optional settings field
+  - `ParsedStudySettings`: Interface for parsed JSON settings
+- **Better Error Handling**: Improved JSON parsing with proper type casting
+- **Component Props**: Enhanced StudyApplicationModal with proper typing
+
+### 🐛 Bug Fix Completion
+
+#### Screening Questions Issue - FULLY RESOLVED
+
+- **Problem**: Custom screening questions showing "No Additional Questions"
+- **Root Cause**: Settings field stored as JSON string, not object
+- **Solution**: Implemented robust JSON parsing with error handling
+- **Result**: Custom screening questions now display correctly
+
+#### Study Information Display - FULLY RESOLVED
+
+- **Problem**: Study info showing incomplete data ("Duration: minutes", "Compensation: $")
+- **Solution**: Dynamic data parsing from settings field
+- **Result**: Proper display of duration and compensation values
+
+### 🧪 Testing Results
+
+- **ESLint Errors**: ✅ 0 errors (down from 8)
+- **TypeScript Compilation**: ✅ Clean build
+- **Functionality**: ✅ All features working correctly
+- **Screening Questions**: ✅ Custom questions displaying properly
+
+### 🔧 Technical Improvements
+
+- **Code Maintainability**: Removed all code smells and anti-patterns
+- **Type Safety**: 100% typed interfaces, no `any` types remaining
+- **Error Handling**: Robust JSON parsing with fallbacks
+- **Component Architecture**: Clean separation of concerns
+
 ## [2025.07.17] - Launch Button CORS Fix & Study Creation Integration
 
 ### 🚀 Critical Issue Resolution

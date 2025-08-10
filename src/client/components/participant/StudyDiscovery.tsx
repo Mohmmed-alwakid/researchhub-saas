@@ -45,16 +45,47 @@ interface StudyFilters {
 
 interface ApplicationData {
   studyId: string;
-  responses: Record<string, any>;
+  responses: ApplicationResponses;
   eligibilityConfirmed: boolean;
+}
+
+// Application responses interface for type safety
+interface ApplicationResponses {
+  interest?: string;
+  experience?: string;
+  ageRange?: string;
+  techExperience?: string;
+  preferredTime?: string;
+  [key: string]: string | undefined;
+}
+
+// Auth client interface for type safety
+interface AuthClient {
+  getToken: () => string | null;
+  isAuthenticated: () => boolean;
+  user: {
+    id: string;
+    email: string;
+    role: string;
+    demographics?: {
+      ageRange?: string;
+      gender?: string;
+      country?: string;
+      phoneNumber?: string;
+      specialization?: string;
+      occupation?: string;
+      educationLevel?: string;
+      techExperience?: string;
+    };
+  } | null;
 }
 
 // Study Discovery API Client
 class StudyDiscoveryAPI {
   private baseUrl: string;
-  private authClient: any; // TODO: Type this properly
+  private authClient: AuthClient;
 
-  constructor(authClient: any, baseUrl = 'http://localhost:3003/api') {
+  constructor(authClient: AuthClient, baseUrl = 'http://localhost:3003/api') {
     this.baseUrl = baseUrl;
     this.authClient = authClient;
   }
@@ -104,6 +135,9 @@ class StudyDiscoveryAPI {
     pages: number;
   }> {
     try {
+      // Get user demographics for automatic filtering
+      const userDemographics = this.authClient.user?.demographics;
+      
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -118,6 +152,22 @@ class StudyDiscoveryAPI {
         sortOrder: filters.sortOrder
       });
 
+      // Add demographic filters if available
+      if (userDemographics) {
+        if (userDemographics.ageRange) {
+          params.append('participant_age_range', userDemographics.ageRange);
+        }
+        if (userDemographics.country) {
+          params.append('participant_country', userDemographics.country);
+        }
+        if (userDemographics.specialization) {
+          params.append('participant_specialization', userDemographics.specialization);
+        }
+        if (userDemographics.gender) {
+          params.append('participant_gender', userDemographics.gender);
+        }
+      }
+
       const response = await this.makeRequest<{
         studies: PublicStudy[];
         total: number;
@@ -129,35 +179,39 @@ class StudyDiscoveryAPI {
         return response.data;
       }
       
-      // If API fails, fallback to mock data
-      console.log('🔄 API failed, using mock data:', response.error);
-      return this.getMockStudies(filters, page, limit);
+      // If API fails, fallback to mock data with demographic filtering
+      console.log('🔄 API failed, using mock data with demographic filtering:', response.error);
+      return this.getMockStudiesWithDemographicFiltering(filters, page, limit, userDemographics);
       
     } catch (error) {
-      console.log('🔄 API error, using mock data:', error);
-      return this.getMockStudies(filters, page, limit);
+      console.log('🔄 API error, using mock data with demographic filtering:', error);
+      return this.getMockStudiesWithDemographicFiltering(filters, page, limit, this.authClient.user?.demographics);
     }
   }
 
   async getStudyDetails(studyId: string): Promise<PublicStudy | null> {
-    const response = await this.makeRequest<PublicStudy>(`/studies/${studyId}/details`);
+    const response = await this.makeRequest<PublicStudy>(`/research-consolidated?action=get-study-details&study_id=${studyId}`);
     return response.data || this.getMockStudyDetails(studyId);
   }
 
   async applyForStudy(applicationData: ApplicationData): Promise<boolean> {
-    const response = await this.makeRequest(`/studies/${applicationData.studyId}/apply`, {
+    const response = await this.makeRequest(`/research-consolidated?action=apply`, {
       method: 'POST',
-      body: JSON.stringify(applicationData)
+      body: JSON.stringify({
+        study_id: applicationData.studyId,
+        screening_answers: JSON.stringify(applicationData.responses),
+        eligibility_confirmed: applicationData.eligibilityConfirmed
+      })
     });
     return response.success;
   }
 
   async getMyApplications(): Promise<PublicStudy[]> {
-    const response = await this.makeRequest<PublicStudy[]>('/applications/my');
+    const response = await this.makeRequest<PublicStudy[]>('/research-consolidated?action=get-applications');
     return response.data || this.getMockApplications();
   }
 
-  // Mock data for development
+  // Mock data for development with real study structure
   private getMockStudies(filters: StudyFilters, page: number, limit: number): {
     studies: PublicStudy[];
     total: number;
@@ -165,129 +219,160 @@ class StudyDiscoveryAPI {
   } {
     const allStudies: PublicStudy[] = [
       {
-        id: 'study-1',
-        title: 'Mobile App Usability Testing',
-        description: 'Help us improve our mobile application by testing new features and providing feedback on user experience.',
+        id: 'study-001',
+        title: 'Mobile App Usability Study',
+        description: 'Help us improve our mobile application by testing new features and providing feedback on user experience. This comprehensive study will involve testing various aspects of our app including navigation, feature discovery, and overall user satisfaction.',
         type: 'unmoderated',
         duration: 30,
         compensation: 25,
         participantsNeeded: 50,
         participantsEnrolled: 32,
         status: 'recruiting',
-        eligibilityCriteria: ['Age 18-65', 'Smartphone user', 'English proficiency'],
+        eligibilityCriteria: ['Age 18-65', 'Smartphone user', 'Arabic or English proficiency', 'Resident in Saudi Arabia'],
         tags: ['Mobile', 'UX', 'Usability'],
-        researcherName: 'Dr. Sarah Johnson',
-        researcherOrganization: 'TechCorp Research',
-        estimatedCompletion: '2025-07-25',
+        researcherName: 'Dr. Ahmed Al-Rashid',
+        researcherOrganization: 'King Saud University',
+        estimatedCompletion: '2025-08-25',
         difficulty: 'beginner',
         category: 'Technology',
-        createdAt: '2025-07-10T10:00:00Z',
-        applicationDeadline: '2025-07-20T23:59:59Z'
+        createdAt: '2025-08-01T10:00:00Z',
+        applicationDeadline: '2025-08-20T23:59:59Z'
       },
       {
-        id: 'study-2',
-        title: 'Online Shopping Behavior Study',
-        description: 'Participate in a comprehensive study about online shopping preferences and decision-making processes.',
+        id: 'study-002',
+        title: 'E-commerce Shopping Behavior in Saudi Arabia',
+        description: 'Participate in a comprehensive study about online shopping preferences and decision-making processes specifically within the Saudi Arabian market. We aim to understand local consumer behavior patterns.',
         type: 'moderated',
         duration: 60,
         compensation: 75,
         participantsNeeded: 20,
         participantsEnrolled: 15,
         status: 'recruiting',
-        eligibilityCriteria: ['Age 25-45', 'Regular online shopper', 'Available for video call'],
+        eligibilityCriteria: ['Age 25-45', 'Regular online shopper', 'Available for video call', 'Saudi resident'],
         tags: ['E-commerce', 'Consumer Behavior', 'Interview'],
-        researcherName: 'Prof. Michael Chen',
-        researcherOrganization: 'University of Commerce',
-        estimatedCompletion: '2025-08-01',
+        researcherName: 'Dr. Fatima Al-Zahra',
+        researcherOrganization: 'Riyadh Business School',
+        estimatedCompletion: '2025-09-01',
         difficulty: 'intermediate',
         category: 'Business',
-        createdAt: '2025-07-09T14:30:00Z',
-        applicationDeadline: '2025-07-18T23:59:59Z'
+        createdAt: '2025-08-02T14:30:00Z',
+        applicationDeadline: '2025-08-18T23:59:59Z'
       },
       {
-        id: 'study-3',
-        title: 'Educational Platform Feedback',
-        description: 'Test our new educational platform and provide insights on learning experience and interface design.',
+        id: 'study-003',
+        title: 'Educational Platform for Arabic Learners',
+        description: 'Test our new educational platform designed specifically for Arabic language learning and provide insights on learning experience and interface design. Help us make education more accessible.',
         type: 'unmoderated',
         duration: 45,
         compensation: 40,
         participantsNeeded: 30,
         participantsEnrolled: 28,
         status: 'recruiting',
-        eligibilityCriteria: ['Students or educators', 'Experience with online learning', 'Age 18+'],
-        tags: ['Education', 'E-learning', 'Interface Design'],
-        researcherName: 'Dr. Emma Davis',
-        researcherOrganization: 'EduTech Solutions',
-        estimatedCompletion: '2025-07-30',
+        eligibilityCriteria: ['Students or educators', 'Experience with online learning', 'Age 18+', 'Arabic speaker'],
+        tags: ['Education', 'E-learning', 'Arabic', 'Interface Design'],
+        researcherName: 'Prof. Omar Al-Mahmoud',
+        researcherOrganization: 'Saudi Education Tech Institute',
+        estimatedCompletion: '2025-08-30',
         difficulty: 'beginner',
         category: 'Education',
-        createdAt: '2025-07-08T09:15:00Z',
+        createdAt: '2025-08-03T09:15:00Z',
         isApplied: true,
-        applicationStatus: 'pending'
+        applicationStatus: 'approved'
       },
       {
-        id: 'study-4',
-        title: 'Health App Navigation Study',
-        description: 'Help improve healthcare app navigation through user testing and feedback sessions.',
+        id: 'study-004',
+        title: 'Healthcare App Navigation Study',
+        description: 'Help improve healthcare app navigation specifically designed for the Saudi healthcare system. Your feedback will help make healthcare technology more user-friendly for all citizens.',
         type: 'moderated',
         duration: 90,
         compensation: 100,
         participantsNeeded: 15,
         participantsEnrolled: 8,
         status: 'recruiting',
-        eligibilityCriteria: ['Age 30-60', 'Uses health apps', 'Available for remote interview'],
+        eligibilityCriteria: ['Age 30-60', 'Uses health apps', 'Available for remote interview', 'Saudi healthcare experience'],
         tags: ['Healthcare', 'Mobile App', 'Navigation'],
-        researcherName: 'Dr. James Wilson',
-        researcherOrganization: 'HealthTech Research',
-        estimatedCompletion: '2025-08-05',
+        researcherName: 'Dr. Khalid Al-Fahad',
+        researcherOrganization: 'Saudi Health Technology Research',
+        estimatedCompletion: '2025-09-05',
         difficulty: 'advanced',
         category: 'Healthcare',
-        createdAt: '2025-07-07T16:45:00Z'
+        createdAt: '2025-08-04T16:45:00Z'
       },
       {
-        id: 'study-5',
-        title: 'Social Media Usage Patterns',
-        description: 'Research study examining social media consumption habits and their impact on daily routines.',
+        id: 'study-005',
+        title: 'Social Media Usage Patterns in KSA',
+        description: 'Research study examining social media consumption habits and their impact on daily routines among Saudi youth and professionals. Understanding digital behavior in the Kingdom.',
         type: 'unmoderated',
         duration: 20,
         compensation: 15,
         participantsNeeded: 100,
         participantsEnrolled: 73,
         status: 'recruiting',
-        eligibilityCriteria: ['Age 16-35', 'Active social media user', 'English speaking'],
-        tags: ['Social Media', 'Behavior', 'Survey'],
-        researcherName: 'Dr. Lisa Park',
-        researcherOrganization: 'Digital Behavior Lab',
-        estimatedCompletion: '2025-07-22',
+        eligibilityCriteria: ['Age 16-35', 'Active social media user', 'Arabic or English speaking', 'Saudi resident'],
+        tags: ['Social Media', 'Behavior', 'Survey', 'Youth'],
+        researcherName: 'Dr. Nora Al-Ghamdi',
+        researcherOrganization: 'Digital Behavior Research Lab - KAUST',
+        estimatedCompletion: '2025-08-22',
         difficulty: 'beginner',
         category: 'Social Science',
-        createdAt: '2025-07-06T11:20:00Z'
+        createdAt: '2025-08-05T11:20:00Z'
       },
       {
-        id: 'study-6',
-        title: 'Financial App Security Perceptions',
-        description: 'Study participant perceptions of security features in financial applications.',
+        id: 'study-006',
+        title: 'Islamic Banking App Security Perceptions',
+        description: 'Study participant perceptions of security features in Islamic banking applications. Help us understand how to better design secure and Sharia-compliant financial technology.',
         type: 'moderated',
         duration: 75,
         compensation: 85,
         participantsNeeded: 25,
         participantsEnrolled: 25,
         status: 'in_progress',
-        eligibilityCriteria: ['Age 25-55', 'Uses mobile banking', 'Security conscious'],
-        tags: ['Finance', 'Security', 'Mobile Banking'],
-        researcherName: 'Dr. Robert Kim',
-        researcherOrganization: 'FinSec Research',
-        estimatedCompletion: '2025-08-10',
+        eligibilityCriteria: ['Age 25-55', 'Uses mobile banking', 'Islamic banking experience', 'Security conscious'],
+        tags: ['Finance', 'Security', 'Islamic Banking', 'Mobile Banking'],
+        researcherName: 'Dr. Abdullah Al-Mutairi',
+        researcherOrganization: 'Islamic FinTech Research Center',
+        estimatedCompletion: '2025-09-10',
         difficulty: 'intermediate',
         category: 'Finance',
-        createdAt: '2025-07-05T13:00:00Z',
+        createdAt: '2025-08-06T13:00:00Z',
         isApplied: true,
-        applicationStatus: 'approved'
-      }
+        applicationStatus: 'pending'
+      },
+      {
+        id: 'simple-study-1754786519414',
+        title: 'Test - 1',
+        description: 'NSNSNSNNSLKJASDLKFJSAFLFODSj',
+        type: 'unmoderated',
+        duration: 30,
+        compensation: 25,
+        participantsNeeded: 1,
+        participantsEnrolled: 0,
+        status: 'recruiting',
+        eligibilityCriteria: ['Age 18+', 'Basic computer skills'],
+        tags: ['Testing', 'Usability'],
+        researcherName: 'Test Researcher',
+        researcherOrganization: 'Test Organization',
+        estimatedCompletion: '2025-08-25',
+        difficulty: 'beginner',
+        category: 'Technology',
+        createdAt: '2025-08-10T00:41:59.414Z',
+        settings: JSON.stringify({
+          "duration": 30,
+          "payment": 25,
+          "screeningQuestions": [
+            {
+              "id": "sq_test_question_1",
+              "question": "What is your experience with usability testing?",
+              "type": "text",
+              "required": true
+            }
+          ]
+        })
+      } as PublicStudy & { settings?: string }
     ];
 
     // Apply filters
-    let filteredStudies = allStudies.filter(study => {
+    const filteredStudies = allStudies.filter(study => {
       // Participants should only see active and recruiting studies (not draft)
       const isPublicStudy = study.status === 'recruiting' || study.status === 'active';
       
@@ -356,6 +441,182 @@ class StudyDiscoveryAPI {
     return { studies, total, pages };
   }
 
+  // Enhanced mock data with demographic filtering
+  private getMockStudiesWithDemographicFiltering(
+    filters: StudyFilters, 
+    page: number, 
+    limit: number, 
+    demographics?: {
+      ageRange?: string;
+      gender?: string;
+      country?: string;
+      phoneNumber?: string;
+      specialization?: string;
+      occupation?: string;
+      educationLevel?: string;
+      techExperience?: string;
+    }
+  ): {
+    studies: PublicStudy[];
+    total: number;
+    pages: number;
+  } {
+    // Get base studies
+    const baseResult = this.getMockStudies(filters, 1, 1000); // Get all for filtering
+    let studies = baseResult.studies;
+
+    // Apply demographic filtering if demographics are available
+    if (demographics) {
+      studies = studies.filter(study => {
+        // Age-based filtering
+        if (demographics.ageRange) {
+          const ageEligible = this.checkAgeEligibility(study.eligibilityCriteria, demographics.ageRange);
+          if (!ageEligible) return false;
+        }
+
+        // Country-based filtering
+        if (demographics.country) {
+          const countryEligible = this.checkCountryEligibility();
+          if (!countryEligible) return false;
+        }
+
+        // Specialization-based filtering (match with study category)
+        if (demographics.specialization) {
+          const specializationMatch = this.checkSpecializationMatch(study, demographics.specialization);
+          if (!specializationMatch) return false;
+        }
+
+        return true;
+      });
+
+      // Sort by relevance to demographics
+      studies = this.sortByDemographicRelevance(studies, demographics);
+    }
+
+    // Apply pagination to filtered results
+    const total = studies.length;
+    const pages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedStudies = studies.slice(startIndex, startIndex + limit);
+
+    return { studies: paginatedStudies, total, pages };
+  }
+
+  private checkAgeEligibility(eligibilityCriteria: string[], userAgeRange: string): boolean {
+    // Extract user age range bounds
+    const [userMinStr, userMaxStr] = userAgeRange.includes('+') 
+      ? [userAgeRange.replace('+', ''), '100']
+      : userAgeRange.split('-');
+    const userMin = parseInt(userMinStr);
+    const userMax = userMaxStr ? parseInt(userMaxStr) : 100;
+
+    // Check if any eligibility criteria mentions age
+    for (const criterion of eligibilityCriteria) {
+      const ageCriterion = criterion.toLowerCase();
+      if (ageCriterion.includes('age')) {
+        // Extract age ranges from criteria like "Age 18-65", "Age 25+", etc.
+        const ageMatch = ageCriterion.match(/(\d+)[-–](\d+)|(\d+)\+|(\d+)/g);
+        if (ageMatch) {
+          for (const match of ageMatch) {
+            if (match.includes('-') || match.includes('–')) {
+              const [minStr, maxStr] = match.split(/[-–]/);
+              const criteriaMin = parseInt(minStr);
+              const criteriaMax = parseInt(maxStr);
+              
+              // Check if user age range overlaps with criteria
+              if (userMin <= criteriaMax && userMax >= criteriaMin) {
+                return true;
+              }
+            } else if (match.includes('+')) {
+              const criteriaMin = parseInt(match.replace('+', ''));
+              if (userMax >= criteriaMin) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // If no age criteria specified, assume eligible
+    return true;
+  }
+
+  private checkCountryEligibility(): boolean {
+    // For now, assume all studies accept participants from any country
+    // In real implementation, this would check study.targetCountries or similar
+    return true;
+  }
+
+  private checkSpecializationMatch(study: PublicStudy, userSpecialization: string): boolean {
+    // Map specializations to study categories for better matching
+    const specializationCategoryMap: Record<string, string[]> = {
+      'Technology & Software': ['Technology', 'Software', 'Development'],
+      'Design & User Experience': ['Technology', 'Design', 'UX'],
+      'Marketing & Advertising': ['Business', 'Marketing'],
+      'Healthcare & Medical': ['Healthcare', 'Medical'],
+      'Education & Training': ['Education'],
+      'Finance & Banking': ['Finance', 'Banking'],
+      'Retail & E-commerce': ['Business', 'E-commerce'],
+      'Student': ['Education', 'Technology', 'Social Science']
+    };
+
+    const relevantCategories = specializationCategoryMap[userSpecialization] || [];
+    
+    // Check if study category matches user specialization
+    if (relevantCategories.some(cat => 
+      study.category.toLowerCase().includes(cat.toLowerCase()) ||
+      study.tags.some(tag => tag.toLowerCase().includes(cat.toLowerCase()))
+    )) {
+      return true;
+    }
+
+    // Also consider if the study title or description mentions the specialization area
+    const searchTerms = userSpecialization.toLowerCase().split(/[&\s]+/);
+    const studyText = (study.title + ' ' + study.description + ' ' + study.tags.join(' ')).toLowerCase();
+    
+    return searchTerms.some(term => studyText.includes(term));
+  }
+
+  private sortByDemographicRelevance(
+    studies: PublicStudy[], 
+    demographics: NonNullable<AuthClient['user']>['demographics']
+  ): PublicStudy[] {
+    if (!demographics) return studies;
+
+    return studies.sort((a, b) => {
+      let scoreA = 0;
+      let scoreB = 0;
+
+      // Higher score for studies matching specialization
+      if (demographics.specialization) {
+        if (this.checkSpecializationMatch(a, demographics.specialization)) scoreA += 10;
+        if (this.checkSpecializationMatch(b, demographics.specialization)) scoreB += 10;
+      }
+
+      // Higher score for studies with appropriate duration for experience level
+      if (demographics.techExperience) {
+        const experienceBonus: Record<string, number> = {
+          'Beginner': a.difficulty === 'beginner' ? 5 : 0,
+          'Intermediate': a.difficulty === 'intermediate' ? 5 : 0,
+          'Advanced': a.difficulty === 'advanced' ? 5 : 0,
+          'Expert': a.difficulty === 'advanced' ? 3 : 0
+        };
+        scoreA += experienceBonus[demographics.techExperience] || 0;
+        
+        const experienceBonusB: Record<string, number> = {
+          'Beginner': b.difficulty === 'beginner' ? 5 : 0,
+          'Intermediate': b.difficulty === 'intermediate' ? 5 : 0,
+          'Advanced': b.difficulty === 'advanced' ? 5 : 0,
+          'Expert': b.difficulty === 'advanced' ? 3 : 0
+        };
+        scoreB += experienceBonusB[demographics.techExperience] || 0;
+      }
+
+      return scoreB - scoreA; // Higher score first
+    });
+  }
+
   private getMockStudyDetails(studyId: string): PublicStudy | null {
     const studies = this.getMockStudies({
       category: '', type: '', duration: '', compensation: '', difficulty: '', 
@@ -394,35 +655,17 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
   const [studyAPI] = useState(() => new StudyDiscoveryAPI(authClient));
 
   // State management
-  const [studies, setStudies] = useState<PublicStudy[]>([
-    {
-      id: 'mock-study-1',
-      title: 'Test Study - Mock Data',
-      description: 'This is mock data to test the interface while we fix the backend.',
-      type: 'unmoderated',
-      duration: 30,
-      compensation: 25,
-      participantsNeeded: 10,
-      participantsEnrolled: 3,
-      status: 'recruiting',
-      eligibilityCriteria: ['Age 18+', 'English speaker'],
-      tags: ['Test', 'Mock'],
-      researcherName: 'Test Researcher',
-      researcherOrganization: 'Test Org',
-      estimatedCompletion: '2025-08-01',
-      difficulty: 'beginner',
-      category: 'Technology',
-      createdAt: '2025-07-18T10:00:00Z'
-    }
-  ]);
+  const [studies, setStudies] = useState<PublicStudy[]>([]);
   const [totalStudies, setTotalStudies] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedStudy, setSelectedStudy] = useState<PublicStudy | null>(null);
+  const [selectedStudy, setSelectedStudy] = useState<StudyWithSettings | null>(null);
   const [showStudyModal, setShowStudyModal] = useState(false);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [applicationSuccess, setApplicationSuccess] = useState(false);
+  const [applicationSuccessStudy, setApplicationSuccessStudy] = useState<string | null>(null);
 
   // Filter state
   const [filters, setFilters] = useState<StudyFilters>({
@@ -473,7 +716,7 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
   };
 
   // Handle study application
-  const handleApplyForStudy = async (studyId: string, responses: Record<string, any>) => {
+  const handleApplyForStudy = async (studyId: string, responses: ApplicationResponses) => {
     try {
       const success = await studyAPI.applyForStudy({
         studyId,
@@ -482,11 +725,30 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
       });
 
       if (success) {
-        await loadStudies(); // Refresh the list
+        // Show success message
+        setApplicationSuccess(true);
+        setApplicationSuccessStudy(studyId);
+        
+        // Update the study in the list to show it's applied
+        setStudies(prevStudies => 
+          prevStudies.map(study => 
+            study.id === studyId 
+              ? { ...study, isApplied: true, applicationStatus: 'pending' as const }
+              : study
+          )
+        );
+        
+        // Close modals
         setShowApplicationModal(false);
         setSelectedStudy(null);
+        
+        // Auto-hide success message after 5 seconds
+        setTimeout(() => {
+          setApplicationSuccess(false);
+          setApplicationSuccessStudy(null);
+        }, 5000);
       } else {
-        setError('Failed to submit application');
+        setError('Failed to submit application. Please try again.');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit application');
@@ -543,6 +805,31 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Application Success Notification */}
+        {applicationSuccess && applicationSuccessStudy && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <div className="text-green-600 mr-3">✅</div>
+              <div className="flex-1">
+                <h4 className="text-green-800 font-medium">Application Submitted Successfully!</h4>
+                <p className="text-green-700 text-sm mt-1">
+                  Your application has been sent to the researcher. You will receive a notification once it's reviewed.
+                  You can track your application status in the "My Applications" section.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setApplicationSuccess(false);
+                  setApplicationSuccessStudy(null);
+                }}
+                className="text-green-600 hover:text-green-800 ml-4"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Error Display */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -921,16 +1208,38 @@ const StudyCard: React.FC<{
 
         {/* Application Status or Actions */}
         {study.isApplied ? (
-          <div className="flex items-center justify-between">
-            <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getApplicationStatusColor(study.applicationStatus)}`}>
-              {study.applicationStatus?.replace('_', ' ') || 'Applied'}
-            </span>
-            <button
-              onClick={onViewDetails}
-              className="text-blue-600 text-sm hover:text-blue-800"
-            >
-              View Details
-            </button>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getApplicationStatusColor(study.applicationStatus)}`}>
+                {study.applicationStatus === 'pending' && '⏳ Application Pending'}
+                {study.applicationStatus === 'approved' && '✅ Application Approved'}
+                {study.applicationStatus === 'rejected' && '❌ Application Rejected'}
+                {study.applicationStatus === 'completed' && '🎉 Study Completed'}
+                {!study.applicationStatus && '📨 Applied'}
+              </span>
+              <button
+                onClick={onViewDetails}
+                className="text-blue-600 text-sm hover:text-blue-800"
+              >
+                View Details
+              </button>
+            </div>
+            {study.applicationStatus === 'pending' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-blue-800 text-xs">
+                  <strong>Application Status:</strong> Your application is being reviewed by the researcher. 
+                  You will receive a notification once there's an update.
+                </p>
+              </div>
+            )}
+            {study.applicationStatus === 'approved' && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-green-800 text-xs">
+                  <strong>Congratulations!</strong> Your application has been approved. 
+                  Check your email for next steps and study instructions.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex space-x-2">
@@ -945,7 +1254,7 @@ const StudyCard: React.FC<{
               disabled={spotsRemaining <= 0 || (study.status !== 'recruiting' && study.status !== 'active')}
               className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Apply Now
+              {spotsRemaining <= 0 ? 'Full' : 'Apply Now'}
             </button>
           </div>
         )}
@@ -1095,18 +1404,70 @@ const StudyDetailsModal: React.FC<{
 };
 
 // Study Application Modal Component
+type ScreeningQuestion = {
+  id: string;
+  question: string;
+  type: 'text' | 'multiple-choice' | 'boolean' | 'number';
+  options?: string[];
+  required: boolean;
+};
+
+// Extended study type to include settings field
+type StudyWithSettings = PublicStudy & { settings?: string };
+
+// Settings interface for parsed JSON
+interface ParsedStudySettings {
+  duration?: number;
+  payment?: number;
+  compensation?: number;
+  screeningQuestions?: ScreeningQuestion[];
+  [key: string]: unknown;
+}
+
 const StudyApplicationModal: React.FC<{
-  study: PublicStudy;
+  study: StudyWithSettings;
   onClose: () => void;
-  onSubmit: (responses: Record<string, any>) => void;
+  onSubmit: (responses: ApplicationResponses) => void;
 }> = ({ study, onClose, onSubmit }) => {
-  const [responses, setResponses] = useState<Record<string, any>>({});
+  // Debug logging to see the study data structure
+  console.log('🔍 StudyApplicationModal - Study Data:', study);
+  console.log('🔍 StudyApplicationModal - Study Settings Raw:', study.settings);
+  
+  // Parse settings if it's a JSON string
+  let parsedSettings: ParsedStudySettings = {};
+  try {
+    if (typeof study.settings === 'string') {
+      parsedSettings = JSON.parse(study.settings);
+    } else if (study.settings) {
+      parsedSettings = study.settings as unknown as ParsedStudySettings;
+    }
+  } catch {
+    parsedSettings = {};
+  }
+  
+  console.log('🔍 StudyApplicationModal - Parsed Settings:', parsedSettings);
+  console.log('🔍 StudyApplicationModal - Screening Questions:', parsedSettings?.screeningQuestions);
+  
+  const [responses, setResponses] = useState<ApplicationResponses>({});
   const [eligibilityConfirmed, setEligibilityConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eligibilityConfirmed) return;
+
+    // Validate required screening questions from the parsed settings
+    const screeningQuestions = parsedSettings?.screeningQuestions || [];
+    
+    if (screeningQuestions.length > 0) {
+      const requiredQuestions = screeningQuestions.filter((q: ScreeningQuestion) => q.required);
+      const unansweredRequired = requiredQuestions.filter((q: ScreeningQuestion) => !responses[q.id]);
+      
+      if (unansweredRequired.length > 0) {
+        alert('Please answer all required screening questions');
+        return;
+      }
+    }
 
     setIsSubmitting(true);
     await onSubmit(responses);
@@ -1133,8 +1494,8 @@ const StudyApplicationModal: React.FC<{
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="font-medium text-blue-900 mb-2">{study.title}</h4>
             <div className="text-sm text-blue-800">
-              <div>Duration: {study.duration} minutes</div>
-              <div>Compensation: ${study.compensation}</div>
+              <div>Duration: {study.duration || parsedSettings?.duration || 'N/A'} minutes</div>
+              <div>Compensation: ${study.compensation || parsedSettings?.payment || parsedSettings?.compensation || 'N/A'}</div>
               <div>Type: {study.type.replace('_', ' ')}</div>
             </div>
           </div>
@@ -1167,97 +1528,101 @@ const StudyApplicationModal: React.FC<{
             </label>
           </div>
 
-          {/* Additional Questions */}
-          <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-3">Screening Questions</h4>
+          {/* Screening Questions */}
+          {(() => {
+            // Get screening questions from the parsed settings
+            const screeningQuestions = parsedSettings?.screeningQuestions || [];
             
-            <div className="space-y-4">
+            return screeningQuestions.length > 0 ? (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Why are you interested in this study? *
-                </label>
-                <textarea
-                  value={responses.interest || ''}
-                  onChange={(e) => setResponses(prev => ({ ...prev, interest: e.target.value }))}
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Tell us about your interest in this research..."
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Relevant experience or background *
-                </label>
-                <textarea
-                  value={responses.experience || ''}
-                  onChange={(e) => setResponses(prev => ({ ...prev, experience: e.target.value }))}
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Describe any relevant experience..."
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  What is your age range? *
-                </label>
-                <select
-                  value={responses.ageRange || ''}
-                  onChange={(e) => setResponses(prev => ({ ...prev, ageRange: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                >
-                  <option value="">Select your age range</option>
-                  <option value="18-24">18-24</option>
-                  <option value="25-34">25-34</option>
-                  <option value="35-44">35-44</option>
-                  <option value="45-54">45-54</option>
-                  <option value="55-64">55-64</option>
-                  <option value="65+">65+</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  How often do you use technology/digital devices? *
-                </label>
-                <select
-                  value={responses.techExperience || ''}
-                  onChange={(e) => setResponses(prev => ({ ...prev, techExperience: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                >
-                  <option value="">Select your experience level</option>
-                  <option value="daily">Daily user</option>
-                  <option value="weekly">Weekly user</option>
-                  <option value="monthly">Monthly user</option>
-                  <option value="rarely">Rarely use</option>
-                </select>
-              </div>
-
-              {study.type === 'moderated' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Preferred interview time (for moderated studies)
-                  </label>
-                  <select
-                    value={responses.preferredTime || ''}
-                    onChange={(e) => setResponses(prev => ({ ...prev, preferredTime: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select preferred time</option>
-                    <option value="morning">Morning (9 AM - 12 PM)</option>
-                    <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
-                    <option value="evening">Evening (5 PM - 8 PM)</option>
-                    <option value="flexible">Flexible</option>
-                  </select>
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Screening Questions</h4>
+                <div className="space-y-4">
+                  {screeningQuestions.map((question: ScreeningQuestion) => (
+                    <div key={question.id}>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {question.question}
+                        {question.required && <span className="text-red-500 ml-1">*</span>}
+                      </label>
+                      
+                      {question.type === 'text' && (
+                        <textarea
+                          value={responses[question.id] || ''}
+                          onChange={(e) => setResponses(prev => ({ ...prev, [question.id]: e.target.value }))}
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter your response..."
+                          required={question.required}
+                        />
+                      )}
+                      
+                      {question.type === 'multiple-choice' && question.options && (
+                        <div className="space-y-2">
+                          {question.options.map((option: string) => (
+                            <label key={option} className="flex items-center">
+                              <input
+                                type="radio"
+                                name={question.id}
+                                value={option}
+                                checked={responses[question.id] === option}
+                                onChange={(e) => setResponses(prev => ({ ...prev, [question.id]: e.target.value }))}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                required={question.required}
+                              />
+                              <span className="ml-3 text-sm text-gray-700">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {question.type === 'boolean' && (
+                        <div className="space-y-2">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name={question.id}
+                              value="yes"
+                              checked={responses[question.id] === 'yes'}
+                              onChange={(e) => setResponses(prev => ({ ...prev, [question.id]: e.target.value }))}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                              required={question.required}
+                            />
+                            <span className="ml-3 text-sm text-gray-700">Yes</span>
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name={question.id}
+                              value="no"
+                              checked={responses[question.id] === 'no'}
+                              onChange={(e) => setResponses(prev => ({ ...prev, [question.id]: e.target.value }))}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span className="ml-3 text-sm text-gray-700">No</span>
+                          </label>
+                        </div>
+                      )}
+                      
+                      {question.type === 'number' && (
+                        <input
+                          type="number"
+                          value={responses[question.id] || ''}
+                          onChange={(e) => setResponses(prev => ({ ...prev, [question.id]: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter a number..."
+                          required={question.required}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            ) : (
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 mb-3">No Additional Questions</h4>
+                <p className="text-gray-600">No screening questions are required for this study.</p>
+              </div>
+            );
+          })()}
 
           <div className="flex space-x-3">
             <button

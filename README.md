@@ -1,8 +1,15 @@
 # 🧠 ResearchHub - User Research Platform
 
-**Last Updated**: 2025-08-07
-**Version**: 1.0.0
-**Status**: ✅ Production Ready (98% functionality)
+**Last Updated**: 2025-08-10
+**Version**: 1.0.1
+**Status**: ✅ Production Ready (99% functionality)
+
+## 🎉 Recent Updates (August 10, 2025)
+
+✅ **Bug Fixes Completed**: Custom screening questions now display correctly
+✅ **Code Quality**: All ESLint errors resolved, 100% TypeScript type safety
+✅ **Enhanced UX**: Study information displays properly (duration, compensation)
+✅ **Technical Debt**: Removed all code smells and anti-patterns
 
 ## 🚀 Quick Start
 
