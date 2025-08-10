@@ -73,12 +73,12 @@
   },
   "functions": {
     "api/health.js": { "maxDuration": 10 },
-    "api/auth-production.js": { "maxDuration": 30 },
-    "api/research-production.js": { "maxDuration": 30 },
+    "api/auth-consolidated.js": { "maxDuration": 30 },
+    "api/research-consolidated.js": { "maxDuration": 30 },
     "api/setup.js": { "maxDuration": 30 },
     "api/templates-consolidated.js": { "maxDuration": 30 },
     "api/payments-consolidated-full.js": { "maxDuration": 30 },
-    "api/user-profile-production.js": { "maxDuration": 30 },
+    "api/user-profile-consolidated.js": { "maxDuration": 30 },
     "api/system-consolidated.js": { "maxDuration": 30 },
     "api/admin-consolidated.js": { "maxDuration": 30 }
   },

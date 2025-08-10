@@ -1,0 +1,1656 @@
+/**
+ * CONSOLIDATED RESEARCH MANAGEMENT API
+ * Production-safe version for Vercel deployment
+ * Handles: Study management, sessions, applications, and block types
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.I_4j2vgcu2aR9Pw1d-QG2hpKunbmNKD8tWg3Psl0GNc';
+
+// Initialize Supabase clients
+const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+console.log('🔧 Research API initialized for production');
+
+/**
+ * Helper function to authenticate user
+ */
+async function authenticateUser(req, requiredRoles = []) {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { success: false, error: 'Missing or invalid authorization header', status: 401 };
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Get user profile for role information
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.log('⚠️ Profile fetch failed:', profileError.message);
+      // Continue without profile, use user metadata
+    }
+
+    const userRole = profile?.role || user.user_metadata?.role || 'participant';
+
+    // Check role requirements
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+        status: 403 
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        profile: profile
+      }
+    };
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication service error', status: 500 };
+  }
+}
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Get user profile for role information
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.log('⚠️ Profile fetch failed:', profileError.message);
+      // Continue without profile, use user metadata
+    }
+
+    const userRole = profile?.role || user.user_metadata?.role || 'participant';
+
+    // Check role requirements
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+        status: 403 
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        profile: profile
+      }
+    };
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication service error', status: 500 };
+  }
+}
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Get user profile for role information
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.log('⚠️ Profile fetch failed:', profileError.message);
+      // Continue without profile, use user metadata
+    }
+
+    const userRole = profile?.role || user.user_metadata?.role || 'participant';
+
+    // Check role requirements
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+        status: 403 
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        profile: profile
+      }
+    };
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication service error', status: 500 };
+  }
+}
+
+// Block type definitions
+const BLOCK_TYPES = {
+  'welcome-screen': { name: 'Welcome Screen', category: 'introductory' },
+  'open-question': { name: 'Open Question', category: 'qualitative' },
+  'opinion-scale': { name: 'Opinion Scale', category: 'quantitative' },
+  'simple-input': { name: 'Simple Input', category: 'data-collection' },
+  'multiple-choice': { name: 'Multiple Choice', category: 'selection' },
+  'context-screen': { name: 'Context Screen', category: 'informational' },
+  'yes-no': { name: 'Yes/No', category: 'binary' },
+  '5-second-test': { name: '5-Second Test', category: 'testing' },
+  'card-sort': { name: 'Card Sort', category: 'organization' },
+  'tree-test': { name: 'Tree Test', category: 'navigation' },
+  'thank-you': { name: 'Thank You', category: 'completion' },
+  'image-upload': { name: 'Image Upload', category: 'media' },
+  'file-upload': { name: 'File Upload', category: 'media' }
+};
+
+/**
+ * STUDIES HANDLERS
+ */
+
+/**
+ * Get studies list
+ */
+async function handleGetStudies(req, res) {
+  try {
+    const auth = await authenticateUser(req);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    console.log('🔍 Studies API - Debug Info:', {
+      userId: auth.user.id,
+      userRole: auth.user.user_metadata?.role,
+      timestamp: new Date().toISOString()
+    });
+
+    // Check user role to determine filtering
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    const isParticipant = userRole === 'participant';
+    
+    let studies, error;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Using fallback database for studies');
+      const studiesResult = await fallbackDb.from('studies').select('*').execute();
+      if (studiesResult.error) {
+        studies = null;
+        error = studiesResult.error;
+      } else {
+        studies = studiesResult.data;
+        // Filter for participants in fallback
+        if (isParticipant) {
+          studies = studies.filter(study => study.status === 'active');
+          console.log('🔒 Participant filter applied: only showing active studies');
+        }
+        error = null;
+      }
+    } else {
+      let query = supabaseAdmin
+        .from('studies')
+        .select(`
+          id,
+          title,
+          description,
+          status,
+          created_at,
+          updated_at,
+          settings,
+          researcher_id,
+          target_participants,
+          is_public
+        `);
+
+      // Filter studies based on user role
+      if (isParticipant) {
+        // Participants should only see active studies (not draft)
+        query = query.eq('status', 'active');
+        console.log('🔒 Participant filter applied: only showing active studies');
+      }
+
+      const response = await query.order('created_at', { ascending: false });
+      studies = response.data;
+      error = response.error;
+    }
+
+    console.log('🔍 Studies query result:', { 
+      studyCount: studies?.length || 0, 
+      error,
+      userRole,
+      isParticipant,
+      sampleStudy: studies?.[0] || null
+    });
+
+    if (error) {
+      console.error('Get studies error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch studies',
+        details: error
+      });
+    }
+
+    // Transform the data to match frontend expectations
+    const transformedStudies = (studies || []).map(study => ({
+      _id: study.id,
+      id: study.id,
+      title: study.title || 'Untitled Study',
+      description: study.description || 'No description available',
+      status: study.status || 'draft',
+      type: study.settings?.type || 'usability',
+      createdAt: study.created_at,
+      updatedAt: study.updated_at,
+      participants: {
+        enrolled: 0, // This would need to be calculated from applications table
+        target: study.target_participants || 10
+      },
+      settings: study.settings || {
+        maxParticipants: study.target_participants || 10,
+        duration: 30,
+        compensation: 25
+      }
+    }));
+
+    return res.status(200).json({
+      success: true,
+      studies: transformedStudies,
+      message: `Found ${transformedStudies.length} studies (${userRole} filtered)`
+    });
+
+  } catch (error) {
+    console.error('Get studies exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Create new study
+ */
+async function handleCreateStudy(req, res) {
+  console.log('🔧 DEBUG: handleCreateStudy called');
+  
+  if (req.method !== 'POST') {
+    console.log('🔧 DEBUG: Method not allowed:', req.method);
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['researcher']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+    
+    const {
+      title = 'Default Test Study',
+      description = 'Default description',
+      participantLimit = 10,
+      compensation = 25,
+      blocks = [],
+      status = 'active',
+      screeningQuestions = []
+    } = req.body;
+    
+    console.log('🔧 DEBUG: Parsed data:', { title, description, participantLimit, screeningQuestions });
+
+    // Create study object
+    const studyData = {
+      id: `simple-study-${Date.now()}`,
+      title,
+      description,
+      status,
+      target_participants: participantLimit,
+      researcher_id: auth.user.id,
+      settings: {
+        compensation: compensation,
+        blocks: blocks,
+        screeningQuestions: screeningQuestions,
+        type: 'usability',
+        maxParticipants: participantLimit,
+        duration: 30
+      },
+      is_public: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    let study, error;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Creating study in fallback database');
+      const result = await fallbackDb.from('studies').insert(studyData).execute();
+      if (result.error) {
+        study = null;
+        error = result.error;
+      } else {
+        study = studyData; // Use the original data since insert doesn't return the created record
+        error = null;
+      }
+    } else {
+      const response = await supabaseAdmin
+        .from('studies')
+        .insert(studyData)
+        .select()
+        .single();
+      study = response.data;
+      error = response.error;
+    }
+    
+    if (error) {
+      console.error('Create study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create study'
+      });
+    }
+    
+    console.log('✅ Study created successfully:', study);
+
+    return res.status(201).json({
+      success: true,
+      study: study,
+      message: 'Study created successfully'
+    });
+
+  } catch (error) {
+    console.error('🔧 DEBUG: Simple create study error:', error);
+    console.error('🔧 DEBUG: Error stack:', error.stack);
+    
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to create study (simple mode)',
+      debug: {
+        message: error.message,
+        stack: error.stack.split('\n')[0]
+      }
+    });
+  }
+}
+
+/**
+ * Update study
+ */
+async function handleUpdateStudy(req, res) {
+  if (req.method !== 'PUT') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { study_id, studyId, id } = req.query;
+    const studyIdFromBody = req.body?.studyId || req.body?.id;
+    const actualStudyId = study_id || studyId || id || studyIdFromBody;
+    
+    if (!actualStudyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    // Check ownership
+    const { data: existingStudy, error: checkError } = await supabaseAdmin
+      .from('studies')
+      .select('researcher_id')
+      .eq('id', actualStudyId)
+      .single();
+
+    if (checkError || !existingStudy) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    if (userRole !== 'admin' && existingStudy.researcher_id !== auth.user.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only update your own studies'
+      });
+    }
+
+    const updateData = { updated_at: new Date().toISOString() };
+    
+    const { title, description, participantLimit, compensation, blocks, status } = req.body;
+
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (participantLimit !== undefined) updateData.participant_limit = participantLimit;
+    if (compensation !== undefined) updateData.compensation = compensation;
+    if (blocks !== undefined) updateData.blocks = blocks;
+    if (status) updateData.status = status;
+
+    const { data: updatedStudy, error } = await supabaseAdmin
+      .from('studies')
+      .update(updateData)
+      .eq('id', actualStudyId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Update study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update study'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      study: updatedStudy,
+      message: 'Study updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Update study exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Delete study
+ */
+async function handleDeleteStudy(req, res) {
+  console.log('🗑️ DELETE HANDLER START - Method:', req.method);
+  console.log('🗑️ DELETE HANDLER - Query params:', req.query);
+  console.log('🗑️ DELETE HANDLER - Body:', req.body);
+  
+  // Consolidated API uses POST with action parameter, not DELETE method
+  if (req.method !== 'POST') {
+    console.log('❌ Method not allowed:', req.method);
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    console.log('🔐 Starting authentication...');
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    console.log('🔐 Auth result:', { success: auth.success, status: auth.status });
+    
+    if (!auth.success) {
+      console.log('❌ Authentication failed:', auth.error);
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    // Get study ID from query, body, or URL path
+    const studyId = req.query.study_id || req.body?.studyId || req.body?.id;
+    console.log('🆔 Study ID extraction:', { 
+      fromQuery: req.query.study_id, 
+      fromBodyStudyId: req.body?.studyId, 
+      fromBodyId: req.body?.id, 
+      final: studyId 
+    });
+    
+    if (!studyId) {
+      console.log('❌ No study ID provided');
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    console.log('🗑️ Starting delete for study:', studyId);
+
+    // Check ownership
+    console.log('🔍 Looking up study in database...');
+    const { data: existingStudy, error: checkError } = await supabaseAdmin
+      .from('studies')
+      .select('researcher_id, title')
+      .eq('id', studyId)
+      .single();
+
+    console.log('🔍 Database lookup complete:', { 
+      foundStudy: !!existingStudy, 
+      hasError: !!checkError, 
+      studyId,
+      studyTitle: existingStudy?.title 
+    });
+
+    if (checkError) {
+      console.error('❌ Study lookup error details:', checkError);
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found',
+        details: checkError.message
+      });
+    }
+
+    if (!existingStudy) {
+      console.error('❌ Study not found in database:', studyId);
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    console.log('👤 Ownership check:', { 
+      userRole, 
+      authUserId: auth.user.id, 
+      studyResearcherId: existingStudy.researcher_id,
+      ownershipMatch: existingStudy.researcher_id === auth.user.id 
+    });
+
+    if (userRole !== 'admin' && existingStudy.researcher_id !== auth.user.id) {
+      console.log('❌ Ownership check failed');
+      return res.status(403).json({
+        success: false,
+        error: 'You can only delete your own studies'
+      });
+    }
+
+    console.log('✅ Ownership verified, proceeding with soft delete...');
+    console.log('✅ Ownership verified, proceeding with soft delete...');
+    // Soft delete by updating status to 'deleted'
+    const { data: deletedStudy, error } = await supabaseAdmin
+      .from('studies')
+      .update({ 
+        status: 'deleted',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', studyId)
+      .select()
+      .single();
+
+    console.log('🗑️ Delete operation result:', { 
+      success: !!deletedStudy, 
+      hasError: !!error,
+      deletedStudyId: deletedStudy?.id,
+      newStatus: deletedStudy?.status 
+    });
+
+    if (error) {
+      console.error('❌ Delete study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete study',
+        details: error.message
+      });
+    }
+
+    console.log('✅ Study successfully deleted:', deletedStudy.id);
+    return res.status(200).json({
+      success: true,
+      study: deletedStudy,
+      message: `Study "${existingStudy.title}" deleted successfully`,
+      method: 'soft-delete'
+    });
+
+  } catch (error) {
+    console.error('❌ Delete study exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message
+    });
+  }
+}
+
+/**
+ * Launch study (change status to active)
+ */
+async function handleLaunchStudy(req, res) {
+  if (req.method !== 'PATCH') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    // Get study ID from query
+    const studyId = req.query.study_id;
+    
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    console.log('Launching study with ID:', studyId);
+
+    // Check ownership
+    const { data: existingStudy, error: checkError } = await supabaseAdmin
+      .from('studies')
+      .select('researcher_id, title, status')
+      .eq('id', studyId)
+      .single();
+
+    if (checkError || !existingStudy) {
+      console.error('Study lookup error:', checkError);
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    if (userRole !== 'admin' && existingStudy.researcher_id !== auth.user.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only launch your own studies'
+      });
+    }
+
+    // Update status to active
+    const { data: launchedStudy, error } = await supabaseAdmin
+      .from('studies')
+      .update({ 
+        status: 'active',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', studyId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Launch study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to launch study'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      study: launchedStudy,
+      message: `Study "${existingStudy.title}" launched successfully`
+    });
+
+  } catch (error) {
+    console.error('Launch study exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * APPLICATIONS HANDLERS
+ */
+
+/**
+ * Get applications
+ */
+async function handleGetApplications(req, res) {
+  try {
+    const auth = await authenticateUser(req);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { study_id, status, limit = 50, offset = 0 } = req.query;
+    const userRole = auth.user.user_metadata?.role || 'participant';
+
+    let query = supabaseAdmin
+      .from('study_applications')
+      .select(`
+        id, user_id, study_id, status, applied_at, completed_at,
+        studies!inner(id, title, creator_id),
+        users!inner(id, first_name, last_name, email)
+      `)
+      .order('applied_at', { ascending: false });
+
+    // Role-based filtering
+    if (userRole === 'participant') {
+      query = query.eq('user_id', auth.user.id);
+    } else if (userRole === 'researcher') {
+      query = query.eq('studies.creator_id', auth.user.id);
+    }
+
+    if (study_id) {
+      query = query.eq('study_id', study_id);
+    }
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    query = query.range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
+    const { data: applications, error } = await query;
+
+    if (error) {
+      console.error('Get applications error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch applications'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      applications: applications || [],
+      pagination: {
+        limit: parseInt(limit),
+        offset: parseInt(offset)
+      }
+    });
+
+  } catch (error) {
+    console.error('Get applications exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Apply to study
+ */
+async function handleApplyToStudy(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['participant']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { study_id } = req.body;
+
+    console.log('🔧 DEBUG: Apply request body:', req.body);
+    console.log('🔧 DEBUG: Extracted study_id:', study_id);
+    console.log('🔧 DEBUG: Type of study_id:', typeof study_id);
+
+    if (!study_id) {
+      console.log('🔧 DEBUG: Study ID check failed - returning error');
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    // Check if study exists and is active
+    let study, studyError;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Using fallback database for study lookup');
+      const response = await fallbackDb.from('studies').select('*').eq('id', study_id).single().execute();
+      study = response.data;
+      studyError = response.error;
+    } else {
+      const response = await supabaseAdmin
+        .from('studies')
+        .select('id, status, participant_limit')
+        .eq('id', study_id)
+        .single();
+      study = response.data;
+      studyError = response.error;
+    }
+
+    if (studyError || !study) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    if (study.status !== 'active') {
+      return res.status(400).json({
+        success: false,
+        error: 'Study is not accepting applications'
+      });
+    }
+
+    // Check if already applied
+    let existingApplication;
+    
+    if (useLocalDatabase) {
+      const response = await fallbackDb.from('applications').select('*').eq('user_id', auth.user.id).eq('study_id', study_id).single().execute();
+      existingApplication = response.data;
+    } else {
+      const { data } = await supabaseAdmin
+        .from('study_applications')
+        .select('id')
+        .eq('user_id', auth.user.id)
+        .eq('study_id', study_id)
+        .single();
+      existingApplication = data;
+    }
+
+    if (existingApplication) {
+      return res.status(400).json({
+        success: false,
+        error: 'You have already applied to this study'
+      });
+    }
+
+    // Create application
+    const applicationData = {
+      user_id: auth.user.id,
+      study_id: study_id,
+      status: 'pending',
+      applied_at: new Date().toISOString(),
+      screening_answers: req.body.screening_answers || {},
+      eligibility_confirmed: req.body.eligibility_confirmed || false
+    };
+
+    let application, error;
+    
+    if (useLocalDatabase) {
+      console.log('🔧 Creating application in fallback database');
+      // Add an ID to the application data
+      applicationData.id = `app-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const result = await fallbackDb.from('applications').insert(applicationData).select().single().execute();
+      application = result.data;
+      error = result.error;
+    } else {
+      const response = await supabaseAdmin
+        .from('study_applications')
+        .insert(applicationData)
+        .select()
+        .single();
+      application = response.data;
+      error = response.error;
+    }
+
+    if (error) {
+      console.error('Apply to study error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to submit application'
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      application,
+      message: 'Application submitted successfully! You can track your application status in My Applications.'
+    });
+
+  } catch (error) {
+    console.error('Apply to study exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get participant's applications (My Applications)
+ */
+async function handleGetMyApplications(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['participant']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    if (useLocalDatabase) {
+      // Fallback: return realistic Saudi Arabian applications
+      const mockApplications = [
+        {
+          id: 'app-001',
+          study_id: 'study-001',
+          studyTitle: 'Mobile Banking App UX Study - Saudi Market',
+          studyDescription: 'Evaluate mobile banking interfaces for Saudi users',
+          compensation: 150,
+          status: 'pending',
+          applied_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          researcher_notes: null,
+          estimated_duration: 45
+        },
+        {
+          id: 'app-002',
+          study_id: 'study-002', 
+          studyTitle: 'E-commerce Platform Usability - Riyadh Focus',
+          studyDescription: 'Test e-commerce shopping experience for Saudi consumers',
+          compensation: 100,
+          status: 'approved',
+          applied_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          researcher_notes: 'Great profile match. Looking forward to your participation.',
+          estimated_duration: 60
+        }
+      ];
+
+      return res.status(200).json({
+        success: true,
+        applications: mockApplications,
+        message: 'Applications retrieved successfully (local database)'
+      });
+    }
+
+    // Supabase query
+    const { data: applications, error } = await supabase
+      .from('study_applications')
+      .select(`
+        id,
+        study_id,
+        status,
+        applied_at,
+        researcher_notes,
+        studies!inner(
+          id,
+          title,
+          description,
+          compensation,
+          estimated_duration
+        )
+      `)
+      .eq('user_id', auth.user.id)
+      .order('applied_at', { ascending: false });
+
+    if (error) {
+      console.error('Get my applications error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve applications'
+      });
+    }
+
+    // Transform data for frontend
+    const transformedApplications = applications.map(app => ({
+      id: app.id,
+      study_id: app.study_id,
+      studyTitle: app.studies.title,
+      studyDescription: app.studies.description,
+      compensation: app.studies.compensation,
+      estimated_duration: app.studies.estimated_duration,
+      status: app.status,
+      applied_at: app.applied_at,
+      researcher_notes: app.researcher_notes
+    }));
+
+    return res.status(200).json({
+      success: true,
+      applications: transformedApplications,
+      message: 'Applications retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Get my applications exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get study applications for researchers
+ */
+async function handleGetStudyApplications(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { study_id } = req.query;
+
+    if (!study_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    if (useLocalDatabase) {
+      // Fallback: return realistic Saudi Arabian applications
+      const mockApplications = [
+        {
+          id: 'app-001',
+          study_id: study_id,
+          participant_id: 'user-001',
+          participantEmail: 'abwanwr77+participant@gmail.com',
+          participantName: 'Ahmed Al-Rashid',
+          demographics: {
+            ageRange: '25-34',
+            gender: 'male',
+            country: 'SA',
+            specialization: 'Technology & Software'
+          },
+          status: 'pending',
+          applied_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          screening_answers: {
+            experience: 'I use mobile banking daily for all my transactions',
+            interest: 'Very interested in improving banking UX',
+            availability: 'Available weekdays after 6 PM'
+          }
+        },
+        {
+          id: 'app-002',
+          study_id: study_id,
+          participant_id: 'user-002',
+          participantEmail: 'sara.almutairi@example.com',
+          participantName: 'Sara Al-Mutairi',
+          demographics: {
+            ageRange: '18-24',
+            gender: 'female',
+            country: 'SA',
+            specialization: 'Business & Finance'
+          },
+          status: 'approved',
+          applied_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          screening_answers: {
+            experience: 'Regular online shopper, familiar with e-commerce',
+            interest: 'Want to contribute to better shopping experiences',
+            availability: 'Flexible schedule, can participate anytime'
+          }
+        }
+      ];
+
+      return res.status(200).json({
+        success: true,
+        applications: mockApplications,
+        message: 'Study applications retrieved successfully (local database)'
+      });
+    }
+
+    // First verify user owns the study (unless admin)
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    if (userRole !== 'admin') {
+      const { data: study, error: studyError } = await supabase
+        .from('studies')
+        .select('creator_id')
+        .eq('id', study_id)
+        .single();
+
+      if (studyError || !study) {
+        return res.status(404).json({
+          success: false,
+          error: 'Study not found'
+        });
+      }
+
+      if (study.creator_id !== auth.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'You can only view applications for your studies'
+        });
+      }
+    }
+
+    // Get applications with participant info
+    const { data: applications, error } = await supabase
+      .from('study_applications')
+      .select(`
+        id,
+        user_id,
+        status,
+        applied_at,
+        screening_answers,
+        researcher_notes,
+        profiles!inner(
+          id,
+          email,
+          full_name,
+          demographics
+        )
+      `)
+      .eq('study_id', study_id)
+      .order('applied_at', { ascending: false });
+
+    if (error) {
+      console.error('Get study applications error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve study applications'
+      });
+    }
+
+    // Transform data for frontend
+    const transformedApplications = applications.map(app => ({
+      id: app.id,
+      study_id: study_id,
+      participant_id: app.user_id,
+      participantEmail: app.profiles.email,
+      participantName: app.profiles.full_name,
+      demographics: app.profiles.demographics,
+      status: app.status,
+      applied_at: app.applied_at,
+      screening_answers: app.screening_answers,
+      researcher_notes: app.researcher_notes
+    }));
+
+    return res.status(200).json({
+      success: true,
+      applications: transformedApplications,
+      message: 'Study applications retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Get study applications exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Update application status
+ */
+async function handleUpdateApplicationStatus(req, res) {
+  if (req.method !== 'PUT') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['researcher', 'admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { application_id, status } = req.body;
+
+    if (!application_id || !status) {
+      return res.status(400).json({
+        success: false,
+        error: 'Application ID and status are required'
+      });
+    }
+
+    const validStatuses = ['pending', 'approved', 'rejected', 'completed'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid status. Must be: ' + validStatuses.join(', ')
+      });
+    }
+
+    // Get application with study info
+    const { data: application, error: getError } = await supabaseAdmin
+      .from('study_applications')
+      .select(`
+        id, user_id, study_id,
+        studies!inner(creator_id)
+      `)
+      .eq('id', application_id)
+      .single();
+
+    if (getError || !application) {
+      return res.status(404).json({
+        success: false,
+        error: 'Application not found'
+      });
+    }
+
+    // Check if user owns the study
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    if (userRole !== 'admin' && application.studies.creator_id !== auth.user.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only update applications for your studies'
+      });
+    }
+
+    const updateData = { status };
+    
+    if (status === 'completed') {
+      updateData.completed_at = new Date().toISOString();
+    }
+
+    const { data: updatedApplication, error } = await supabaseAdmin
+      .from('study_applications')
+      .update(updateData)
+      .eq('id', application_id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Update application status error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update application status'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      application: updatedApplication,
+      message: 'Application status updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Update application status exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * BLOCKS HANDLERS
+ */
+
+/**
+ * Get block types
+ */
+async function handleGetBlockTypes(req, res) {
+  try {
+    const blocks = Object.entries(BLOCK_TYPES).map(([type, info]) => ({
+      type,
+      name: info.name,
+      category: info.category,
+      description: getBlockDescription(type)
+    }));
+
+    return res.status(200).json({
+      success: true,
+      blocks,
+      totalTypes: blocks.length
+    });
+
+  } catch (error) {
+    console.error('Get block types exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get block description
+ */
+function getBlockDescription(type) {
+  const descriptions = {
+    'welcome-screen': 'Welcome participants and provide study introduction',
+    'open-question': 'Collect qualitative feedback with open-ended questions',
+    'opinion-scale': 'Gather quantitative ratings using various scale types',
+    'simple-input': 'Collect structured data like text, numbers, dates',
+    'multiple-choice': 'Present options for single or multiple selection',
+    'context-screen': 'Provide instructions or transitional information',
+    'yes-no': 'Binary choice questions with visual indicators',
+    '5-second-test': 'Test first impressions and memory recall',
+    'card-sort': 'Organize information into categories',
+    'tree-test': 'Evaluate navigation and information findability',
+    'thank-you': 'Thank participants and conclude the study',
+    'image-upload': 'Allow participants to upload images',
+    'file-upload': 'Allow participants to upload documents or files'
+  };
+
+  return descriptions[type] || 'Block for collecting participant data';
+}
+
+/**
+ * STUDY SESSIONS HANDLERS
+ */
+
+/**
+ * Start study session
+ */
+async function handleStartSession(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['participant']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { study_id } = req.body;
+
+    if (!study_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    // Check if user has approved application
+    const { data: application, error: appError } = await supabaseAdmin
+      .from('study_applications')
+      .select('id, status')
+      .eq('user_id', auth.user.id)
+      .eq('study_id', study_id)
+      .eq('status', 'approved')
+      .single();
+
+    if (appError || !application) {
+      return res.status(403).json({
+        success: false,
+        error: 'No approved application found for this study'
+      });
+    }
+
+    // Get study blocks
+    const { data: study, error: studyError } = await supabaseAdmin
+      .from('studies')
+      .select('blocks, title')
+      .eq('id', study_id)
+      .single();
+
+    if (studyError || !study) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    const sessionData = {
+      user_id: auth.user.id,
+      study_id: study_id,
+      application_id: application.id,
+      started_at: new Date().toISOString(),
+      current_block: 0,
+      blocks_data: study.blocks || [],
+      responses: {}
+    };
+
+    const { data: session, error } = await supabaseAdmin
+      .from('study_sessions')
+      .insert(sessionData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Start session error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to start study session'
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      session,
+      study: {
+        title: study.title,
+        totalBlocks: study.blocks?.length || 0
+      },
+      message: 'Study session started successfully'
+    });
+
+  } catch (error) {
+    console.error('Start session exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Submit block response
+ */
+async function handleSubmitResponse(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const auth = await authenticateUser(req, ['participant']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { session_id, block_index, response_data } = req.body;
+
+    if (!session_id || block_index === undefined || !response_data) {
+      return res.status(400).json({
+        success: false,
+        error: 'Session ID, block index, and response data are required'
+      });
+    }
+
+    // Get session
+    const { data: session, error: sessionError } = await supabaseAdmin
+      .from('study_sessions')
+      .select('*')
+      .eq('id', session_id)
+      .eq('user_id', auth.user.id)
+      .single();
+
+    if (sessionError || !session) {
+      return res.status(404).json({
+        success: false,
+        error: 'Session not found'
+      });
+    }
+
+    // Update responses
+    const updatedResponses = {
+      ...session.responses,
+      [block_index]: {
+        data: response_data,
+        submitted_at: new Date().toISOString()
+      }
+    };
+
+    const updateData = {
+      responses: updatedResponses,
+      current_block: Math.max(block_index + 1, session.current_block),
+      updated_at: new Date().toISOString()
+    };
+
+    // Check if this is the last block
+    const totalBlocks = session.blocks_data?.length || 0;
+    if (block_index >= totalBlocks - 1) {
+      updateData.completed_at = new Date().toISOString();
+      updateData.status = 'completed';
+    }
+
+    const { data: updatedSession, error } = await supabaseAdmin
+      .from('study_sessions')
+      .update(updateData)
+      .eq('id', session_id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Submit response error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to submit response'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      session: updatedSession,
+      nextBlock: updateData.current_block,
+      isCompleted: !!updateData.completed_at,
+      message: 'Response submitted successfully'
+    });
+
+  } catch (error) {
+    console.error('Submit response exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Main handler - routes to appropriate sub-handler
+ */
+export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    const { action } = req.query;
+
+    console.log(`=== RESEARCH ACTION: ${action} ===`);
+
+    switch (action) {
+      // Studies
+      case 'get-studies':
+      case 'studies':
+        return await handleGetStudies(req, res);
+      
+      case 'create-study':
+        return await handleCreateStudy(req, res);
+      
+      case 'update-study':
+        return await handleUpdateStudy(req, res);
+      
+      case 'delete-study':
+        return await handleDeleteStudy(req, res);
+      
+      case 'launch-study':
+        return await handleLaunchStudy(req, res);
+      
+      // Applications
+      case 'get-applications':
+      case 'applications':
+        return await handleGetApplications(req, res);
+      
+      case 'get-my-applications':
+        return await handleGetMyApplications(req, res);
+      
+      case 'get-study-applications':
+        return await handleGetStudyApplications(req, res);
+      
+      case 'apply':
+        return await handleApplyToStudy(req, res);
+      
+      case 'update-application':
+        return await handleUpdateApplicationStatus(req, res);
+      
+      // Blocks
+      case 'get-blocks':
+      case 'blocks':
+      case 'block-types':
+        return await handleGetBlockTypes(req, res);
+      
+      // Sessions
+      case 'start-session':
+        return await handleStartSession(req, res);
+      
+      case 'submit-response':
+        return await handleSubmitResponse(req, res);
+      
+      default:
+        // Default based on method
+        if (req.method === 'GET') {
+          return await handleGetStudies(req, res);
+        }
+
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid action',
+          availableActions: [
+            'studies', 'create-study', 'update-study', 'delete-study', 'launch-study',
+            'applications', 'get-my-applications', 'get-study-applications', 'apply', 'update-application',
+            'blocks', 'block-types',
+            'start-session', 'submit-response'
+          ]
+        });
+    }
+  } catch (error) {
+    console.error('Research handler exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}

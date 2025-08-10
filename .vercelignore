@@ -2,11 +2,14 @@
 
 api/*
 !api/auth-consolidated.js
+!api/auth-production.js
 !api/templates-consolidated.js
 !api/payments-consolidated-full.js
 !api/user-profile-consolidated.js
+!api/user-profile-production.js
 !api/system-consolidated.js
 !api/research-consolidated.js
+!api/research-production.js
 !api/admin-consolidated.js
 !api/health.js
 !api/auth.js
