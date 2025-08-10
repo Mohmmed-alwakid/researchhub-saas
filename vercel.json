@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "alias": ["researchhub-saas.vercel.app"],
+  "alias": ["afkar-saas.vercel.app"],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
@@ -68,19 +68,17 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "VITE_APP_NAME": "ResearchHub",
-    "VITE_API_URL": "https://researchhub-saas.vercel.app/api"
+    "VITE_APP_NAME": "Afkar",
+    "VITE_API_URL": "https://afkar-saas.vercel.app/api"
   },
   "functions": {
     "api/health.js": { "maxDuration": 10 },
-    "api/auth.js": { "maxDuration": 30 },
-    "api/research.js": { "maxDuration": 30 },
+    "api/auth-production.js": { "maxDuration": 30 },
+    "api/research-production.js": { "maxDuration": 30 },
     "api/setup.js": { "maxDuration": 30 },
-    "api/auth-consolidated.js": { "maxDuration": 30 },
-    "api/research-consolidated.js": { "maxDuration": 30 },
     "api/templates-consolidated.js": { "maxDuration": 30 },
     "api/payments-consolidated-full.js": { "maxDuration": 30 },
-    "api/user-profile-consolidated.js": { "maxDuration": 30 },
+    "api/user-profile-production.js": { "maxDuration": 30 },
     "api/system-consolidated.js": { "maxDuration": 30 },
     "api/admin-consolidated.js": { "maxDuration": 30 }
   },

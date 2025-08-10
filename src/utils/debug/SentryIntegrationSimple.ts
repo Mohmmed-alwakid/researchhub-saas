@@ -1,16 +1,16 @@
 /**
- * 🔍 Simple Sentry Integration for ResearchHub
- * Professional error tracking with ResearchHub-specific context
+ * 🔍 Simple Sentry Integration for Afkar
+ * Professional error tracking with Afkar-specific context
  */
 
 import * as Sentry from '@sentry/react';
 
-class ResearchHubSentry {
+class AfkarSentry {
   private isInitialized: boolean = false;
   private researchContext: Map<string, unknown> = new Map();
 
   /**
-   * Initialize Sentry with ResearchHub-specific configuration
+   * Initialize Sentry with Afkar-specific configuration
    */
   init(): void {
     if (this.isInitialized) return;
@@ -44,15 +44,15 @@ class ResearchHubSentry {
       sampleRate: import.meta.env.PROD ? 0.9 : 1.0,
       
       // Release tracking
-      release: `researchhub@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
+      release: `afkar@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
     });
 
     this.isInitialized = true;
-    console.log('🔍 Sentry initialized for ResearchHub');
+    console.log('🔍 Sentry initialized for Afkar');
   }
 
   /**
-   * Set user context with ResearchHub-specific data
+   * Set user context with Afkar-specific data
    */
   setUserContext(user: { id: string; email?: string; role?: string; [key: string]: unknown }): void {
     if (!this.isInitialized) return;
@@ -135,7 +135,7 @@ class ResearchHubSentry {
   }
 
   /**
-   * Capture ResearchHub-specific errors
+   * Capture Afkar-specific errors
    */
   captureResearchError(error: Error, context: { type?: string; userRole?: string; feature?: string; [key: string]: unknown }): void {
     if (!this.isInitialized) return;
@@ -177,7 +177,7 @@ class ResearchHubSentry {
 }
 
 // Create singleton instance
-const sentryIntegration = new ResearchHubSentry();
+const sentryIntegration = new AfkarSentry();
 
 export default sentryIntegration;
 

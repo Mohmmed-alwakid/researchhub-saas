@@ -1,5 +1,5 @@
 /**
- * Professional logging utility for ResearchHub
+ * Professional logging utility for Afkar
  * Provides structured logging with different levels and environments
  */
 
@@ -11,11 +11,20 @@ export enum LogLevel {
   TRACE = 4
 }
 
+// Type-safe context interface
+export interface LogContext {
+  userId?: string;
+  sessionId?: string;
+  action?: string;
+  component?: string;
+  [key: string]: unknown;
+}
+
 export interface LogEntry {
   level: LogLevel;
   message: string;
   timestamp: string;
-  context?: Record<string, any>;
+  context?: LogContext;
   error?: Error;
   userId?: string;
   sessionId?: string;
@@ -30,7 +39,7 @@ class Logger {
     this.currentLevel = this.isDevelopment ? LogLevel.DEBUG : LogLevel.INFO;
   }
 
-  private formatMessage(level: LogLevel, message: string, context?: Record<string, any>): LogEntry {
+  private formatMessage(level: LogLevel, message: string, context?: LogContext): LogEntry {
     return {
       level,
       message,
@@ -78,37 +87,37 @@ class Logger {
     }
   }
 
-  error(message: string, context?: Record<string, any>, error?: Error): void {
+  error(message: string, context?: LogContext, error?: Error): void {
     const entry = this.formatMessage(LogLevel.ERROR, message, context);
     if (error) entry.error = error;
     this.output(entry);
   }
 
-  warn(message: string, context?: Record<string, any>): void {
+  warn(message: string, context?: LogContext): void {
     this.output(this.formatMessage(LogLevel.WARN, message, context));
   }
 
-  info(message: string, context?: Record<string, any>): void {
+  info(message: string, context?: LogContext): void {
     this.output(this.formatMessage(LogLevel.INFO, message, context));
   }
 
-  debug(message: string, context?: Record<string, any>): void {
+  debug(message: string, context?: LogContext): void {
     this.output(this.formatMessage(LogLevel.DEBUG, message, context));
   }
 
-  trace(message: string, context?: Record<string, any>): void {
+  trace(message: string, context?: LogContext): void {
     this.output(this.formatMessage(LogLevel.TRACE, message, context));
   }
 
   // Specialized logging methods for common scenarios
-  security(violation: string, context?: Record<string, any>): void {
+  security(violation: string, context?: LogContext): void {
     this.error(`SECURITY_VIOLATION: ${violation}`, { 
       type: 'security', 
       ...context 
     });
   }
 
-  performance(metric: string, value: number, context?: Record<string, any>): void {
+  performance(metric: string, value: number, context?: LogContext): void {
     this.info(`PERFORMANCE: ${metric}`, { 
       type: 'performance', 
       metric, 
@@ -117,7 +126,7 @@ class Logger {
     });
   }
 
-  cache(operation: string, context?: Record<string, any>): void {
+  cache(operation: string, context?: LogContext): void {
     this.debug(`CACHE: ${operation}`, { 
       type: 'cache', 
       ...context 
@@ -141,21 +150,21 @@ export const logger = new Logger();
 
 // Export convenience methods
 export const log = {
-  error: (message: string, context?: Record<string, any>, error?: Error) => 
+  error: (message: string, context?: LogContext, error?: Error) => 
     logger.error(message, context, error),
-  warn: (message: string, context?: Record<string, any>) => 
+  warn: (message: string, context?: LogContext) => 
     logger.warn(message, context),
-  info: (message: string, context?: Record<string, any>) => 
+  info: (message: string, context?: LogContext) => 
     logger.info(message, context),
-  debug: (message: string, context?: Record<string, any>) => 
+  debug: (message: string, context?: LogContext) => 
     logger.debug(message, context),
-  trace: (message: string, context?: Record<string, any>) => 
+  trace: (message: string, context?: LogContext) => 
     logger.trace(message, context),
-  security: (violation: string, context?: Record<string, any>) => 
+  security: (violation: string, context?: LogContext) => 
     logger.security(violation, context),
-  performance: (metric: string, value: number, context?: Record<string, any>) => 
+  performance: (metric: string, value: number, context?: LogContext) => 
     logger.performance(metric, value, context),
-  cache: (operation: string, context?: Record<string, any>) => 
+  cache: (operation: string, context?: LogContext) => 
     logger.cache(operation, context),
   api: (method: string, endpoint: string, status: number, duration?: number) => 
     logger.api(method, endpoint, status, duration)

@@ -1,5 +1,5 @@
 @echo off
-echo 🚀 ResearchHub Port 5175 Force Restart Script
+echo 🚀 Afkar Port 5175 Force Restart Script
 echo ========================================
 
 echo Step 1: Killing any process using port 5175...
@@ -17,7 +17,7 @@ for /f "tokens=5" %%b in ('netstat -ano ^| findstr :3003') do (
 echo Step 3: Waiting 2 seconds for ports to be released...
 timeout /t 2 /nobreak >nul
 
-echo Step 4: Starting ResearchHub on port 5175...
+echo Step 4: Starting Afkar on port 5175...
 echo Frontend: http://localhost:5175
 echo API: http://localhost:3003
 echo.

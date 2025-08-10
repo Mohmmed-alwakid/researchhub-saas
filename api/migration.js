@@ -231,7 +231,7 @@ async function runMigration(supabase, res) {
     migrationSteps.push('Inserting default system settings...');
     await executeSQL(supabase, `
       INSERT INTO system_settings (key, value, description, category, is_public) VALUES
-        ('app_name', '"ResearchHub"', 'Application name', 'branding', true),
+        ('app_name', '"Afkar"', 'Application name', 'branding', true),
         ('app_version', '"1.0.0"', 'Application version', 'system', true),
         ('maintenance_mode', 'false', 'Maintenance mode flag', 'system', false),
         ('max_study_blocks', '50', 'Maximum blocks per study', 'limits', false)

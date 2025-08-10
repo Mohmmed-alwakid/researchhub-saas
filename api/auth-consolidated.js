@@ -5,24 +5,34 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { 
-  checkSupabaseConnectivity, 
-  initializeFallbackDatabase 
-} from '../scripts/development/network-resilient-fallback.js';
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.I_4j2vgcu2aR9Pw1d-QG2hpKunbmNKD8tWg3Psl0GNc';
 
-let supabase, supabaseAdmin, fallbackDb;
-let useLocalAuth = false;
+let supabase, supabaseAdmin;
 let supabaseConnected = false;
 
-// Initialize Supabase with automatic fallback
-async function initializeSupabaseWithFallback() {
+// Production-safe Supabase connectivity check
+async function checkSupabaseConnectivity(url) {
   try {
-    console.log('🔧 Initializing database connections...');
+    const response = await fetch(`${url}/rest/v1/`, {
+      headers: {
+        'apikey': supabaseKey
+      }
+    });
+    return response.ok;
+  } catch (error) {
+    console.log('⚠️ Supabase connectivity check failed:', error.message);
+    return false;
+  }
+}
+
+// Initialize Supabase with production fallback
+async function initializeSupabase() {
+  try {
+    console.log('🔧 Initializing Supabase connection...');
     
     // Check Supabase connectivity
     supabaseConnected = await checkSupabaseConnectivity(supabaseUrl);
@@ -31,22 +41,23 @@ async function initializeSupabaseWithFallback() {
       console.log('✅ Using Supabase (remote database)');
       supabase = createClient(supabaseUrl, supabaseKey);
       supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-      useLocalAuth = false;
     } else {
-      console.log('🔧 Supabase unavailable, switching to local fallback database');
-      fallbackDb = await initializeFallbackDatabase();
-      useLocalAuth = true;
+      console.log('⚠️ Supabase unavailable, authentication limited to production mode');
+      // In production, we expect Supabase to be available
+      supabase = createClient(supabaseUrl, supabaseKey);
+      supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
     }
     
   } catch (error) {
-    console.warn('⚠️ Database initialization failed, using local fallback');
-    fallbackDb = await initializeFallbackDatabase();
-    useLocalAuth = true;
+    console.warn('⚠️ Database initialization warning:', error.message);
+    // Initialize clients anyway for production
+    supabase = createClient(supabaseUrl, supabaseKey);
+    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
   }
 }
 
 // Initialize on module load
-await initializeSupabaseWithFallback();
+await initializeSupabase();
 
 // Test accounts for development (from TESTING_RULES_MANDATORY.md)
 const TEST_ACCOUNTS = {
@@ -357,17 +368,29 @@ async function handleLogin(req, res) {
 }
 
 /**
- * Handle fallback database authentication
+ * Handle production authentication with Supabase
  */
-async function handleFallbackAuth(email, password, res) {
+async function handleLogin(email, password, res) {
   try {
-    console.log(`🔧 Using fallback database for: ${email}`);
+    console.log(`� Attempting login for: ${email}`);
     
-    const authResult = await fallbackDb.signInWithPassword({ email, password });
-    
-    if (authResult.data && authResult.data.user) {
-      console.log('✅ Fallback authentication successful');
-      return await handleSuccessfulAuth(authResult.data, res);
+    // Use Supabase for authentication
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (authError) {
+      console.log('❌ Authentication failed:', authError.message);
+      return res.status(401).json({
+        success: false,
+        error: authError.message
+      });
+    }
+
+    if (authData?.user) {
+      console.log('✅ Authentication successful');
+      return await handleSuccessfulAuth(authData, res);
     } else {
       return res.status(401).json({
         success: false,
@@ -376,7 +399,7 @@ async function handleFallbackAuth(email, password, res) {
     }
     
   } catch (error) {
-    console.error('Fallback auth error:', error);
+    console.error('Login error:', error);
     return res.status(500).json({
       success: false,
       error: 'Authentication service unavailable'

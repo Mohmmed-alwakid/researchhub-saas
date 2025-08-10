@@ -1,4 +1,4 @@
-# 🧠 ResearchHub - User Research Platform
+# 🧠 Afkar - User Research Platform
 
 **Last Updated**: 2025-08-10
 **Version**: 1.0.1

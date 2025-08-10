@@ -1,62 +1,21 @@
 /**
  * CONSOLIDATED RESEARCH MANAGEMENT API
- * Merges: studies.js + study-sessions.js + applications.js + blocks.js
+ * Production-safe version for Vercel deployment
  * Handles: Study management, sessions, applications, and block types
  */
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 import { createClient } from '@supabase/supabase-js';
-import { 
-  checkSupabaseConnectivity, 
-  initializeFallbackDatabase 
-} from '../scripts/development/network-resilient-fallback.js';
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.I_4j2vgcu2aR9Pw1d-QG2hpKunbmNKD8tWg3Psl0GNc';
 
-console.log('🔑 Research API - Supabase Config Debug:', {
-  url: supabaseUrl,
-  hasServiceKey: !!supabaseServiceKey,
-  serviceKeyPreview: supabaseServiceKey ? `${supabaseServiceKey.substring(0, 20)}...` : 'NOT_SET',
-  envServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? `${process.env.SUPABASE_SERVICE_ROLE_KEY.substring(0, 20)}...` : 'NOT_SET'
-});
+// Initialize Supabase clients
+const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-let supabase, supabaseAdmin, fallbackDb;
-let useLocalDatabase = false;
-let supabaseConnected = false;
-
-// Initialize Supabase with automatic fallback
-async function initializeSupabaseWithFallback() {
-  try {
-    console.log('🔧 Initializing database connections...');
-    
-    // Check Supabase connectivity
-    supabaseConnected = await checkSupabaseConnectivity(supabaseUrl);
-    
-    if (supabaseConnected) {
-      console.log('✅ Using Supabase (remote database)');
-      supabase = createClient(supabaseUrl, supabaseKey);
-      supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-      useLocalDatabase = false;
-    } else {
-      console.log('🔧 Supabase unavailable, switching to local fallback database');
-      fallbackDb = await initializeFallbackDatabase();
-      useLocalDatabase = true;
-    }
-    
-  } catch (error) {
-    console.warn('⚠️ Database initialization failed, using local fallback');
-    fallbackDb = await initializeFallbackDatabase();
-    useLocalDatabase = true;
-  }
-}
-
-// Initialize on module load
-await initializeSupabaseWithFallback();
+console.log('🔧 Research API initialized for production');
 
 /**
  * Helper function to authenticate user
@@ -71,112 +30,144 @@ async function authenticateUser(req, requiredRoles = []) {
 
     const token = authHeader.replace('Bearer ', '');
     
-    // Check if this is a fallback token
-    if (token.startsWith('fallback-token-')) {
-      // Handle fallback authentication (local development)
-      // Token format: fallback-token-{userId}-{timestamp}
-      const tokenParts = token.replace('fallback-token-', '').split('-');
-      
-      // Reconstruct userId (everything except the last part which is timestamp)
-      const timestampPart = tokenParts[tokenParts.length - 1];
-      const userIdParts = tokenParts.slice(0, -1);
-      const userId = userIdParts.join('-');
-      
-      console.log('🔧 Fallback token parsing:', {
-        originalToken: token.substring(0, 40) + '...',
-        tokenParts: tokenParts,
-        timestampPart: timestampPart,
-        reconstructedUserId: userId
-      });
-      
-      // For fallback tokens, create a mock user object based on the actual userId
-      let fallbackUser;
-      
-      if (userId === 'test-researcher-001') {
-        fallbackUser = {
-          id: 'test-researcher-001',
-          email: 'abwanwr77+researcher@gmail.com',
-          user_metadata: { role: 'researcher' }
-        };
-      } else if (userId === 'test-participant-001') {
-        fallbackUser = {
-          id: 'test-participant-001',
-          email: 'abwanwr77+participant@gmail.com',
-          user_metadata: { role: 'participant' }
-        };
-      } else if (userId === 'test-admin-001') {
-        fallbackUser = {
-          id: 'test-admin-001',
-          email: 'abwanwr77+admin@gmail.com',
-          user_metadata: { role: 'admin' }
-        };
-      } else {
-        // Default fallback - try to guess from userId content
-        if (userId.includes('researcher')) {
-          fallbackUser = {
-            id: userId,
-            email: 'abwanwr77+researcher@gmail.com',
-            user_metadata: { role: 'researcher' }
-          };
-        } else if (userId.includes('admin')) {
-          fallbackUser = {
-            id: userId,
-            email: 'abwanwr77+admin@gmail.com',
-            user_metadata: { role: 'admin' }
-          };
-        } else {
-          fallbackUser = {
-            id: userId,
-            email: 'abwanwr77+participant@gmail.com',
-            user_metadata: { role: 'participant' }
-          };
-        }
-      }
-      
-      console.log('🔧 Fallback authentication - User resolved:', {
-        userId: userId,
-        resolvedRole: fallbackUser.user_metadata.role,
-        resolvedEmail: fallbackUser.email
-      });
-      
-      // Check role if specified
-      if (requiredRoles.length > 0) {
-        const userRole = fallbackUser.user_metadata?.role || 'participant';
-        if (!requiredRoles.includes(userRole)) {
-          return { 
-            success: false, 
-            error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
-            status: 403 
-          };
-        }
-      }
-      
-      return { success: true, user: fallbackUser };
-    }
-
-    // Handle regular Supabase tokens
+    // Verify token with Supabase
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
       return { success: false, error: 'Invalid or expired token', status: 401 };
     }
 
-    // Check role if specified
-    if (requiredRoles.length > 0) {
-      const userRole = user.user_metadata?.role || 'participant';
-      if (!requiredRoles.includes(userRole)) {
-        return { 
-          success: false, 
-          error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
-          status: 403 
-        };
-      }
+    // Get user profile for role information
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.log('⚠️ Profile fetch failed:', profileError.message);
+      // Continue without profile, use user metadata
     }
 
-    return { success: true, user };
+    const userRole = profile?.role || user.user_metadata?.role || 'participant';
+
+    // Check role requirements
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+        status: 403 
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        profile: profile
+      }
+    };
+
   } catch (error) {
     console.error('Authentication error:', error);
-    return { success: false, error: 'Authentication failed', status: 500 };
+    return { success: false, error: 'Authentication service error', status: 500 };
+  }
+}
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Get user profile for role information
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.log('⚠️ Profile fetch failed:', profileError.message);
+      // Continue without profile, use user metadata
+    }
+
+    const userRole = profile?.role || user.user_metadata?.role || 'participant';
+
+    // Check role requirements
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+        status: 403 
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        profile: profile
+      }
+    };
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication service error', status: 500 };
+  }
+}
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Get user profile for role information
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.log('⚠️ Profile fetch failed:', profileError.message);
+      // Continue without profile, use user metadata
+    }
+
+    const userRole = profile?.role || user.user_metadata?.role || 'participant';
+
+    // Check role requirements
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+        status: 403 
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        profile: profile
+      }
+    };
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication service error', status: 500 };
   }
 }
 

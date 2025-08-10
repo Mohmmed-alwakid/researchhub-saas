@@ -228,7 +228,7 @@ export const ENHANCED_STUDY_TEMPLATES: EnhancedStudyTemplateDefinition[] = [
       difficulty: 'beginner' as const,
       studyTypes: ['usability', 'prototype'],
       tags: ['usability', 'product-testing', 'early-stage', 'validation'],
-      author: 'ResearchHub Team',
+      author: 'Afkar Team',
       version: '1.0.0',
       lastModified: new Date()
     },
@@ -354,7 +354,7 @@ export const ENHANCED_STUDY_TEMPLATES: EnhancedStudyTemplateDefinition[] = [
       difficulty: 'beginner' as const,
       studyTypes: ['survey', 'feedback'],
       tags: ['feature-testing', 'satisfaction', 'usability', 'feedback'],
-      author: 'ResearchHub Team',
+      author: 'Afkar Team',
       version: '1.0.0',
       lastModified: new Date()
     },
@@ -456,7 +456,7 @@ export const ENHANCED_STUDY_TEMPLATES: EnhancedStudyTemplateDefinition[] = [
       difficulty: 'beginner' as const,
       studyTypes: ['content-testing', '5-second-test'],
       tags: ['cta', 'conversion', 'first-impression', 'website-testing'],
-      author: 'ResearchHub Team',
+      author: 'Afkar Team',
       version: '1.0.0',
       lastModified: new Date()
     },
@@ -602,7 +602,7 @@ export const ENHANCED_STUDY_TEMPLATES: EnhancedStudyTemplateDefinition[] = [
       difficulty: 'beginner' as const,
       studyTypes: ['survey', 'feedback', 'nps'],
       tags: ['nps', 'customer-satisfaction', 'feedback', 'loyalty'],
-      author: 'ResearchHub Team',
+      author: 'Afkar Team',
       version: '1.0.0',
       lastModified: new Date()
     },

@@ -1,0 +1,458 @@
+/**
+ * USER PROFILE API - PRODUCTION VERSION
+ * Clean production-safe version for Vercel deployment
+ * Handles: User profile management, enhanced user operations, role management
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.I_4j2vgcu2aR9Pw1d-QG2hpKunbmNKD8tWg3Psl0GNc';
+
+// Initialize Supabase clients
+const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+console.log('🔧 User Profile API initialized for production');
+
+/**
+ * Helper function to authenticate user
+ */
+async function authenticateUser(req, requiredRoles = []) {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { success: false, error: 'Missing or invalid authorization header', status: 401 };
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Get user profile for role information
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.log('⚠️ Profile fetch failed:', profileError.message);
+      // Continue without profile, use user metadata
+    }
+
+    const userRole = profile?.role || user.user_metadata?.role || 'participant';
+
+    // Check role requirements
+    if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+      return { 
+        success: false, 
+        error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+        status: 403 
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        profile: profile
+      }
+    };
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication service error', status: 500 };
+  }
+}
+
+/**
+ * Main API handler
+ */
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    const { action } = req.query;
+
+    switch (action) {
+      case 'get-profile':
+        return await getProfile(req, res);
+      
+      case 'update-profile':
+        return await updateProfile(req, res);
+      
+      case 'upload-avatar':
+        return await uploadAvatar(req, res);
+      
+      case 'delete-profile':
+        return await deleteProfile(req, res);
+      
+      case 'get-users':
+        return await getUsers(req, res);
+      
+      case 'update-user-role':
+        return await updateUserRole(req, res);
+      
+      case 'get-user-stats':
+        return await getUserStats(req, res);
+      
+      default:
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Invalid action parameter' 
+        });
+    }
+
+  } catch (error) {
+    console.error('User Profile API error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Internal server error' 
+    });
+  }
+}
+
+/**
+ * Get user profile
+ */
+async function getProfile(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', auth.user.id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error('Database error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch profile' 
+      });
+    }
+
+    // If no profile exists, create a basic one
+    if (!profile) {
+      const newProfile = {
+        id: auth.user.id,
+        email: auth.user.email,
+        full_name: auth.user.email.split('@')[0],
+        role: auth.user.role || 'participant',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: createdProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert([newProfile])
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Profile creation error:', createError);
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Failed to create profile' 
+        });
+      }
+
+      return res.status(200).json({ 
+        success: true, 
+        data: createdProfile 
+      });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      data: profile 
+    });
+
+  } catch (error) {
+    console.error('Get profile error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch profile' 
+    });
+  }
+}
+
+/**
+ * Update user profile
+ */
+async function updateProfile(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const updateData = req.body;
+
+    // Remove sensitive fields that shouldn't be updated directly
+    delete updateData.id;
+    delete updateData.email;
+    delete updateData.created_at;
+    delete updateData.role; // Role updates require admin privileges
+
+    // Add timestamp
+    updateData.updated_at = new Date().toISOString();
+
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .update(updateData)
+      .eq('id', auth.user.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to update profile' 
+      });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      data: profile 
+    });
+
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to update profile' 
+    });
+  }
+}
+
+/**
+ * Upload avatar (placeholder - would integrate with storage service)
+ */
+async function uploadAvatar(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    // For now, return a placeholder response
+    // In a real implementation, this would handle file upload to storage
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Avatar upload functionality not yet implemented',
+      avatar_url: null 
+    });
+
+  } catch (error) {
+    console.error('Upload avatar error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to upload avatar' 
+    });
+  }
+}
+
+/**
+ * Delete user profile
+ */
+async function deleteProfile(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    // Delete profile from database
+    const { error } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', auth.user.id);
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to delete profile' 
+      });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Profile deleted successfully' 
+    });
+
+  } catch (error) {
+    console.error('Delete profile error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to delete profile' 
+    });
+  }
+}
+
+/**
+ * Get users (admin only)
+ */
+async function getUsers(req, res) {
+  const auth = await authenticateUser(req, ['admin']);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const { data: users, error } = await supabase
+      .from('profiles')
+      .select('id, email, full_name, role, created_at, updated_at, last_sign_in_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch users' 
+      });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      data: users || [] 
+    });
+
+  } catch (error) {
+    console.error('Get users error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch users' 
+    });
+  }
+}
+
+/**
+ * Update user role (admin only)
+ */
+async function updateUserRole(req, res) {
+  const auth = await authenticateUser(req, ['admin']);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const { userId, role } = req.body;
+
+    if (!userId || !role) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'User ID and role are required' 
+      });
+    }
+
+    const validRoles = ['participant', 'researcher', 'admin'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid role. Must be one of: ' + validRoles.join(', ') 
+      });
+    }
+
+    const { data: user, error } = await supabase
+      .from('profiles')
+      .update({ 
+        role: role,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to update user role' 
+      });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      data: user 
+    });
+
+  } catch (error) {
+    console.error('Update user role error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to update user role' 
+    });
+  }
+}
+
+/**
+ * Get user statistics (admin only)
+ */
+async function getUserStats(req, res) {
+  const auth = await authenticateUser(req, ['admin']);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    // Get user counts by role
+    const { data: roleStats, error: roleError } = await supabase
+      .from('profiles')
+      .select('role')
+      .not('role', 'is', null);
+
+    if (roleError) {
+      console.error('Database error:', roleError);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch user statistics' 
+      });
+    }
+
+    // Count users by role
+    const stats = {
+      total: roleStats.length,
+      participants: roleStats.filter(u => u.role === 'participant').length,
+      researchers: roleStats.filter(u => u.role === 'researcher').length,
+      admins: roleStats.filter(u => u.role === 'admin').length
+    };
+
+    return res.status(200).json({ 
+      success: true, 
+      data: stats 
+    });
+
+  } catch (error) {
+    console.error('Get user stats error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch user statistics' 
+    });
+  }
+}

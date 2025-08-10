@@ -15,19 +15,19 @@ sentryIntegration.init()
 initializeDebugSuite()
 
 // Log initialization with enhanced debugging
-devDebugConsole.log('🚀 ResearchHub application initializing', {
+devDebugConsole.log('🚀 Afkar application initializing', {
   environment: import.meta.env.MODE,
   timestamp: Date.now(),
   debugSuite: 'Phase 1 + Phase 2 Active',
-  tools: ['Sentry', 'DevDebugConsole', 'SmartErrorBoundary', 'ResearchFlowMonitor', 'BusinessLogicValidator', 'PerformanceIntelligence']
+  tools: ['Sentry', 'DevDebugConsole', 'SmartErrorBoundary', 'AfkarFlowMonitor', 'BusinessLogicValidator', 'PerformanceIntelligence']
 })
 
 // In development, show debug keyboard shortcuts
 if (import.meta.env.DEV) {
   setTimeout(() => {
-    console.log('🎯 ResearchHub Debug Tools Ready!')
+    console.log('🎯 Afkar Debug Tools Ready!')
     console.log('Press Ctrl+Shift+D to open debug console')
-    console.log('Global debug tools: window.ResearchHubDebugUtils')
+    console.log('Global debug tools: window.AfkarDebugUtils')
   }, 1000)
 }
 

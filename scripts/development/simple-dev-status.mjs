@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 
-console.log('🔍 ResearchHub Development Status');
+console.log('🔍 Afkar Development Status');
 console.log('=' .repeat(40));
 
 try {
