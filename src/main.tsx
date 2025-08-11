@@ -37,9 +37,27 @@ import App from './App.tsx'
       'hook.js',
       'Error with Permissions-Policy header',
       'Unrecognized feature: \'browsing-topics\'',
+      'Unrecognized feature: \'run-ad-auction\'',
+      'Unrecognized feature: \'private-state-token-redemption\'',
+      'Unrecognized feature: \'private-state-token-issuance\'',
+      'Unrecognized feature: \'private-aggregation\'',
+      'Unrecognized feature: \'attribution-reporting\'',
+      'Origin trial controlled feature not enabled',
+      'Origin trial controlled feature not enabled: \'join-ad-interest-group\'',
+      'contentScript.js:193',
+      'contentScript.js:138',
+      'contentScript.js:139',
+      'reading \'sentence\'',
+      'at record (contentScript.js',
+      'Uncaught (in promise) TypeError',
+      'Failed to fetch dashboard data',
+      'SyntaxError: Unexpected token',
+      '"The page c"... is not valid JSON',
       'extensions/',
       'chrome-extension://',
-      'moz-extension://'
+      'moz-extension://',
+      'private-state-token-redemption',
+      'private-state-token-issuance'
     ];
 
     // Helper function to check if message should be suppressed

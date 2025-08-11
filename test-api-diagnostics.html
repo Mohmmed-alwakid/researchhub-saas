@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 API Endpoint Diagnostics</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+            line-height: 1.6;
+        }
+        .container {
+            background: #000;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #00ff00;
+        }
+        .endpoint-test {
+            background: #1a1a1a;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #00ff00;
+        }
+        .button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        .button:hover {
+            background: #33ff33;
+        }
+        .result {
+            background: #111;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffff00; }
+        .info { color: #00ffff; }
+        h1, h2, h3 { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 API ENDPOINT DIAGNOSTICS</h1>
+        <p>Testing all API endpoints to identify 404 issues</p>
+
+        <div class="endpoint-test">
+            <h3>📊 Studies API Tests</h3>
+            <button class="button" onclick="testEndpoint('/api/studies', 'GET')">GET /api/studies</button>
+            <button class="button" onclick="testEndpoint('/api/studies', 'POST', {title: 'Test Study'})">POST /api/studies</button>
+            <div id="studies-result" class="result">Click buttons to test endpoints...</div>
+        </div>
+
+        <div class="endpoint-test">
+            <h3>🔬 Research API Tests</h3>
+            <button class="button" onclick="testEndpoint('/api/research-consolidated?action=get-studies', 'GET')">GET Research Consolidated</button>
+            <button class="button" onclick="testEndpoint('/api/research-consolidated', 'POST', {action: 'get-studies'})">POST Research Consolidated</button>
+            <div id="research-result" class="result">Click buttons to test endpoints...</div>
+        </div>
+
+        <div class="endpoint-test">
+            <h3>💚 Health API Tests</h3>
+            <button class="button" onclick="testEndpoint('/api/health', 'GET')">GET /api/health</button>
+            <div id="health-result" class="result">Click buttons to test endpoints...</div>
+        </div>
+
+        <div class="endpoint-test">
+            <h3>🔐 Authentication API Tests</h3>
+            <button class="button" onclick="testEndpoint('/api/auth-consolidated?action=check-session', 'GET')">GET Auth Check</button>
+            <div id="auth-result" class="result">Click buttons to test endpoints...</div>
+        </div>
+
+        <div class="endpoint-test">
+            <h3>📋 All Endpoints Status</h3>
+            <button class="button" onclick="testAllEndpoints()">🧪 Test All Endpoints</button>
+            <button class="button" onclick="clearResults()">🧹 Clear Results</button>
+            <div id="summary-result" class="result">Click "Test All Endpoints" for comprehensive testing...</div>
+        </div>
+
+        <div class="endpoint-test">
+            <h3>🛠️ Console Error Simulation</h3>
+            <p>Simulate the exact console errors you reported:</p>
+            <button class="button" onclick="simulateOriginalErrors()">⚠️ Simulate Original Errors</button>
+            <button class="button" onclick="checkConsoleNow()">👀 Check Console Now</button>
+            <div id="console-result" class="result">Console error simulation results will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        async function testEndpoint(url, method = 'GET', body = null) {
+            const resultId = url.includes('studies') ? 'studies-result' : 
+                            url.includes('research') ? 'research-result' :
+                            url.includes('health') ? 'health-result' :
+                            url.includes('auth') ? 'auth-result' : 'summary-result';
+            
+            const resultElement = document.getElementById(resultId);
+            resultElement.innerHTML = `<span class="info">Testing ${method} ${url}...</span>\n`;
+
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (body && (method === 'POST' || method === 'PUT')) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const startTime = Date.now();
+                const response = await fetch(url, options);
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                let resultText = '';
+                let data;
+                
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = await response.text();
+                }
+
+                resultText += `<span class="info">REQUEST:</span>\n`;
+                resultText += `  Method: ${method}\n`;
+                resultText += `  URL: ${url}\n`;
+                resultText += `  Headers: Content-Type: application/json\n`;
+                if (body) resultText += `  Body: ${JSON.stringify(body, null, 2)}\n`;
+                
+                resultText += `\n<span class="${response.ok ? 'success' : 'error'}">RESPONSE:</span>\n`;
+                resultText += `  Status: ${response.status} ${response.statusText}\n`;
+                resultText += `  Response Time: ${responseTime}ms\n`;
+                resultText += `  Headers: ${JSON.stringify(Object.fromEntries(response.headers), null, 2)}\n`;
+                
+                resultText += `\n<span class="info">DATA:</span>\n`;
+                resultText += typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+
+                if (!response.ok) {
+                    resultText += `\n\n<span class="error">❌ ENDPOINT FAILED</span>`;
+                    if (response.status === 404) {
+                        resultText += `\n<span class="warning">⚠️ 404 - Endpoint not found or not properly configured</span>`;
+                    }
+                } else {
+                    resultText += `\n\n<span class="success">✅ ENDPOINT WORKING</span>`;
+                }
+
+                resultElement.innerHTML = resultText;
+
+            } catch (error) {
+                resultElement.innerHTML = `<span class="error">❌ NETWORK ERROR:</span>\n${error.message}\n\n<span class="warning">Check if development server is running at http://localhost:5175</span>`;
+            }
+        }
+
+        async function testAllEndpoints() {
+            const summaryElement = document.getElementById('summary-result');
+            summaryElement.innerHTML = '<span class="info">🧪 Running comprehensive endpoint tests...</span>\n\n';
+
+            const endpoints = [
+                { url: '/api/health', method: 'GET' },
+                { url: '/api/studies', method: 'GET' },
+                { url: '/api/research-consolidated?action=get-studies', method: 'GET' },
+                { url: '/api/auth-consolidated?action=check-session', method: 'GET' },
+                { url: '/api/admin-consolidated?action=overview', method: 'GET' },
+                { url: '/api/system-consolidated?action=status', method: 'GET' }
+            ];
+
+            let results = '';
+            let passCount = 0;
+            let failCount = 0;
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url);
+                    const status = response.ok ? '✅' : '❌';
+                    const statusText = response.ok ? 'PASS' : 'FAIL';
+                    
+                    results += `${status} ${endpoint.method} ${endpoint.url} - ${response.status} - ${statusText}\n`;
+                    
+                    if (response.ok) {
+                        passCount++;
+                    } else {
+                        failCount++;
+                    }
+                } catch (error) {
+                    results += `❌ ${endpoint.method} ${endpoint.url} - NETWORK ERROR - ${error.message}\n`;
+                    failCount++;
+                }
+            }
+
+            results += `\n📊 SUMMARY:\n`;
+            results += `✅ Passed: ${passCount}\n`;
+            results += `❌ Failed: ${failCount}\n`;
+            results += `📈 Success Rate: ${Math.round((passCount / (passCount + failCount)) * 100)}%\n`;
+
+            summaryElement.innerHTML = results;
+        }
+
+        function simulateOriginalErrors() {
+            const consoleElement = document.getElementById('console-result');
+            consoleElement.innerHTML = '<span class="warning">⚠️ Simulating exact errors from your report...</span>\n\n';
+
+            // Simulate the exact errors you reported
+            console.warn("This page is not reloaded");
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'browsing-topics'.");
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'run-ad-auction'.");
+            console.warn("Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'join-ad-interest-group'.");
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-redemption'.");
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-issuance'.");
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'private-aggregation'.");
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'attribution-reporting'.");
+            console.warn("contentScript.js:193 This page is not reloaded");
+            console.error("contentScript.js:138 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'sentence')");
+            console.error("contentScript.js:139 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'sentence')");
+            console.error("hook.js:608 Failed to fetch dashboard data: SyntaxError: Unexpected token 'T', \"The page c\"... is not valid JSON");
+
+            consoleElement.innerHTML += '<span class="info">🔇 All errors simulated. Check console:</span>\n';
+            consoleElement.innerHTML += '<span class="success">✅ If suppression is working, you should NOT see these errors in console</span>\n';
+            consoleElement.innerHTML += '<span class="error">❌ If you still see these errors, suppression needs adjustment</span>\n';
+        }
+
+        function checkConsoleNow() {
+            const consoleElement = document.getElementById('console-result');
+            consoleElement.innerHTML = '<span class="info">👀 Manual Console Check Instructions:</span>\n\n';
+            consoleElement.innerHTML += '1. Open Browser DevTools (F12)\n';
+            consoleElement.innerHTML += '2. Go to Console tab\n';
+            consoleElement.innerHTML += '3. Clear console (Ctrl+L)\n';
+            consoleElement.innerHTML += '4. Click "Simulate Original Errors" button\n';
+            consoleElement.innerHTML += '5. Check if errors appear in console\n\n';
+            consoleElement.innerHTML += '<span class="success">✅ SUCCESS: No suppressed errors visible</span>\n';
+            consoleElement.innerHTML += '<span class="error">❌ FAILURE: Suppressed errors still appearing</span>\n';
+        }
+
+        function clearResults() {
+            document.querySelectorAll('.result').forEach(el => {
+                el.innerHTML = 'Results cleared...';
+            });
+        }
+
+        // Auto-test health endpoint on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔗 API Endpoint Diagnostics loaded');
+            setTimeout(() => testEndpoint('/api/health', 'GET'), 1000);
+        });
+    </script>
+</body>
+</html>
