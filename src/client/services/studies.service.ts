@@ -76,7 +76,7 @@ export const studiesService = {
    */
   async getStudies(filters: StudyFilters = {}): Promise<StudiesResponse> {
     const params = new URLSearchParams();
-    params.append('action', 'studies');
+    params.append('action', 'get-studies');
     
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== '') {

@@ -60,26 +60,48 @@ export default async function handler(req, res) {
       case 'get-studies':
         return res.status(200).json({
           success: true,
-          data: [
+          studies: [
             {
-              id: 1,
+              id: '1',
               title: 'Sample User Research Study',
               description: 'A sample study for testing purposes',
               status: 'active',
+              target_participants: 50,
               created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
               created_by: 'test-user',
               profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
             },
             {
-              id: 2,
+              id: '2',
               title: 'Product Testing Study',
               description: 'Testing new product features',
               status: 'draft',
+              target_participants: 30,
               created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: 'test-user',
+              profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
+            },
+            {
+              id: '3',
+              title: 'User Experience Research',
+              description: 'Evaluating user interface improvements',
+              status: 'completed',
+              target_participants: 75,
+              created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+              updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
               created_by: 'test-user',
               profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
             }
-          ]
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            totalStudies: 3,
+            hasNext: false,
+            hasPrev: false
+          }
         });
 
       default:
