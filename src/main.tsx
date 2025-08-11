@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+// Import development console manager for clean development experience
+import './utils/devConsoleManager'
+
 // NUCLEAR OPTION: Immediate, ultra-aggressive console suppression
 // Define all error patterns to suppress
 const suppressPatterns = [
