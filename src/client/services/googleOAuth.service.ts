@@ -35,7 +35,7 @@ class GoogleOAuthService {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: options.redirectTo || `${window.location.origin}/auth/callback`,
+          redirectTo: options.redirectTo || `${window.location.origin}/auth/google/callback`,
           scopes: options.scopes || 'openid email profile',
         },
       });

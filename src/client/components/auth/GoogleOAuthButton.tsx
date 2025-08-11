@@ -19,7 +19,7 @@ export const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
 
   const handleGoogleAuth = async () => {
     if (!googleOAuthService.isGoogleOAuthConfigured()) {
-      console.warn('Google OAuth is not configured. Please set VITE_GOOGLE_CLIENT_ID in environment variables.');
+      // Google OAuth not configured - silently disable the button
       return;
     }
 

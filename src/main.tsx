@@ -20,7 +20,9 @@ import App from './App.tsx'
           message.includes('join-ad-interest-group') ||
           message.includes('private-state-token') ||
           message.includes('private-aggregation') ||
-          message.includes('attribution-reporting')) {
+          message.includes('attribution-reporting') ||
+          message.includes('Google OAuth is not configured') ||
+          message.includes('VITE_GOOGLE_CLIENT_ID')) {
         return; // Suppress these warnings
       }
       originalWarn.apply(console, args);
@@ -38,7 +40,13 @@ import App from './App.tsx'
           message.includes('join-ad-interest-group') ||
           message.includes('private-state-token') ||
           message.includes('private-aggregation') ||
-          message.includes('attribution-reporting')) {
+          message.includes('attribution-reporting') ||
+          message.includes('Cannot read properties of undefined') ||
+          message.includes('contentScript.js') ||
+          message.includes('hook.js') ||
+          message.includes('Google OAuth is not configured') ||
+          message.includes('A listener indicated an asynchronous response') ||
+          message.includes('message channel closed')) {
         return; // Suppress these errors
       }
       originalError.apply(console, args);

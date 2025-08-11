@@ -134,6 +134,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+            <Route path="/auth/google/callback" element={<OAuthCallbackPage />} />
             
             {/* Admin Dashboard Routes - Separate from AppLayout */}
             <Route path="/app/admin/*" element={
