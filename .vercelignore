@@ -10,6 +10,9 @@ api/*
 !api/system-consolidated.js
 !api/admin-consolidated.js
 !api/setup.js
+!api/wallet.js
+!api/password.js
+!api/applications.js
 
 ## Ignore subdirectories completely
 

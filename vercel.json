@@ -80,7 +80,10 @@
     "api/payments-consolidated-full.js": { "maxDuration": 30 },
     "api/user-profile-consolidated.js": { "maxDuration": 30 },
     "api/system-consolidated.js": { "maxDuration": 30 },
-    "api/admin-consolidated.js": { "maxDuration": 30 }
+    "api/admin-consolidated.js": { "maxDuration": 30 },
+    "api/wallet.js": { "maxDuration": 30 },
+    "api/password.js": { "maxDuration": 30 },
+    "api/applications.js": { "maxDuration": 30 }
   },
   "regions": ["iad1"],
   "framework": "vite"

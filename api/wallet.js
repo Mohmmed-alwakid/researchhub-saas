@@ -1,6 +1,7 @@
 /**
- * WALLET MANAGEMENT API
- * Handles: User wallets, transactions, and withdrawals
+ * WALLET API (SINGULAR) - Frontend Compatibility
+ * Handles: User wallet data, transactions, and withdrawals
+ * Note: This is the singular version that the frontend expects
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -14,7 +15,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJ
 const supabase = createClient(supabaseUrl, supabaseKey);
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-console.log('💰 Wallet API initialized');
+console.log('💰 Wallet API (singular) initialized for frontend compatibility');
 
 /**
  * Helper function to authenticate user
@@ -74,7 +75,7 @@ export default async function handler(req, res) {
       case 'transactions':
         return await getTransactions(req, res);
       
-      case 'withdrawals':
+      case 'withdrawal-requests':
         return await getWithdrawals(req, res);
       
       case 'create-withdrawal':
@@ -163,7 +164,7 @@ async function getTransactions(req, res) {
 }
 
 /**
- * Get user withdrawals
+ * Get user withdrawals (handles withdrawal-requests action)
  */
 async function getWithdrawals(req, res) {
   const auth = await authenticateUser(req);

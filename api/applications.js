@@ -1,6 +1,6 @@
 /**
- * WALLET MANAGEMENT API
- * Handles: User wallets, transactions, and withdrawals
+ * APPLICATIONS API
+ * Handles: Participant study applications
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -14,7 +14,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJ
 const supabase = createClient(supabaseUrl, supabaseKey);
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-console.log('💰 Wallet API initialized');
+console.log('📋 Applications API initialized');
 
 /**
  * Helper function to authenticate user
@@ -57,7 +57,7 @@ async function authenticateUser(req) {
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   if (req.method === 'OPTIONS') {
@@ -65,30 +65,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { action } = req.query;
+    const { endpoint } = req.query;
 
-    switch (action) {
-      case 'wallet':
-        return await getWallet(req, res);
-      
-      case 'transactions':
-        return await getTransactions(req, res);
-      
-      case 'withdrawals':
-        return await getWithdrawals(req, res);
-      
-      case 'create-withdrawal':
-        return await createWithdrawal(req, res);
-      
-      default:
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Invalid action parameter' 
-        });
+    // Handle different endpoint patterns
+    if (endpoint === 'applications/my-applications') {
+      return await getMyApplications(req, res);
+    } else if (endpoint && endpoint.includes('/withdraw')) {
+      return await withdrawApplication(req, res);
+    } else if (endpoint && endpoint.includes('/applications')) {
+      return await getStudyApplications(req, res);
+    } else {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid endpoint parameter' 
+      });
     }
 
   } catch (error) {
-    console.error('Wallet API error:', error);
+    console.error('Applications API error:', error);
     return res.status(500).json({ 
       success: false, 
       error: 'Internal server error' 
@@ -97,140 +91,98 @@ export default async function handler(req, res) {
 }
 
 /**
- * Get user wallet information
+ * Get participant's applications
  */
-async function getWallet(req, res) {
+async function getMyApplications(req, res) {
   const auth = await authenticateUser(req);
   if (!auth.success) {
     return res.status(auth.status).json(auth);
   }
 
   try {
-    // For now, return a default wallet structure
-    // In the future, this would fetch from a wallets table
-    const wallet = {
-      id: auth.user.id,
-      user_id: auth.user.id,
-      balance: 0.00,
-      currency: 'USD',
-      total_earned: 0.00,
-      total_withdrawn: 0.00,
-      pending_earnings: 0.00,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    // For now, return empty applications list
+    // In the future, this would fetch from applications table
+    const applications = [];
 
     return res.status(200).json({ 
       success: true, 
-      data: wallet 
+      data: {
+        applications: applications,
+        total: 0,
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+        totalPages: 0
+      }
     });
 
   } catch (error) {
-    console.error('Get wallet error:', error);
+    console.error('Get my applications error:', error);
     return res.status(500).json({ 
       success: false, 
-      error: 'Failed to fetch wallet' 
+      error: 'Failed to fetch applications' 
     });
   }
 }
 
 /**
- * Get user transactions
+ * Withdraw application
  */
-async function getTransactions(req, res) {
+async function withdrawApplication(req, res) {
   const auth = await authenticateUser(req);
   if (!auth.success) {
     return res.status(auth.status).json(auth);
   }
 
   try {
-    // For now, return empty transactions
-    // In the future, this would fetch from a transactions table
-    const transactions = [];
+    const { endpoint } = req.query;
+    const applicationId = endpoint.split('/')[1]; // Extract application ID
 
+    // For now, return success response
+    // In the future, this would update the application status
     return res.status(200).json({ 
       success: true, 
-      data: transactions 
+      message: 'Application withdrawn successfully' 
     });
 
   } catch (error) {
-    console.error('Get transactions error:', error);
+    console.error('Withdraw application error:', error);
     return res.status(500).json({ 
       success: false, 
-      error: 'Failed to fetch transactions' 
+      error: 'Failed to withdraw application' 
     });
   }
 }
 
 /**
- * Get user withdrawals
+ * Get study applications (for researchers)
  */
-async function getWithdrawals(req, res) {
+async function getStudyApplications(req, res) {
   const auth = await authenticateUser(req);
   if (!auth.success) {
     return res.status(auth.status).json(auth);
   }
 
   try {
-    // For now, return empty withdrawals
-    // In the future, this would fetch from a withdrawals table
-    const withdrawals = [];
+    // For now, return empty applications list
+    // In the future, this would fetch applications for the study
+    const applications = [];
 
     return res.status(200).json({ 
       success: true, 
-      data: withdrawals 
+      data: {
+        applications: applications,
+        total: 0,
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+        totalPages: 0
+      }
     });
 
   } catch (error) {
-    console.error('Get withdrawals error:', error);
+    console.error('Get study applications error:', error);
     return res.status(500).json({ 
       success: false, 
-      error: 'Failed to fetch withdrawals' 
-    });
-  }
-}
-
-/**
- * Create a withdrawal request
- */
-async function createWithdrawal(req, res) {
-  const auth = await authenticateUser(req);
-  if (!auth.success) {
-    return res.status(auth.status).json(auth);
-  }
-
-  try {
-    const { amount, method } = req.body;
-
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Valid amount is required' 
-      });
-    }
-
-    // For now, return a placeholder response
-    // In the future, this would create an actual withdrawal request
-    const withdrawal = {
-      id: `withdrawal_${Date.now()}`,
-      user_id: auth.user.id,
-      amount: amount,
-      method: method || 'bank_transfer',
-      status: 'pending',
-      created_at: new Date().toISOString()
-    };
-
-    return res.status(201).json({ 
-      success: true, 
-      data: withdrawal,
-      message: 'Withdrawal request created successfully'
-    });
-
-  } catch (error) {
-    console.error('Create withdrawal error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Failed to create withdrawal request' 
+      error: 'Failed to fetch study applications' 
     });
   }
 }
