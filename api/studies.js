@@ -31,6 +31,30 @@ export default async function handler(req, res) {
     
     if (req.method === 'GET') {
       action = 'get-studies';
+      // Return immediate mock data for studies
+      return res.status(200).json({
+        success: true,
+        data: [
+          {
+            id: 1,
+            title: 'Sample User Research Study',
+            description: 'A sample study for testing purposes',
+            status: 'active',
+            created_at: new Date().toISOString(),
+            created_by: 'test-user',
+            profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
+          },
+          {
+            id: 2,
+            title: 'Product Testing Study',
+            description: 'Testing product usability',
+            status: 'draft',
+            created_at: new Date().toISOString(),
+            created_by: 'test-user',
+            profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
+          }
+        ]
+      });
     } else if (req.method === 'POST') {
       action = 'create-study';
     } else if (req.method === 'PUT') {

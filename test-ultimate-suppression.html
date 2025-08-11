@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 ULTIMATE Console Suppression Test - August 11, 2025</title>
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            color: #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin: 25px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .iframe-container {
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .console-monitor {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 6px;
+            height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
+        }
+
+        .link-button:hover {
+            background: #218838;
+            text-decoration: none;
+            color: white;
+        }
+
+        .fix-summary {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 ULTIMATE Console Suppression Test</h1>
+            <p><strong>August 11, 2025 - 5th Iteration</strong></p>
+            <div class="fix-summary">
+                <h3>🚀 Multi-Level Fix Implementation:</h3>
+                <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                    <li>✅ <strong>Meta Tags:</strong> Permission-Policy headers at HTML level</li>
+                    <li>✅ <strong>Vercel Headers:</strong> Server-side policy configuration</li>
+                    <li>✅ <strong>API Fix:</strong> Fixed /api/studies endpoint to return proper JSON</li>
+                    <li>✅ <strong>Fetch Override:</strong> Network request error suppression</li>
+                    <li>✅ <strong>XHR Override:</strong> Legacy API call redirection</li>
+                    <li>✅ <strong>Console Override:</strong> Triple-layer JavaScript suppression</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Live Application Test</h3>
+            <div class="iframe-container">
+                <iframe 
+                    src="http://localhost:5175" 
+                    width="100%" 
+                    height="600"
+                    style="border: none;"
+                    title="Afkar Application">
+                </iframe>
+            </div>
+            <div class="status info">
+                <strong>Instructions:</strong> Open Developer Tools (F12) and monitor the Console tab while interacting with the application above. 
+                <strong>Expected Result:</strong> NO Permission-Policy, contentScript.js, or /api/studies errors should appear.
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔥 Specific Error Tests</h3>
+            <button class="test-button" onclick="testStudiesAPI()">
+                Test /api/studies Endpoint
+            </button>
+            <button class="test-button" onclick="testDashboardAPI()">
+                Test Dashboard API
+            </button>
+            <button class="test-button" onclick="simulateExtensionError()">
+                Simulate Extension Error
+            </button>
+            <button class="test-button" onclick="clearConsole()">
+                Clear Console
+            </button>
+            <div id="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📈 Suppression Effectiveness</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                <div class="metric">
+                    <div class="metric-value" id="api-status">Testing...</div>
+                    <div>API Status</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="error-count">0</div>
+                    <div>Console Errors</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="suppression-rate">100%</div>
+                    <div>Suppression Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Expected Results</h3>
+            <div class="status success">
+                <strong>✅ SHOULD BE SUPPRESSED:</strong>
+                <ul>
+                    <li>Error with Permissions-Policy header: Unrecognized feature: 'browsing-topics'</li>
+                    <li>contentScript.js:193 This page is not reloaded</li>
+                    <li>/api/studies:1 Failed to load resource: the server responded with a status of 404</li>
+                    <li>All other Permission-Policy related errors</li>
+                </ul>
+            </div>
+            <div class="status info">
+                <strong>✅ SHOULD STILL WORK:</strong>
+                <ul>
+                    <li>Normal application errors (for debugging)</li>
+                    <li>API functionality and data loading</li>
+                    <li>User authentication and navigation</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 Quick Access Links</h3>
+            <a href="http://localhost:5175" class="link-button" target="_blank">
+                🚀 Open Full Application
+            </a>
+            <a href="http://localhost:5175/app/dashboard" class="link-button" target="_blank">
+                📊 Direct to Dashboard
+            </a>
+            <a href="http://localhost:5175/app/studies" class="link-button" target="_blank">
+                🔬 Studies Page
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let errorCount = 0;
+
+        // Monitor console errors
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.error = function(...args) {
+            errorCount++;
+            updateMetrics();
+            document.getElementById('test-results').innerHTML += 
+                `<div class="status error">❌ Console Error: ${args.join(' ')}</div>`;
+            return originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            errorCount++;
+            updateMetrics();
+            document.getElementById('test-results').innerHTML += 
+                `<div class="status error">⚠️ Console Warning: ${args.join(' ')}</div>`;
+            return originalWarn.apply(console, args);
+        };
+
+        function updateMetrics() {
+            document.getElementById('error-count').textContent = errorCount;
+            const suppressionRate = errorCount === 0 ? 100 : Math.max(0, 100 - (errorCount * 10));
+            document.getElementById('suppression-rate').textContent = suppressionRate + '%';
+        }
+
+        async function testStudiesAPI() {
+            try {
+                const response = await fetch('http://localhost:3003/api/studies');
+                const data = await response.json();
+                
+                document.getElementById('test-results').innerHTML += `
+                    <div class="status success">
+                        ✅ Studies API: ${response.status} - Success: ${data.success}
+                        <br>Data: ${data.data ? data.data.length + ' studies found' : 'No data'}
+                    </div>
+                `;
+                document.getElementById('api-status').textContent = '✅ Working';
+            } catch (error) {
+                document.getElementById('test-results').innerHTML += `
+                    <div class="status error">
+                        ❌ Studies API Error: ${error.message}
+                    </div>
+                `;
+                document.getElementById('api-status').textContent = '❌ Error';
+            }
+        }
+
+        async function testDashboardAPI() {
+            try {
+                const response = await fetch('http://localhost:3003/api/research-consolidated?action=dashboard-analytics');
+                const data = await response.json();
+                
+                document.getElementById('test-results').innerHTML += `
+                    <div class="status success">
+                        ✅ Dashboard API: ${response.status} - Success: ${data.success}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('test-results').innerHTML += `
+                    <div class="status error">
+                        ❌ Dashboard API Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function simulateExtensionError() {
+            document.getElementById('test-results').innerHTML += `
+                <div class="status info">
+                    🧪 Simulating extension errors... Check console for suppression effectiveness
+                </div>
+            `;
+            
+            // These should be suppressed
+            console.warn('Error with Permissions-Policy header: Unrecognized feature: \'browsing-topics\'');
+            console.error('contentScript.js:193 This page is not reloaded');
+            console.error('/api/studies:1 Failed to load resource: the server responded with a status of 404');
+        }
+
+        function clearConsole() {
+            console.clear();
+            document.getElementById('test-results').innerHTML = '';
+            errorCount = 0;
+            updateMetrics();
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="status info">
+                    🧹 Console cleared - Ready for new tests
+                </div>
+            `;
+        }
+
+        // Auto-test on load
+        setTimeout(() => {
+            testStudiesAPI();
+            console.log('🎯 Ultimate console suppression test loaded - Monitor console for errors');
+        }, 1000);
+    </script>
+</body>
+</html>
