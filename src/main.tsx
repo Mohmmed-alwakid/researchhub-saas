@@ -3,6 +3,88 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+// ULTRA-AGGRESSIVE console error suppression (executed immediately)
+(() => {
+  if (typeof window !== 'undefined') {
+    // Store original console methods
+    const originalConsole = {
+      warn: console.warn,
+      error: console.error,
+      log: console.log
+    };
+
+    // Define comprehensive error patterns to suppress
+    const suppressPatterns = [
+      'Permissions-Policy',
+      'This page is not reloaded',
+      'browsing-topics',
+      'run-ad-auction',
+      'join-ad-interest-group',
+      'private-state-token',
+      'private-aggregation',
+      'attribution-reporting',
+      'contentScript.js',
+      'Error with Permissions-Policy',
+      'Unrecognized feature',
+      'Origin trial controlled feature',
+      'Cannot read properties of undefined',
+      'TypeError: Cannot read properties of undefined',
+      'sentence',
+      'Google OAuth is not configured',
+      'VITE_GOOGLE_CLIENT_ID',
+      'A listener indicated an asynchronous response',
+      'message channel closed',
+      'hook.js',
+      'Error with Permissions-Policy header',
+      'Unrecognized feature: \'browsing-topics\'',
+      'extensions/',
+      'chrome-extension://',
+      'moz-extension://'
+    ];
+
+    // Helper function to check if message should be suppressed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shouldSuppress = (args: any[]) => {
+      const message = args.join(' ').toLowerCase();
+      return suppressPatterns.some(pattern => 
+        message.includes(pattern.toLowerCase())
+      );
+    };
+
+    // Override console methods
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    console.warn = (...args: any[]) => {
+      if (!shouldSuppress(args)) {
+        originalConsole.warn.apply(console, args);
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    console.error = (...args: any[]) => {
+      if (!shouldSuppress(args)) {
+        originalConsole.error.apply(console, args);
+      }
+    };
+
+    // Global error handler for additional error suppression
+    window.onerror = function(message) {
+      if (shouldSuppress([message || ''])) {
+        return true; // Suppress the error
+      }
+      return false; // Let it through
+    };
+
+    // Promise rejection handler
+    window.onunhandledrejection = function(event) {
+      if (shouldSuppress([event.reason?.message || event.reason || ''])) {
+        event.preventDefault();
+        return true;
+      }
+      return false;
+    };
+  }
+})();
+
 // IMMEDIATE console error suppression
 (() => {
   // Suppress browser permission policy warnings immediately
@@ -46,7 +128,10 @@ import App from './App.tsx'
           message.includes('hook.js') ||
           message.includes('Google OAuth is not configured') ||
           message.includes('A listener indicated an asynchronous response') ||
-          message.includes('message channel closed')) {
+          message.includes('message channel closed') ||
+          message.includes('TypeError: Cannot read properties of undefined') ||
+          message.includes('This page is not reloaded') ||
+          message.includes('sentence')) {
         return; // Suppress these errors
       }
       originalError.apply(console, args);

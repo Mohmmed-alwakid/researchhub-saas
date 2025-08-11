@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Conflict Scenarios Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        .scenario { border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .current { background-color: #fff3cd; border-color: #ffeaa7; }
+        .recommended { background-color: #d4edda; border-color: #c3e6cb; }
+        .problem { background-color: #f8d7da; border-color: #f5c6cb; }
+        .code { font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 3px; margin: 5px 0; }
+        .solution { background-color: #e2e3e5; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Email Conflict Scenarios Analysis</h1>
+    
+    <div class="current">
+        <h2>📋 Current Behavior (Supabase Default)</h2>
+        <p><strong>Question:</strong> Can a user signup with the same email used for Google OAuth?</p>
+        
+        <h3>Scenario 1: Google OAuth First, Then Regular Signup</h3>
+        <ol>
+            <li>User signs up with Google OAuth (user@example.com)</li>
+            <li>Later, user tries to register with regular form using same email</li>
+            <li><strong>Result:</strong> Supabase will reject - "User already exists"</li>
+        </ol>
+        
+        <h3>Scenario 2: Regular Signup First, Then Google OAuth</h3>
+        <ol>
+            <li>User registers with regular form (user@example.com)</li>
+            <li>Later, user tries "Sign in with Google" using same email</li>
+            <li><strong>Result:</strong> Supabase will link the accounts automatically</li>
+        </ol>
+    </div>
+
+    <div class="problem">
+        <h2>⚠️ Potential Issues</h2>
+        <ul>
+            <li><strong>User Confusion:</strong> "I already signed up with Google, why can't I use regular login?"</li>
+            <li><strong>Account Fragmentation:</strong> User might think they need separate accounts</li>
+            <li><strong>Password Reset Issues:</strong> Google OAuth users have no password set</li>
+            <li><strong>Support Burden:</strong> Users will contact support about "can't login" issues</li>
+        </ul>
+    </div>
+
+    <div class="recommended">
+        <h2>✅ Recommended Solution: Account Linking</h2>
+        
+        <h3>Enhanced Registration Flow</h3>
+        <div class="code">
+// When user tries to register with existing OAuth email:
+1. Check if email exists in Supabase
+2. If exists and from OAuth provider:
+   - Show: "This email is already registered with Google. Would you like to sign in with Google instead?"
+   - Provide "Sign in with Google" button
+3. If exists with regular signup:
+   - Show normal "User already exists" message
+</div>
+
+        <h3>Enhanced Login Flow</h3>
+        <div class="code">
+// When user tries regular login with OAuth-only email:
+1. Check if user has password set
+2. If no password (OAuth-only user):
+   - Show: "This account uses Google sign-in. Please use 'Sign in with Google' button"
+   - Provide "Sign in with Google" button
+3. Allow "Add Password" option for OAuth users
+</div>
+    </div>
+
+    <div class="solution">
+        <h2>🔧 Implementation Strategy</h2>
+        
+        <h3>1. Email Existence Check Service</h3>
+        <div class="code">
+// Add to auth service
+async checkEmailExists(email) {
+  // Query Supabase to check if email exists
+  // Return provider information (google, email, both)
+}
+</div>
+
+        <h3>2. Enhanced Error Messages</h3>
+        <div class="code">
+// Instead of generic "User already exists"
+if (existingUser.provider === 'google') {
+  return {
+    success: false,
+    error: 'EMAIL_EXISTS_WITH_GOOGLE',
+    message: 'This email is already registered with Google. Please sign in with Google.',
+    suggestedAction: 'google_signin'
+  }
+}
+</div>
+
+        <h3>3. Account Linking Options</h3>
+        <ul>
+            <li><strong>Link Google to existing account:</strong> Allow OAuth login for email/password users</li>
+            <li><strong>Add password to OAuth account:</strong> Let Google users set a password for regular login</li>
+            <li><strong>Smart redirect:</strong> Automatically suggest correct login method</li>
+        </ul>
+    </div>
+
+    <div class="current">
+        <h2>🎯 Quick Answer to Your Question</h2>
+        <p><strong>Current State:</strong> No, if a user signs up with Google OAuth first, they cannot create a regular account with the same email. Supabase will reject it with "User already exists".</p>
+        
+        <p><strong>User Experience:</strong> This can be confusing for users who might want to use both login methods.</p>
+        
+        <p><strong>Recommendation:</strong> Implement smart email checking and provide clear guidance about which login method to use for each email.</p>
+    </div>
+
+    <script>
+        console.log('🔐 Email Conflict Analysis Loaded');
+        console.log('📧 Current behavior: Google OAuth email cannot be used for regular signup');
+        console.log('💡 Recommendation: Implement account linking and smart error messages');
+    </script>
+</body>
+</html>

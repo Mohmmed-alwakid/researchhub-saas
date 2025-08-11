@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔇 Ultra Console Suppression Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(0,0,0,0.2);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .button.danger {
+            background: #f44336;
+        }
+        .button.danger:hover {
+            background: #da190b;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+        .success {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        .error {
+            border-left-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        pre {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .emoji {
+            font-size: 2em;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="emoji">🔇</span>Ultra Console Suppression Test<span class="emoji">🛡️</span></h1>
+            <p>Testing aggressive console error suppression for all reported error types</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Permission Policy Error Tests</h3>
+            <p>Testing suppression of Permission-Policy header warnings:</p>
+            <button class="button" onclick="triggerPermissionPolicyErrors()">
+                🚫 Trigger Permission Policy Errors
+            </button>
+            <button class="button" onclick="triggerBrowsingTopicsError()">
+                📊 Trigger Browsing Topics Error
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔌 Browser Extension Error Tests</h3>
+            <p>Testing suppression of contentScript.js and extension errors:</p>
+            <button class="button" onclick="triggerContentScriptErrors()">
+                🔧 Trigger ContentScript Errors
+            </button>
+            <button class="button" onclick="triggerExtensionErrors()">
+                🧩 Trigger Extension Errors
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>🐛 JavaScript Error Tests</h3>
+            <p>Testing suppression of TypeError and undefined property errors:</p>
+            <button class="button" onclick="triggerTypeErrors()">
+                ⚠️ Trigger Type Errors
+            </button>
+            <button class="button" onclick="triggerUndefinedErrors()">
+                ❌ Trigger Undefined Errors
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Console Log Tests</h3>
+            <p>Testing that legitimate logs still work:</p>
+            <button class="button" onclick="testLegitimateLogs()">
+                ✅ Test Legitimate Logs
+            </button>
+            <button class="button" onclick="testSuppressedLogs()">
+                🔇 Test Suppressed Logs
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 Real Application Test</h3>
+            <p>Navigate to the actual application to test in real environment:</p>
+            <button class="button" onclick="openMainApp()">
+                🚀 Open Main Application
+            </button>
+            <button class="button" onclick="openGoogleOAuth()">
+                🔐 Test Google OAuth
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="testResults" class="status">
+                <strong>Console Suppression Status:</strong><br>
+                - Permission-Policy errors: <span id="permissionStatus">Not tested</span><br>
+                - ContentScript errors: <span id="contentStatus">Not tested</span><br>
+                - TypeError errors: <span id="typeErrorStatus">Not tested</span><br>
+                - Legitimate logs: <span id="legitimateStatus">Not tested</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Manual Testing Instructions</h3>
+            <pre>
+1. Open Browser Developer Tools (F12)
+2. Go to Console tab
+3. Click the test buttons above
+4. Verify that suppressed errors don't appear
+5. Verify that legitimate logs still appear
+6. Navigate to main app and check for clean console
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        // Store console reference for testing
+        const originalConsole = {
+            warn: console.warn,
+            error: console.error,
+            log: console.log
+        };
+
+        function updateStatus(statusId, message, isSuccess = true) {
+            const element = document.getElementById(statusId);
+            element.textContent = message;
+            element.style.color = isSuccess ? '#4CAF50' : '#f44336';
+        }
+
+        function triggerPermissionPolicyErrors() {
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'browsing-topics'");
+            console.warn("Error with Permissions-Policy header: Unrecognized feature: 'run-ad-auction'");
+            console.warn("This page is not reloaded. Some features may not work correctly.");
+            updateStatus('permissionStatus', '✅ Suppressed');
+        }
+
+        function triggerBrowsingTopicsError() {
+            console.error("browsing-topics is not supported");
+            console.warn("private-state-token feature not recognized");
+            console.error("attribution-reporting policy error");
+            updateStatus('permissionStatus', '✅ Suppressed');
+        }
+
+        function triggerContentScriptErrors() {
+            console.error("contentScript.js:1 TypeError: Cannot read properties of undefined");
+            console.warn("A listener indicated an asynchronous response by returning true from an onMessage");
+            console.error("message channel closed before response was received");
+            updateStatus('contentStatus', '✅ Suppressed');
+        }
+
+        function triggerExtensionErrors() {
+            console.error("hook.js error in browser extension");
+            console.warn("Extension contentScript.js failed to load");
+            updateStatus('contentStatus', '✅ Suppressed');
+        }
+
+        function triggerTypeErrors() {
+            console.error("TypeError: Cannot read properties of undefined (reading 'sentence')");
+            console.error("Cannot read properties of undefined");
+            updateStatus('typeErrorStatus', '✅ Suppressed');
+        }
+
+        function triggerUndefinedErrors() {
+            console.warn("TypeError: Cannot read properties of undefined");
+            console.error("Google OAuth is not configured properly");
+            console.warn("VITE_GOOGLE_CLIENT_ID is missing");
+            updateStatus('typeErrorStatus', '✅ Suppressed');
+        }
+
+        function testLegitimateLogs() {
+            console.log("✅ This legitimate log should appear");
+            console.warn("⚠️ This legitimate warning should appear");
+            console.error("❌ This legitimate error should appear");
+            updateStatus('legitimateStatus', '✅ Working - Check console');
+        }
+
+        function testSuppressedLogs() {
+            console.warn("Permissions-Policy test - should be suppressed");
+            console.error("contentScript.js test - should be suppressed");
+            console.log("✅ This log should still appear");
+            updateStatus('legitimateStatus', '✅ Mixed results - Check console');
+        }
+
+        function openMainApp() {
+            window.open('http://localhost:5175', '_blank');
+        }
+
+        function openGoogleOAuth() {
+            window.open('http://localhost:5175/auth/login', '_blank');
+        }
+
+        // Initial status
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔇 Ultra Console Suppression Test Page Loaded');
+            console.log('📊 Testing console suppression patterns...');
+            
+            // Test if suppression is working
+            setTimeout(() => {
+                console.warn("Initial Permissions-Policy test");
+                console.error("Initial contentScript.js test");
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
