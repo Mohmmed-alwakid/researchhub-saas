@@ -23,7 +23,10 @@ export const debugUtils = {
     import('./DevDebugConsole').then(({ default: console }) => {
       console.logStudyAction(action, studyId, context);
     });
-    // TODO: Integrate with ResearchFlowMonitor once method signatures are aligned
+    // Integrate with ResearchFlowMonitor for comprehensive tracking
+    import('./ResearchFlowMonitor').then(({ default: monitor }) => {
+      monitor.trackStudyStep(studyId, action, context);
+    });
   },
 
   /**
@@ -33,7 +36,12 @@ export const debugUtils = {
     import('./DevDebugConsole').then(({ default: console }) => {
       console.logParticipantJourney(step, context);
     });
-    // TODO: Integrate with ResearchFlowMonitor once method signatures are aligned
+    // Integrate with ResearchFlowMonitor for journey tracking
+    const participantId = context?.participantId as string || 'anonymous';
+    const blockIndex = context?.blockIndex as number || 0;
+    import('./ResearchFlowMonitor').then(({ default: monitor }) => {
+      monitor.trackParticipantBlock(participantId, step, blockIndex, Date.now());
+    });
   },
 
   /**
@@ -43,7 +51,22 @@ export const debugUtils = {
     import('./DevDebugConsole').then(({ default: console }) => {
       console.logPaymentEvent(action, context);
     });
-    // TODO: Integrate with BusinessLogicValidator once transaction structure is defined
+    // Integrate with BusinessLogicValidator for transaction validation
+    if (context && action.includes('transaction')) {
+      import('./BusinessLogicValidator').then(({ default: validator }) => {
+        const transaction = {
+          id: context.transactionId as string || 'temp-' + Date.now(),
+          type: context.type as 'earn' | 'spend' | 'transfer' | 'refund' || 'earn',
+          amount: context.amount as number || 0,
+          participantId: context.participantId as string,
+          researcherId: context.researcherId as string,
+          studyId: context.studyId as string,
+          timestamp: Date.now(),
+          metadata: context
+        };
+        validator.validatePointsTransaction(transaction);
+      });
+    }
   },
 
   /**

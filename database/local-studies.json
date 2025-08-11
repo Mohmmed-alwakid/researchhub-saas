@@ -4,6 +4,70 @@
     "id": "2",
     "title": "Product Testing Study",
     "description": "Testing new product features",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [
+      {
+        "id": "block_1754931775939_welcome",
+        "order": 1,
+        "type": "welcome_screen",
+        "title": "Welcome",
+        "description": "Welcome to our study!",
+        "settings": {
+          "title": "Welcome to our usability study",
+          "message": "Thank you for participating in our usability research. Your feedback will help us improve our product.",
+          "showContinueButton": true
+        }
+      },
+      {
+        "id": "block_1754931777354",
+        "order": 2,
+        "type": "website_navigation",
+        "title": "Website Navigation",
+        "description": "Navigate to a specific page or section",
+        "settings": {
+          "title": "Navigation Task",
+          "startUrl": "https://example.com",
+          "targetUrl": "https://example.com/contact",
+          "instruction": "Navigate to the contact page",
+          "trackClicks": true,
+          "trackTime": true
+        }
+      },
+      {
+        "id": "block_1754931775940_thank_you",
+        "order": 3,
+        "type": "thank_you_screen",
+        "title": "Thank You",
+        "description": "Thank you for participating!",
+        "settings": {
+          "title": "Thank you for your participation!",
+          "message": "Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.",
+          "showCompletionCode": false,
+          "redirectUrl": ""
+        }
+      }
+    ],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-08-11T17:03:03.315Z",
+    "updated_at": "2025-08-11T17:03:03.315Z",
+    "created_by": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Test Researcher"
+    }
+  },
+  {
+    "_id": "2",
+    "id": "2",
+    "title": "Product Testing Study",
+    "description": "Testing new product features",
     "status": "draft",
     "type": "usability",
     "target_participants": 30,
@@ -14,27 +78,6 @@
     },
     "created_at": "2025-08-11T15:55:25.778Z",
     "updated_at": "2025-08-11T15:55:25.778Z",
-    "created_by": "test-user",
-    "profiles": {
-      "email": "researcher@test.com",
-      "full_name": "Test Researcher"
-    }
-  },
-  {
-    "_id": "3",
-    "id": "3",
-    "title": "User Experience Research",
-    "description": "Evaluating user interface improvements",
-    "status": "completed",
-    "type": "usability",
-    "target_participants": 75,
-    "participants": {
-      "enrolled": 75,
-      "completed": 75,
-      "target": 75
-    },
-    "created_at": "2025-08-04T15:55:25.778Z",
-    "updated_at": "2025-08-10T15:55:25.778Z",
     "created_by": "test-user",
     "profiles": {
       "email": "researcher@test.com",

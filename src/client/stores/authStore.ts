@@ -108,14 +108,6 @@ export const useAuthStore = create<AuthState>()(
             tokenPreview: token ? token.substring(0, 50) + '...' : null
           });
           
-          // DEBUG: Log the received user data
-          console.log('🔍 Auth Store - Login Response Data:', {
-            fullResponse: response,
-            user: user,
-            userRole: user?.role,
-            timestamp: new Date().toISOString()
-          });
-          
           // Ensure user has all required SupabaseUser fields
           const supabaseUser: SupabaseUser = {
             id: user?.id || '', // Supabase uses id, not _id
@@ -130,14 +122,6 @@ export const useAuthStore = create<AuthState>()(
           // DEBUG: Log the final user object being stored
           console.log('💾 Auth Store - Final User Object:', supabaseUser);
           
-          // DEBUG: Log what we're about to store
-          console.log('💾 Auth Store - About to store in Zustand:', {
-            user: supabaseUser,
-            token: token,
-            refreshToken: refreshToken,
-            isAuthenticated: true,
-            tokenLength: token ? token.length : 0
-          });
           
           set({ 
             user: supabaseUser, 

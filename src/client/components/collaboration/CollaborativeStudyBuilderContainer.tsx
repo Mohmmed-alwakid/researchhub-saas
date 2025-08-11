@@ -411,8 +411,8 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
                     entityType="study"
                     entityId={studyId}
                     currentUser={{
-                      id: '1', // TODO: Get from auth context
-                      name: 'Current User',
+                      id: user?.id || '1',
+                      name: user?.email?.split('@')[0] || 'Current User',
                       avatar: '',
                       role: 'researcher'
                     }}
@@ -462,9 +462,9 @@ export const CollaborativeStudyBuilderContainer: React.FC<CollaborativeStudyBuil
                       };
                     })}
                     currentUser={{
-                      id: '1', // TODO: Get from auth context
-                      name: 'Current User',
-                      email: 'user@example.com',
+                      id: user?.id || '1',
+                      name: user?.email?.split('@')[0] || 'Current User',
+                      email: user?.email || 'user@example.com',
                       avatar: '',
                       role: 'collaborator'
                     }}

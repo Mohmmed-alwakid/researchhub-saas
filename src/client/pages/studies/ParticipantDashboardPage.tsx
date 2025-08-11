@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -80,34 +80,37 @@ const ParticipantDashboardPage: React.FC = () => {
   // Wallet hook
   const {
     wallet,
-    // transactions, // TODO: Will be used when transaction history is implemented
+    transactions,
     withdrawals,
     loading: walletLoading,
-    refreshWallet
-    // createWithdrawal // TODO: Will be used when withdrawal form is implemented
+    refreshWallet,
+    createWithdrawal
   } = useEnhancedWallet();
 
   // Withdrawal handling
-  // TODO: These functions will be used when withdrawal form is implemented
-  // const handleWithdrawalSubmit = async (data: WithdrawalFormData) => {
-  //   try {
-  //     const result = await createWithdrawal({
-  //       amount: data.amount,
-  //       payment_method: data.payment_method,
-  //       payment_details: data.payment_details
-  //     });
+  const handleWithdrawalSubmit = async (data: { 
+    amount: number; 
+    payment_method: 'paypal' | 'bank_transfer' | 'crypto'; 
+    payment_details: Record<string, unknown>
+  }) => {
+    try {
+      const result = await createWithdrawal({
+        amount: data.amount,
+        payment_method: data.payment_method,
+        payment_details: data.payment_details
+      });
       
-  //     if (result.success) {
-  //       walletToasts.withdrawalSubmitted(data.amount, wallet?.currency);
-  //       setShowWithdrawalForm(false);
-  //     } else {
-  //       walletToasts.withdrawalFailed(result.error);
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to submit withdrawal:', error);
-  //     walletToasts.withdrawalFailed();
-  //   }
-  // };
+      if (result.success) {
+        // Show success message
+        setShowWithdrawalForm(false);
+        await refreshWallet();
+      } else {
+        console.error('Withdrawal failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Failed to submit withdrawal:', error);
+    }
+  };
 
   // const handleWithdrawalCancel = () => {
   //   setShowWithdrawalForm(false);
@@ -134,7 +137,6 @@ const ParticipantDashboardPage: React.FC = () => {
       const response = await participantApplicationsService.getMyApplications(filters);
       if (response.success && response.data) {
         const apps = (response.data.applications || []) as unknown as EnhancedApplication[];
-        console.log('🐛 Debug - Received applications data:', apps);
 
         setApplications(apps);
         setCurrentPage(response.data.pagination?.current || 1);
@@ -250,23 +252,26 @@ interface StudyType {
   };
 }
 
-  const getStudyTitle = (app: EnhancedApplication): string => {
+  const getStudyTitle = useCallback((app: EnhancedApplication): string => {
     const study = (app as unknown as {study?: StudyType; studyId?: StudyType}).study || (app as unknown as {study?: StudyType; studyId?: StudyType}).studyId;
     if (!study) return 'Unknown Study';
     if (typeof study === 'string') return study;
     if (typeof study === 'object' && study.title) return study.title;
     return 'Unknown Study';
-  };
+  }, []);
 
-  const getStudyId = (app: EnhancedApplication): string => {
+  const getStudyId = useCallback((app: EnhancedApplication): string => {
     return (app as {study?: StudyType; studyId?: StudyType}).study?._id || (app as {study?: StudyType; studyId?: StudyType}).studyId?._id || '';
-  };
+  }, []);
 
-  const filteredApplications = (applications || []).filter(app => {
-    const matchesSearch = getStudyTitle(app).toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Optimized filtered applications with memoization
+  const filteredApplications = useMemo(() => {
+    return (applications || []).filter(app => {
+      const matchesSearch = getStudyTitle(app).toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [applications, searchTerm, statusFilter, getStudyTitle]);
 
   useEffect(() => {
     fetchApplications();
