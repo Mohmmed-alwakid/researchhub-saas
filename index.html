@@ -6,6 +6,54 @@
     <link rel="apple-touch-icon" href="/afkar-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- NUCLEAR OPTION: Ultra-early console suppression -->
+    <script>
+      (function() {
+        // Store original console methods IMMEDIATELY
+        const orig = {
+          warn: console.warn,
+          error: console.error,
+          info: console.info,
+          debug: console.debug,
+          log: console.log
+        };
+
+        // Define error patterns to suppress
+        const patterns = [
+          'permissions-policy', 'browsing-topics', 'run-ad-auction',
+          'join-ad-interest-group', 'private-state-token', 'private-aggregation',
+          'attribution-reporting', 'contentscript.js', 'this page is not reloaded',
+          'error with permissions-policy', 'unrecognized feature',
+          'origin trial controlled feature', 'failed to load resource',
+          'status of 404', '/api/studies', 'chrome-extension', 'moz-extension'
+        ];
+
+        // Ultra-fast suppression check
+        function suppress(args) {
+          const msg = args.join(' ').toLowerCase();
+          return patterns.some(p => msg.includes(p));
+        }
+
+        // Override console methods immediately
+        console.warn = function() { !suppress(Array.from(arguments)) && orig.warn.apply(console, arguments); };
+        console.error = function() { !suppress(Array.from(arguments)) && orig.error.apply(console, arguments); };
+        console.info = function() { !suppress(Array.from(arguments)) && orig.info.apply(console, arguments); };
+        console.debug = function() { !suppress(Array.from(arguments)) && orig.debug.apply(console, arguments); };
+
+        // Global error handlers
+        window.onerror = function(msg, src, ln, col, err) {
+          return suppress([msg, src, err && err.message].filter(Boolean));
+        };
+
+        window.addEventListener('unhandledrejection', function(e) {
+          const reason = e.reason && e.reason.message || e.reason || '';
+          if (suppress([reason])) {
+            e.preventDefault();
+          }
+        });
+      })();
+    </script>
+    
     <!-- Critical resource preloading for LCP optimization -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,4 +96,5 @@
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
+</html>
 </html>

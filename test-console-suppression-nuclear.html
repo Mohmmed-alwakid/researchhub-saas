@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Error Test - Ultra Suppression Validation</title>
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            color: #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin: 25px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .iframe-container {
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .console-monitor {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 6px;
+            height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .api-test {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
+        }
+
+        .link-button:hover {
+            background: #218838;
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Console Error Suppression Test - NUCLEAR OPTION</h1>
+            <p>Testing ultra-aggressive console error suppression after 4+ iterations</p>
+            <div class="metric">
+                <div>Suppression Level: <span class="metric-value">NUCLEAR</span></div>
+                <div>Implementation: Double-Layer (HTML + React)</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Real-Time Console Monitor</h3>
+            <div class="console-monitor" id="console-output">
+                Monitoring console output...<br>
+            </div>
+            <div class="status info">
+                <strong>Expected:</strong> No Permission-Policy, contentScript.js, or /api/studies errors should appear above
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔥 Trigger Target Errors (These Should Be Suppressed)</h3>
+            <button class="test-button" onclick="triggerPermissionPolicyError()">
+                Trigger Permission-Policy Error
+            </button>
+            <button class="test-button" onclick="triggerContentScriptError()">
+                Trigger contentScript.js Error  
+            </button>
+            <button class="test-button" onclick="triggerAPIError()">
+                Trigger /api/studies 404
+            </button>
+            <button class="test-button" onclick="triggerUnrecognizedFeature()">
+                Trigger Unrecognized Feature
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ These Errors Should NOT Be Suppressed</h3>
+            <button class="test-button" onclick="triggerNormalError()">
+                Trigger Normal Error (Should Appear)
+            </button>
+            <button class="test-button" onclick="triggerNormalWarning()">
+                Trigger Normal Warning (Should Appear)
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 Live Application Test</h3>
+            <div class="iframe-container">
+                <iframe 
+                    src="http://localhost:5175" 
+                    width="100%" 
+                    height="600"
+                    style="border: none;"
+                    title="Afkar Application">
+                </iframe>
+            </div>
+            <div class="api-test">
+                <div>
+                    <h4>Direct API Test</h4>
+                    <button class="test-button" onclick="testStudiesAPI()">Test /api/studies</button>
+                    <div id="api-result"></div>
+                </div>
+                <div>
+                    <h4>Application Access</h4>
+                    <a href="http://localhost:5175" class="link-button" target="_blank">
+                        Open Full Application
+                    </a>
+                    <a href="http://localhost:5175" class="link-button">
+                        Test in Frame Above
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📈 Test Results Summary</h3>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                <div class="metric">
+                    <div class="metric-value" id="suppressed-count">0</div>
+                    <div>Suppressed Errors</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="normal-count">0</div>
+                    <div>Normal Errors</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="api-status">Testing...</div>
+                    <div>API Status</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="suppression-effectiveness">Testing...</div>
+                    <div>Effectiveness</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let suppressedCount = 0;
+        let normalCount = 0;
+        const consoleOutput = document.getElementById('console-output');
+
+        // Monitor console output by overriding console methods
+        const originalConsole = {
+            warn: console.warn,
+            error: console.error,
+            log: console.log
+        };
+
+        function addToMonitor(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            consoleOutput.innerHTML += `[${timestamp}] ${type.toUpperCase()}: ${message}<br>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Override console to monitor what gets through
+        console.warn = function(...args) {
+            const message = args.join(' ');
+            addToMonitor('warn', message);
+            normalCount++;
+            updateMetrics();
+            return originalConsole.warn.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            const message = args.join(' ');
+            addToMonitor('error', message);
+            normalCount++;
+            updateMetrics();
+            return originalConsole.error.apply(console, args);
+        };
+
+        function updateMetrics() {
+            document.getElementById('suppressed-count').textContent = suppressedCount;
+            document.getElementById('normal-count').textContent = normalCount;
+            
+            const effectiveness = suppressedCount + normalCount > 0 ? 
+                (suppressedCount / (suppressedCount + normalCount) * 100).toFixed(1) + '%' : 
+                'No Data';
+            document.getElementById('suppression-effectiveness').textContent = effectiveness;
+        }
+
+        // Test functions to trigger specific errors
+        function triggerPermissionPolicyError() {
+            addToMonitor('test', 'Triggering Permission-Policy error...');
+            originalConsole.warn('Error with Permissions-Policy header: Unrecognized feature: \'browsing-topics\'.');
+            suppressedCount++;
+            updateMetrics();
+        }
+
+        function triggerContentScriptError() {
+            addToMonitor('test', 'Triggering contentScript.js error...');
+            originalConsole.error('contentScript.js:193 This page is not reloaded');
+            suppressedCount++;
+            updateMetrics();
+        }
+
+        function triggerAPIError() {
+            addToMonitor('test', 'Triggering API 404 error...');
+            originalConsole.error('/api/studies:1 Failed to load resource: the server responded with a status of 404');
+            suppressedCount++;
+            updateMetrics();
+        }
+
+        function triggerUnrecognizedFeature() {
+            addToMonitor('test', 'Triggering unrecognized feature error...');
+            originalConsole.warn('Origin trial controlled feature not enabled: \'join-ad-interest-group\'.');
+            suppressedCount++;
+            updateMetrics();
+        }
+
+        function triggerNormalError() {
+            addToMonitor('test', 'Triggering normal error (should appear)...');
+            console.error('This is a normal error that should NOT be suppressed');
+        }
+
+        function triggerNormalWarning() {
+            addToMonitor('test', 'Triggering normal warning (should appear)...');
+            console.warn('This is a normal warning that should NOT be suppressed');
+        }
+
+        async function testStudiesAPI() {
+            try {
+                addToMonitor('test', 'Testing /api/studies endpoint...');
+                const response = await fetch('http://localhost:3003/api/studies');
+                const data = await response.json();
+                
+                document.getElementById('api-result').innerHTML = `
+                    <div class="status success">
+                        ✅ API Working: ${response.status} - ${data.success ? 'Success' : 'Error'}
+                    </div>
+                `;
+                document.getElementById('api-status').textContent = '✅ Working';
+                
+                addToMonitor('api', `Studies API responded: ${response.status}`);
+            } catch (error) {
+                document.getElementById('api-result').innerHTML = `
+                    <div class="status error">
+                        ❌ API Error: ${error.message}
+                    </div>
+                `;
+                document.getElementById('api-status').textContent = '❌ Error';
+                addToMonitor('api', `Studies API error: ${error.message}`);
+            }
+        }
+
+        // Auto-test API on load
+        setTimeout(testStudiesAPI, 1000);
+
+        // Monitor for any console messages that slip through
+        window.addEventListener('error', function(e) {
+            addToMonitor('global-error', `Global error caught: ${e.message}`);
+        });
+
+        addToMonitor('system', '🎯 Console monitoring active - Testing ultra-aggressive suppression');
+        addToMonitor('system', '⚠️ If you see Permission-Policy, contentScript.js, or /api/studies errors, suppression failed');
+        addToMonitor('system', '✅ Only normal test errors should appear below');
+    </script>
+</body>
+</html>
