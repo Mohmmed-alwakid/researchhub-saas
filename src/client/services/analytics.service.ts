@@ -107,7 +107,7 @@ export const analyticsService = {
    * Get dashboard analytics summary
    */
   async getDashboardAnalytics(): Promise<DashboardAnalytics> {
-    const response = await apiService.get<{ data: DashboardAnalytics }>('/dashboard/analytics');
+    const response = await apiService.get<{ data: DashboardAnalytics }>('/research-consolidated?action=dashboard-analytics');
     return response.data;
   },
 

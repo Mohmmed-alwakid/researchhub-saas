@@ -3,6 +3,13 @@ import { persist } from 'zustand/middleware';
 import toast from 'react-hot-toast';
 import { authService, type RegisterRequest } from '../services';
 
+// Environment-aware debug logging
+const debugLog = (message: string, data?: unknown) => {
+  if (import.meta.env.VITE_DEBUG_MODE === 'true') {
+    console.log(message, data);
+  }
+};
+
 // Supabase-compatible user type
 interface SupabaseUser {
   id: string;
@@ -61,11 +68,11 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true });
         try {
-          console.log('🔍 Auth Store - Starting login with:', { email });
+          debugLog('🔍 Auth Store - Starting login with:', { email });
           
           const response = await authService.login({ email, password });
           
-          console.log('🔍 Auth Store - Login response received:', response);
+          debugLog('🔍 Auth Store - Login response received:', response);
           
           if (response.requiresTwoFactor) {
             set({ 
@@ -81,7 +88,7 @@ export const useAuthStore = create<AuthState>()(
           const user = response.user;
           
           // DEBUG: Log response structure before token extraction
-          console.log('🔍 Auth Store - Response structure debugging:', {
+          debugLog('🔍 Auth Store - Response structure debugging:', {
             hasSession: !!response.session,
             sessionKeys: response.session ? Object.keys(response.session) : [],
             sessionAccessToken: response.session?.access_token,
@@ -94,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
           const refreshToken = response.session?.refresh_token || response.tokens?.refreshToken;
           
           // DEBUG: Log token extraction results
-          console.log('🔍 Auth Store - Token extraction results:', {
+          debugLog('🔍 Auth Store - Token extraction results:', {
             extractedToken: token,
             extractedRefreshToken: refreshToken,
             tokenLength: token ? token.length : 0,
@@ -524,12 +531,15 @@ export const useAuthStore = create<AuthState>()(
         };
       },
       onRehydrateStorage: () => (state) => {
-        console.log('🔄 Auth Store - Rehydration complete:', {
-          hasState: !!state,
-          hasToken: state?.token ? true : false,
-          tokenPreview: state?.token ? state.token.substring(0, 20) + '...' : null,
-          isAuthenticated: state?.isAuthenticated || false
-        });
+        // Use environment-aware logging
+        if (import.meta.env.VITE_DEBUG_MODE === 'true') {
+          console.log('🔄 Auth Store - Rehydration complete:', {
+            hasState: !!state,
+            hasToken: state?.token ? true : false,
+            tokenPreview: state?.token ? state.token.substring(0, 20) + '...' : null,
+            isAuthenticated: state?.isAuthenticated || false
+          });
+        }
         
         if (state) {
           state.hasHydrated = true;
