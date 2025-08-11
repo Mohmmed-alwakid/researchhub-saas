@@ -68,7 +68,7 @@ const StudyDetailPage: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4">Study Overview</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{study.participants.enrolled || 0}</div>
+            <div className="text-2xl font-bold text-blue-600">{study.participants?.enrolled || 0}</div>
             <div className="text-sm text-gray-600">Enrolled Participants</div>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -304,7 +304,7 @@ const StudyDetailPage: React.FC = () => {
                   <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
                     <div className="flex items-center">
                       <Users className="w-4 h-4 mr-1" />
-                      <span>{study.participants.enrolled || 0} participants</span>
+                      <span>{study.participants?.enrolled || 0} participants</span>
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />

@@ -1,0 +1,44 @@
+[
+  {
+    "_id": "2",
+    "id": "2",
+    "title": "Product Testing Study",
+    "description": "Testing new product features",
+    "status": "draft",
+    "type": "usability",
+    "target_participants": 30,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 30
+    },
+    "created_at": "2025-08-11T15:55:25.778Z",
+    "updated_at": "2025-08-11T15:55:25.778Z",
+    "created_by": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Test Researcher"
+    }
+  },
+  {
+    "_id": "3",
+    "id": "3",
+    "title": "User Experience Research",
+    "description": "Evaluating user interface improvements",
+    "status": "completed",
+    "type": "usability",
+    "target_participants": 75,
+    "participants": {
+      "enrolled": 75,
+      "completed": 75,
+      "target": 75
+    },
+    "created_at": "2025-08-04T15:55:25.778Z",
+    "updated_at": "2025-08-10T15:55:25.778Z",
+    "created_by": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Test Researcher"
+    }
+  }
+]
