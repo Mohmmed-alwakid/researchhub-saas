@@ -59,8 +59,8 @@ const DashboardPage = () => {
         const data = await analyticsService.getDashboardAnalytics();
         setDashboardData(data);
         
-        // Fetch recent studies separately
-        const studiesResponse = await fetch('/api/studies');
+        // Fetch recent studies using the proper service
+        const studiesResponse = await fetch('/api/research-consolidated?action=get-studies');
         const studiesResult = await studiesResponse.json();
         
         if (studiesResult.success) {
