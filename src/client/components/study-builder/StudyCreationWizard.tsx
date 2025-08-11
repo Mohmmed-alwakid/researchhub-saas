@@ -62,10 +62,17 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
 
   // Load draft on mount and check for template selection
   useEffect(() => {
-    // If editing existing study, load the data and go to last step
+    // If editing existing study, load the data and go to review step
     if (isEditMode && initialData) {
-      console.log(`Edit mode: Loading study data${studyId ? ` for study ID: ${studyId}` : ''}`);
-      setFormData(prev => ({ ...prev, ...initialData }));
+      console.log(`✅ Edit mode: Loading study data${studyId ? ` for study ID: ${studyId}` : ''}`);
+      console.log('📋 Initial data received:', initialData);
+      
+      // Merge initial data with existing form data, prioritizing initial data
+      setFormData(prev => {
+        const merged = { ...prev, ...initialData };
+        console.log('🔄 Form data after merge:', merged);
+        return merged;
+      });
       
       // For edit mode, go to the review step (second to last) so user can make final changes
       const reviewStepIndex = STEPS.length - 2; // Review step is typically second to last
@@ -75,6 +82,7 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
       const completedStepsArray = Array.from({ length: reviewStepIndex }, (_, i) => i);
       setCompletedSteps(completedStepsArray);
       
+      console.log(`🎯 Edit mode: Set to review step ${reviewStepIndex}, completed steps:`, completedStepsArray);
       return; // Skip template and draft loading for edit mode
     }
 

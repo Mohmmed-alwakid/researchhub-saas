@@ -1,16 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { StudyCreationWizard } from '../../components/study-builder/StudyCreationWizard';
+import { StudyStateManager } from '../../components/study-builder/StudyStateManager';
 import { studiesService } from '../../services/studies.service';
 import { StudyFormData } from '../../components/study-builder/types';
 
+// Define types locally
+type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
+
 export const StudyBuilderPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [initialData, setInitialData] = useState<Partial<StudyFormData> | undefined>();
+  const [currentStudy, setCurrentStudy] = useState<{ status: StudyStatus; title: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isEditMode = Boolean(id);
+
+  // Handle study status changes
+  const handleStatusChange = async (newStatus: StudyStatus) => {
+    if (!id || !currentStudy) return;
+
+    try {
+      let response;
+      switch (newStatus) {
+        case 'active':
+          response = await studiesService.launchStudy(id);
+          break;
+        case 'paused':
+          response = await studiesService.pauseStudy(id);
+          break;
+        case 'completed':
+          response = await studiesService.completeStudy(id);
+          break;
+        case 'archived':
+          response = await studiesService.archiveStudy(id);
+          break;
+        default:
+          throw new Error(`Unsupported status transition: ${newStatus}`);
+      }
+
+      if (response.success) {
+        setCurrentStudy(prev => prev ? { ...prev, status: newStatus } : null);
+        
+        // Show success message and navigate if archived
+        const statusMessages = {
+          active: 'Study launched successfully!',
+          paused: 'Study paused successfully.',
+          completed: 'Study completed successfully.',
+          archived: 'Study archived successfully.'
+        };
+        
+        alert(statusMessages[newStatus]);
+        
+        // Navigate to studies page if archived
+        if (newStatus === 'archived') {
+          navigate('/app/studies');
+        }
+      } else {
+        throw new Error(response.message || 'Failed to update study status');
+      }
+    } catch (error) {
+      console.error('Failed to change study status:', error);
+      alert(`Failed to ${newStatus} study. Please try again.`);
+    }
+  };
 
   useEffect(() => {
     if (isEditMode && id) {
@@ -18,39 +73,74 @@ export const StudyBuilderPage: React.FC = () => {
         setIsLoading(true);
         setError(null);
         try {
-          console.log('Loading study data for editing:', id);
-          const response = await studiesService.getStudies();
+          console.log('🔄 Loading study data for editing (Study ID):', id);
           
-          if (response.studies) {
-            // Find the specific study by ID
-            const study = response.studies.find(s => s._id === id);
+          // Use the specific getStudy method instead of loading all studies
+          const response = await studiesService.getStudy(id);
+          
+          if (response.success && response.study) {
+            const study = response.study;
+            console.log('📋 Raw study data loaded:', study);
             
-            if (study) {
-              // Convert study data to StudyFormData format
-              const studyFormData: Partial<StudyFormData> = {
-                title: study.title || '',
-                description: study.description || '',
-                type: study.type === 'usability' || study.type === 'interview' ? study.type : 'usability',
-                target_participants: study.settings?.maxParticipants || 15,
-                duration: study.settings?.duration || 30,
-                // Note: blocks, research_objectives, and instructions may not be in IStudy
-                // They might be part of configuration or need to be fetched separately
-                blocks: [],
-                research_objectives: [],
-                instructions: '',
-              };
+            // Simplified data conversion - focus on core fields that exist in IStudy
+            const studyFormData: Partial<StudyFormData> = {
+              title: study.title || '',
+              description: study.description || '',
+              type: (study.type === 'usability' || study.type === 'interview') ? study.type : 'usability',
+              target_participants: study.settings?.maxParticipants || study.configuration?.maxParticipants || 15,
+              duration: study.settings?.duration || study.configuration?.duration || 30,
+              include_audio: Boolean(study.configuration?.recordingOptions?.audio),
               
-              console.log('Loaded study data for editing:', studyFormData);
-              setInitialData(studyFormData);
-            } else {
-              setError('Study not found');
-            }
+              // These fields may not exist yet in the database, set as empty for now
+              blocks: [],
+              research_objectives: [],
+              instructions: '',
+              template_id: undefined,
+              
+              // Set interview config if it's an interview study
+              interview_session_config: study.type === 'interview' ? {
+                type: 'live_interview',
+                duration_minutes: study.configuration?.duration || 30,
+                recording: {
+                  enabled: Boolean(study.configuration?.recordingOptions?.audio || study.configuration?.recordingOptions?.screen),
+                  audio: Boolean(study.configuration?.recordingOptions?.audio),
+                  video: Boolean(study.configuration?.recordingOptions?.webcam),
+                  screen_share: Boolean(study.configuration?.recordingOptions?.screen),
+                  consent_required: true
+                },
+                interview_script: {
+                  introduction: '',
+                  questions: [],
+                  conclusion: ''
+                },
+                scheduling: {
+                  buffer_time_minutes: 15,
+                  available_slots: [],
+                  auto_confirm: false,
+                  reminder_settings: {
+                    email_24h: true,
+                    email_1h: true,
+                    sms_15min: false
+                  }
+                }
+              } : undefined
+            };
+            
+            console.log('✅ Converted study data for form:', studyFormData);
+            setInitialData(studyFormData);
+            
+            // Store current study info for state management
+            setCurrentStudy({
+              status: study.status,
+              title: study.title
+            });
           } else {
-            setError('Failed to load study data');
+            console.error('❌ Failed to load study - API response:', response);
+            setError(response.message || 'Study not found');
           }
         } catch (err) {
-          console.error('Error loading study for editing:', err);
-          setError('Failed to load study data');
+          console.error('💥 Error loading study for editing:', err);
+          setError('Failed to load study data. Please try again.');
         } finally {
           setIsLoading(false);
         }
@@ -90,11 +180,25 @@ export const StudyBuilderPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <StudyCreationWizard 
-        isEditMode={isEditMode}
-        studyId={id}
-        initialData={initialData}
-      />
+      {isEditMode && currentStudy && id ? (
+        <StudyStateManager
+          studyId={id}
+          currentStatus={currentStudy.status}
+          onStatusChange={handleStatusChange}
+        >
+          <StudyCreationWizard 
+            isEditMode={isEditMode}
+            studyId={id}
+            initialData={initialData}
+          />
+        </StudyStateManager>
+      ) : (
+        <StudyCreationWizard 
+          isEditMode={isEditMode}
+          studyId={id}
+          initialData={initialData}
+        />
+      )}
     </div>
   );
 };

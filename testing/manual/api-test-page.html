@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Edit API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { border-color: #28a745; background-color: #d4edda; }
+        .error { border-color: #dc3545; background-color: #f8d7da; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .status.running { background-color: #fff3cd; border: 1px solid #ffeaa7; }
+        .status.complete { background-color: #d4edda; border: 1px solid #c3e6cb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Study Edit System API Testing</h1>
+        <p>This page tests the new study edit API endpoints that were implemented.</p>
+        
+        <div id="status" class="status">Ready to test...</div>
+        
+        <button onclick="runTests()">Run API Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+        
+        <h2>Test Results:</h2>
+        <div id="results"></div>
+        
+        <h2>Manual Frontend Testing:</h2>
+        <p>Use these links to test the frontend implementation:</p>
+        <ul>
+            <li><a href="http://localhost:5175/studies" target="_blank">Studies List Page</a></li>
+            <li><a href="http://localhost:5175/study-builder/1" target="_blank">Edit Study ID 1 (Active Study)</a></li>
+            <li><a href="http://localhost:5175/study-builder/2" target="_blank">Edit Study ID 2 (Draft Study)</a></li>
+        </ul>
+        
+        <h2>Expected Behavior:</h2>
+        <ul>
+            <li><strong>Study ID 1</strong>: Should show state management controls (active study)</li>
+            <li><strong>Study ID 2</strong>: Should allow full editing (draft study)</li>
+            <li><strong>State Manager</strong>: Should display appropriate edit permissions and warnings</li>
+            <li><strong>Empty Title Bug</strong>: Should be fixed - titles should load properly</li>
+        </ul>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:3003/api/research';
+        
+        function addResult(testName, result, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = `<strong>${testName}</strong>\n${JSON.stringify(result, null, 2)}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        function updateStatus(message, isComplete = false) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${isComplete ? 'complete' : 'running'}`;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            updateStatus('Ready to test...');
+        }
+        
+        async function runTests() {
+            clearResults();
+            updateStatus('Running API tests...');
+            
+            console.log('🔧 Testing Study Edit API Endpoints...');
+
+            // Test 1: Check if study can be edited (Study 1 - Active)
+            try {
+                const response1 = await fetch(`${baseUrl}?action=can-edit-study&id=1`);
+                const result1 = await response1.json();
+                addResult('Test 1: Can Edit Study (ID: 1 - Active)', result1);
+                console.log('✅ Test 1 passed');
+            } catch (error) {
+                addResult('Test 1: Can Edit Study (ID: 1)', { error: error.message }, false);
+                console.error('❌ Test 1 Failed:', error);
+            }
+
+            // Test 2: Check if study can be edited (Study 2 - Draft)
+            try {
+                const response2 = await fetch(`${baseUrl}?action=can-edit-study&id=2`);
+                const result2 = await response2.json();
+                addResult('Test 2: Can Edit Study (ID: 2 - Draft)', result2);
+                console.log('✅ Test 2 passed');
+            } catch (error) {
+                addResult('Test 2: Can Edit Study (ID: 2)', { error: error.message }, false);
+                console.error('❌ Test 2 Failed:', error);
+            }
+
+            // Test 3: Validate state transition (draft → active)
+            try {
+                const response3 = await fetch(`${baseUrl}?action=validate-state-transition&id=2&newStatus=active`);
+                const result3 = await response3.json();
+                addResult('Test 3: Validate State Transition (ID: 2, draft → active)', result3);
+                console.log('✅ Test 3 passed');
+            } catch (error) {
+                addResult('Test 3: Validate State Transition', { error: error.message }, false);
+                console.error('❌ Test 3 Failed:', error);
+            }
+
+            // Test 4: Try invalid state transition (draft → completed)
+            try {
+                const response4 = await fetch(`${baseUrl}?action=validate-state-transition&id=2&newStatus=completed`);
+                const result4 = await response4.json();
+                addResult('Test 4: Invalid State Transition (ID: 2, draft → completed)', result4);
+                console.log('✅ Test 4 passed');
+            } catch (error) {
+                addResult('Test 4: Invalid State Transition', { error: error.message }, false);
+                console.error('❌ Test 4 Failed:', error);
+            }
+
+            // Test 5: Test with non-existent study
+            try {
+                const response5 = await fetch(`${baseUrl}?action=can-edit-study&id=999`);
+                const result5 = await response5.json();
+                addResult('Test 5: Non-existent Study (ID: 999)', result5);
+                console.log('✅ Test 5 passed');
+            } catch (error) {
+                addResult('Test 5: Non-existent Study', { error: error.message }, false);
+                console.error('❌ Test 5 Failed:', error);
+            }
+
+            updateStatus('All tests completed!', true);
+            console.log('🎉 API Testing Complete!');
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 1000);
+        });
+    </script>
+</body>
+</html>

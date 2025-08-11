@@ -147,6 +147,90 @@ export const studiesService = {
   },
 
   /**
+   * Enhanced state management methods
+   */
+
+  /**
+   * Check if study can be edited based on current state
+   */
+  async canEditStudy(studyId: string): Promise<{ canEdit: boolean; reason?: string }> {
+    try {
+      const response = await apiService.get<{ success: boolean; canEdit: boolean; reason?: string }>(`research?action=can-edit-study&id=${studyId}`);
+      
+      if (!response.success) {
+        return { canEdit: false, reason: 'Failed to check edit permissions' };
+      }
+      
+      return { canEdit: response.canEdit, reason: response.reason };
+    } catch {
+      return { canEdit: false, reason: 'Failed to check study status' };
+    }
+  },
+
+  /**
+   * Validate state transition
+   */
+  async validateStateTransition(studyId: string, newStatus: StudyStatus): Promise<{ valid: boolean; reason?: string }> {
+    try {
+      const response = await apiService.get<{ success: boolean; valid: boolean; reason?: string }>(`research?action=validate-state-transition&id=${studyId}&newStatus=${newStatus}`);
+      
+      if (!response.success) {
+        return { valid: false, reason: 'Failed to validate state transition' };
+      }
+      
+      return { valid: response.valid, reason: response.reason };
+    } catch {
+      return { valid: false, reason: 'Failed to validate state transition' };
+    }
+  },
+
+  /**
+   * Archive study
+   */
+  async archiveStudy(studyId: string): Promise<StudyResponse> {
+    return apiService.patch<StudyResponse>(`research?action=archive-study&id=${studyId}`);
+  },
+
+  /**
+   * Restore study from archive
+   */
+  async restoreStudy(studyId: string): Promise<StudyResponse> {
+    return apiService.patch<StudyResponse>(`studies?action=restore-study&id=${studyId}`);
+  },
+
+  /**
+   * Get study edit lock status (for collaborative editing)
+   */
+  async getStudyEditLock(studyId: string): Promise<{ 
+    success: boolean; 
+    isLocked: boolean; 
+    lockedBy?: string; 
+    lockedAt?: Date;
+    expiresAt?: Date;
+  }> {
+    return apiService.get(`studies?action=get-edit-lock&id=${studyId}`);
+  },
+
+  /**
+   * Acquire edit lock for study (for collaborative editing)
+   */
+  async acquireStudyEditLock(studyId: string): Promise<{
+    success: boolean;
+    lockAcquired: boolean;
+    expiresAt?: Date;
+    conflictsWith?: string;
+  }> {
+    return apiService.post(`studies?action=acquire-edit-lock&id=${studyId}`);
+  },
+
+  /**
+   * Release edit lock for study
+   */
+  async releaseStudyEditLock(studyId: string): Promise<{ success: boolean }> {
+    return apiService.delete(`studies?action=release-edit-lock&id=${studyId}`);
+  },
+
+  /**
    * Get study analytics
    */
   async getStudyAnalytics(studyId: string): Promise<{ success: boolean; analytics: StudyAnalytics }> {

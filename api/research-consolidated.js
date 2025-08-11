@@ -146,6 +146,15 @@ export default async function handler(req, res) {
       case 'dashboard-analytics':
         return await getDashboardAnalytics(req, res);
       
+      case 'can-edit-study':
+        return await canEditStudy(req, res);
+      
+      case 'validate-state-transition':
+        return await validateStateTransition(req, res);
+      
+      case 'archive-study':
+        return await archiveStudy(req, res);
+      
       default:
         return res.status(400).json({
           success: false,
@@ -424,6 +433,191 @@ async function getDashboardAnalytics(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: 'Failed to fetch analytics' 
+    });
+  }
+}
+
+/**
+ * Check if study can be edited
+ */
+async function canEditStudy(req, res) {
+  try {
+    const { id } = req.query;
+    
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    const study = localStudies.find(s => s.id === id || s._id === id);
+    
+    if (!study) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    let canEdit = false;
+    let reason = '';
+
+    switch (study.status) {
+      case 'draft':
+        canEdit = true;
+        reason = 'Study is in draft status and can be edited';
+        break;
+      case 'paused':
+        canEdit = true;
+        reason = 'Study is paused. Changes will take effect when resumed.';
+        break;
+      case 'active':
+        canEdit = false;
+        reason = 'Cannot edit active study. Pause it first to make changes.';
+        break;
+      case 'completed':
+        canEdit = false;
+        reason = 'Cannot edit completed study';
+        break;
+      case 'archived':
+        canEdit = false;
+        reason = 'Cannot edit archived study';
+        break;
+      default:
+        canEdit = false;
+        reason = 'Unknown study status';
+    }
+
+    return res.status(200).json({
+      success: true,
+      canEdit,
+      reason
+    });
+
+  } catch (error) {
+    console.error('Can edit study error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to check edit permissions'
+    });
+  }
+}
+
+/**
+ * Validate state transition
+ */
+async function validateStateTransition(req, res) {
+  try {
+    const { id, newStatus } = req.query;
+    
+    if (!id || !newStatus) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID and new status are required'
+      });
+    }
+
+    const study = localStudies.find(s => s.id === id || s._id === id);
+    
+    if (!study) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    const currentStatus = study.status;
+    let valid = false;
+    let reason = '';
+
+    // Define valid transitions
+    const validTransitions = {
+      'draft': ['active', 'archived'],
+      'active': ['paused', 'completed'],
+      'paused': ['active', 'archived'],
+      'completed': ['archived'],
+      'archived': [] // No transitions from archived
+    };
+
+    if (validTransitions[currentStatus]?.includes(newStatus)) {
+      // Additional validation for specific transitions
+      if (newStatus === 'active' && currentStatus === 'draft') {
+        // Check if study has minimum required content
+        if (!study.title || !study.description) {
+          valid = false;
+          reason = 'Study must have title and description before going active';
+        } else {
+          valid = true;
+        }
+      } else {
+        valid = true;
+      }
+    } else {
+      valid = false;
+      reason = `Cannot transition from ${currentStatus} to ${newStatus}`;
+    }
+
+    return res.status(200).json({
+      success: true,
+      valid,
+      reason
+    });
+
+  } catch (error) {
+    console.error('Validate state transition error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to validate state transition'
+    });
+  }
+}
+
+/**
+ * Archive study
+ */
+async function archiveStudy(req, res) {
+  try {
+    const { id } = req.query;
+    
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    const studyIndex = localStudies.findIndex(s => s.id === id || s._id === id);
+    
+    if (studyIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    // Update study status to archived
+    localStudies[studyIndex] = {
+      ...localStudies[studyIndex],
+      status: 'archived',
+      updated_at: new Date().toISOString()
+    };
+
+    // Save updated studies
+    saveStudies(localStudies);
+
+    console.log(`📦 Archived study: ${localStudies[studyIndex].title}`);
+
+    return res.status(200).json({
+      success: true,
+      study: localStudies[studyIndex]
+    });
+
+  } catch (error) {
+    console.error('Archive study error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to archive study'
     });
   }
 }
