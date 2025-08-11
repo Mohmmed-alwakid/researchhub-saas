@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Suppression Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; margin: 10px 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #console-output { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin-top: 15px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Console Error Automation Test</h1>
+        
+        <div class="test-section info">
+            <h3>📋 Instructions</h3>
+            <ol>
+                <li>Open browser developer tools (F12)</li>
+                <li>Go to the Console tab</li>
+                <li>Click the test buttons below</li>
+                <li>Check if Permission-Policy errors are suppressed</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Browser Console Tests</h3>
+            <button onclick="testPermissionPolicyErrors()">Test Permission-Policy Errors</button>
+            <button onclick="testDebugLogging()">Test Debug Logging</button>
+            <button onclick="testErrorPreservation()">Test Error Preservation</button>
+            <button onclick="clearConsole()">Clear Console</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 Live Application Test</h3>
+            <p>Test the actual application to verify console suppression:</p>
+            <a href="http://localhost:5175" target="_blank" style="display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 4px;">
+                Open Afkar Platform (localhost:5175)
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Expected Results</h3>
+            <div class="success">
+                <strong>✅ Should be suppressed:</strong><br>
+                • Error with Permissions-Policy header: Unrecognized feature: 'browsing-topics'<br>
+                • Error with Permissions-Policy header: Unrecognized feature: 'run-ad-auction'<br>
+                • Origin trial controlled feature not enabled: 'join-ad-interest-group'<br>
+                • This page is not reloaded<br>
+                • contentScript.js errors
+            </div>
+            <div class="error">
+                <strong>❌ Should still show:</strong><br>
+                • Actual application errors<br>
+                • API failures (500/400 errors)<br>
+                • JavaScript errors
+            </div>
+        </div>
+
+        <div id="console-output"></div>
+    </div>
+
+    <script>
+        // Capture console output for display
+        const output = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        function logToOutput(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${type}: ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Override console methods to capture output
+        console.log = function(...args) {
+            logToOutput('LOG', args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logToOutput('WARN', args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            logToOutput('ERROR', args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        function testPermissionPolicyErrors() {
+            console.error("Error with Permissions-Policy header: Unrecognized feature: 'browsing-topics'");
+            console.error("Error with Permissions-Policy header: Unrecognized feature: 'run-ad-auction'");
+            console.error("Origin trial controlled feature not enabled: 'join-ad-interest-group'");
+            console.warn("This page is not reloaded");
+            console.error("contentScript.js:193 This page is not reloaded");
+        }
+
+        function testDebugLogging() {
+            console.log("🔍 Debug: This should be suppressed when VITE_DEBUG_MODE=false");
+            console.log("🔧 Debug: Another debug message");
+            console.log("📊 Debug: Component state update");
+        }
+
+        function testErrorPreservation() {
+            console.error("❌ This is a real error and should always be visible");
+            console.error("💥 Failed to load resource: the server responded with a status of 500");
+            console.log("❌ Error message should always show");
+        }
+
+        function clearConsole() {
+            output.textContent = '';
+            console.clear();
+        }
+
+        // Initial test
+        logToOutput('INFO', 'Console suppression test initialized');
+        logToOutput('INFO', 'Debug mode: ' + (localStorage.getItem('VITE_DEBUG_MODE') || 'not set'));
+    </script>
+</body>
+</html>

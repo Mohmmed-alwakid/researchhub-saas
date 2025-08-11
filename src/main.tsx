@@ -29,7 +29,16 @@ import App from './App.tsx'
     console.error = (...args) => {
       const message = args.join(' ');
       if (message.includes('Permissions-Policy') ||
-          message.includes('contentScript.js')) {
+          message.includes('contentScript.js') ||
+          message.includes('Error with Permissions-Policy') ||
+          message.includes('Unrecognized feature') ||
+          message.includes('Origin trial controlled feature') ||
+          message.includes('browsing-topics') ||
+          message.includes('run-ad-auction') ||
+          message.includes('join-ad-interest-group') ||
+          message.includes('private-state-token') ||
+          message.includes('private-aggregation') ||
+          message.includes('attribution-reporting')) {
         return; // Suppress these errors
       }
       originalError.apply(console, args);

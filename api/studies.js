@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     let modifiedBody = req.body;
     
     if (req.method === 'GET') {
-      action = 'studies';
+      action = 'get-studies';
     } else if (req.method === 'POST') {
       action = 'create-study';
     } else if (req.method === 'PUT') {

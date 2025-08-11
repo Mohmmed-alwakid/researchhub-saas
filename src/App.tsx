@@ -21,6 +21,7 @@ const LoginPage = lazy(() => import('./client/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('./client/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./client/pages/auth/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('./client/pages/auth/ResetPasswordPage'));
+const OAuthCallbackPage = lazy(() => import('./client/pages/auth/OAuthCallbackPage'));
 const DashboardPage = lazy(() => import('./client/pages/dashboard/DashboardPage'));
 const StudiesPage = lazy(() => import('./client/pages/studies/StudiesPage'));
 const StudyDetailPage = lazy(() => import('./client/pages/studies/StudyDetailPage'));
@@ -132,6 +133,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/auth/callback" element={<OAuthCallbackPage />} />
             
             {/* Admin Dashboard Routes - Separate from AppLayout */}
             <Route path="/app/admin/*" element={
