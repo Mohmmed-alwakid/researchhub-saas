@@ -140,6 +140,9 @@ export default async function handler(req, res) {
       case 'update-application-status':
         return await updateApplicationStatus(req, res);
       
+      case 'dashboard-analytics':
+        return await getDashboardAnalytics(req, res);
+      
       default:
         return res.status(400).json({ 
           success: false, 
@@ -673,6 +676,64 @@ async function updateApplicationStatus(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: 'Failed to update application status' 
+    });
+  }
+}
+
+/**
+ * Get dashboard analytics for authenticated user
+ */
+async function getDashboardAnalytics(req, res) {
+  const authResult = await authenticateUser(req, ['researcher', 'admin']);
+  if (!authResult.success) {
+    return res.status(authResult.status).json({ 
+      success: false, 
+      error: authResult.error 
+    });
+  }
+
+  const userId = authResult.user.id;
+
+  try {
+    // Get study analytics for the researcher
+    const { data: studies, error: studiesError } = await supabase
+      .from('studies')
+      .select(`
+        id, title, status, created_at,
+        study_sessions (
+          id, status, submitted_at
+        )
+      `)
+      .eq('researcher_id', userId);
+
+    if (studiesError) {
+      throw studiesError;
+    }
+
+    // Calculate analytics
+    const totalStudies = studies?.length || 0;
+    const activeStudies = studies?.filter(s => s.status === 'active')?.length || 0;
+    const completedSessions = studies?.reduce((acc, study) => {
+      return acc + (study.study_sessions?.filter(session => session.status === 'completed')?.length || 0);
+    }, 0) || 0;
+
+    const analytics = {
+      totalStudies,
+      activeStudies,
+      completedSessions,
+      recentActivity: studies?.slice(0, 5) || []
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: analytics
+    });
+
+  } catch (error) {
+    console.error('❌ Dashboard analytics error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch dashboard analytics'
     });
   }
 }

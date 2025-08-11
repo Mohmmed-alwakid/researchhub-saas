@@ -33,10 +33,23 @@ export interface LogEntry {
 class Logger {
   private currentLevel: LogLevel;
   private isDevelopment: boolean;
+  private enableConsole: boolean;
 
   constructor() {
-    this.isDevelopment = process.env.NODE_ENV === 'development';
-    this.currentLevel = this.isDevelopment ? LogLevel.DEBUG : LogLevel.INFO;
+    this.isDevelopment = import.meta.env.DEV || process.env.NODE_ENV === 'development';
+    
+    // Check environment variables for logging control
+    const debugMode = import.meta.env.VITE_DEBUG_MODE === 'true';
+    const enableConsole = import.meta.env.VITE_ENABLE_CONSOLE_LOGS !== 'false';
+    
+    // Set log level based on environment and debug mode
+    if (!this.isDevelopment && !debugMode) {
+      this.currentLevel = LogLevel.WARN; // Production: only warnings and errors
+    } else {
+      this.currentLevel = LogLevel.DEBUG; // Development: full logging
+    }
+    
+    this.enableConsole = enableConsole;
   }
 
   private formatMessage(level: LogLevel, message: string, context?: LogContext): LogEntry {
@@ -55,7 +68,7 @@ class Logger {
   }
 
   private output(entry: LogEntry): void {
-    if (!this.shouldLog(entry.level)) return;
+    if (!this.shouldLog(entry.level) || !this.enableConsole) return;
 
     const levelName = LogLevel[entry.level];
     const prefix = `[${entry.timestamp}] ${levelName}`;

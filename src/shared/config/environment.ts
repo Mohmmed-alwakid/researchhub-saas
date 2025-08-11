@@ -1,9 +1,23 @@
 /**
  * Environment Configuration
- * Environment-specific configuration values
+ * Environment-specific configuration values and console error reduction
  */
 
 import { Environment } from './AppConfig';
+
+// Sentry mock interface
+interface SentryMock {
+  captureException: () => void;
+  captureMessage: () => void;
+  configureScope: () => void;
+  withScope: () => void;
+}
+
+declare global {
+  interface Window {
+    Sentry?: SentryMock;
+  }
+}
 
 // Environment detection
 export const getCurrentEnvironment = (): Environment => {
@@ -12,6 +26,53 @@ export const getCurrentEnvironment = (): Environment => {
   if (env === 'production') return 'production';
   if (env === 'test') return 'test';
   return 'development';
+};
+
+// Sentry Configuration
+export const initializeSentry = () => {
+  const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+  
+  if (!sentryDsn) {
+    // Suppress the "Sentry DSN not found" warning
+    if (typeof window !== 'undefined') {
+      window.Sentry = {
+        captureException: () => {},
+        captureMessage: () => {},
+        configureScope: () => {},
+        withScope: () => {}
+      };
+    }
+    return;
+  }
+
+  // Initialize real Sentry if DSN is provided
+  import('@sentry/browser').then(({ init }) => {
+    init({
+      dsn: sentryDsn,
+      environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'development',
+      tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
+    });
+  });
+};
+
+// Suppress browser warnings
+export const suppressBrowserWarnings = () => {
+  if (typeof window !== 'undefined') {
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      const message = args.join(' ');
+      
+      // Skip permission policy warnings and content script warnings
+      if (message.includes('Permissions-Policy') || 
+          message.includes('This page is not reloaded') ||
+          message.includes('browsing-topics') ||
+          message.includes('run-ad-auction')) {
+        return;
+      }
+      
+      originalWarn.apply(console, args);
+    };
+  }
 };
 
 // Environment-specific defaults

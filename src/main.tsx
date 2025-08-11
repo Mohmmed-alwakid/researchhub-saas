@@ -3,13 +3,16 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+// Initialize environment configuration for error reduction
+import { initializeSentry, suppressBrowserWarnings } from './shared/config/environment'
+
 // Initialize complete debugging suite (Phase 1 + Phase 2)
 import { initializeDebugSuite } from './utils/debug'
-import sentryIntegration from './utils/debug/SentryIntegrationSimple'
 import devDebugConsole from './utils/debug/DevDebugConsole'
 
-// Initialize Sentry error tracking (Production + Development)
-sentryIntegration.init()
+// Initialize error tracking and suppress browser warnings
+initializeSentry()
+suppressBrowserWarnings()
 
 // Initialize complete debug suite (Phase 1 + Phase 2 tools)
 initializeDebugSuite()

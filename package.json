@@ -14,6 +14,7 @@
     "dev:server": "nodemon src/server/index.ts",
     "dev:local": "node scripts/development/local-dev-server.js",
     "dev:fullstack": "node scripts/development/local-full-dev.js",
+    "dev:clean": "node scripts/utilities/console-error-reducer.mjs",
     "dev:status": "node scripts/development/simple-dev-status.mjs",
     "debug:start": "cross-env DEBUG=true npm run dev:fullstack",
     "debug:research": "cross-env DEBUG_MODE=research npm run dev:fullstack",
