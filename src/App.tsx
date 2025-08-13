@@ -7,9 +7,8 @@ import { useEffect, Suspense, lazy } from 'react';
 import AppLayout from './client/components/common/AppLayout';
 import AuthGuard from './client/components/auth/AuthGuard';
 import ProtectedRoute from './client/components/auth/ProtectedRoute';
-import { ErrorBoundary } from './client/components/ErrorBoundary';
 // Enhanced Sentry error boundaries
-import { SentryErrorBoundary, DashboardErrorBoundary, StudyBuilderErrorBoundary } from './components/common/SentryErrorBoundary';
+import { SentryErrorBoundary } from './components/common/SentryErrorBoundary';
 // Connectivity status banner
 import ConnectivityStatusBanner from './components/common/ConnectivityStatusBanner';
 // Removed during cleanup - will be restored when needed
@@ -17,8 +16,6 @@ import ConnectivityStatusBanner from './components/common/ConnectivityStatusBann
 // import FloatingReportButton from './client/components/performance/FloatingReportButton';
 import { useAuthStore } from './client/stores/authStore';
 import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
-// Sentry utilities
-import { SentryUtils } from './config/sentry';
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./client/pages/LandingPage'));
