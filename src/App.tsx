@@ -10,6 +10,8 @@ import ProtectedRoute from './client/components/auth/ProtectedRoute';
 import { ErrorBoundary } from './client/components/ErrorBoundary';
 // Enhanced Sentry error boundaries
 import { SentryErrorBoundary, DashboardErrorBoundary, StudyBuilderErrorBoundary } from './components/common/SentryErrorBoundary';
+// Connectivity status banner
+import ConnectivityStatusBanner from './components/common/ConnectivityStatusBanner';
 // Removed during cleanup - will be restored when needed
 // import { PerformanceMonitor } from './client/components/performance/PerformanceMonitor';
 // import FloatingReportButton from './client/components/performance/FloatingReportButton';
@@ -276,6 +278,7 @@ function App() {
           </Routes>
             </Suspense>
           <Toaster position="top-right" />
+          <ConnectivityStatusBanner />
           {/* Temporarily disabled during cleanup - will be restored when needed
           <PerformanceMonitor showMetrics={process.env.NODE_ENV === 'development'} />
           <FloatingReportButton />

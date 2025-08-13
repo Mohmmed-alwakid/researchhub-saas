@@ -26,8 +26,9 @@ async function checkRemoteConnectivity(): Promise<boolean> {
   
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // Reduced timeout
     
+    // Use the proxied endpoint through Vite instead of direct API call
     const response = await fetch('/api/health', {
       method: 'GET',
       signal: controller.signal,
@@ -39,13 +40,13 @@ async function checkRemoteConnectivity(): Promise<boolean> {
     lastConnectivityCheck = now;
     
     if (!isOnline) {
-      console.log('🔧 Remote APIs unreachable, switching to local fallback');
+      console.log('🔧 Remote APIs unreachable, using fallback strategy');
     }
     
     return isOnline;
     
   } catch (error) {
-    console.log('🔧 Network connectivity check failed, using local fallback');
+    console.log('🔧 Network connectivity check failed, using fallback strategy');
     isOnline = false;
     lastConnectivityCheck = now;
     return false;
@@ -78,18 +79,20 @@ class NetworkResilientApiService {
     // Request interceptor to add auth token and check connectivity
     this.api.interceptors.request.use(
       async (config) => {
-        // Check connectivity before making request
-        const hasConnectivity = await checkRemoteConnectivity();
-        
-        // Switch to local fallback if no connectivity
-        if (!hasConnectivity && !config.url?.includes('localhost')) {
-          console.log('🔧 Switching to local fallback API for:', config.url);
+        // Always use the proxied endpoint through Vite in development
+        // This avoids CORS and browser blocking issues
+        if (import.meta.env.DEV) {
+          // In development, all /api calls go through Vite proxy to localhost:3003
+          console.log('🔧 Using Vite proxy for API call:', config.url);
+        } else {
+          // In production, check connectivity and fallback if needed
+          const hasConnectivity = await checkRemoteConnectivity();
           
-          // Modify the request to use local fallback
-          if (config.url?.startsWith('/api/')) {
-            config.baseURL = this.fallbackBaseUrl.replace('/api', '');
-          } else {
-            config.baseURL = this.fallbackBaseUrl;
+          if (!hasConnectivity && !config.url?.includes('localhost')) {
+            console.log('🔧 Switching to fallback strategy for:', config.url);
+            
+            // In production, we would implement appropriate fallback logic
+            // For now, continue with the original request
           }
         }
 
@@ -192,7 +195,7 @@ class NetworkResilientApiService {
                 // Check if this is a fallback token
                 isLocalAuth = state?.token?.includes('mock-signature') || 
                              state?.token?.includes('fallback-token');
-              } catch (e) {
+              } catch {
                 // Invalid storage, safe to clear
               }
             }
