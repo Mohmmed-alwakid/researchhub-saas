@@ -51,7 +51,10 @@ export function initSentry() {
     // Release and user context
     release: `researchhub-saas@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
     
-    // Enhanced error filtering
+    // Enhanced transport configuration to handle blocking
+    transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
+    
+    // Graceful error handling for transport failures
     beforeSend(event, hint) {
       // Filter out development noise
       if (currentEnv === 'development') {
@@ -60,7 +63,8 @@ export function initSentry() {
         // Skip HMR and development errors
         if (error?.message?.includes('HMR') || 
             error?.message?.includes('Module build failed') ||
-            error?.message?.includes('WebSocket connection')) {
+            error?.message?.includes('WebSocket connection') ||
+            error?.message?.includes('Failed to fetch')) {
           return null;
         }
       }

@@ -235,6 +235,7 @@
     "@modelcontextprotocol/server-filesystem": "^2025.7.1",
     "@modelcontextprotocol/server-memory": "^2025.4.25",
     "@sentry/node": "^10.4.0",
+    "@sentry/profiling-node": "^10.5.0",
     "@sentry/react": "^9.45.0",
     "@sentry/tracing": "^7.120.3",
     "@sentry/vite-plugin": "^4.1.0",
