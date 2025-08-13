@@ -1,0 +1,11 @@
+# Security - Keep tokens private
+.env
+*.env
+.env.local
+.env.production
+notion-config.json
+notion-secrets.json
+
+# Notion workspace data
+workspace-*.json
+notion-backup-*.json

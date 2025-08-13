@@ -93,7 +93,7 @@ export const studiesService = {
    * Get study by ID
    */
   async getStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.get<StudyResponse>(`research-consolidated?action=get-study&study_id=${studyId}`);
+    return apiService.get<StudyResponse>(`research-consolidated?action=get-study&id=${studyId}`);
   },
 
   /**
@@ -107,7 +107,7 @@ export const studiesService = {
    * Update study
    */
   async updateStudy(studyId: string, data: UpdateStudyRequest): Promise<StudyResponse> {
-    return apiService.put<StudyResponse>(`research-consolidated?action=update-study&study_id=${studyId}`, data);
+    return apiService.put<StudyResponse>(`research-consolidated?action=update-study&id=${studyId}`, data);
   },
 
   /**
@@ -129,7 +129,7 @@ export const studiesService = {
    * Launch study (change status to active)
    */
   async launchStudy(studyId: string): Promise<StudyResponse> {
-    return apiService.patch<StudyResponse>(`research-consolidated?action=launch-study&study_id=${studyId}`);
+    return apiService.patch<StudyResponse>(`research-consolidated?action=launch-study&id=${studyId}`);
   },
 
   /**

@@ -6,6 +6,10 @@ import App from './App.tsx'
 // Import development console manager for clean development experience
 import './utils/devConsoleManager'
 
+// Initialize Sentry for comprehensive error tracking
+import { initSentry } from './config/sentry'
+initSentry()
+
 // NUCLEAR OPTION: Immediate, ultra-aggressive console suppression
 // Define all error patterns to suppress
 const suppressPatterns = [

@@ -47,6 +47,31 @@ product-manager/
 
 ## 🚀 HOW TO USE THIS SYSTEM
 
+### **🎯 NEW: Notion Product Management Hub (August 2025)**
+**Revolutionary research-driven product management with Notion MCP integration**
+
+```bash
+# Quick start - Interactive setup
+npm run pm:hub
+
+# Full automated setup
+npm run pm:init
+
+# Test integration
+npm run pm:test
+```
+
+**Features:**
+- 📊 **5 Integrated Databases**: Features, Sprints, Research, Releases, Metrics
+- 🔄 **Automated Workflows**: ResearchHub studies → Feature insights
+- 🎯 **Kanban Boards**: Research-driven project management
+- 🤖 **Smart Automation**: Study completion → Priority updates
+- 📈 **Analytics Dashboard**: Real-time product metrics
+
+**See**: `notion-integration/QUICK_START_GUIDE.md` for complete setup guide
+
+---
+
 ### For Feature Requests
 1. **Requirements**: Check `requirements/approved/` for existing specs
 2. **Context**: Review `MASTER_CONTEXT.md` for full project understanding

@@ -1,8 +1,13 @@
 /**
  * Simple health check API for Vercel deployment
+ * Enhanced with Sentry error tracking
  */
 
-export default function handler(req, res) {
+// Initialize Sentry for backend error tracking
+const { initSentryBackend, withSentry, BackendSentryUtils } = require('./lib/sentry');
+initSentryBackend();
+
+async function healthHandler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -14,12 +19,16 @@ export default function handler(req, res) {
   }
 
   if (req.method === 'GET') {
+    // Track health check
+    BackendSentryUtils.trackAPIPerformance('/api/health', 50, true);
+    
     return res.status(200).json({
       success: true,
       message: 'Afkar API is running',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
-      version: '1.0.0'
+      version: '1.0.0',
+      sentry: 'enabled'
     });
   }
 
@@ -28,3 +37,6 @@ export default function handler(req, res) {
     error: 'Method not allowed'
   });
 }
+
+// Export with Sentry wrapper
+export default withSentry(healthHandler);

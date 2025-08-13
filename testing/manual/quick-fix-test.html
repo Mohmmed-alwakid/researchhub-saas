@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick API Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔧 API Parameter Fix Test</h1>
+    <p>Testing the study ID parameter fix</p>
+    
+    <button onclick="testGetStudy()">Test Get Study (ID: 2)</button>
+    <button onclick="testGetStudyError()">Test Invalid Study (ID: 999)</button>
+    <button onclick="testCanEdit()">Test Can Edit Study</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const baseUrl = 'http://localhost:3003/api/research-consolidated';
+        
+        function addResult(title, data, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${isSuccess ? 'success' : 'error'}`;
+            div.innerHTML = `<strong>${title}</strong><br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            resultsDiv.appendChild(div);
+        }
+        
+        async function testGetStudy() {
+            try {
+                const response = await fetch(`${baseUrl}?action=get-study&id=2`);
+                const data = await response.json();
+                addResult('✅ Get Study Test (ID: 2)', data, response.ok);
+                if (data.success && data.study) {
+                    console.log('Study title:', data.study.title);
+                    console.log('Study status:', data.study.status);
+                }
+            } catch (error) {
+                addResult('❌ Get Study Test Failed', { error: error.message }, false);
+            }
+        }
+        
+        async function testGetStudyError() {
+            try {
+                const response = await fetch(`${baseUrl}?action=get-study&id=999`);
+                const data = await response.json();
+                addResult('Test Invalid Study (ID: 999)', data, false);
+            } catch (error) {
+                addResult('❌ Invalid Study Test Failed', { error: error.message }, false);
+            }
+        }
+        
+        async function testCanEdit() {
+            try {
+                const response = await fetch(`${baseUrl}?action=can-edit-study&id=2`);
+                const data = await response.json();
+                addResult('✅ Can Edit Study Test (ID: 2)', data, response.ok);
+            } catch (error) {
+                addResult('❌ Can Edit Test Failed', { error: error.message }, false);
+            }
+        }
+        
+        // Auto run basic test
+        window.addEventListener('load', testGetStudy);
+    </script>
+</body>
+</html>

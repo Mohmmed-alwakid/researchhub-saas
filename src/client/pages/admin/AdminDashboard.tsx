@@ -1,6 +1,6 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign, FileText, LogOut, Bell, Search } from 'lucide-react';
+import { Users, CreditCard, BarChart3, Settings, Shield, HelpCircle, Activity, Database, DollarSign, FileText, LogOut, Bell, Search, AlertTriangle } from 'lucide-react';
 
 // Admin Sidebar - keep this loaded immediately
 import AdminSidebar from '../../components/admin/AdminSidebar';
@@ -19,6 +19,7 @@ const PaymentManagement = lazy(() => import('../../components/admin/PaymentManag
 const AnalyticsDashboard = lazy(() => import('../../components/admin/AnalyticsDashboard'));
 const FinancialDashboard = lazy(() => import('../../components/admin/FinancialDashboard'));
 const TemplateManagement = lazy(() => import('../../components/admin/templates/TemplateManagement'));
+const SentryDashboard = lazy(() => import('../../../components/admin/SentryDashboard'));
 
 // Loading component for lazy-loaded components
 const AdminLoadingSpinner = () => (
@@ -207,6 +208,14 @@ const adminRoutes: AdminRoute[] = [
     component: AnalyticsDashboard,
     permission: 'SYSTEM_MONITOR',
     description: 'Advanced system analytics and reporting'
+  },
+  {
+    path: '/app/admin/monitoring',
+    label: 'Error Monitoring',
+    icon: AlertTriangle,
+    component: SentryDashboard,
+    permission: 'SYSTEM_MONITOR',
+    description: 'Real-time error tracking and performance monitoring'
   },
   {
     path: '/app/admin/financial',

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Page ID Helper</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #f1f3f4;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4285f4;
+        }
+        .url-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .result {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 2px solid #4caf50;
+        }
+        .error {
+            background: #ffeaea;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 2px solid #f44336;
+        }
+        .copy-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .copy-btn:hover {
+            background: #3367d6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 Notion Page ID Helper</h1>
+            <p>Get your page ID for ResearchHub Product Management setup</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 1: Create Your Notion Page</h3>
+            <ol>
+                <li>Go to your <strong>Notion workspace</strong></li>
+                <li>Create a new page titled: <strong>"ResearchHub Product Management"</strong></li>
+                <li>Share it with your integration (give Edit permissions)</li>
+                <li>Copy the page URL from your browser</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Extract Page ID</h3>
+            <label for="pageUrl">Paste your Notion page URL here:</label>
+            <input type="text" id="pageUrl" class="url-input" placeholder="https://notion.so/workspace/ResearchHub-Product-Management-abc123def456">
+            <button onclick="extractPageId()">Extract Page ID</button>
+        </div>
+
+        <div id="result" style="display: none;"></div>
+
+        <div class="step">
+            <h3>Step 3: Use in CLI</h3>
+            <p>Once you have your page ID:</p>
+            <ol>
+                <li>Run: <code>npm run pm:hub</code></li>
+                <li>Select option <strong>3: Quick parent page setup guide</strong></li>
+                <li>Enter your page ID when prompted</li>
+                <li>Enjoy your automated product management system! 🚀</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Example URLs and Page IDs</h3>
+            <div style="font-family: monospace; font-size: 14px;">
+                <p><strong>URL:</strong> https://notion.so/ResearchHub-Product-Management-<span style="background: yellow;">1234567890abcdef</span></p>
+                <p><strong>Page ID:</strong> <span style="background: yellow;">1234567890abcdef</span></p>
+                <br>
+                <p><strong>URL:</strong> https://notion.so/workspace/My-Page-<span style="background: yellow;">abc123def456ghi789</span></p>
+                <p><strong>Page ID:</strong> <span style="background: yellow;">abc123def456ghi789</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function extractPageId() {
+            const url = document.getElementById('pageUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!url) {
+                resultDiv.innerHTML = '<div class="error">Please enter a Notion page URL</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            // Extract page ID from various Notion URL formats
+            let pageId = null;
+            
+            // Method 1: After last dash
+            const parts = url.split('-');
+            if (parts.length > 1) {
+                const lastPart = parts[parts.length - 1];
+                // Remove any query parameters or fragments
+                pageId = lastPart.split('?')[0].split('#')[0];
+            }
+            
+            // Method 2: If URL has /page/ structure
+            const pageMatch = url.match(/\/([a-f0-9]{32})/i);
+            if (pageMatch) {
+                pageId = pageMatch[1];
+            }
+
+            if (pageId && pageId.length >= 10) {
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <h4>✅ Page ID Extracted Successfully!</h4>
+                        <p><strong>Your Page ID:</strong></p>
+                        <div style="font-family: monospace; font-size: 18px; background: white; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                            ${pageId}
+                        </div>
+                        <button class="copy-btn" onclick="copyToClipboard('${pageId}')">📋 Copy Page ID</button>
+                        <p style="margin-top: 15px; color: #666;">
+                            Now use this ID in option 3 of the CLI setup!
+                        </p>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Could not extract Page ID</h4>
+                        <p>Make sure your URL looks like:</p>
+                        <ul>
+                            <li>https://notion.so/ResearchHub-Product-Management-abc123def456</li>
+                            <li>https://notion.so/workspace/My-Page-1234567890abcdef</li>
+                        </ul>
+                        <p>The Page ID should be the characters after the last dash.</p>
+                    </div>
+                `;
+            }
+            
+            resultDiv.style.display = 'block';
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Page ID copied to clipboard! 📋');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Page ID copied to clipboard! 📋');
+            });
+        }
+
+        // Auto-extract when user pastes URL
+        document.getElementById('pageUrl').addEventListener('paste', function() {
+            setTimeout(extractPageId, 100);
+        });
+    </script>
+</body>
+</html>

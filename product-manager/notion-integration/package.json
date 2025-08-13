@@ -1,0 +1,17 @@
+{
+  "name": "notion-integration",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Notion MCP-powered product management system for ResearchHub",
+  "main": "cli.js",
+  "scripts": {
+    "start": "node cli.js",
+    "test": "node test-integration.js"
+  },
+  "keywords": ["notion", "product-management", "researchhub"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
