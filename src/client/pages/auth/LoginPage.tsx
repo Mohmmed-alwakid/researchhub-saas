@@ -100,7 +100,12 @@ const EnhancedLoginPage = () => {
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back!</h2>
               <p className="text-gray-600">
                 Sign in to your account to continue your research journey.{' '}
-                <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200">
+                <Link 
+                  to="/register" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200"
+                >
                   Create account
                 </Link>
               </p>

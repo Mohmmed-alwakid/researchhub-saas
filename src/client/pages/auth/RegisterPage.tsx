@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
 import GoogleOAuthButton from '../../components/auth/GoogleOAuthButton';
@@ -114,7 +114,19 @@ const RegisterPage = () => {
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <div className="flex items-center">              <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            {/* Back Button */}
+            <div className="mb-4">
+              <Link 
+                to="/login" 
+                className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Login
+              </Link>
+            </div>
+            
+            <div className="flex items-center">
+              <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <AfkarLogo variant="icon" className="h-6 w-6 text-white" />
               </div>
               <h1 className="ml-3 text-2xl font-bold text-gray-900">Afkar</h1>

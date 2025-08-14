@@ -92,6 +92,23 @@ const SettingsPage: React.FC = () => {
   };
 
   // Handle demographics update
+  // Form handlers
+  const handleProfileUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    
+    try {
+      await updateProfile({
+        firstName: formData.get('firstName') as string,
+        lastName: formData.get('lastName') as string,
+      });
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Profile update error:', error);
+      alert('Failed to update profile. Please try again.');
+    }
+  };
+
   const handleDemographicsUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -132,42 +149,62 @@ const SettingsPage: React.FC = () => {
                 <h3 className="text-lg font-semibold">Personal Information</h3>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={user?.firstName || ''}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
+                <form onSubmit={handleProfileUpdate}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        defaultValue={user?.firstName || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        defaultValue={user?.lastName || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={user?.email || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+                        disabled
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Email cannot be changed. Contact support if needed.
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Role
+                      </label>
+                      <input
+                        type="text"
+                        value={user?.role || ''}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+                        disabled
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={user?.lastName || ''}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
+                  <div className="mt-6">
+                    <Button type="submit">Save Changes</Button>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Role
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={user?.role || ''}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <Button>Save Changes</Button>
-                </div>
+                </form>
               </CardContent>
             </Card>            <Card>
               <CardHeader>

@@ -29,8 +29,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ currentPage = 'home'
             >
               Home
             </Link>
-            <a 
-              href="#features" 
+            <Link 
+              to="/features" 
               className={`text-sm font-medium transition-colors ${
                 currentPage === 'features' 
                   ? 'text-primary-600 border-b-2 border-primary-600 pb-1' 
@@ -38,7 +38,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ currentPage = 'home'
               }`}
             >
               Features
-            </a>
+            </Link>
             <Link 
               to="/pricing" 
               className={`text-sm font-medium transition-colors ${
@@ -49,8 +49,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ currentPage = 'home'
             >
               Pricing
             </Link>
-            <a 
-              href="#about" 
+            <Link 
+              to="/about" 
               className={`text-sm font-medium transition-colors ${
                 currentPage === 'about' 
                   ? 'text-primary-600 border-b-2 border-primary-600 pb-1' 
@@ -58,7 +58,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ currentPage = 'home'
               }`}
             >
               About
-            </a>
+            </Link>
           </nav>
           
           <div className="flex items-center space-x-4">

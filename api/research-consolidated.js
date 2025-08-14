@@ -12,65 +12,7 @@ const isLocalDevelopment = process.env.NODE_ENV !== 'production';
 // File path for persistent local storage
 const STUDIES_FILE_PATH = path.join(process.cwd(), 'database', 'local-studies.json');
 
-// Default mock data (only used for initial setup)
-const defaultStudies = [
-  {
-    _id: '1',
-    id: '1',
-    title: 'Sample User Research Study',
-    description: 'A sample study for testing purposes',
-    status: 'active',
-    type: 'usability',
-    target_participants: 50,
-    participants: {
-      enrolled: 25,
-      completed: 15,
-      target: 50
-    },
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    created_by: 'test-user',
-    profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
-  },
-  {
-    _id: '2',
-    id: '2',
-    title: 'Product Testing Study',
-    description: 'Testing new product features',
-    status: 'draft',
-    type: 'usability',
-    target_participants: 30,
-    participants: {
-      enrolled: 0,
-      completed: 0,
-      target: 30
-    },
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    created_by: 'test-user',
-    profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
-  },
-  {
-    _id: '3',
-    id: '3',
-    title: 'User Experience Research',
-    description: 'Evaluating user interface improvements',
-    status: 'completed',
-    type: 'usability',
-    target_participants: 75,
-    participants: {
-      enrolled: 75,
-      completed: 75,
-      target: 75
-    },
-    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    created_by: 'test-user',
-    profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
-  }
-];
-
-// Function to load studies from file or create default
+// Function to load studies from file or create empty
 function loadStudies() {
   try {
     // Ensure database directory exists
@@ -86,15 +28,15 @@ function loadStudies() {
       console.log(`📚 Loaded ${studies.length} studies from persistent storage`);
       return studies;
     } else {
-      // Create file with default studies
-      fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify(defaultStudies, null, 2));
-      console.log(`📚 Created new studies file with ${defaultStudies.length} default studies`);
-      return [...defaultStudies];
+      // Create empty file for studies
+      fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify([], null, 2));
+      console.log(`📚 Created new empty studies file`);
+      return [];
     }
   } catch (error) {
     console.error('Error loading studies:', error);
-    console.log('📚 Using default studies in memory');
-    return [...defaultStudies];
+    console.log('📚 Using empty studies array');
+    return [];
   }
 }
 
@@ -113,6 +55,9 @@ let localStudies = loadStudies();
 
 console.log('🔧 Research API initialized');
 
+/**
+ * Main handler function
+ */
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');

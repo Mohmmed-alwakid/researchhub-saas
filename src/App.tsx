@@ -19,6 +19,8 @@ import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./client/pages/LandingPage'));
+const AboutPage = lazy(() => import('./client/pages/AboutPage'));
+const FeaturesPage = lazy(() => import('./client/pages/FeaturesPage'));
 const PricingPage = lazy(() => import('./client/pages/PricingPage'));
 const LoginPage = lazy(() => import('./client/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('./client/pages/auth/RegisterPage'));
@@ -131,6 +133,8 @@ function App() {
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/features" element={<FeaturesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
