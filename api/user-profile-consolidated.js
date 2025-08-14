@@ -339,12 +339,65 @@ async function handleUpdateProfile(req, res) {
     if (preferences !== undefined) updateData.preferences = preferences;
 
     // Update in users table
-    const { data: updatedProfile, error: updateError } = await supabaseAdmin
-      .from('users')
-      .update(updateData)
-      .eq('id', targetUserId)
-      .select()
-      .single();
+    let updatedProfile, updateError;
+    
+    if (useLocalAuth) {
+      // Use fallback database
+      console.log('🔧 Using fallback database for profile update');
+      try {
+        // Get current user from fallback
+        const userQuery = fallbackDb.prepare('SELECT * FROM users WHERE id = ?');
+        const currentUser = userQuery.get(targetUserId);
+        
+        if (!currentUser) {
+          return res.status(404).json({
+            success: false,
+            error: 'User not found'
+          });
+        }
+        
+        // Prepare update fields
+        const updateFields = [];
+        const updateValues = [];
+        
+        if (firstName) { updateFields.push('first_name = ?'); updateValues.push(firstName); }
+        if (lastName) { updateFields.push('last_name = ?'); updateValues.push(lastName); }
+        if (role) { updateFields.push('role = ?'); updateValues.push(role); }
+        if (organizationId !== undefined) { updateFields.push('organization_id = ?'); updateValues.push(organizationId); }
+        if (bio !== undefined) { updateFields.push('bio = ?'); updateValues.push(bio); }
+        if (location !== undefined) { updateFields.push('location = ?'); updateValues.push(location); }
+        if (timezone !== undefined) { updateFields.push('timezone = ?'); updateValues.push(timezone); }
+        if (preferences !== undefined) { updateFields.push('preferences = ?'); updateValues.push(JSON.stringify(preferences)); }
+        
+        updateFields.push('updated_at = ?');
+        updateValues.push(new Date().toISOString());
+        updateValues.push(targetUserId);
+        
+        const updateQuery = `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`;
+        const stmt = fallbackDb.prepare(updateQuery);
+        stmt.run(...updateValues);
+        
+        // Return updated user
+        const updatedUserQuery = fallbackDb.prepare('SELECT * FROM users WHERE id = ?');
+        updatedProfile = updatedUserQuery.get(targetUserId);
+        updateError = null;
+        
+      } catch (fallbackError) {
+        console.error('Fallback profile update error:', fallbackError);
+        updateError = fallbackError;
+      }
+    } else {
+      // Use Supabase
+      const result = await supabaseAdmin
+        .from('users')
+        .update(updateData)
+        .eq('id', targetUserId)
+        .select()
+        .single();
+      
+      updatedProfile = result.data;
+      updateError = result.error;
+    }
 
     if (updateError) {
       console.error('Update profile error:', updateError);

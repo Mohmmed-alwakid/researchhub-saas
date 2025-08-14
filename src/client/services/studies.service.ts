@@ -155,7 +155,7 @@ export const studiesService = {
    */
   async canEditStudy(studyId: string): Promise<{ canEdit: boolean; reason?: string }> {
     try {
-      const response = await apiService.get<{ success: boolean; canEdit: boolean; reason?: string }>(`research?action=can-edit-study&id=${studyId}`);
+      const response = await apiService.get<{ success: boolean; canEdit: boolean; reason?: string }>(`research-consolidated?action=can-edit-study&id=${studyId}`);
       
       if (!response.success) {
         return { canEdit: false, reason: 'Failed to check edit permissions' };

@@ -176,8 +176,9 @@ class GoogleOAuthService {
    * Check if current environment supports Google OAuth
    */
   isGoogleOAuthConfigured() {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    return Boolean(clientId && clientId !== 'your-google-client-id');
+    // For Supabase OAuth, we just need the provider to be enabled in the dashboard
+    // Return true if we have a valid Supabase URL and key
+    return Boolean(supabaseUrl && supabaseKey);
   }
 }
 

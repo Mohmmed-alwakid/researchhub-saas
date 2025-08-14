@@ -123,13 +123,53 @@ async function getStudies(req, res) {
   try {
     console.log(`📚 Getting studies - count: ${localStudies.length}`);
     
+    // Try to get user info from token (optional for public studies)
+    let userRole = 'participant'; // Default to participant
+    let userId = null;
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        // Extract user info from token if available
+        const token = authHeader.replace('Bearer ', '');
+        if (token.startsWith('fallback-token-')) {
+          // Parse fallback token: fallback-token-{userId}-{role}
+          const parts = token.split('-');
+          if (parts.length >= 4) {
+            userId = parts[2];
+            userRole = parts[3];
+          }
+        }
+        console.log(`🔍 User context: role=${userRole}, id=${userId}`);
+      } catch (error) {
+        console.log('⚠️ Could not parse token, treating as public request');
+      }
+    }
+    
+    let filteredStudies = [...localStudies];
+    
+    // Filter studies based on user role
+    if (userRole === 'researcher') {
+      // Researchers see only their own studies
+      filteredStudies = localStudies.filter(study => 
+        study.created_by === userId || study.creator_id === userId
+      );
+      console.log(`🔬 Researcher view: ${filteredStudies.length} studies`);
+    } else {
+      // Participants see all active/public studies
+      filteredStudies = localStudies.filter(study => 
+        study.status === 'active' || study.status === 'published'
+      );
+      console.log(`👥 Participant view: ${filteredStudies.length} active studies`);
+    }
+    
     return res.status(200).json({
       success: true,
-      studies: localStudies,
+      studies: filteredStudies,
       pagination: {
         currentPage: 1,
         totalPages: 1,
-        totalStudies: localStudies.length,
+        totalStudies: filteredStudies.length,
         hasNext: false,
         hasPrev: false
       }
@@ -160,6 +200,31 @@ async function createStudy(req, res) {
       });
     }
 
+    // Get user info from token
+    let userId = 'test-user';
+    let userEmail = 'researcher@test.com';
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        if (token.startsWith('fallback-token-')) {
+          // Parse fallback token: fallback-token-{userId}-{role}
+          const parts = token.split('-');
+          if (parts.length >= 4) {
+            userId = parts[2];
+            // Try to extract email from parts[4] if available
+            if (parts.length >= 5) {
+              userEmail = decodeURIComponent(parts[4]);
+            }
+          }
+        }
+        console.log(`👤 Creating study for user: ${userId} (${userEmail})`);
+      } catch (error) {
+        console.log('⚠️ Could not parse token, using default user');
+      }
+    }
+
     // Generate new ID
     const newId = (localStudies.length + 1).toString();
 
@@ -170,7 +235,7 @@ async function createStudy(req, res) {
       title: studyData.title,
       description: studyData.description || '',
       type: studyData.type || 'usability',
-      status: studyData.status || 'active',
+      status: studyData.status || 'active', // Default to active so participants can see it
       settings: studyData.settings || {},
       blocks: studyData.blocks || [],
       target_participants: studyData.target_participants || 10,
@@ -181,8 +246,9 @@ async function createStudy(req, res) {
       },
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      created_by: 'test-user',
-      profiles: { email: 'researcher@test.com', full_name: 'Test Researcher' }
+      created_by: userId,
+      creator_id: userId, // Also add this for compatibility
+      profiles: { email: userEmail, full_name: 'Researcher' }
     };
 
     // Add to local storage
