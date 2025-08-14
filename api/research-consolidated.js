@@ -9,16 +9,20 @@ import path from 'path';
 // In development with fallback database, we'll use a simpler approach
 const isLocalDevelopment = process.env.NODE_ENV !== 'production';
 
-// File path for persistent local storage
-const STUDIES_FILE_PATH = path.join(process.cwd(), 'database', 'local-studies.json');
+// Studies storage path - use temp directory for production
+const STUDIES_FILE_PATH = process.env.VERCEL 
+  ? '/tmp/studies.json' 
+  : path.join(process.cwd(), 'testing', 'data', 'studies.json');
 
 // Function to load studies from file or create empty
 function loadStudies() {
   try {
-    // Ensure database directory exists
-    const dbDir = path.dirname(STUDIES_FILE_PATH);
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });
+    // Ensure database directory exists (skip in production)
+    if (!process.env.VERCEL) {
+      const dbDir = path.dirname(STUDIES_FILE_PATH);
+      if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+      }
     }
 
     // Try to load existing studies
@@ -28,9 +32,11 @@ function loadStudies() {
       console.log(`📚 Loaded ${studies.length} studies from persistent storage`);
       return studies;
     } else {
-      // Create empty file for studies
-      fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify([], null, 2));
-      console.log(`📚 Created new empty studies file`);
+      // Create empty file for studies (skip in production temp directories)
+      if (!process.env.VERCEL) {
+        fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify([], null, 2));
+        console.log(`📚 Created new empty studies file`);
+      }
       return [];
     }
   } catch (error) {
@@ -47,6 +53,10 @@ function saveStudies(studies) {
     console.log(`💾 Saved ${studies.length} studies to persistent storage`);
   } catch (error) {
     console.error('Error saving studies:', error);
+    // Don't throw error in production - just log it
+    if (!process.env.VERCEL) {
+      console.warn('Studies will not persist across restarts');
+    }
   }
 }
 
