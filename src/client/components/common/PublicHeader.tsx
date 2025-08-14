@@ -68,7 +68,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ currentPage = 'home'
             >
               Sign in
             </Link>
-            <Link to="/register">
+            <Link 
+              to="/register" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
               <Button size="sm">
                 Get Started
               </Button>

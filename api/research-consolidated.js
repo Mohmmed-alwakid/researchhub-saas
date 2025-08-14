@@ -121,6 +121,9 @@ export default async function handler(req, res) {
  */
 async function getStudies(req, res) {
   try {
+    // Reload studies from persistent storage to ensure we have latest data
+    localStudies = loadStudies();
+    
     console.log(`📚 Getting studies - count: ${localStudies.length}`);
     
     // Try to get user info from token (optional for public studies)
@@ -189,6 +192,9 @@ async function getStudies(req, res) {
  */
 async function createStudy(req, res) {
   try {
+    // Reload studies from persistent storage to ensure we have latest data
+    localStudies = loadStudies();
+    
     const studyData = req.body;
     console.log(`📝 Creating study: ${studyData.title}`);
 
@@ -278,6 +284,9 @@ async function createStudy(req, res) {
  */
 async function getStudy(req, res) {
   try {
+    // Reload studies from persistent storage to ensure we have latest data
+    localStudies = loadStudies();
+    
     const { id } = req.query;
 
     if (!id) {
@@ -315,6 +324,9 @@ async function getStudy(req, res) {
  */
 async function updateStudy(req, res) {
   try {
+    // Reload studies from persistent storage to ensure we have latest data
+    localStudies = loadStudies();
+    
     const { id } = req.query;
     const studyData = req.body;
 

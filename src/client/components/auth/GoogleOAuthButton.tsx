@@ -19,7 +19,8 @@ export const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
 
   const handleGoogleAuth = async () => {
     if (!googleOAuthService.isGoogleOAuthConfigured()) {
-      // Google OAuth not configured - silently disable the button
+      // Google OAuth not configured - show user-friendly message
+      alert('Google OAuth is not currently configured. Please use email/password authentication.');
       return;
     }
 
@@ -31,6 +32,12 @@ export const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
       });
 
       if (!result.success) {
+        // Handle specific Supabase errors
+        if (result.error?.includes('provider is not enabled') || result.error?.includes('Unsupported provider')) {
+          alert('Google authentication is not currently available. Please contact support or use email/password authentication.');
+          setIsLoading(false);
+          return;
+        }
         throw new Error(result.error || 'Google authentication failed');
       }
 
@@ -40,7 +47,14 @@ export const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
     } catch (error) {
       console.error('Google OAuth error:', error);
       setIsLoading(false);
-      // You might want to show a toast or error message here
+      
+      // Show user-friendly error message
+      const errorMessage = error instanceof Error ? error.message : 'Google authentication failed';
+      if (errorMessage.includes('provider is not enabled') || errorMessage.includes('Unsupported provider')) {
+        alert('Google authentication is not currently available. Please use email/password authentication.');
+      } else {
+        alert(`Authentication failed: ${errorMessage}`);
+      }
     }
   };
 

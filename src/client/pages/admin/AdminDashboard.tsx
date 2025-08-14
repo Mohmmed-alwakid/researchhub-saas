@@ -9,6 +9,9 @@ import { useAuthStore } from '../../stores/authStore';
 // Import the new tab-based user management component
 import UserManagement from '../../components/admin/UserManagement';
 
+// Import AdminStudiesPage immediately since it's a core admin feature
+import AdminStudiesPage from './AdminStudiesPage';
+
 // Lazy load admin components for better bundle splitting
 const SubscriptionManager = lazy(() => import('../../components/admin/SubscriptionManager'));
 const RolePermissionManager = lazy(() => import('../../components/admin/RolePermissionManager'));
@@ -229,7 +232,7 @@ const adminRoutes: AdminRoute[] = [
     path: '/app/admin/studies',
     label: 'Study Oversight',
     icon: Database,
-    component: () => <div className="p-6"><p>Study oversight coming soon...</p></div>,
+    component: AdminStudiesPage,
     permission: 'STUDY_VIEW_ALL',
     description: 'Monitor all platform studies'
   },

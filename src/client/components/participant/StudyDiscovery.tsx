@@ -181,11 +181,25 @@ class StudyDiscoveryAPI {
       
       // If API fails, fallback to mock data with demographic filtering
       console.log('🔄 API failed, using mock data with demographic filtering:', response.error);
-      return this.getMockStudiesWithDemographicFiltering(filters, page, limit, userDemographics);
+      const mockData = this.getMockStudiesWithDemographicFiltering(filters, page, limit, userDemographics);
+      // Mark studies as mock data for clear identification
+      mockData.studies = mockData.studies.map(study => ({
+        ...study,
+        title: `[DEMO] ${study.title}`,
+        description: `⚠️ This is demo data. ${study.description}`
+      }));
+      return mockData;
       
     } catch (error) {
       console.log('🔄 API error, using mock data with demographic filtering:', error);
-      return this.getMockStudiesWithDemographicFiltering(filters, page, limit, this.authClient.user?.demographics);
+      const mockData = this.getMockStudiesWithDemographicFiltering(filters, page, limit, this.authClient.user?.demographics);
+      // Mark studies as mock data for clear identification
+      mockData.studies = mockData.studies.map(study => ({
+        ...study,
+        title: `[DEMO] ${study.title}`,
+        description: `⚠️ This is demo data. ${study.description}`
+      }));
+      return mockData;
     }
   }
 
