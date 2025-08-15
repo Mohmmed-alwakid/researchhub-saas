@@ -65,19 +65,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { endpoint } = req.query;
+    const { endpoint, action } = req.query;
+
+    console.log('📋 Applications API - Query params:', { endpoint, action, method: req.method });
 
     // Handle different endpoint patterns
-    if (endpoint === 'applications/my-applications') {
+    if (endpoint === 'applications/my-applications' || action === 'my-applications') {
       return await getMyApplications(req, res);
     } else if (endpoint && endpoint.includes('/withdraw')) {
       return await withdrawApplication(req, res);
     } else if (endpoint && endpoint.includes('/applications')) {
       return await getStudyApplications(req, res);
+    } else if (action === 'apply' || req.method === 'POST') {
+      return await submitApplication(req, res);
     } else {
+      console.log('❌ Applications API - Invalid parameters:', { endpoint, action });
       return res.status(400).json({ 
         success: false, 
-        error: 'Invalid endpoint parameter' 
+        error: `Invalid endpoint or action parameter. Received: endpoint=${endpoint}, action=${action}` 
       });
     }
 
@@ -183,6 +188,48 @@ async function getStudyApplications(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: 'Failed to fetch study applications' 
+    });
+  }
+}
+
+/**
+ * Submit a study application
+ */
+async function submitApplication(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const { studyId, responses } = req.body;
+
+    console.log('📋 Submit application request:', { studyId, responses, userId: auth.user.id });
+
+    // For now, return success response
+    // In the future, this would save to applications table
+    const application = {
+      id: Date.now().toString(),
+      study_id: studyId,
+      participant_id: auth.user.id,
+      status: 'pending',
+      responses: responses || {},
+      submitted_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    return res.status(201).json({ 
+      success: true, 
+      data: application,
+      message: 'Application submitted successfully' 
+    });
+
+  } catch (error) {
+    console.error('Submit application error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to submit application' 
     });
   }
 }

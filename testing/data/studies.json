@@ -1,49 +1,66 @@
 [
   {
-    "_id": "2",
-    "id": "2",
-    "title": "Test Study",
-    "description": "API Fix Test Study",
-    "type": "usability",
-    "status": "active",
-    "settings": {},
-    "blocks": [],
-    "target_participants": 10,
-    "participants": {
-      "enrolled": 0,
-      "completed": 0,
-      "target": 10
-    },
-    "created_at": "2025-08-14T22:27:29.272Z",
-    "updated_at": "2025-08-14T22:27:29.272Z",
-    "created_by": "user",
-    "creator_id": "user",
-    "profiles": {
-      "email": "researcher",
-      "full_name": "Researcher"
-    }
-  },
-  {
     "_id": "1",
     "id": "1",
-    "title": "Test Study",
-    "description": "API Fix Test Study",
+    "title": "sdfdf",
+    "description": "dsfsdfsdfsdfsdf",
     "type": "usability",
     "status": "active",
     "settings": {},
-    "blocks": [],
+    "blocks": [
+      {
+        "id": "block_1755220597997_welcome",
+        "order": 1,
+        "type": "welcome_screen",
+        "title": "Welcome",
+        "description": "Welcome to our study!",
+        "settings": {
+          "title": "Welcome to our usability study",
+          "message": "Thank you for participating in our usability research. Your feedback will help us improve our product.",
+          "showContinueButton": true
+        }
+      },
+      {
+        "id": "block_1755220599193",
+        "order": 2,
+        "type": "website_navigation",
+        "title": "Website Navigation",
+        "description": "Navigate to a specific page or section",
+        "settings": {
+          "title": "Navigation Task",
+          "startUrl": "https://example.com",
+          "targetUrl": "https://example.com/contact",
+          "instruction": "Navigate to the contact page",
+          "trackClicks": true,
+          "trackTime": true
+        }
+      },
+      {
+        "id": "block_1755220597998_thank_you",
+        "order": 3,
+        "type": "thank_you_screen",
+        "title": "Thank You",
+        "description": "Thank you for participating!",
+        "settings": {
+          "title": "Thank you for your participation!",
+          "message": "Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.",
+          "showCompletionCode": false,
+          "redirectUrl": ""
+        }
+      }
+    ],
     "target_participants": 10,
     "participants": {
       "enrolled": 0,
       "completed": 0,
       "target": 10
     },
-    "created_at": "2025-08-14T22:26:41.355Z",
-    "updated_at": "2025-08-14T22:26:41.355Z",
-    "created_by": "user",
-    "creator_id": "user",
+    "created_at": "2025-08-15T01:16:42.285Z",
+    "updated_at": "2025-08-15T01:16:42.285Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
     "profiles": {
-      "email": "researcher",
+      "email": "researcher@test.com",
       "full_name": "Researcher"
     }
   }

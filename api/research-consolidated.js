@@ -110,6 +110,9 @@ export default async function handler(req, res) {
       case 'archive-study':
         return await archiveStudy(req, res);
       
+      case 'apply':
+        return await applyToStudy(req, res);
+      
       default:
         return res.status(400).json({
           success: false,
@@ -651,6 +654,82 @@ async function archiveStudy(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Failed to archive study'
+    });
+  }
+}
+
+/**
+ * Apply to a study
+ */
+async function applyToStudy(req, res) {
+  try {
+    console.log('📋 Apply to study request:', req.body);
+
+    const { studyId, responses } = req.body;
+
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    // Get user from token
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      if (token.startsWith('fallback-token-')) {
+        // Parse fallback token: fallback-token-{userId}-{role}
+        const parts = token.split('-');
+        if (parts.length >= 3) {
+          userId = parts[2];
+        }
+      }
+    }
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    // Find the study
+    const study = localStudies.find(s => s.id === studyId);
+    if (!study) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+
+    // Create application record
+    const application = {
+      id: Date.now().toString(),
+      study_id: studyId,
+      participant_id: userId,
+      status: 'pending',
+      responses: responses || {},
+      submitted_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    console.log('📋 Created application:', application);
+
+    return res.status(201).json({
+      success: true,
+      data: application,
+      message: 'Application submitted successfully'
+    });
+
+  } catch (error) {
+    console.error('Apply to study error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to submit application'
     });
   }
 }

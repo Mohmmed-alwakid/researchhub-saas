@@ -35,57 +35,74 @@ export function initSentry() {
     return;
   }
 
-  Sentry.init({
-    dsn: config.dsn,
-    environment: config.environment,
-    debug: config.debug,
-    
-    // Performance Monitoring
-    integrations: [
-      Sentry.browserTracingIntegration(),
-    ],
+  try {
+    Sentry.init({
+      dsn: config.dsn,
+      environment: config.environment,
+      debug: config.debug,
+      
+      // Performance Monitoring
+      integrations: [
+        Sentry.browserTracingIntegration(),
+      ],
 
-    // Sampling rates
-    tracesSampleRate: config.tracesSampleRate,
+      // Sampling rates
+      tracesSampleRate: config.tracesSampleRate,
 
-    // Release and user context
-    release: `researchhub-saas@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
-    
-    // Enhanced transport configuration to handle blocking
-    transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
-    
-    // Graceful error handling for transport failures
-    beforeSend(event, hint) {
-      // Filter out development noise
-      if (currentEnv === 'development') {
-        const error = hint.originalException as Error;
-        
-        // Skip HMR and development errors
-        if (error?.message?.includes('HMR') || 
-            error?.message?.includes('Module build failed') ||
-            error?.message?.includes('WebSocket connection') ||
-            error?.message?.includes('Failed to fetch')) {
-          return null;
+      // Release and user context
+      release: `researchhub-saas@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
+      
+      // Enhanced transport configuration to handle blocking
+      transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
+      
+      // Graceful error handling for transport failures
+      beforeSend(event, hint) {
+        try {
+          // Filter out development noise
+          if (currentEnv === 'development') {
+            const error = hint.originalException as Error;
+            const errorMessage = error?.message || event.message || '';
+            
+            // Filter out XHR instrumentation errors
+            if (errorMessage.includes('Cannot create proxy with a non-object') ||
+                errorMessage.includes('instrumentXHR') ||
+                errorMessage.includes('Error while instrumenting xhr')) {
+              console.log('📊 Sentry: Filtered XHR instrumentation error');
+              return null;
+            }
+            
+            // Skip HMR and development errors
+            if (errorMessage.includes('HMR') || 
+                errorMessage.includes('Module build failed') ||
+                errorMessage.includes('WebSocket connection') ||
+                errorMessage.includes('Failed to fetch') ||
+                errorMessage.includes('BLOCKED_BY_CLIENT')) {
+              console.log('📊 Sentry: Filtered development/blocked error');
+              return null;
+            }
+          }
+
+          // Enhanced error context for ResearchHub
+          if (event.exception) {
+          const error = event.exception.values?.[0];
+          if (error) {
+            // Add ResearchHub-specific context
+            event.tags = {
+              ...event.tags,
+              component: getComponentFromPath(window.location.pathname),
+              feature: getFeatureFromPath(window.location.pathname),
+              userRole: getCurrentUserRole(),
+              studyContext: getCurrentStudyContext()
+            };
+          }
         }
-      }
 
-      // Enhanced error context for ResearchHub
-      if (event.exception) {
-        const error = event.exception.values?.[0];
-        if (error) {
-          // Add ResearchHub-specific context
-          event.tags = {
-            ...event.tags,
-            component: getComponentFromPath(window.location.pathname),
-            feature: getFeatureFromPath(window.location.pathname),
-            userRole: getCurrentUserRole(),
-            studyContext: getCurrentStudyContext()
-          };
+        return event;
+        } catch (filterError) {
+          console.warn('Sentry beforeSend error:', filterError);
+          return event;
         }
-      }
-
-      return event;
-    },
+      },
 
     // Enhanced breadcrumbs
     beforeBreadcrumb(breadcrumb) {
@@ -104,7 +121,11 @@ export function initSentry() {
     }
   });
 
-  console.log(`🔍 Sentry initialized for ResearchHub (${config.environment})`);
+    console.log(`🔍 Sentry initialized for ResearchHub (${config.environment})`);
+  } catch (error) {
+    console.warn('🔍 Sentry initialization failed (possibly blocked):', error);
+    console.log('📊 Continuing without error monitoring');
+  }
 }
 
 /**
