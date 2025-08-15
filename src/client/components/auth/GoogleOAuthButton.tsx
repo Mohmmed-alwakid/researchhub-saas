@@ -50,10 +50,15 @@ export const GoogleOAuthButton: React.FC<GoogleOAuthButtonProps> = ({
       
       // Show user-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Google authentication failed';
+      
       if (errorMessage.includes('provider is not enabled') || errorMessage.includes('Unsupported provider')) {
         alert('Google authentication is not currently available. Please use email/password authentication.');
+      } else if (errorMessage.includes('redirect_uri_mismatch') || errorMessage.includes('invalid request')) {
+        alert('Google authentication is being configured. Please try again in a few minutes or use email/password authentication.');
+      } else if (errorMessage.includes('access_denied')) {
+        alert('Google sign-in was cancelled. Please try again or use email/password authentication.');
       } else {
-        alert(`Authentication failed: ${errorMessage}`);
+        alert(`Authentication failed: ${errorMessage}. Please try email/password authentication.`);
       }
     }
   };

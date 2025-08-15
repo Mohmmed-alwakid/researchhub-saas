@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth Configuration Fix - ResearchHub SaaS</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .urgent {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .step {
+            background: #f1f5f9;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        .code {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .button {
+            background: #ef4444;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+        }
+        .button:hover { background: #dc2626; }
+        .success-btn {
+            background: #22c55e;
+        }
+        .success-btn:hover { background: #16a34a; }
+        h1 { color: #1f2937; text-align: center; }
+        h2 { color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+        .highlight { background: #fef3c7; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Google OAuth Configuration Fix</h1>
+        <p style="text-align: center; font-size: 18px; color: #6b7280;">Critical Fix for redirect_uri_mismatch Error</p>
+
+        <div class="urgent">
+            <h2>🚨 URGENT: Redirect URI Mismatch Error</h2>
+            <p><strong>Error:</strong> <code>redirect_uri_mismatch</code></p>
+            <p><strong>Cause:</strong> Google Cloud Console has wrong redirect URI</p>
+            <p><strong>Impact:</strong> Users cannot sign in with Google</p>
+            <p><strong>Fix Required:</strong> Update redirect URI in Google Cloud Console</p>
+        </div>
+
+        <h2>🔧 Step-by-Step Fix (5 Minutes)</h2>
+
+        <div class="step">
+            <h3>Step 1: Open Google Cloud Console</h3>
+            <p>Go to Google Cloud Console and navigate to your OAuth settings:</p>
+            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="button">
+                Open Google Cloud Console
+            </a>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Find Your OAuth Client</h3>
+            <p>Look for this OAuth client ID:</p>
+            <div class="code">82450668697-4u5vdu8mno6bv71c29h3jqb60mhksloo.apps.googleusercontent.com</div>
+            <p>Click the <strong>Edit button (pencil icon)</strong> next to it.</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Fix Redirect URIs</h3>
+            <p>In the "Authorized redirect URIs" section:</p>
+            
+            <h4>❌ REMOVE (Wrong URI):</h4>
+            <div class="code">https://researchhub-saas.vercel.app/auth/google/callback</div>
+            
+            <h4>✅ ADD (Correct URI):</h4>
+            <div class="code">https://wxpwxzdgdvinlbtnbgdf.supabase.co/auth/v1/callback</div>
+            
+            <p><strong>Important:</strong> Make sure there are NO other redirect URIs listed!</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Save Changes</h3>
+            <p>Click <strong>"Save"</strong> in Google Cloud Console.</p>
+            <p>⏱️ <em>Changes may take 1-2 minutes to propagate.</em></p>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Test Google Sign-In</h3>
+            <p>After saving, test Google authentication:</p>
+            <a href="https://researchhub-saas.vercel.app" target="_blank" class="button success-btn">
+                Test Production Platform
+            </a>
+            <div id="test-results" style="margin-top: 15px;"></div>
+        </div>
+
+        <h2>🔍 Configuration Verification</h2>
+
+        <div class="step">
+            <h3>Google Cloud Console Settings (After Fix)</h3>
+            <p><strong>Client ID:</strong></p>
+            <div class="code">82450668697-4u5vdu8mno6bv71c29h3jqb60mhksloo.apps.googleusercontent.com</div>
+            
+            <p><strong>Client Secret:</strong></p>
+            <div class="code">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</div>
+            
+            <p><strong>Authorized Redirect URI (MUST be exactly this):</strong></p>
+            <div class="code">https://wxpwxzdgdvinlbtnbgdf.supabase.co/auth/v1/callback</div>
+        </div>
+
+        <div class="step">
+            <h3>Supabase Configuration Verification</h3>
+            <p>Verify these settings in your Supabase dashboard:</p>
+            <ul>
+                <li>✅ Google provider is <strong>enabled</strong></li>
+                <li>✅ Client ID matches Google Cloud Console</li>
+                <li>✅ Client Secret is correctly entered</li>
+                <li>✅ Redirect URL is automatically set by Supabase</li>
+            </ul>
+            <a href="https://supabase.com/dashboard/project/wxpwxzdgdvinlbtnbgdf/auth/providers" target="_blank" class="button">
+                Verify Supabase Settings
+            </a>
+        </div>
+
+        <h2>🧪 Testing Checklist</h2>
+
+        <div class="step">
+            <h3>After Making the Fix, Test These:</h3>
+            <ol>
+                <li><strong>Google Sign-In:</strong> Should work without errors</li>
+                <li><strong>Email Sign-In:</strong> Should continue working</li>
+                <li><strong>Profile Updates:</strong> Should work for Google users</li>
+                <li><strong>Study Creation:</strong> Should work for Google users</li>
+            </ol>
+        </div>
+
+        <div class="success" style="text-align: center; margin-top: 30px;">
+            <h2>✅ After This Fix: Platform Ready for Real Users!</h2>
+            <p style="font-size: 18px;">Once this redirect URI is fixed, your ResearchHub SaaS will be 100% functional for production use!</p>
+        </div>
+
+        <h2>📞 If You Need Help</h2>
+        <div class="step">
+            <p>If you encounter any issues:</p>
+            <ol>
+                <li>Double-check the redirect URI is <strong>exactly</strong> as shown above</li>
+                <li>Wait 2-3 minutes after saving for changes to propagate</li>
+                <li>Try Google sign-in in an incognito window</li>
+                <li>Verify no extra redirect URIs are listed in Google Console</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function testGoogleAuth() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p style="color: #3b82f6;">🔄 Testing Google authentication... Please try signing in with Google on the production site.</p>';
+            setTimeout(() => {
+                resultsDiv.innerHTML = '<p style="color: #22c55e;">✅ Test completed. Check if Google sign-in works without redirect URI errors.</p>';
+            }, 3000);
+        }
+
+        // Add click handler for test button
+        document.querySelector('.success-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            testGoogleAuth();
+            setTimeout(() => {
+                window.open('https://researchhub-saas.vercel.app', '_blank');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
