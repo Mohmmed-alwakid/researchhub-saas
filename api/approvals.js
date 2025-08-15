@@ -43,43 +43,69 @@ export default async function handler(req, res) {
 
 async function handleGetApprovals(req, res) {
   const { workspaceId, status } = req.query;
-  
-  // TODO: Implement get approvals logic
-  return res.status(200).json({
-    success: true,
-    data: []
-  });
+    try {
+      let query = supabase.from('approvals').select('*');
+      if (workspaceId) query = query.eq('workspaceId', workspaceId);
+      if (status) query = query.eq('status', status);
+      query = query.order('createdAt', { ascending: true });
+      const { data, error } = await query;
+      if (error) throw error;
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
 }
 
 async function handleRequestApproval(req, res) {
   const { entityType, entityId, workspaceId, requestedBy, approvalType } = req.body;
-  
-  // TODO: Implement request approval logic
-  return res.status(200).json({
-    success: true,
-    data: {
-      id: `approval_${Date.now()}`,
-      entityType,
-      entityId,
-      workspaceId,
-      requestedBy,
-      approvalType,
-      status: 'pending',
-      createdAt: new Date()
+    try {
+      const { data, error } = await supabase
+        .from('approvals')
+        .insert([
+          {
+            entityType,
+            entityId,
+            workspaceId,
+            requestedBy,
+            approvalType,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+          }
+        ])
+        .select();
+      if (error) throw error;
+      return res.status(200).json({ success: true, data: data[0] });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
     }
-  });
 }
 
 async function handleApprove(req, res) {
   const { approvalId, approvedBy, notes } = req.body;
-  
-  // TODO: Implement approve logic
-  return res.status(200).json({ success: true });
+    try {
+      const { data, error } = await supabase
+        .from('approvals')
+        .update({ status: 'approved', approvedBy, notes, approvedAt: new Date().toISOString() })
+        .eq('id', approvalId)
+        .select();
+      if (error) throw error;
+      return res.status(200).json({ success: true, data: data[0] });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
 }
 
 async function handleReject(req, res) {
   const { approvalId, rejectedBy, reason } = req.body;
-  
-  // TODO: Implement reject logic
-  return res.status(200).json({ success: true });
+    try {
+      const { data, error } = await supabase
+        .from('approvals')
+        .update({ status: 'rejected', rejectedBy, reason, rejectedAt: new Date().toISOString() })
+        .eq('id', approvalId)
+        .select();
+      if (error) throw error;
+      return res.status(200).json({ success: true, data: data[0] });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
 }

@@ -10,9 +10,7 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 4
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "reporter": [
       [
@@ -44,9 +42,7 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 4
-        },
+        "metadata": {},
         "id": "chromium",
         "name": "chromium",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -60,9 +56,7 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 4
-        },
+        "metadata": {},
         "id": "firefox",
         "name": "firefox",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -76,9 +70,7 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 4
-        },
+        "metadata": {},
         "id": "webkit",
         "name": "webkit",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -92,9 +84,7 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 4
-        },
+        "metadata": {},
         "id": "mobile-chrome",
         "name": "mobile-chrome",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -112,292 +102,19 @@
     "workers": 8,
     "webServer": null
   },
-  "suites": [
+  "suites": [],
+  "errors": [
     {
-      "title": "enhanced-participant-profile.spec.js",
-      "file": "enhanced-participant-profile.spec.js",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Enhanced Participant Profile & Study Matching",
-          "file": "enhanced-participant-profile.spec.js",
-          "line": 16,
-          "column": 6,
-          "specs": [
-            {
-              "title": "should update participant demographics and filter studies accordingly",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 13137,
-                      "error": {
-                        "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================",
-                        "stack": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:28:16",
-                        "location": {
-                          "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                          "column": 16,
-                          "line": 28
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 26 |\u001b[39m     \n \u001b[90m 27 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \n \u001b[90m 30 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                            "column": 16,
-                            "line": 28
-                          },
-                          "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n\n\u001b[0m \u001b[90m 26 |\u001b[39m     \n \u001b[90m 27 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m     \n \u001b[90m 30 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:28:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-08T22:14:16.675Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-38ce6--filter-studies-accordingly-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                        "column": 16,
-                        "line": 28
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "fa67459c0aef2a044903-27bbef7771c0d422b71e",
-              "file": "enhanced-participant-profile.spec.js",
-              "line": 18,
-              "column": 3
-            },
-            {
-              "title": "should show demographics tab only for participants",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3180,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "✅ Demographics tab correctly hidden for researcher role\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-08T22:14:16.650Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fa67459c0aef2a044903-3a7a34cc400d5db07cc9",
-              "file": "enhanced-participant-profile.spec.js",
-              "line": 120,
-              "column": 3
-            },
-            {
-              "title": "should require mandatory demographic fields",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 12790,
-                      "error": {
-                        "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================",
-                        "stack": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:158:16",
-                        "location": {
-                          "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                          "column": 16,
-                          "line": 158
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 156 |\u001b[39m     \n \u001b[90m 157 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 158 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 159 |\u001b[39m     \n \u001b[90m 160 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 161 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                            "column": 16,
-                            "line": 158
-                          },
-                          "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n\n\u001b[0m \u001b[90m 156 |\u001b[39m     \n \u001b[90m 157 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 158 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 159 |\u001b[39m     \n \u001b[90m 160 |\u001b[39m     \u001b[90m// Navigate to settings\u001b[39m\n \u001b[90m 161 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:158:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-08T22:14:16.626Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-cb29b-andatory-demographic-fields-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                        "column": 16,
-                        "line": 158
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "fa67459c0aef2a044903-b20401acd849257b46d4",
-              "file": "enhanced-participant-profile.spec.js",
-              "line": 148,
-              "column": 3
-            },
-            {
-              "title": "should demonstrate automatic study matching",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 13344,
-                      "error": {
-                        "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================",
-                        "stack": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:208:16",
-                        "location": {
-                          "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                          "column": 16,
-                          "line": 208
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 206 |\u001b[39m     \n \u001b[90m 207 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 208 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 209 |\u001b[39m     \n \u001b[90m 210 |\u001b[39m     \u001b[90m// Set specific demographics to test matching\u001b[39m\n \u001b[90m 211 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                            "column": 16,
-                            "line": 208
-                          },
-                          "message": "TimeoutError: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/participant/**\" until \"load\"\n  navigated to \"http://localhost:5175/app\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n  navigated to \"http://localhost:5175/app/participant-dashboard\"\n============================================================\n\n\u001b[0m \u001b[90m 206 |\u001b[39m     \n \u001b[90m 207 |\u001b[39m     \u001b[90m// Wait for redirect\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 208 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/participant/**'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 209 |\u001b[39m     \n \u001b[90m 210 |\u001b[39m     \u001b[90m// Set specific demographics to test matching\u001b[39m\n \u001b[90m 211 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5175/settings'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js:208:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-08T22:14:16.660Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "D:\\MAMP\\AfakarM\\test-results\\enhanced-participant-profi-977c0-te-automatic-study-matching-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "D:\\MAMP\\AfakarM\\testing\\playwright-mcp\\enhanced-participant-profile.spec.js",
-                        "column": 16,
-                        "line": 208
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "fa67459c0aef2a044903-4260af4dbf38f7fcf968",
-              "file": "enhanced-participant-profile.spec.js",
-              "line": 198,
-              "column": 3
-            }
-          ]
-        }
-      ]
+      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
+      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
     }
   ],
-  "errors": [],
   "stats": {
-    "startTime": "2025-08-08T22:14:15.044Z",
-    "duration": 15657.066,
-    "expected": 1,
+    "startTime": "2025-08-15T04:34:59.475Z",
+    "duration": 29.82299999999998,
+    "expected": 0,
     "skipped": 0,
-    "unexpected": 3,
+    "unexpected": 0,
     "flaky": 0
   }
 }

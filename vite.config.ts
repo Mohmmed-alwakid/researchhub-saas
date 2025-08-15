@@ -21,6 +21,9 @@ export default defineConfig({
     assetsDir: 'assets',
     sourcemap: false,
     minify: 'esbuild',
+    target: 'es2020',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       onwarn(warning, warn) {
         // Suppress specific warnings
@@ -29,20 +32,21 @@ export default defineConfig({
         warn(warning);
       },
       output: {
+        // Enhanced chunking strategy for optimal caching
         manualChunks: {
-          // Core React (Most Critical)
+          // Core React (Most Critical) - Changes rarely
           'react-core': ['react', 'react-dom'],
           'react-router': ['react-router-dom'],
           
-          // UI & Forms (Frequently Used)
+          // UI & Forms (Frequently Used) - Medium cache
           'ui-components': ['lucide-react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
           'form-handling': ['react-hook-form', '@hookform/resolvers', 'zod'],
           
-          // Data & API (Heavy Libraries)
+          // Data & API (Heavy Libraries) - Long cache
           'data-fetching': ['@tanstack/react-query', '@supabase/supabase-js'],
           'charts-data': ['recharts'],
           
-          // Utilities (Shared Across App)
+          // Utilities (Shared Across App) - Long cache
           'utilities': ['date-fns', 'clsx', 'tailwind-merge'],
           'motion': ['framer-motion'],
           
@@ -56,8 +60,7 @@ export default defineConfig({
           return `js/${facadeModuleId}-[hash].js`;
         }
       }
-    },
-    chunkSizeWarningLimit: 1000
+    }
   },
   envPrefix: ['VITE_'],
   css: {

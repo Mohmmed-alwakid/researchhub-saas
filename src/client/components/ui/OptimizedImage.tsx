@@ -42,7 +42,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     onError?.();
   };
 
-  // Generate responsive srcSet for common breakpoints
+  // Generate responsive srcSet for common breakpoints with WebP support
   const generateSrcSet = (baseSrc: string) => {
     if (baseSrc.includes('placeholder') || baseSrc.includes('data:')) {
       return undefined;
@@ -51,13 +51,25 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     const ext = baseSrc.split('.').pop();
     const basePath = baseSrc.replace(`.${ext}`, '');
     
-    return [
+    // Generate both WebP and original format sources
+    const webpSources = [
+      `${basePath}-320w.webp 320w`,
+      `${basePath}-640w.webp 640w`,
+      `${basePath}-1024w.webp 1024w`,
+      `${basePath}-1280w.webp 1280w`
+    ].join(', ');
+    
+    const fallbackSources = [
       `${basePath}-320w.${ext} 320w`,
       `${basePath}-640w.${ext} 640w`,
       `${basePath}-1024w.${ext} 1024w`,
       `${basePath}-1280w.${ext} 1280w`
     ].join(', ');
+    
+    return { webp: webpSources, fallback: fallbackSources };
   };
+
+  const srcSet = generateSrcSet(currentSrc);
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -69,22 +81,32 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         </div>
       )}
       
-      <img
-        src={currentSrc}
-        srcSet={generateSrcSet(currentSrc)}
-        sizes={sizes}
-        alt={alt}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding="async"
-        onLoad={handleLoad}
-        onError={handleError}
-        className={`
-          transition-opacity duration-300
-          ${isLoading ? 'opacity-0' : 'opacity-100'}
-          ${hasError ? 'opacity-50' : ''}
-          w-full h-full object-cover
-        `}
-      />
+      {/* Use picture element for WebP support with fallback */}
+      <picture>
+        {srcSet && (
+          <source
+            srcSet={srcSet.webp}
+            sizes={sizes}
+            type="image/webp"
+          />
+        )}
+        <img
+          src={currentSrc}
+          srcSet={srcSet?.fallback}
+          sizes={sizes}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          onLoad={handleLoad}
+          onError={handleError}
+          className={`
+            transition-opacity duration-300
+            ${isLoading ? 'opacity-0' : 'opacity-100'}
+            ${hasError ? 'opacity-50' : ''}
+            w-full h-full object-cover
+          `}
+        />
+      </picture>
       
       {hasError && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">

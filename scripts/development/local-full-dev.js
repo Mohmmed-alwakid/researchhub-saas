@@ -41,33 +41,25 @@ console.log('   Service Role Key:', supabaseServiceKey ? '✅ Set' : '❌ Missin
 
 // Import consolidated API handlers
 import authHandler from '../../api/auth-consolidated.js';
-import authLocalHandler from '../../api/auth-local.js';
 import templatesHandler from '../../api/templates-consolidated.js';
 import paymentsHandler from '../../api/payments-consolidated-full.js';
 import userProfileHandler from '../../api/user-profile-consolidated.js';
 import systemHandler from '../../api/system-consolidated.js';
 import researchHandler from '../../api/research-consolidated.js';
 import adminHandler from '../../api/admin-consolidated.js';
-
-// Check if we should use local auth (will switch to local if Supabase fails)
-let useLocalAuth = false;
+import studySessionsHandler from '../../api/study-sessions.js';
 
 console.log('🔍 Testing Supabase connectivity...');
 
 // === CONSOLIDATED API ROUTES ===
 
-// Auth endpoints - with fallback to local auth
+// Auth endpoints - using consolidated auth handler
 app.all('/api/auth*', async (req, res) => {
   try {
-    if (useLocalAuth) {
-      await authLocalHandler(req, res);
-    } else {
-      await authHandler(req, res);
-    }
+    await authHandler(req, res);
   } catch (error) {
-    console.log('⚠️  Switching to local auth due to error:', error.message);
-    useLocalAuth = true;
-    await authLocalHandler(req, res);
+    console.log('⚠️  Auth error:', error.message);
+    res.status(500).json({ error: 'Authentication service unavailable' });
   }
 });
 
@@ -90,6 +82,11 @@ app.all('/api/study-sessions*', async (req, res) => {
 
 app.all('/api/blocks*', async (req, res) => {
   await researchHandler(req, res);
+});
+
+// Study Sessions endpoints (NEW - Participant completion workflow)
+app.all('/api/study-sessions*', async (req, res) => {
+  await studySessionsHandler(req, res);
 });
 
 // Payments & Wallets endpoints

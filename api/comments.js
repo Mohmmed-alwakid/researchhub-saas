@@ -43,41 +43,67 @@ export default async function handler(req, res) {
 
 async function handleGetComments(req, res) {
   const { entityType, entityId } = req.query;
-  
-  // TODO: Implement get comments logic
-  return res.status(200).json({
-    success: true,
-    data: []
-  });
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('entityType', entityType)
+        .eq('entityId', entityId)
+        .order('createdAt', { ascending: true });
+      if (error) throw error;
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
 }
 
 async function handleAddComment(req, res) {
   const { entityType, entityId, content, parentId } = req.body;
-  
-  // TODO: Implement add comment logic
-  return res.status(200).json({
-    success: true,
-    data: {
-      id: `comment_${Date.now()}`,
-      content,
-      entityType,
-      entityId,
-      parentId,
-      createdAt: new Date()
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .insert([
+          {
+            content,
+            entityType,
+            entityId,
+            parentId,
+            createdAt: new Date().toISOString()
+          }
+        ])
+        .select();
+      if (error) throw error;
+      return res.status(200).json({ success: true, data: data[0] });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
     }
-  });
 }
 
 async function handleUpdateComment(req, res) {
   const { commentId, content } = req.body;
-  
-  // TODO: Implement update comment logic
-  return res.status(200).json({ success: true });
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .update({ content })
+        .eq('id', commentId)
+        .select();
+      if (error) throw error;
+      return res.status(200).json({ success: true, data: data[0] });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
 }
 
 async function handleDeleteComment(req, res) {
   const { commentId } = req.body;
-  
-  // TODO: Implement delete comment logic
-  return res.status(200).json({ success: true });
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .delete()
+        .eq('id', commentId);
+      if (error) throw error;
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
 }

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Data Filtering Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .results {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        .demo-study { background: #fff3cd; border-left: 4px solid #ffc107; }
+        .real-study { background: #d4edda; border-left: 4px solid #28a745; }
+        .study-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Demo Data Filtering Test Suite</h1>
+    
+    <p><strong>Purpose:</strong> Verify that participants only see real studies and demo data is properly filtered out.</p>
+    
+    <div class="test-section">
+        <h3>📊 Test 1: Participant View (Default)</h3>
+        <p>Simulates what a participant would see - should exclude demo/test studies</p>
+        <button onclick="testParticipantView()">Test Participant View</button>
+        <div id="participant-results" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔬 Test 2: Researcher View</h3>
+        <p>Simulates what a researcher would see - only their own studies</p>
+        <button onclick="testResearcherView()">Test Researcher View</button>
+        <div id="researcher-results" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>👑 Test 3: Admin View</h3>
+        <p>Simulates what an admin would see - all studies including demo data</p>
+        <button onclick="testAdminView()">Test Admin View</button>
+        <div id="admin-results" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>➕ Test 4: Create Real Study</h3>
+        <p>Create a legitimate study to verify it appears for participants</p>
+        <button onclick="createRealStudy()">Create Real Study</button>
+        <div id="create-results" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📈 Test Summary</h3>
+        <div id="summary-results" class="results">
+            <p>Run tests above to see summary...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        
+        let testResults = {
+            participant: null,
+            researcher: null,
+            admin: null,
+            created: null
+        };
+
+        async function testParticipantView() {
+            const resultsDiv = document.getElementById('participant-results');
+            resultsDiv.innerHTML = '<p class="info">⏳ Testing participant view...</p>';
+            
+            try {
+                // No auth token = participant view
+                const response = await fetch(`${API_BASE}/research-consolidated?action=get-studies`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const studyCount = data.studies.length;
+                    testResults.participant = studyCount;
+                    
+                    let html = `<p class="success">✅ Participant view successful: ${studyCount} studies shown</p>`;
+                    
+                    if (studyCount === 0) {
+                        html += `<p class="success">🎯 Perfect! No demo studies shown to participants</p>`;
+                    } else {
+                        html += `<p class="info">📋 Studies visible to participants:</p>`;
+                        data.studies.forEach(study => {
+                            const isDemo = isDemoStudy(study);
+                            html += `<div class="study-item ${isDemo ? 'demo-study' : 'real-study'}">
+                                <strong>${study.title}</strong><br>
+                                <small>ID: ${study.id} | Status: ${study.status} | Creator: ${study.created_by || 'N/A'}</small>
+                                ${isDemo ? '<br><span class="error">⚠️ This appears to be demo data!</span>' : '<br><span class="success">✅ Legitimate study</span>'}
+                            </div>`;
+                        });
+                    }
+                    
+                    resultsDiv.innerHTML = html;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+            
+            updateSummary();
+        }
+
+        async function testResearcherView() {
+            const resultsDiv = document.getElementById('researcher-results');
+            resultsDiv.innerHTML = '<p class="info">⏳ Testing researcher view...</p>';
+            
+            try {
+                // Simulate researcher token
+                const token = 'fallback-token-real-researcher-001-researcher';
+                const response = await fetch(`${API_BASE}/research-consolidated?action=get-studies`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const studyCount = data.studies.length;
+                    testResults.researcher = studyCount;
+                    
+                    let html = `<p class="success">✅ Researcher view successful: ${studyCount} studies shown</p>`;
+                    html += `<p class="info">🔬 Researchers see only their own studies (filtered by creator)</p>`;
+                    
+                    data.studies.forEach(study => {
+                        html += `<div class="study-item real-study">
+                            <strong>${study.title}</strong><br>
+                            <small>ID: ${study.id} | Creator: ${study.created_by || 'N/A'}</small>
+                        </div>`;
+                    });
+                    
+                    resultsDiv.innerHTML = html;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+            
+            updateSummary();
+        }
+
+        async function testAdminView() {
+            const resultsDiv = document.getElementById('admin-results');
+            resultsDiv.innerHTML = '<p class="info">⏳ Testing admin view...</p>';
+            
+            try {
+                // Simulate admin token
+                const token = 'fallback-token-admin-001-admin';
+                const response = await fetch(`${API_BASE}/research-consolidated?action=get-studies`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const studyCount = data.studies.length;
+                    testResults.admin = studyCount;
+                    
+                    let html = `<p class="success">✅ Admin view successful: ${studyCount} studies shown</p>`;
+                    html += `<p class="info">👑 Admins see ALL studies including demo data for debugging</p>`;
+                    
+                    data.studies.forEach(study => {
+                        const isDemo = isDemoStudy(study);
+                        html += `<div class="study-item ${isDemo ? 'demo-study' : 'real-study'}">
+                            <strong>${study.title}</strong><br>
+                            <small>ID: ${study.id} | Status: ${study.status} | Creator: ${study.created_by || 'N/A'}</small>
+                            ${isDemo ? '<br><span class="error">🧪 Demo/Test Study</span>' : '<br><span class="success">✅ Real Study</span>'}
+                        </div>`;
+                    });
+                    
+                    resultsDiv.innerHTML = html;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+            
+            updateSummary();
+        }
+
+        async function createRealStudy() {
+            const resultsDiv = document.getElementById('create-results');
+            resultsDiv.innerHTML = '<p class="info">⏳ Creating real study...</p>';
+            
+            try {
+                const studyData = {
+                    action: 'create-study',
+                    title: 'User Experience Research Study',
+                    description: 'Research study to understand user behavior and preferences',
+                    type: 'unmoderated',
+                    status: 'active',
+                    target_participants: 50,
+                    settings: JSON.stringify({
+                        duration: 30,
+                        payment: 25
+                    })
+                };
+                
+                // Simulate real researcher token
+                const token = 'fallback-token-real-researcher-001-researcher';
+                const response = await fetch(`${API_BASE}/research-consolidated`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    testResults.created = true;
+                    resultsDiv.innerHTML = `
+                        <p class="success">✅ Real study created successfully!</p>
+                        <div class="study-item real-study">
+                            <strong>${data.study.title}</strong><br>
+                            <small>ID: ${data.study.id} | Status: ${data.study.status}</small><br>
+                            <span class="success">✅ This should now appear for participants</span>
+                        </div>
+                        <p class="info">💡 Now test participant view again to see if this study appears</p>
+                    `;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+            
+            updateSummary();
+        }
+
+        function isDemoStudy(study) {
+            return (
+                (study.created_by && (
+                    study.created_by.includes('test-') ||
+                    study.created_by.includes('demo-') ||
+                    study.created_by === 'test-researcher-001'
+                )) ||
+                (study.title && (
+                    study.title.toLowerCase().includes('test') ||
+                    study.title.toLowerCase().includes('demo') ||
+                    study.title.toLowerCase().includes('sample')
+                )) ||
+                (study.description && (
+                    study.description.toLowerCase().includes('demo') ||
+                    study.description.toLowerCase().includes('test') ||
+                    study.description.toLowerCase().includes('example')
+                )) ||
+                (study.title && study.title.includes('Default')) ||
+                (study.id && study.id.includes('simple-study'))
+            );
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary-results');
+            
+            let html = '<h4>📊 Test Results Summary</h4>';
+            
+            if (testResults.participant !== null) {
+                html += `<p>👥 <strong>Participant View:</strong> ${testResults.participant} studies visible ${testResults.participant === 0 ? '✅' : '⚠️'}</p>`;
+            }
+            
+            if (testResults.researcher !== null) {
+                html += `<p>🔬 <strong>Researcher View:</strong> ${testResults.researcher} studies visible ✅</p>`;
+            }
+            
+            if (testResults.admin !== null) {
+                html += `<p>👑 <strong>Admin View:</strong> ${testResults.admin} total studies ✅</p>`;
+            }
+            
+            if (testResults.created !== null) {
+                html += `<p>➕ <strong>Study Creation:</strong> ${testResults.created ? 'Successful ✅' : 'Failed ❌'}</p>`;
+            }
+            
+            // Analysis
+            if (testResults.participant !== null && testResults.admin !== null) {
+                const filteredOut = testResults.admin - testResults.participant;
+                html += `<br><p class="info"><strong>📈 Analysis:</strong></p>`;
+                html += `<p>• Demo data filtering removed ${filteredOut} studies from participant view</p>`;
+                html += `<p>• This ${filteredOut > 0 ? 'confirms' : 'suggests'} demo filtering is ${filteredOut > 0 ? 'working correctly' : 'may need adjustment'}</p>`;
+            }
+            
+            summaryDiv.innerHTML = html;
+        }
+
+        // Auto-run participant test on load
+        document.addEventListener('DOMContentLoaded', () => {
+            testParticipantView();
+        });
+    </script>
+</body>
+</html>
