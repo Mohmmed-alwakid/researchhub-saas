@@ -133,7 +133,8 @@ async function ensureStudiesLoaded() {
  * Main handler function
  */
 export default async function handler(req, res) {
-  console.log('🔧 Research API handler called');
+  const startTime = Date.now();
+  console.log(`🔧 Research API handler called - ${req.method} ${req.url}`);
   
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -146,7 +147,7 @@ export default async function handler(req, res) {
 
   try {
     const { action } = req.query;
-    console.log(`🔧 API handling action: ${action}`);
+    console.log(`🔧 API handling action: ${action} (${req.method})`);
 
     switch (action) {
       case 'get-studies':
@@ -196,6 +197,43 @@ export default async function handler(req, res) {
 }
 
 /**
+ * Helper function to detect demo/test studies
+ * @param {Object} study - Study object to check
+ * @returns {boolean} - True if this is a demo/test study
+ */
+function isDemoOrTestStudy(study) {
+  // Studies created by test users
+  const hasTestCreator = study.created_by && (
+    study.created_by.includes('test-') ||
+    study.created_by.includes('demo-') ||
+    study.created_by === 'test-researcher-001' ||
+    study.created_by === 'test-user' ||
+    study.created_by === 'test'
+  );
+  
+  // Studies with demo/test keywords in title
+  const hasTestTitle = study.title && (
+    study.title.toLowerCase().includes('test') ||
+    study.title.toLowerCase().includes('demo') ||
+    study.title.toLowerCase().includes('sample') ||
+    study.title.includes('Default')
+  );
+  
+  // Studies with demo/test keywords in description
+  const hasTestDescription = study.description && (
+    study.description.toLowerCase().includes('demo') ||
+    study.description.toLowerCase().includes('test') ||
+    study.description.toLowerCase().includes('example') ||
+    study.description.toLowerCase().includes('testing')
+  );
+  
+  // Studies with test IDs
+  const hasTestId = study.id && study.id.includes('simple-study');
+  
+  return hasTestCreator || hasTestTitle || hasTestDescription || hasTestId;
+}
+
+/**
  * Get list of studies
  */
 async function getStudies(req, res) {
@@ -206,7 +244,7 @@ async function getStudies(req, res) {
     console.log(`📚 Getting studies - count: ${localStudies.length}`);
     
     // Try to get user info from token (optional for public studies)
-    let userRole = 'participant'; // Default to participant
+    let userRole = 'participant'; // Default to participant (most restrictive)
     let userId = null;
     
     const authHeader = req.headers.authorization;
@@ -214,18 +252,36 @@ async function getStudies(req, res) {
       try {
         // Extract user info from token if available
         const token = authHeader.replace('Bearer ', '');
+        
         if (token.startsWith('fallback-token-')) {
           // Parse fallback token: fallback-token-{userId}-{role}
           const parts = token.split('-');
           if (parts.length >= 4) {
             userId = parts[2];
             userRole = parts[3];
+            
+            // Validate role
+            const validRoles = ['participant', 'researcher', 'admin'];
+            if (!validRoles.includes(userRole)) {
+              console.log(`⚠️ Invalid role '${userRole}', defaulting to participant`);
+              userRole = 'participant';
+            }
+          } else {
+            console.log(`⚠️ Invalid token format, expected 4+ parts, got ${parts.length}`);
           }
+        } else {
+          // Handle JWT tokens here in the future
+          console.log('� JWT token detected, would parse with Supabase');
         }
-        console.log(`🔍 User context: role=${userRole}, id=${userId}`);
+        
+        console.log(`�🔍 User context: role=${userRole}, id=${userId}, token=${token.substring(0, 20)}...`);
       } catch (error) {
-        console.log('⚠️ Could not parse token, treating as public request');
+        console.log(`⚠️ Token parsing error: ${error.message}, treating as public request`);
+        userRole = 'participant';
+        userId = null;
       }
+    } else {
+      console.log('👤 No authorization header, treating as participant request');
     }
     
     let filteredStudies = [...localStudies];
@@ -236,46 +292,30 @@ async function getStudies(req, res) {
       filteredStudies = localStudies.filter(study => 
         study.created_by === userId || study.creator_id === userId
       );
-      console.log(`🔬 Researcher view: ${filteredStudies.length} studies`);
+      console.log(`🔬 Researcher view: ${filteredStudies.length} studies (filtered by creator: ${userId})`);
     } else if (userRole === 'admin') {
       // Admins see all studies including demo data for debugging
       filteredStudies = localStudies;
-      console.log(`👑 Admin view: ${filteredStudies.length} studies (including demo data)`);
+      console.log(`👑 Admin view: ${filteredStudies.length} studies (including demo data for debugging)`);
     } else {
       // Participants see active/public studies, but exclude demo/test data
       filteredStudies = localStudies.filter(study => {
-        // Must be active or published
+        // Must be active or published to be visible to participants
         const isActive = study.status === 'active' || study.status === 'published';
+        if (!isActive) return false;
         
-        // Exclude demo/test studies based on multiple criteria
-        const isDemoStudy = 
-          // Studies created by test users
-          (study.created_by && (
-            study.created_by.includes('test-') ||
-            study.created_by.includes('demo-') ||
-            study.created_by === 'test-researcher-001'
-          )) ||
-          // Studies with demo/test in title or description
-          (study.title && (
-            study.title.toLowerCase().includes('test') ||
-            study.title.toLowerCase().includes('demo') ||
-            study.title.toLowerCase().includes('sample')
-          )) ||
-          // Studies with demo markers in description
-          (study.description && (
-            study.description.toLowerCase().includes('demo') ||
-            study.description.toLowerCase().includes('test') ||
-            study.description.toLowerCase().includes('example')
-          )) ||
-          // Default/template studies
-          (study.title && study.title.includes('Default')) ||
-          // Studies created for testing purposes
-          (study.id && study.id.includes('simple-study'));
+        // Multi-criteria demo study detection
+        const isDemoStudy = isDemoOrTestStudy(study);
         
-        return isActive && !isDemoStudy;
+        // Return true only if active and NOT demo data
+        return !isDemoStudy;
       });
       console.log(`👥 Participant view: ${filteredStudies.length} real studies (filtered out demo data)`);
     }
+    
+    // Performance logging
+    const processingTime = Date.now() - startTime;
+    console.log(`⚡ Study filtering completed in ${processingTime}ms`);
     
     return res.status(200).json({
       success: true,

@@ -2,10 +2,22 @@
   "version": 2,
   "alias": ["afkar-saas.vercel.app"],
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "dist", 
   "installCommand": "npm install",
   "cleanUrls": true,
   "trailingSlash": false,
+  "github": {
+    "enabled": true,
+    "autoAlias": true,
+    "autoJobCancelation": true
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "staging": true,
+      "develop": true
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
