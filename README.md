@@ -1,10 +1,18 @@
 # 🧠 Afkar - User Research Platform
 
 **Last Updated**: 2025-08-15
-**Version**: 1.0.2
-**Status**: 🚀 **PRODUCTION READY** - **All Critical Issues Resolved**
+**Version**: 1.1.0
+**Status**: 🚀 **PRODUCTION READY** - **Multi-Environment Strategy Active**
 
 ## 🎉 Latest Achievements (August 15, 2025)
+
+🌍 **Multi-Environment Strategy**: Production, Staging, Development environments live
+✅ **Environment Parity**: Eliminated "local vs production" deployment discrepancies
+🚀 **Professional Pipeline**: Feature → Staging → Production deployment workflow
+🔄 **Hybrid Development**: Local development + Cloud testing for optimal productivity
+📦 **Automatic Deployments**: Branch-based deployments with instant preview URLs
+
+## � Previous Achievements (August 15, 2025)
 
 🎯 **Production Readiness Achieved**: Data persistence + demo data filtering complete
 ✅ **Database-First Storage**: Studies persist across deployments (no more data loss)
@@ -14,13 +22,30 @@
 
 ## 🚀 Quick Start
 
+### 💻 **Local Development** (Daily Work - Fastest)
 ```bash
-# Development
 npm run dev:fullstack    # Local development (Frontend: 5175, Backend: 3003)
+npm run dev              # Standard React + API development
 npm run test:quick       # Run comprehensive testing
-npm run cleanup          # Organize project structure
+```
 
-# Testing Accounts (MANDATORY - Use Only These)
+### ☁️ **Cloud Development** (Environment Testing)
+```bash
+# Feature Testing
+git checkout -b feature/your-feature
+git push origin feature/your-feature  # Auto-creates preview URL
+
+# Staging Testing  
+git checkout staging
+git push origin staging  # Deploys to staging environment
+
+# Production Release
+git checkout main
+git push origin main     # Deploys to production
+```
+
+### 🧪 **Testing Accounts** (MANDATORY - Use Only These)
+```bash
 # Researcher: abwanwr77+Researcher@gmail.com / Testtest123
 # Participant: abwanwr77+participant@gmail.com / Testtest123  
 # Admin: abwanwr77+admin@gmail.com / Testtest123
@@ -79,15 +104,25 @@ npm run test:deployment # Pre-deployment checks
 
 🔬 **Manual Testing**: `testing/manual/test-demo-data-filtering.html` for filtering validation
 
-## 🚀 Deployment
+## 🚀 Deployment & Environments
 
-**Production**: https://researchhub-saas-9ep442fsv-mohmmed-alwakids-projects.vercel.app
-- ✅ Auto-deploy from `main` branch via Vercel
-- ✅ All 12/12 serverless functions operational
-- ✅ Database persistence active
-- ✅ Demo data filtering enabled
+### 🌍 **Multi-Environment Strategy**
+- **Production**: https://researchhub-saas-ca57yz24b-mohmmed-alwakids-projects.vercel.app
+  - ✅ Auto-deploy from `main` branch
+  - ✅ Production database with real user data
+  - ✅ All 12/12 serverless functions operational
+  
+- **Staging**: https://researchhub-saas-rmwizk1az-mohmmed-alwakids-projects.vercel.app
+  - ✅ Auto-deploy from `staging` branch  
+  - ✅ Team testing and validation environment
+  - ✅ Safe testing before production releases
+  
+- **Development**: Auto-generated preview URLs for feature branches
+  - ✅ Individual feature testing
+  - ✅ Automatic preview deployments
+  - ✅ Isolated development environments
 
-**Local Development**: `npm run dev:fullstack` for fastest development
+### 💻 **Local Development**: `npm run dev:fullstack` for fastest daily development
 
 ---
 

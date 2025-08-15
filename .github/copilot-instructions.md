@@ -44,37 +44,45 @@ npm run cleanup          # Clean project structure
 ## 📋 Development Rules
 1. **Requirements First**: Check `docs/requirements/` before coding
 2. **Extend Don't Replace**: Enhance existing code vs creating new
-3. **Local Testing**: Always test with `npm run dev:fullstack`
+3. **Hybrid Development**: Local development + Cloud testing for optimal workflow
 4. **Clean Structure**: Use proper directories (testing/, docs/, scripts/)
-5. **Staging First**: Use staging/preview for issue reporting, NOT production
-6. **Production Ready Only**: Only merge to main after full validation
+5. **Multi-Environment**: Use staging for testing, production for releases
+6. **Production Ready Only**: Only merge to main after staging validation
 
-## 🌐 **ENVIRONMENT STRATEGY & DEPLOYMENT BEST PRACTICES**
+## 🌐 **HYBRID DEVELOPMENT STRATEGY** 
 
-### **Available Environments**
+### **Multi-Environment Setup** ✅ **ACTIVE**
 1. **Local Development**: 
    - **URL**: http://localhost:5175 (frontend) + http://localhost:3003 (API)
-   - **Purpose**: Rapid development and debugging
+   - **Purpose**: Daily development, rapid iteration, debugging
    - **Command**: `npm run dev:fullstack`
-   - **Database**: Production Supabase (for consistency)
+   - **Benefits**: Speed, offline capability, superior debugging
 
-2. **Staging/Preview**: 
-   - **URL**: Vercel preview deployments (auto-created for PRs/branches)
-   - **Purpose**: Feature validation before production
-   - **Best for**: Issue reporting, stakeholder review, testing
+2. **Staging Environment**: 
+   - **URL**: https://researchhub-saas-rmwizk1az-mohmmed-alwakids-projects.vercel.app
+   - **Purpose**: Team testing, integration validation
+   - **Deployment**: Auto-deploy from `staging` branch
+   - **Benefits**: Environment parity, team collaboration
 
-3. **Production**: 
-   - **URL**: https://researchhub-saas-9ep442fsv-mohmmed-alwakids-projects.vercel.app
+3. **Production Environment**: 
+   - **URL**: https://researchhub-saas-ca57yz24b-mohmmed-alwakids-projects.vercel.app
    - **Purpose**: Live platform for end users
-   - **Deployment**: Auto-deploy from main branch only
+   - **Deployment**: Auto-deploy from `main` branch
+   - **Benefits**: Stable, tested releases
 
-### **Development Best Practices**
-- ✅ **Issue Reporting**: Use staging/preview environments, NOT production
-- ✅ **Rapid Iteration**: Local development for immediate feedback
-- ✅ **Staging Updates**: Frequent updates encouraged for fast feedback
-- ✅ **Production Updates**: Only after comprehensive validation
-- ❌ **Avoid**: Breaking changes directly to production
-- ❌ **Avoid**: Testing unfinished features in production
+4. **Feature Preview**: 
+   - **URL**: Auto-generated URLs for feature branches
+   - **Purpose**: Individual feature testing and validation
+   - **Deployment**: Auto-deploy on feature branch push
+   - **Benefits**: Isolated testing, stakeholder previews
+
+### **Hybrid Development Best Practices**
+- ✅ **Local First**: Use local development for daily work (90% of time)
+- ✅ **Cloud Validate**: Use cloud environments for testing (10% of time)
+- ✅ **Staging Approval**: Always test in staging before production
+- ✅ **Environment Parity**: Cloud testing ensures production compatibility
+- ❌ **Avoid**: Direct production testing of unfinished features
+- ❌ **Avoid**: Skipping staging validation
 
 ### **Branch Strategy & Merge Guidelines**
 - **main**: Production-ready code only (deploy to production)
