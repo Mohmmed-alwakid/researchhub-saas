@@ -5,6 +5,28 @@
 
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let supabase = null;
+let supabaseAdmin = null;
+
+// Initialize Supabase clients only if environment variables are available
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+  console.log('📚 Supabase client initialized');
+} else {
+  console.log('📚 Supabase not configured, using file storage only');
+}
+
+if (supabaseUrl && supabaseServiceKey) {
+  supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+  console.log('📚 Supabase admin client initialized');
+}
 
 // In development with fallback database, we'll use a simpler approach
 const isLocalDevelopment = process.env.NODE_ENV !== 'production';
@@ -14,31 +36,38 @@ const STUDIES_FILE_PATH = process.env.VERCEL
   ? '/tmp/studies.json' 
   : path.join(process.cwd(), 'testing', 'data', 'studies.json');
 
-// Function to load studies from file or create empty
-function loadStudies() {
+// Function to load studies from Supabase or file fallback
+async function loadStudies() {
   try {
-    // Ensure database directory exists (skip in production)
-    if (!process.env.VERCEL) {
-      const dbDir = path.dirname(STUDIES_FILE_PATH);
-      if (!fs.existsSync(dbDir)) {
-        fs.mkdirSync(dbDir, { recursive: true });
+    // Try to load from Supabase first (if available)
+    if (supabase) {
+      try {
+        const { data: studies, error } = await supabase
+          .from('studies')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && studies && studies.length > 0) {
+          console.log(`📚 Loaded ${studies.length} studies from Supabase database`);
+          return studies;
+        }
+      } catch (dbError) {
+        console.log('📚 Supabase query failed, trying file fallback:', dbError.message);
       }
     }
 
-    // Try to load existing studies
-    if (fs.existsSync(STUDIES_FILE_PATH)) {
+    // Fallback to file storage
+    if (!process.env.VERCEL && fs.existsSync(STUDIES_FILE_PATH)) {
       const data = fs.readFileSync(STUDIES_FILE_PATH, 'utf8');
       const studies = JSON.parse(data);
-      console.log(`📚 Loaded ${studies.length} studies from persistent storage`);
+      console.log(`📚 Loaded ${studies.length} studies from file storage`);
       return studies;
-    } else {
-      // Create empty file for studies (skip in production temp directories)
-      if (!process.env.VERCEL) {
-        fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify([], null, 2));
-        console.log(`📚 Created new empty studies file`);
-      }
-      return [];
     }
+
+    // If no studies found anywhere, return empty array
+    console.log('📚 No studies found in database or file storage');
+    return [];
+
   } catch (error) {
     console.error('Error loading studies:', error);
     console.log('📚 Using empty studies array');
@@ -46,29 +75,66 @@ function loadStudies() {
   }
 }
 
-// Function to save studies to file
-function saveStudies(studies) {
+// Function to save studies to Supabase and file fallback
+async function saveStudies(studies) {
   try {
-    fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify(studies, null, 2));
-    console.log(`💾 Saved ${studies.length} studies to persistent storage`);
+    // Try to save to Supabase first (if available)
+    if (supabase) {
+      try {
+        for (const study of studies) {
+          const { error } = await supabase
+            .from('studies')
+            .upsert(study, { onConflict: 'id' });
+          
+          if (error) throw error;
+        }
+        console.log(`💾 Saved ${studies.length} studies to Supabase database`);
+        return; // Success, no need for file fallback
+      } catch (dbError) {
+        console.log('💾 Supabase save failed, using file fallback:', dbError.message);
+      }
+    }
+      
+    // Fallback to file storage
+    if (!process.env.VERCEL) {
+      const dbDir = path.dirname(STUDIES_FILE_PATH);
+      if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+      }
+      fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify(studies, null, 2));
+      console.log(`💾 Saved ${studies.length} studies to file storage`);
+    }
   } catch (error) {
     console.error('Error saving studies:', error);
-    // Don't throw error in production - just log it
-    if (!process.env.VERCEL) {
-      console.warn('Studies will not persist across restarts');
-    }
   }
 }
 
-// Load studies from persistent storage
-let localStudies = loadStudies();
+// Initialize with empty array, will be loaded async
+let localStudies = [];
+
+// Initialize studies on first request
+let studiesInitialized = false;
 
 console.log('🔧 Research API initialized');
+
+/**
+ * Ensure studies are loaded from persistent storage
+ */
+async function ensureStudiesLoaded() {
+  if (!studiesInitialized) {
+    console.log('📚 Loading studies from persistent storage...');
+    localStudies = await loadStudies();
+    studiesInitialized = true;
+    console.log(`📚 Loaded ${localStudies.length} studies from storage`);
+  }
+}
 
 /**
  * Main handler function
  */
 export default async function handler(req, res) {
+  console.log('🔧 Research API handler called');
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -134,8 +200,8 @@ export default async function handler(req, res) {
  */
 async function getStudies(req, res) {
   try {
-    // Reload studies from persistent storage to ensure we have latest data
-    localStudies = loadStudies();
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
     
     console.log(`📚 Getting studies - count: ${localStudies.length}`);
     
@@ -171,12 +237,44 @@ async function getStudies(req, res) {
         study.created_by === userId || study.creator_id === userId
       );
       console.log(`🔬 Researcher view: ${filteredStudies.length} studies`);
+    } else if (userRole === 'admin') {
+      // Admins see all studies including demo data for debugging
+      filteredStudies = localStudies;
+      console.log(`👑 Admin view: ${filteredStudies.length} studies (including demo data)`);
     } else {
-      // Participants see all active/public studies
-      filteredStudies = localStudies.filter(study => 
-        study.status === 'active' || study.status === 'published'
-      );
-      console.log(`👥 Participant view: ${filteredStudies.length} active studies`);
+      // Participants see active/public studies, but exclude demo/test data
+      filteredStudies = localStudies.filter(study => {
+        // Must be active or published
+        const isActive = study.status === 'active' || study.status === 'published';
+        
+        // Exclude demo/test studies based on multiple criteria
+        const isDemoStudy = 
+          // Studies created by test users
+          (study.created_by && (
+            study.created_by.includes('test-') ||
+            study.created_by.includes('demo-') ||
+            study.created_by === 'test-researcher-001'
+          )) ||
+          // Studies with demo/test in title or description
+          (study.title && (
+            study.title.toLowerCase().includes('test') ||
+            study.title.toLowerCase().includes('demo') ||
+            study.title.toLowerCase().includes('sample')
+          )) ||
+          // Studies with demo markers in description
+          (study.description && (
+            study.description.toLowerCase().includes('demo') ||
+            study.description.toLowerCase().includes('test') ||
+            study.description.toLowerCase().includes('example')
+          )) ||
+          // Default/template studies
+          (study.title && study.title.includes('Default')) ||
+          // Studies created for testing purposes
+          (study.id && study.id.includes('simple-study'));
+        
+        return isActive && !isDemoStudy;
+      });
+      console.log(`👥 Participant view: ${filteredStudies.length} real studies (filtered out demo data)`);
     }
     
     return res.status(200).json({
@@ -205,8 +303,8 @@ async function getStudies(req, res) {
  */
 async function createStudy(req, res) {
   try {
-    // Reload studies from persistent storage to ensure we have latest data
-    localStudies = loadStudies();
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
     
     const studyData = req.body;
     console.log(`📝 Creating study: ${studyData.title}`);
@@ -274,7 +372,7 @@ async function createStudy(req, res) {
     localStudies.unshift(newStudy);
 
     // Save to persistent storage
-    saveStudies(localStudies);
+    await saveStudies(localStudies);
 
     console.log(`✅ Study created successfully: ${newStudy.title} (ID: ${newId})`);
 
@@ -297,8 +395,8 @@ async function createStudy(req, res) {
  */
 async function getStudy(req, res) {
   try {
-    // Reload studies from persistent storage to ensure we have latest data
-    localStudies = loadStudies();
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
     
     const { id } = req.query;
 
@@ -337,8 +435,8 @@ async function getStudy(req, res) {
  */
 async function updateStudy(req, res) {
   try {
-    // Reload studies from persistent storage to ensure we have latest data
-    localStudies = loadStudies();
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
     
     const { id } = req.query;
     const studyData = req.body;
@@ -368,6 +466,9 @@ async function updateStudy(req, res) {
 
     localStudies[studyIndex] = updatedStudy;
 
+    // Save to persistent storage
+    await saveStudies(localStudies);
+
     console.log(`📝 Study updated: ${updatedStudy.title} (ID: ${id})`);
 
     return res.status(200).json({
@@ -389,6 +490,9 @@ async function updateStudy(req, res) {
  */
 async function deleteStudy(req, res) {
   try {
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
     // Get ID from query params or request body
     const id = req.query.id || req.body.id;
 
@@ -415,7 +519,7 @@ async function deleteStudy(req, res) {
     localStudies.splice(studyIndex, 1);
 
     // Save to persistent storage
-    saveStudies(localStudies);
+    await saveStudies(localStudies);
 
     console.log('✅ Study deleted successfully:', deletedStudy.title, '(ID:', id, ')');
     console.log('📊 Remaining studies count:', localStudies.length);
@@ -441,6 +545,9 @@ async function deleteStudy(req, res) {
  */
 async function getDashboardAnalytics(req, res) {
   try {
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
     const totalStudies = localStudies.length;
     const activeStudies = localStudies.filter(s => s.status === 'active').length;
     const recentStudies = localStudies.slice(0, 3);
@@ -478,6 +585,9 @@ async function getDashboardAnalytics(req, res) {
  */
 async function canEditStudy(req, res) {
   try {
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
     const { id } = req.query;
     
     if (!id) {
@@ -545,6 +655,9 @@ async function canEditStudy(req, res) {
  */
 async function validateStateTransition(req, res) {
   try {
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
     const { id, newStatus } = req.query;
     
     if (!id || !newStatus) {
@@ -614,6 +727,9 @@ async function validateStateTransition(req, res) {
  */
 async function archiveStudy(req, res) {
   try {
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
     const { id } = req.query;
     
     if (!id) {
@@ -640,7 +756,7 @@ async function archiveStudy(req, res) {
     };
 
     // Save updated studies
-    saveStudies(localStudies);
+    await saveStudies(localStudies);
 
     console.log(`📦 Archived study: ${localStudies[studyIndex].title}`);
 
@@ -663,6 +779,9 @@ async function archiveStudy(req, res) {
  */
 async function applyToStudy(req, res) {
   try {
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
     console.log('📋 Apply to study request:', req.body);
 
     const { studyId, responses } = req.body;
