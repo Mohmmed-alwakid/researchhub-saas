@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STC Bank Payment Integration Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">STC Bank Payment Integration Test</h1>
+            
+            <!-- Test Status -->
+            <div id="testStatus" class="mb-8"></div>
+            
+            <!-- API Configuration Test -->
+            <div class="mb-8 p-6 border rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">1. API Configuration Test</h2>
+                <button onclick="testAPIConfig()" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Test API Configuration
+                </button>
+                <div id="configResult" class="mt-4"></div>
+            </div>
+
+            <!-- Payment Intent Creation Test -->
+            <div class="mb-8 p-6 border rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">2. Payment Intent Creation Test</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Amount (SAR)</label>
+                        <input type="number" id="testAmount" value="100" 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Currency</label>
+                        <select id="testCurrency" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                            <option value="SAR">SAR</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                        <input type="text" id="testDescription" value="Test Payment" 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                </div>
+                <button onclick="createPaymentIntent()" 
+                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Create Payment Intent
+                </button>
+                <div id="paymentResult" class="mt-4"></div>
+            </div>
+
+            <!-- Payment Verification Test -->
+            <div class="mb-8 p-6 border rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">3. Payment Verification Test</h2>
+                <div class="flex gap-4 mb-4">
+                    <input type="text" id="paymentId" placeholder="Enter payment ID from above" 
+                           class="flex-1 border border-gray-300 rounded-md px-3 py-2">
+                    <button onclick="verifyPayment()" 
+                            class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
+                        Verify Payment
+                    </button>
+                </div>
+                <div id="verifyResult" class="mt-4"></div>
+            </div>
+
+            <!-- Webhook Test -->
+            <div class="mb-8 p-6 border rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">4. Webhook Test</h2>
+                <p class="text-gray-600 mb-4">
+                    Test webhook endpoint with sample data
+                </p>
+                <button onclick="testWebhook()" 
+                        class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    Test Webhook
+                </button>
+                <div id="webhookResult" class="mt-4"></div>
+            </div>
+
+            <!-- Environment Information -->
+            <div class="mb-8 p-6 border rounded-lg bg-gray-50">
+                <h2 class="text-xl font-semibold mb-4">Environment Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-medium text-gray-700">API Endpoints</h3>
+                        <ul class="text-sm text-gray-600 mt-2">
+                            <li>Create Payment: <code>/api/payments-consolidated-full?action=stc-create-payment</code></li>
+                            <li>Verify Payment: <code>/api/payments-consolidated-full?action=stc-verify-payment</code></li>
+                            <li>Process Refund: <code>/api/payments-consolidated-full?action=stc-refund</code></li>
+                            <li>Webhook: <code>/api/payments-consolidated-full?action=stc-webhook</code></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-700">Required Environment Variables</h3>
+                        <ul class="text-sm text-gray-600 mt-2">
+                            <li><code>STC_BANK_MERCHANT_ID</code></li>
+                            <li><code>STC_BANK_API_KEY</code></li>
+                            <li><code>STC_BANK_SECRET_KEY</code></li>
+                            <li><code>STC_BANK_WEBHOOK_SECRET</code></li>
+                            <li><code>STC_BANK_ENVIRONMENT</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/payments-consolidated-full';
+        
+        // Helper function to display results
+        function displayResult(elementId, result, type = 'info') {
+            const element = document.getElementById(elementId);
+            const bgColor = type === 'success' ? 'bg-green-50 border-green-200 text-green-800' :
+                           type === 'error' ? 'bg-red-50 border-red-200 text-red-800' :
+                           'bg-blue-50 border-blue-200 text-blue-800';
+            
+            element.innerHTML = `
+                <div class="border rounded-md p-4 ${bgColor}">
+                    <pre class="text-sm overflow-x-auto">${JSON.stringify(result, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        // Test API Configuration
+        async function testAPIConfig() {
+            try {
+                const response = await fetch(`${API_BASE}?action=health-check`);
+                const result = await response.json();
+                
+                displayResult('configResult', {
+                    status: 'API accessible',
+                    endpoint: API_BASE,
+                    response: result
+                }, 'success');
+            } catch (error) {
+                displayResult('configResult', {
+                    status: 'API connection failed',
+                    error: error.message
+                }, 'error');
+            }
+        }
+
+        // Create Payment Intent
+        async function createPaymentIntent() {
+            const amount = parseFloat(document.getElementById('testAmount').value);
+            const currency = document.getElementById('testCurrency').value;
+            const description = document.getElementById('testDescription').value;
+
+            try {
+                const response = await fetch(`${API_BASE}?action=stc-create-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        currency: currency,
+                        description: description,
+                        metadata: {
+                            test: true,
+                            timestamp: new Date().toISOString()
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.paymentIntent) {
+                    // Automatically fill payment ID for verification test
+                    document.getElementById('paymentId').value = result.paymentIntent.payment_id;
+                    displayResult('paymentResult', result, 'success');
+                } else {
+                    displayResult('paymentResult', result, 'error');
+                }
+            } catch (error) {
+                displayResult('paymentResult', {
+                    error: error.message,
+                    stack: error.stack
+                }, 'error');
+            }
+        }
+
+        // Verify Payment
+        async function verifyPayment() {
+            const paymentId = document.getElementById('paymentId').value;
+            
+            if (!paymentId) {
+                displayResult('verifyResult', {
+                    error: 'Please enter a payment ID'
+                }, 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}?action=stc-verify-payment&payment_id=${paymentId}`);
+                const result = await response.json();
+                
+                displayResult('verifyResult', result, result.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('verifyResult', {
+                    error: error.message
+                }, 'error');
+            }
+        }
+
+        // Test Webhook
+        async function testWebhook() {
+            const sampleWebhookData = {
+                event_type: 'payment.completed',
+                data: {
+                    payment_id: 'stc_test_' + Date.now(),
+                    status: 'completed',
+                    amount: 10000, // 100.00 SAR in halala
+                    currency: 'SAR',
+                    paid_at: new Date().toISOString()
+                },
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}?action=stc-webhook`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Signature': 'test_signature' // In production, this would be a real HMAC signature
+                    },
+                    body: JSON.stringify(sampleWebhookData)
+                });
+
+                const result = await response.json();
+                
+                displayResult('webhookResult', {
+                    request: sampleWebhookData,
+                    response: result
+                }, result.success ? 'success' : 'error');
+            } catch (error) {
+                displayResult('webhookResult', {
+                    error: error.message
+                }, 'error');
+            }
+        }
+
+        // Display initial status
+        function showInitialStatus() {
+            document.getElementById('testStatus').innerHTML = `
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <h3 class="font-medium text-blue-900">STC Bank Integration Test Suite</h3>
+                    <p class="text-blue-700 mt-1">
+                        Use this page to test your STC Bank payment integration. 
+                        Make sure your environment variables are properly configured.
+                    </p>
+                    <div class="mt-4 text-sm text-blue-600">
+                        <strong>Current Environment:</strong> ${window.location.origin}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize page
+        showInitialStatus();
+    </script>
+</body>
+</html>

@@ -238,6 +238,8 @@ function isDemoOrTestStudy(study) {
  */
 async function getStudies(req, res) {
   try {
+    const startTime = Date.now(); // Performance tracking
+    
     // Ensure studies are loaded from persistent storage
     await ensureStudiesLoaded();
     

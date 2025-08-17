@@ -14,10 +14,25 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJ
 const supabase = createClient(supabaseUrl, supabaseKey);
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
+// Payment gateway configuration
+const DEFAULT_PAYMENT_PROVIDER = process.env.DEFAULT_PAYMENT_PROVIDER || 'stcbank';
+
 // DodoPayments configuration
 const DODOPAYMENTS_API_KEY = process.env.DODOPAYMENTS_API_KEY;
 const DODOPAYMENTS_SECRET_KEY = process.env.DODOPAYMENTS_SECRET_KEY;
 const DODOPAYMENTS_WEBHOOK_SECRET = process.env.DODOPAYMENTS_WEBHOOK_SECRET;
+
+// STC Bank configuration
+const STC_BANK_CONFIG = {
+  merchant_id: process.env.STC_BANK_MERCHANT_ID,
+  api_key: process.env.STC_BANK_API_KEY,
+  secret_key: process.env.STC_BANK_SECRET_KEY,
+  webhook_secret: process.env.STC_BANK_WEBHOOK_SECRET,
+  environment: process.env.STC_BANK_ENVIRONMENT || 'sandbox'
+};
+
+// Import STC Bank integration
+import { STCBankAPI } from './stc-bank-integration.js';
 
 // Simulated data for testing mode
 const simulatedData = {
@@ -117,6 +132,187 @@ async function handleCreatePaymentIntent(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Failed to create payment intent'
+    });
+  }
+}
+
+/**
+ * STC Bank: Create payment intent
+ */
+async function handleCreateSTCPaymentIntent(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { amount, currency = 'SAR', description, metadata = {} } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid amount is required'
+      });
+    }
+
+    const stcBank = new STCBankAPI();
+    const paymentIntent = await stcBank.createPaymentIntent(
+      amount, 
+      currency, 
+      description || 'ResearchHub Payment',
+      metadata
+    );
+
+    return res.status(200).json({
+      success: true,
+      paymentIntent,
+      provider: 'stcbank',
+      message: 'STC Bank payment intent created successfully'
+    });
+
+  } catch (error) {
+    console.error('STC Bank payment intent error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to create STC Bank payment intent',
+      details: error.message
+    });
+  }
+}
+
+/**
+ * STC Bank: Verify payment
+ */
+async function handleVerifySTCPayment(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { payment_id } = req.query;
+
+    if (!payment_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Payment ID is required'
+      });
+    }
+
+    const stcBank = new STCBankAPI();
+    const paymentDetails = await stcBank.verifyPayment(payment_id);
+
+    return res.status(200).json({
+      success: true,
+      payment: paymentDetails,
+      provider: 'stcbank'
+    });
+
+  } catch (error) {
+    console.error('STC Bank payment verification error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to verify payment',
+      details: error.message
+    });
+  }
+}
+
+/**
+ * STC Bank: Process refund
+ */
+async function handleSTCRefund(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const { payment_id, amount, reason } = req.body;
+
+    if (!payment_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Payment ID is required'
+      });
+    }
+
+    const stcBank = new STCBankAPI();
+    const refund = await stcBank.processRefund(payment_id, amount, reason);
+
+    return res.status(200).json({
+      success: true,
+      refund,
+      provider: 'stcbank',
+      message: 'Refund processed successfully'
+    });
+
+  } catch (error) {
+    console.error('STC Bank refund error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to process refund',
+      details: error.message
+    });
+  }
+}
+
+/**
+ * STC Bank: Handle webhook
+ */
+async function handleSTCWebhook(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
+  try {
+    const signature = req.headers['x-stc-signature'] || req.headers['x-signature'];
+    const payload = JSON.stringify(req.body);
+
+    // Verify webhook signature
+    const stcBank = new STCBankAPI();
+    if (signature && !stcBank.verifyWebhookSignature(payload, signature)) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid webhook signature'
+      });
+    }
+
+    const { event_type, data } = req.body;
+
+    console.log('STC Bank webhook received:', { event_type, payment_id: data?.payment_id });
+
+    // Process different webhook events
+    switch (event_type) {
+      case 'payment.completed':
+      case 'payment.success':
+        console.log('STC Payment completed:', data.payment_id);
+        // Update database with successful payment
+        // You can add database update logic here
+        break;
+      
+      case 'payment.failed':
+      case 'payment.declined':
+        console.log('STC Payment failed:', data.payment_id);
+        // Handle failed payment
+        break;
+      
+      case 'refund.processed':
+        console.log('STC Refund processed:', data.refund_id);
+        // Handle successful refund
+        break;
+      
+      default:
+        console.log('Unhandled STC webhook event:', event_type);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Webhook processed successfully'
+    });
+
+  } catch (error) {
+    console.error('STC Bank webhook processing error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Webhook processing failed'
     });
   }
 }
@@ -876,6 +1072,22 @@ export default async function handler(req, res) {
       
       case 'webhook':
         return await handleDodoWebhook(req, res);
+      
+      // STC Bank actions
+      case 'stc-create-payment':
+      case 'create-stc-payment':
+        return await handleCreateSTCPaymentIntent(req, res);
+      
+      case 'stc-verify-payment':
+      case 'verify-stc-payment':
+        return await handleVerifySTCPayment(req, res);
+      
+      case 'stc-refund':
+      case 'process-stc-refund':
+        return await handleSTCRefund(req, res);
+      
+      case 'stc-webhook':
+        return await handleSTCWebhook(req, res);
       
       // Wallet actions
       case 'get-wallet':

@@ -2,10 +2,39 @@ import { apiService } from './api.service';
 
 export interface PaymentIntent {
   id: string;
-  client_secret: string;
+  client_secret?: string;
   amount: number;
   currency: string;
   status: string;
+  payment_url?: string; // For STC Bank redirect payments
+}
+
+export interface STCPaymentIntent {
+  payment_id: string;
+  status: string;
+  amount: number;
+  currency: string;
+  payment_url: string;
+  merchant_reference: string;
+  expires_at: string;
+}
+
+export interface STCPaymentVerification {
+  payment_id: string;
+  status: 'pending' | 'completed' | 'failed' | 'expired';
+  amount: number;
+  currency: string;
+  paid_at?: string;
+}
+
+export interface PaymentProvider {
+  name: 'dodopayments' | 'stcbank';
+  display_name: string;
+  supported_currencies: string[];
+  fees: {
+    percentage: number;
+    fixed: number;
+  };
 }
 
 export interface PaymentHistoryItem {
@@ -442,6 +471,159 @@ export const walletService = {
     error?: string;
   }> {
     return apiService.get('wallets?action=admin-wallets');
+  }
+};
+
+/**
+ * STC Bank Payment Service
+ * Handles payments through STC Bank payment gateway
+ */
+export const stcBankService = {
+  /**
+   * Create STC Bank payment intent
+   */
+  async createPaymentIntent(
+    amount: number, 
+    currency: string = 'SAR', 
+    description: string = '',
+    metadata: Record<string, string | number> = {}
+  ): Promise<{
+    success: boolean;
+    paymentIntent?: STCPaymentIntent;
+    error?: string;
+  }> {
+    try {
+      const response = await apiService.post('payments-consolidated-full?action=stc-create-payment', {
+        amount,
+        currency,
+        description,
+        metadata
+      }) as { success: boolean; paymentIntent?: STCPaymentIntent; error?: string };
+
+      return {
+        success: response.success,
+        paymentIntent: response.paymentIntent,
+        error: response.error
+      };
+    } catch (error) {
+      console.error('STC Bank payment intent creation failed:', error);
+      return {
+        success: false,
+        error: 'Failed to create payment intent'
+      };
+    }
+  },
+
+  /**
+   * Verify STC Bank payment status
+   */
+  async verifyPayment(paymentId: string): Promise<{
+    success: boolean;
+    payment?: STCPaymentVerification;
+    error?: string;
+  }> {
+    try {
+      const response = await apiService.get(`payments-consolidated-full?action=stc-verify-payment&payment_id=${paymentId}`) as { 
+        success: boolean; 
+        payment?: STCPaymentVerification; 
+        error?: string 
+      };
+
+      return {
+        success: response.success,
+        payment: response.payment,
+        error: response.error
+      };
+    } catch (error) {
+      console.error('STC Bank payment verification failed:', error);
+      return {
+        success: false,
+        error: 'Failed to verify payment'
+      };
+    }
+  },
+
+  /**
+   * Process STC Bank refund
+   */
+  async processRefund(
+    paymentId: string, 
+    amount?: number, 
+    reason: string = 'Customer request'
+  ): Promise<{
+    success: boolean;
+    refund?: { refund_id: string; status: string; amount: number };
+    error?: string;
+  }> {
+    try {
+      const response = await apiService.post('payments-consolidated-full?action=stc-refund', {
+        payment_id: paymentId,
+        amount,
+        reason
+      }) as { 
+        success: boolean; 
+        refund?: { refund_id: string; status: string; amount: number }; 
+        error?: string 
+      };
+
+      return {
+        success: response.success,
+        refund: response.refund,
+        error: response.error
+      };
+    } catch (error) {
+      console.error('STC Bank refund failed:', error);
+      return {
+        success: false,
+        error: 'Failed to process refund'
+      };
+    }
+  },
+
+  /**
+   * Get available payment providers
+   */
+  async getPaymentProviders(): Promise<{
+    success: boolean;
+    providers?: PaymentProvider[];
+    default?: string;
+    error?: string;
+  }> {
+    return {
+      success: true,
+      providers: [
+        {
+          name: 'stcbank',
+          display_name: 'STC Bank',
+          supported_currencies: ['SAR', 'USD', 'EUR'],
+          fees: {
+            percentage: 2.5,
+            fixed: 1.0
+          }
+        },
+        {
+          name: 'dodopayments',
+          display_name: 'DodoPayments',
+          supported_currencies: ['USD', 'EUR', 'GBP'],
+          fees: {
+            percentage: 2.5,
+            fixed: 0.30
+          }
+        }
+      ],
+      default: 'stcbank'
+    };
+  },
+
+  /**
+   * Redirect to STC Bank payment page
+   */
+  redirectToPayment(paymentIntent: STCPaymentIntent): void {
+    if (paymentIntent.payment_url) {
+      window.location.href = paymentIntent.payment_url;
+    } else {
+      console.error('No payment URL provided');
+    }
   }
 };
 

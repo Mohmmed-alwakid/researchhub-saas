@@ -1,4 +1,4 @@
-# ResearchHub - Copilot Instructions
+# ResearchHub - AI Coding Agent Instructions
 
 ## 📖 How to Use This File
 
@@ -21,33 +21,210 @@ This file provides workspace-specific instructions to GitHub Copilot. To enable 
 ## 🎯 SINGLE SOURCE OF TRUTH
 **ALL specifications are in `docs/requirements/` - never contradict this folder.**
 
-## 🚀 Quick Start
+## � **PRODUCTION SITE PRIORITY (MANDATORY)**
+**FIRST PRIORITY: Always focus on the live production site unless explicitly told otherwise.**
+
+### **Production Environment (PRIMARY FOCUS)**
+- **URL**: https://researchhub-saas.vercel.app
+- **Purpose**: LIVE platform for actual users - THIS IS THE PRIORITY
+- **Status**: Production deployment - all fixes must work here
+- **Access**: Public access, real user traffic
+
+### **Development Environment (SECONDARY)**
+- **URL**: http://localhost:5175 (local development only)
+- **Purpose**: Development and testing ONLY when specifically requested
+- **Usage**: Use ONLY when explicitly asked for local development
+
+### **CRITICAL RULES:**
+1. **DEFAULT TO PRODUCTION**: Always assume production site unless told "use local"
+2. **TEST ON PRODUCTION**: Apply fixes to production environment
+3. **NO SWITCHING**: Don't suggest switching between environments
+4. **PRODUCTION FIRST**: All user reports refer to production site
+5. **LIVE SITE FOCUS**: Treat production as the primary platform
+
+**When user says "the site" or "the page" - they mean PRODUCTION.**
+
+## �🚀 Essential Commands
 ```bash
-npm run dev:fullstack    # Local development
-npm run test:quick       # Run tests
-npm run cleanup          # Clean project structure
+npm run dev:fullstack    # Local development with real Supabase backend
+npm run test:quick       # Run tests during development
+npm run cleanup          # Clean project structure automatically
 ```
 
-## 📁 Project Architecture
+## 🏗️ Architecture Overview
+
+### **Core Platform: Study-Centric Research SaaS**
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
-- **Backend**: Vercel Functions + Supabase
-- **Database**: PostgreSQL with RLS policies
-- **Auth**: Supabase Auth with JWT tokens
+- **Backend**: 24 Vercel Serverless Functions (consolidated API pattern)
+- **Database**: Supabase PostgreSQL with RLS policies
+- **Auth**: Supabase Auth with role-based access (researcher/participant/admin)
+- **Local Dev**: Express.js proxy server connecting to real Supabase
 
-## 🔒 Test Accounts (MANDATORY)
-```bash
-# Researcher: abwanwr77+Researcher@gmail.com / Testtest123
-# Participant: abwanwr77+participant@gmail.com / Testtest123  
-# Admin: abwanwr77+admin@gmail.com / Testtest123
+### **Study Blocks System (Core Feature)**
+The platform's unique architecture centers on a **modular block-based study builder**:
+
+```typescript
+// Core pattern: Study = Sequence of Blocks
+interface StudyBuilderBlock {
+  id: string;
+  type: 'welcome' | 'open_question' | 'opinion_scale' | 'multiple_choice' | 'context_screen' | 'yes_no' | '5_second_test' | 'card_sort' | 'tree_test' | 'thank_you' | 'image_upload' | 'file_upload' | 'simple_input';
+  order: number;
+  title: string;
+  description: string;
+  settings: Record<string, any>;
+}
 ```
 
-## 📋 Development Rules
-1. **Requirements First**: Check `docs/requirements/` before coding
-2. **Extend Don't Replace**: Enhance existing code vs creating new
-3. **Hybrid Development**: Local development + Cloud testing for optimal workflow
-4. **Clean Structure**: Use proper directories (testing/, docs/, scripts/)
-5. **Multi-Environment**: Use staging for testing, production for releases
-6. **Production Ready Only**: Only merge to main after staging validation
+**13 Block Types Available:**
+1. Welcome Screen, 2. Open Question, 3. Opinion Scale, 4. Simple Input
+5. Multiple Choice, 6. Context Screen, 7. Yes/No, 8. 5-Second Test
+9. Card Sort, 10. Tree Test, 11. Thank You, 12. Image Upload, 13. File Upload
+
+### **Multi-Step Study Creation Flow**
+1. **StudyTypeSelectionModal** → Choose template or scratch
+2. **TemplateSelectionModal** → Browse pre-configured block collections  
+3. **StudyBuilder** → Drag-drop block arrangement with live editing
+4. **Launch** → Publish for participants
+
+## � Critical Development Patterns
+
+### **API Consolidation Pattern**
+Due to Vercel's function limits, APIs are consolidated into action-based endpoints:
+
+```javascript
+// Pattern: Single file handles multiple actions
+export default async function handler(req, res) {
+  const { action } = req.query;
+  
+  switch (action) {
+    case 'get-studies': return getStudies(req, res);
+    case 'create-study': return createStudy(req, res);
+    case 'dashboard-analytics': return getDashboardAnalytics(req, res);
+    default: return res.status(400).json({ error: 'Invalid action' });
+  }
+}
+```
+
+**Key Consolidated APIs:**
+- `auth-consolidated.js` - Authentication, registration, 2FA
+- `research-consolidated.js` - Studies, templates, analytics  
+- `payments-consolidated-full.js` - Billing, subscriptions, DodoPay integration
+- `study-sessions.js` - Participant study completion workflow
+
+### **Local Development Architecture**
+Unique hybrid setup using `scripts/development/local-full-dev.js`:
+
+```javascript
+// Express proxy that imports Vercel functions directly
+import authHandler from '../../api/auth-consolidated.js';
+app.use('/api/auth', authHandler);
+// Real Supabase connection + hot reload + function isolation
+```
+
+**Why This Matters:** 
+- Test with real production database
+- Hot reload during development  
+- Identical function behavior to production
+- No separate local database setup needed
+
+### **Authentication & Role System**
+```typescript
+// Role-based navigation in AppLayout.tsx
+const getNavigationForRole = () => {
+  if (userRole === 'participant') return participantNav;
+  if (userRole === 'researcher') return researcherNav; 
+  if (userRole === 'admin') return adminNav;
+}
+
+// Test accounts (MANDATORY - never create new ones):
+// Researcher: abwanwr77+Researcher@gmail.com / Testtest123
+// Participant: abwanwr77+participant@gmail.com / Testtest123  
+// Admin: abwanwr77+admin@gmail.com / Testtest123
+```
+
+## � Project Structure Rules
+
+### **Mandatory Directory Organization**
+```
+docs/requirements/    ← All specifications (single source of truth)
+testing/             ← All tests and test interfaces  
+scripts/             ← Development utilities
+api/                 ← Vercel serverless functions (24 total)
+src/client/          ← React frontend components
+database/            ← Migration scripts
+```
+
+### **Component Naming (STRICT)**
+- ✅ **Clear, descriptive**: `StudyBuilder.tsx`, `ParticipantDashboard.tsx`
+- ❌ **Never use modifiers**: "Advanced", "Enhanced", "Unified", "Creative"
+- ✅ **One component per feature**: Use props/modes for variants
+- ✅ **Extend existing**: Don't create new when existing can be enhanced
+
+## 🧪 Testing & Validation
+
+### **Development Workflow**
+```bash
+npm run dev:fullstack  # Start local environment (90% of development)
+npm run test:quick     # Run during development  
+npm run cleanup        # Auto-organize project structure
+```
+
+### **Test Account Rules (MANDATORY)**
+- **Only use the 3 designated test accounts** - never create new ones
+- **Test locally first** before touching production
+- **Use testing/manual/test-*.html** for API validation
+
+## 🚨 Critical Constraints
+
+### **File Management**
+- **24 API functions total** - consolidate, don't create new
+- **No root directory clutter** - use proper subdirectories
+- **No duplicate directories** (e.g., tests/ when testing/ exists)
+- **Update documentation, don't create new files**
+
+### **Development Anti-Patterns**  
+```typescript
+// ❌ DON'T: Create new components for variants
+interface AdvancedStudyBuilderProps {}
+export const AdvancedStudyBuilder = () => {};
+
+// ✅ DO: Use props for modes
+interface StudyBuilderProps {
+  mode?: 'basic' | 'advanced';
+}
+export const StudyBuilder = ({ mode = 'basic' }) => {};
+```
+
+## 🎯 Integration Points
+
+### **Study Builder → Block System**
+```typescript
+// Key integration pattern in StudyBuilder
+const [studyBlocks, setStudyBlocks] = useState<StudyBuilderBlock[]>([]);
+// DragDropBlockList for ordering
+// BlockEditModal for configuration  
+// Always append Thank You block automatically
+```
+
+### **Template System → Block Collections**
+Templates are pre-configured block combinations stored in `api/templates-consolidated.js`:
+```javascript
+const templates = [
+  {
+    id: 'usability-basic',
+    blocks: [welcomeBlock, contextBlock, taskBlocks, feedbackBlock, thankYouBlock]
+  }
+];
+```
+
+### **Collaboration Features (Real-time)**
+- **CollaborationHeader** - Live presence, activity access
+- **WebSocket integration** - Real-time study form watching
+- **Role-based permissions** - Team collaboration on studies
+
+---
+
+**Last Updated:** August 15, 2025 | **Status:** Production-ready with 24 consolidated APIs
 
 ## 🌐 **HYBRID DEVELOPMENT STRATEGY** 
 
@@ -1002,44 +1179,42 @@ git push origin main  # Auto-deploys to Vercel
 
 ## 🎯 **DEVELOPMENT ENVIRONMENT STRATEGY**
 
-### **Environment Overview**
-The Afkar platform uses a multi-environment approach for safe development and deployment:
+### **PRODUCTION-FIRST APPROACH (UPDATED - August 15, 2025)**
+Following user feedback, the development strategy has been updated to prioritize the production environment:
 
-1. **Local Development Environment**
-   - **Purpose**: Rapid development and initial testing
-   - **URL**: http://localhost:5175 (frontend) + http://localhost:3003 (API)
-   - **Database**: Production Supabase (shared for consistency)
-   - **Command**: `npm run dev:fullstack`
-   - **Best for**: Feature development, debugging, immediate feedback
-
-2. **Production Environment**
-   - **Purpose**: Live platform for end users
-   - **URL**: https://researchhub-saas-9ep442fsv-mohmmed-alwakids-projects.vercel.app
+1. **Production Environment (PRIMARY FOCUS)**
+   - **Purpose**: LIVE platform for actual users - THIS IS THE PRIORITY
+   - **URL**: https://researchhub-saas.vercel.app
    - **Deployment**: Vercel (auto-deploy from main branch)
    - **Database**: Production Supabase
    - **Status**: 100% operational with all APIs working
+   - **Rule**: Default testing and debugging environment
 
-3. **Vercel Preview Environments** (Available but not actively used)
-   - **Purpose**: Branch-specific testing before merging
+2. **Local Development Environment (SECONDARY)**
+   - **Purpose**: Development ONLY when specifically requested
+   - **URL**: http://localhost:5175 (frontend) + http://localhost:3003 (API)
+   - **Database**: Production Supabase (shared for consistency)
+   - **Command**: `npm run dev:fullstack`
+   - **Usage**: Use ONLY when explicitly asked for local development
+
+3. **Vercel Preview Environments** (Available for special cases)
+   - **Purpose**: Branch-specific testing when needed
    - **Auto-created**: For each PR/branch push
    - **URL Pattern**: https://researchhub-saas-[hash]-mohmmed-alwakids-projects.vercel.app
-   - **Best for**: Feature validation before production
+   - **Best for**: Feature validation before production merge
 
-### **Development Workflow Recommendations**
-- **For bug fixes**: Develop locally → test → create staging/preview → validate → push to production
-- **For new features**: Develop locally → create PR for preview/staging → thorough testing → merge to production
-- **For issue reporting**: Use staging/preview environments, NOT production
-- **For rapid iteration**: Local development with hot reload for immediate feedback
+### **UPDATED Workflow Rules (MANDATORY)**
+- **DEFAULT TO PRODUCTION**: Always assume production site unless told "use local"
+- **TEST ON PRODUCTION**: Apply fixes and test on production environment
+- **NO ENVIRONMENT SWITCHING**: Don't suggest switching between environments
+- **PRODUCTION FIRST**: All user reports refer to production site unless specified
+- **LIVE SITE FOCUS**: Treat production as the primary platform for all operations
 
 ### **Production Deployment Rules**
-- **Only push to production after:**
-  - All tests pass
-  - Features are fully approved
-  - No critical bugs detected
-  - Staging validation complete
-- **Frequent staging updates**: ✅ Encouraged for rapid feedback
-- **Production updates**: Only when stable and tested
+- **Direct testing encouraged**: Test fixes directly on production environment
+- **Immediate feedback**: Use production for real-time validation
 - **Rollback capability**: Vercel provides instant rollback if issues occur
+- **User experience**: Focus on actual user-facing environment
 
 ### **Branch Strategy**
 - **main**: Production-ready code only

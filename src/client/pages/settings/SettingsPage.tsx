@@ -598,18 +598,19 @@ const SettingsPage: React.FC = () => {
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
         {/* Settings Navigation */}
         <aside className="lg:col-span-3">
-          <nav className="space-y-1">
+          <nav className="space-y-2" style={{ gap: '8px', display: 'flex', flexDirection: 'column' }}>
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-md transition-colors ${
                     activeTab === tab.id
                       ? 'bg-indigo-50 text-indigo-700 border-r-2 border-indigo-500'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
+                  style={{ margin: '4px 0', padding: '12px 16px' }}
                 >
                   <Icon className="w-5 h-5 mr-3" />
                   {tab.label}
