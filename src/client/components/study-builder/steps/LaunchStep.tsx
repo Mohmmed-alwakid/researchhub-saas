@@ -141,7 +141,17 @@ export const LaunchStep: React.FC<StepProps> = ({
                 View All Studies
               </button>
               <button
-                onClick={() => navigator.clipboard.writeText(window.location.origin + `/participate/${studyId}`)}
+                onClick={async () => {
+                  try {
+                    const participantLink = `${window.location.origin}/participate/${studyId}`;
+                    await navigator.clipboard.writeText(participantLink);
+                    // You can add a toast notification here if available
+                    alert('Participant link copied to clipboard!');
+                  } catch (error) {
+                    console.error('Failed to copy link:', error);
+                    alert('Failed to copy link. Please copy manually.');
+                  }
+                }}
                 className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
                 Copy Participant Link

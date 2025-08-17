@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Study Creation Debug - August 17, 2025</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .critical {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.danger {
+            background: #dc2626;
+        }
+        .button.danger:hover {
+            background: #b91c1c;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 12px;
+            margin: 5px;
+        }
+        .status.success { background: #f0fdf4; color: #16a34a; }
+        .status.warning { background: #fefbf2; color: #d97706; }
+        .status.error { background: #fef2f2; color: #dc2626; }
+        #results {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .test-step {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🔍 Production Study Creation Debug</h1>
+            <p>Testing JWT Parsing and Study Visibility on Production - August 17, 2025</p>
+            <div>
+                <span class="status error">❌ PRODUCTION ISSUE</span>
+                <span class="status warning">🔍 DEBUGGING</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="debug-section critical">
+                <h3>🎯 Current Issue</h3>
+                <p><strong>Problem:</strong> Studies created on production (https://researchhub-saas.vercel.app) are not visible</p>
+                <p><strong>Cause:</strong> Production environment may not have the JWT token parsing fix deployed</p>
+                <p><strong>Status:</strong> Need to verify production API behavior vs local environment</p>
+            </div>
+
+            <div class="debug-section">
+                <h3>🧪 Production API Debug Test</h3>
+                <p>This will test the production API directly to see if JWT parsing is working:</p>
+                
+                <button class="button danger" onclick="testProductionAPI()">🔍 Test Production API</button>
+                <button class="button" onclick="testLocalAPI()">🏠 Test Local API</button>
+                <button class="button" onclick="clearResults()">🧹 Clear Results</button>
+                
+                <div id="results">Click "Test Production API" to debug the issue...</div>
+            </div>
+
+            <div class="debug-section">
+                <h3>🔄 Expected vs Actual Behavior</h3>
+                
+                <div class="test-step">
+                    <h4>Step 1: Login as Researcher</h4>
+                    <p>Email: <code>abwanwr77+Researcher@gmail.com</code></p>
+                    <p>Expected: JWT token with role="researcher" in user_metadata</p>
+                </div>
+                
+                <div class="test-step">
+                    <h4>Step 2: Create Study</h4>
+                    <p>Use Study Builder to create a new study</p>
+                    <p>Expected: Study saved with created_by = researcher user ID</p>
+                </div>
+                
+                <div class="test-step">
+                    <h4>Step 3: View Studies List</h4>
+                    <p>Visit /app/studies page</p>
+                    <p>Expected: Created study appears in list (currently failing)</p>
+                </div>
+            </div>
+
+            <div class="debug-section">
+                <h3>🔧 JWT Token Debug</h3>
+                <p>Let's check if the production environment properly parses JWT tokens:</p>
+                
+                <div class="code-block">
+// Expected JWT parsing logic (should be in production):
+
+} else {
+  // Handle JWT tokens - decode to get user role
+  console.log('🔑 JWT token detected, parsing with Supabase');
+  
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (user && !error) {
+      userId = user.id;
+      userRole = user.user_metadata?.role || 'participant';
+      console.log(`✅ JWT parsed: role=${userRole}, id=${userId}`);
+    }
+  } catch (jwtError) {
+    console.log('⚠️ JWT parsing failed, using fallback');
+    userRole = 'participant';
+  }
+}
+</div>
+            </div>
+
+            <div class="debug-section critical">
+                <h3>🚨 Immediate Action Required</h3>
+                <p>If the production API test shows JWT parsing is NOT working, we need to:</p>
+                <ol>
+                    <li>✅ <strong>Verify Local Fix:</strong> Confirm JWT parsing works locally</li>
+                    <li>🔄 <strong>Deploy Changes:</strong> Push JWT fix to production</li>
+                    <li>⏰ <strong>Wait for Deployment:</strong> Vercel auto-deploys in ~2-3 minutes</li>
+                    <li>🧪 <strong>Re-test Production:</strong> Verify studies appear after deployment</li>
+                </ol>
+            </div>
+
+            <div class="debug-section">
+                <h3>🎯 Quick Test Instructions</h3>
+                <ol>
+                    <li>Click "Test Production API" above to see current production behavior</li>
+                    <li>If JWT parsing fails in production, we'll deploy the fix</li>
+                    <li>If JWT parsing works, the issue is elsewhere (frontend/data filtering)</li>
+                    <li>Compare with "Test Local API" to see the difference</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testProductionAPI() {
+            const results = document.getElementById('results');
+            results.textContent = 'Testing production API...\n';
+            
+            try {
+                // First, let's check if the production health endpoint works
+                results.textContent += 'Step 1: Testing production health endpoint...\n';
+                const healthResponse = await fetch('https://researchhub-saas.vercel.app/api/health');
+                const healthData = await healthResponse.text();
+                results.textContent += `Health Response: ${healthData}\n\n`;
+                
+                // Now test the research API (this will require authentication)
+                results.textContent += 'Step 2: Testing research API (needs auth token)...\n';
+                results.textContent += 'Note: This test requires a valid JWT token from login.\n';
+                results.textContent += 'Please login at https://researchhub-saas.vercel.app and check browser console for token.\n\n';
+                
+                // Test with a mock request to see the endpoint structure
+                const mockResponse = await fetch('https://researchhub-saas.vercel.app/api/research-consolidated?action=get-studies', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const mockData = await mockResponse.text();
+                results.textContent += `Research API Response (no auth): ${mockData}\n\n`;
+                
+                results.textContent += '🎯 NEXT STEPS:\n';
+                results.textContent += '1. Login at https://researchhub-saas.vercel.app\n';
+                results.textContent += '2. Open browser console and look for JWT token\n';
+                results.textContent += '3. Create a study and check if it appears\n';
+                results.textContent += '4. If not, the JWT parsing fix needs deployment\n';
+                
+            } catch (error) {
+                results.textContent += `❌ Error testing production API: ${error.message}\n`;
+            }
+        }
+        
+        async function testLocalAPI() {
+            const results = document.getElementById('results');
+            results.textContent = 'Testing local API...\n';
+            
+            try {
+                const healthResponse = await fetch('http://localhost:3003/api/health');
+                const healthData = await healthResponse.text();
+                results.textContent += `Local Health Response: ${healthData}\n\n`;
+                
+                results.textContent += 'Local API is running. JWT parsing fix should be working here.\n';
+                results.textContent += 'Test by creating a study locally at http://localhost:5175\n';
+                
+            } catch (error) {
+                results.textContent += `❌ Local API not running: ${error.message}\n`;
+                results.textContent += 'Start local server with: npm run dev:fullstack\n';
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('results').textContent = 'Results cleared. Run a test to see debug information...';
+        }
+    </script>
+</body>
+</html>

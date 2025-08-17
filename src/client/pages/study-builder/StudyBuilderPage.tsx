@@ -18,6 +18,74 @@ export const StudyBuilderPage: React.FC = () => {
 
   const isEditMode = Boolean(id);
 
+  // Handle study completion (create/launch)
+  const handleStudyComplete = async (studyData: StudyFormData) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      if (isEditMode && id) {
+        // Update existing study and launch it
+        const updateResponse = await studiesService.updateStudy(id, {
+          title: studyData.title || '',
+          description: studyData.description || '',
+          type: studyData.type || 'usability',
+          settings: {
+            recordScreen: studyData.include_audio || false, // Using available field
+            recordAudio: studyData.include_audio || false,
+            recordWebcam: false,
+            trackClicks: true,
+            trackHovers: true,
+            trackScrolls: true
+          }
+        });
+
+        if (updateResponse.success) {
+          // Now launch the study
+          const launchResponse = await studiesService.launchStudy(id);
+          if (launchResponse.success) {
+            alert('Study launched successfully!');
+            navigate('/app/studies', { state: { fromStudyBuilder: true } });
+          } else {
+            throw new Error('Failed to launch study');
+          }
+        }
+      } else {
+        // Create new study
+        const createResponse = await studiesService.createStudy({
+          title: studyData.title || 'Untitled Study',
+          description: studyData.description || '',
+          type: studyData.type || 'usability',
+          targetParticipants: studyData.target_participants || 15,
+          duration: studyData.duration || 30,
+          compensation: 0,
+          requirements: [],
+          tasks: [],
+          settings: {
+            recordScreen: studyData.include_audio || false, // Using available field
+            recordAudio: studyData.include_audio || false,
+            recordWebcam: false,
+            trackClicks: true,
+            trackHovers: true,
+            trackScrolls: true
+          }
+        });
+
+        if (createResponse.success) {
+          alert('Study created successfully!');
+          navigate('/app/studies', { state: { fromStudyBuilder: true } });
+        } else {
+          throw new Error('Failed to create study');
+        }
+      }
+    } catch (error) {
+      console.error('Error completing study:', error);
+      setError('Failed to complete study. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Handle study status changes
   const handleStatusChange = async (newStatus: StudyStatus) => {
     if (!id || !currentStudy) return;
@@ -190,6 +258,7 @@ export const StudyBuilderPage: React.FC = () => {
             isEditMode={isEditMode}
             studyId={id}
             initialData={initialData}
+            onComplete={handleStudyComplete}
           />
         </StudyStateManager>
       ) : (
@@ -197,6 +266,7 @@ export const StudyBuilderPage: React.FC = () => {
           isEditMode={isEditMode}
           studyId={id}
           initialData={initialData}
+          onComplete={handleStudyComplete}
         />
       )}
     </div>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Visibility Debug - August 18, 2025</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .critical {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.danger {
+            background: #dc2626;
+        }
+        .button.danger:hover {
+            background: #b91c1c;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        #results {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .test-step {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 12px;
+            margin: 5px;
+        }
+        .status.error { background: #fef2f2; color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🔍 Study Visibility Debug</h1>
+            <p>Deep Dive Analysis - August 18, 2025</p>
+            <div>
+                <span class="status error">❌ STUDIES NOT SHOWING</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="debug-section critical">
+                <h3>🎯 Current Issue Analysis</h3>
+                <p><strong>Problem:</strong> Studies created successfully but don't appear in studies list</p>
+                <p><strong>JWT Fix Status:</strong> Deployed yesterday, but issue persists</p>
+                <p><strong>Need to Test:</strong> Frontend authentication vs Backend authentication</p>
+            </div>
+
+            <div class="debug-section">
+                <h3>🧪 Production API Tests</h3>
+                <p>Let's test the production API directly to identify where the issue is:</p>
+                
+                <button class="button danger" onclick="testAuthFlow()">🔍 Test Auth + Studies API</button>
+                <button class="button" onclick="testWithoutAuth()">🏠 Test API Without Auth</button>
+                <button class="button" onclick="clearResults()">🧹 Clear Results</button>
+                
+                <div id="results">Click "Test Auth + Studies API" to debug the authentication flow...</div>
+            </div>
+
+            <div class="debug-section">
+                <h3>🔄 Debugging Strategy</h3>
+                
+                <div class="test-step">
+                    <h4>Hypothesis 1: Frontend Token Issue</h4>
+                    <p>Frontend might not be sending the JWT token correctly to the API</p>
+                    <p><strong>Test:</strong> Check if Authorization header is being sent</p>
+                </div>
+                
+                <div class="test-step">
+                    <h4>Hypothesis 2: Backend Role Detection Issue</h4>
+                    <p>Backend JWT parsing might still not be working correctly</p>
+                    <p><strong>Test:</strong> Verify API logs show correct role extraction</p>
+                </div>
+                
+                <div class="test-step">
+                    <h4>Hypothesis 3: Study Storage Issue</h4>
+                    <p>Studies might not be saving correctly during creation</p>
+                    <p><strong>Test:</strong> Check if studies exist in backend storage</p>
+                </div>
+                
+                <div class="test-step">
+                    <h4>Hypothesis 4: Frontend Filtering Issue</h4>
+                    <p>Studies might be returned by API but filtered out by frontend</p>
+                    <p><strong>Test:</strong> Check browser network tab for API responses</p>
+                </div>
+            </div>
+
+            <div class="debug-section">
+                <h3>🔧 Manual Debug Instructions</h3>
+                <ol>
+                    <li><strong>Step 1:</strong> Login to production as researcher</li>
+                    <li><strong>Step 2:</strong> Open browser DevTools > Network tab</li>
+                    <li><strong>Step 3:</strong> Create a study and watch network requests</li>
+                    <li><strong>Step 4:</strong> Check if study creation API call succeeds</li>
+                    <li><strong>Step 5:</strong> Go to studies page and check get-studies API call</li>
+                    <li><strong>Step 6:</strong> Verify the response includes your created study</li>
+                </ol>
+            </div>
+
+            <div class="debug-section critical">
+                <h3>🚨 Common Issues to Check</h3>
+                <ul>
+                    <li>🔑 <strong>Authentication Token:</strong> Is JWT token being sent with requests?</li>
+                    <li>🎭 <strong>Role Detection:</strong> Is user being identified as "researcher" or "participant"?</li>
+                    <li>💾 <strong>Study Storage:</strong> Are studies actually being saved in backend?</li>
+                    <li>🔍 <strong>API Filtering:</strong> Is backend filtering studies correctly by user?</li>
+                    <li>🌐 <strong>Frontend State:</strong> Is frontend updating the studies state after creation?</li>
+                </ul>
+            </div>
+
+            <div class="debug-section">
+                <h3>🎯 Next Steps Based on Results</h3>
+                <div class="code-block">
+If JWT token missing → Fix frontend authentication service
+If role detection wrong → Fix backend JWT parsing logic  
+If studies not saved → Fix study creation API
+If studies filtered out → Fix filtering logic
+If frontend state issue → Fix state management
+</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testAuthFlow() {
+            const results = document.getElementById('results');
+            results.textContent = 'Testing authentication flow and studies API...\n\n';
+            
+            try {
+                // Test production health first
+                results.textContent += '🔍 Step 1: Testing production health...\n';
+                const healthResponse = await fetch('https://researchhub-saas.vercel.app/api/health');
+                const healthText = await healthResponse.text();
+                results.textContent += `Health Status: ${healthResponse.status} - ${healthText}\n\n`;
+                
+                // Test studies API without auth (should return limited data)
+                results.textContent += '🔍 Step 2: Testing studies API without authentication...\n';
+                const noAuthResponse = await fetch('https://researchhub-saas.vercel.app/api/research-consolidated?action=get-studies');
+                const noAuthData = await noAuthResponse.text();
+                results.textContent += `No Auth Response: ${noAuthResponse.status}\n`;
+                results.textContent += `Data: ${noAuthData.substring(0, 500)}...\n\n`;
+                
+                // Instructions for authenticated test
+                results.textContent += '🔍 Step 3: Authentication Test Required\n';
+                results.textContent += 'To test with authentication:\n';
+                results.textContent += '1. Open https://researchhub-saas.vercel.app in new tab\n';
+                results.textContent += '2. Login as: abwanwr77+Researcher@gmail.com / Testtest123\n';
+                results.textContent += '3. Open DevTools > Application > LocalStorage\n';
+                results.textContent += '4. Look for auth token\n';
+                results.textContent += '5. Go to Studies page and check Network tab\n\n';
+                
+                results.textContent += '🎯 ANALYSIS:\n';
+                if (noAuthResponse.ok && noAuthData.includes('studies')) {
+                    results.textContent += '✅ API is working - issue likely with authentication\n';
+                } else {
+                    results.textContent += '❌ API issue detected - backend problem\n';
+                }
+                
+            } catch (error) {
+                results.textContent += `❌ Error testing: ${error.message}\n`;
+            }
+        }
+        
+        async function testWithoutAuth() {
+            const results = document.getElementById('results');
+            results.textContent = 'Testing API endpoints without authentication...\n\n';
+            
+            try {
+                // Test multiple endpoints
+                const endpoints = [
+                    'health',
+                    'research-consolidated?action=get-studies'
+                ];
+                
+                for (const endpoint of endpoints) {
+                    results.textContent += `Testing: ${endpoint}\n`;
+                    const response = await fetch(`https://researchhub-saas.vercel.app/api/${endpoint}`);
+                    const data = await response.text();
+                    results.textContent += `Status: ${response.status}\n`;
+                    results.textContent += `Response: ${data.substring(0, 200)}...\n\n`;
+                }
+                
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}\n`;
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('results').textContent = 'Results cleared. Run a test to see debug information...';
+        }
+
+        // Auto-run basic test on load
+        window.onload = function() {
+            testWithoutAuth();
+        };
+    </script>
+</body>
+</html>

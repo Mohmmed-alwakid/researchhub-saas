@@ -139,27 +139,19 @@ export const ReviewStep: React.FC<StepProps> = ({
 
             {isReady && (
               <div className="mt-4">
-                <p className="text-green-800 font-medium mb-3">
-                  🎉 Great! Your study meets all requirements and is ready for participants.
+                <p className="text-green-800 font-medium mb-2">
+                  🎉 Great! Your study is ready for participants.
                 </p>
-                <div className="bg-green-100 rounded-lg p-4 border border-green-200">
-                  <h4 className="font-semibold text-green-900 mb-3">What happens after launch?</h4>
-                  <ul className="space-y-2 text-green-800 text-sm">
-                    <li className="flex items-start space-x-2">
-                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></span>
-                      <span>Your study will be immediately available to participants</span>
+                <div className="bg-green-100 rounded-lg p-3 border border-green-200">
+                  <h4 className="font-semibold text-green-900 mb-2 text-sm">After launch:</h4>
+                  <ul className="space-y-1 text-green-800 text-xs">
+                    <li className="flex items-center space-x-2">
+                      <span className="w-1 h-1 bg-green-600 rounded-full flex-shrink-0"></span>
+                      <span>Study available to participants immediately</span>
                     </li>
-                    <li className="flex items-start space-x-2">
-                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></span>
-                      <span>You'll receive a unique link to share with participants</span>
-                    </li>
-                    <li className="flex items-start space-x-2">
-                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></span>
-                      <span>Results will be collected in real-time and available in your dashboard</span>
-                    </li>
-                    <li className="flex items-start space-x-2">
-                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></span>
-                      <span>You can monitor progress and pause the study at any time</span>
+                    <li className="flex items-center space-x-2">
+                      <span className="w-1 h-1 bg-green-600 rounded-full flex-shrink-0"></span>
+                      <span>Real-time results in your dashboard</span>
                     </li>
                   </ul>
                 </div>

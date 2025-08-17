@@ -347,7 +347,7 @@ const StudyDetailPage: React.FC = () => {
 
           {/* Tab Navigation */}
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8">
+            <nav style={{ display: 'flex', gap: '32px' }}>
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
