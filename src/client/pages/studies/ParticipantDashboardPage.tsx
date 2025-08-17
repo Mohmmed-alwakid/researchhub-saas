@@ -291,7 +291,7 @@ interface StudyType {
         {/* Navigation Tabs */}
         <div className="mb-8">
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+            <nav style={{ marginBottom: '-1px', display: 'flex', gap: '32px' }}>
               <button
                 onClick={() => setCurrentView('applications')}
                 className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${

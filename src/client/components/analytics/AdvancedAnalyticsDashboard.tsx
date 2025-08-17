@@ -299,7 +299,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
 
       {/* Navigation Tabs */}
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+        <nav style={{ marginBottom: '-1px', display: 'flex', gap: '32px' }}>
           {[
             { id: 'overview', name: 'Overview', icon: Activity },
             { id: 'journey', name: 'Participant Journey', icon: Target },

@@ -261,7 +261,7 @@ const PaymentManagement: React.FC = () => {
 
       {/* Tab Navigation */}
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+        <nav style={{ marginBottom: '-1px', display: 'flex', gap: '32px' }}>
           <button
             onClick={() => setActiveTab('payments')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${

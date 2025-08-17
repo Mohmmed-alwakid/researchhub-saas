@@ -50,7 +50,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 space-y-2">
+      <nav style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {routes.map((route) => {
           const Icon = route.icon;
           const isActive = currentPath === route.path || 

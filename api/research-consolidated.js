@@ -272,8 +272,28 @@ async function getStudies(req, res) {
             console.log(`⚠️ Invalid token format, expected 4+ parts, got ${parts.length}`);
           }
         } else {
-          // Handle JWT tokens here in the future
-          console.log('� JWT token detected, would parse with Supabase');
+          // Handle JWT tokens - decode to get user role
+          console.log('🔑 JWT token detected, parsing with Supabase');
+          
+          try {
+            // Try to decode JWT token with Supabase
+            const { data: { user }, error } = await supabase.auth.getUser(token);
+            
+            if (user && !error) {
+              userId = user.id;
+              userRole = user.user_metadata?.role || 'participant';
+              console.log(`✅ JWT parsed successfully: role=${userRole}, id=${userId}, email=${user.email}`);
+            } else {
+              console.log(`⚠️ JWT parsing failed: ${error?.message}, treating as participant`);
+              // Fall back to participant for invalid JWT
+              userRole = 'participant';
+              userId = null;
+            }
+          } catch (jwtError) {
+            console.log(`⚠️ JWT parsing error: ${jwtError.message}, treating as participant`);
+            userRole = 'participant';
+            userId = null;
+          }
         }
         
         console.log(`�🔍 User context: role=${userRole}, id=${userId}, token=${token.substring(0, 20)}...`);
