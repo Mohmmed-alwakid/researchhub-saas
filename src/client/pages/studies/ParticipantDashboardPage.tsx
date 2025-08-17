@@ -587,15 +587,98 @@ interface StudyType {
                     {/* Enhanced Withdrawal Form */}
                     {showWithdrawalForm && (
                       <div className="lg:col-span-1">
-                        <div>Withdrawal form placeholder</div>
+                        <Card>
+                          <CardContent className="p-6">
+                            <h3 className="text-lg font-semibold mb-4">Request Withdrawal</h3>
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              const formData = new FormData(e.currentTarget);
+                              handleWithdrawalSubmit({
+                                amount: Number(formData.get('amount')),
+                                payment_method: formData.get('payment_method') as 'paypal' | 'bank_transfer' | 'crypto',
+                                payment_details: { email: formData.get('payment_email') || '' }
+                              });
+                            }} className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-medium mb-2">Amount</label>
+                                <input
+                                  type="number"
+                                  name="amount"
+                                  step="0.01"
+                                  min="0"
+                                  max={wallet?.balance || 0}
+                                  required
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium mb-2">Payment Method</label>
+                                <select
+                                  name="payment_method"
+                                  required
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                  <option value="paypal">PayPal</option>
+                                  <option value="bank_transfer">Bank Transfer</option>
+                                  <option value="crypto">Cryptocurrency</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium mb-2">Payment Email</label>
+                                <input
+                                  type="email"
+                                  name="payment_email"
+                                  required
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              <div className="flex gap-3">
+                                <Button type="submit" className="flex-1">
+                                  Submit Request
+                                </Button>
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  onClick={() => setShowWithdrawalForm(false)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </form>
+                          </CardContent>
+                        </Card>
                       </div>
                     )}
                   </div>
 
-                  {/* Enhanced Transaction and Withdrawal History */}
+                    {/* Enhanced Transaction and Withdrawal History */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <div>Transaction history placeholder</div>
+                      <Card>
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
+                          {transactions && transactions.length > 0 ? (
+                            <div className="space-y-3">
+                              {transactions.slice(0, 5).map((transaction) => (
+                                <div key={transaction.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                  <div>
+                                    <p className="font-medium">${transaction.amount}</p>
+                                    <p className="text-sm text-gray-600">{transaction.description}</p>
+                                  </div>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(transaction.created_at).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8 text-gray-500">
+                              <DollarSign className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                              <p>No transactions yet</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
                     </div>
 
                     <div>
