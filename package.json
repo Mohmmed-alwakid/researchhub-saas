@@ -16,7 +16,7 @@
     "dev:local": "node scripts/development/local-dev-server.js",
     "dev:fullstack": "node scripts/development/local-full-dev.js",
     "dev:production": "vercel dev --env=.env.production.local",
-    "dev:staging": "vercel dev --env=.env.staging.local", 
+    "dev:staging": "vercel dev --env=.env.staging.local",
     "dev:development": "vercel dev --env=.env.development.local",
     "dev:clean": "node scripts/utilities/console-error-reducer.mjs",
     "dev:clean-console": "node scripts/development/clean-console-dev.mjs",
@@ -36,6 +36,7 @@
     "test:api": "powershell -ExecutionPolicy Bypass -File scripts/test-api.ps1",
     "build": "npm run build:client",
     "build:client": "vite build",
+    "build:analyze": "npm run build:client && npx webpack-bundle-analyzer dist/assets/*.js",
     "build:server": "tsc -p tsconfig.server.json && node generate-server-package.cjs",
     "start": "vercel dev",
     "lint": "eslint .",
@@ -320,7 +321,8 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vercel": "^32.0.0",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "overrides": {
     "debug": "^4.3.1",

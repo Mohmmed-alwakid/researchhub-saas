@@ -11,9 +11,8 @@ import ProtectedRoute from './client/components/auth/ProtectedRoute';
 import { SentryErrorBoundary } from './components/common/SentryErrorBoundary';
 // Connectivity status banner
 import ConnectivityStatusBanner from './components/common/ConnectivityStatusBanner';
-// Removed during cleanup - will be restored when needed
-// import { PerformanceMonitor } from './client/components/performance/PerformanceMonitor';
-// import FloatingReportButton from './client/components/performance/FloatingReportButton';
+// Performance monitoring
+import { PerformanceMonitor } from './client/components/performance/PerformanceMonitor';
 import { useAuthStore } from './client/stores/authStore';
 import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
 
@@ -280,10 +279,7 @@ function App() {
             </Suspense>
           <Toaster position="top-right" />
           <ConnectivityStatusBanner />
-          {/* Temporarily disabled during cleanup - will be restored when needed
-          <PerformanceMonitor showMetrics={process.env.NODE_ENV === 'development'} />
-          <FloatingReportButton />
-          */}
+          <PerformanceMonitor />
         </div>
       </Router>
     </QueryClientProvider>
