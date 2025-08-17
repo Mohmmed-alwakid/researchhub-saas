@@ -1,39 +1,16 @@
 {
   "version": 2,
-  "alias": ["afkar-saas.vercel.app"],
   "buildCommand": "npm run build",
-  "outputDirectory": "dist", 
+  "outputDirectory": "dist",
   "installCommand": "npm install",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "github": {
-    "enabled": true,
-    "autoAlias": true,
-    "autoJobCancelation": true
-  },
-  "git": {
-    "deploymentEnabled": {
-      "main": true,
-      "staging": true,
-      "develop": true
-    }
-  },
+  "framework": "vite",
   "routes": [
+    {
+      "handle": "filesystem"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/js/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot)$)",
-      "dest": "/$1"
     },
     {
       "src": "/(.*)",
@@ -45,45 +22,22 @@
       "source": "/(.*)",
       "headers": [
         {
-          "key": "Permissions-Policy",
-          "value": "browsing-topics=*, run-ad-auction=*, join-ad-interest-group=*, private-state-token-redemption=*, private-state-token-issuance=*, private-aggregation=*, attribution-reporting=*"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)\\.js",
-      "headers": [
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
         {
-          "key": "Content-Type",
-          "value": "application/javascript"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)\\.css",
-      "headers": [
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
         {
-          "key": "Content-Type",
-          "value": "text/css"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)\\.svg",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "image/svg+xml"
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
         }
       ]
     },
     {
       "source": "/api/(.*)",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        },
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
@@ -99,11 +53,6 @@
       ]
     }
   ],
-  "env": {
-    "NODE_ENV": "production",
-    "VITE_APP_NAME": "Afkar",
-    "VITE_API_URL": "https://afkar-saas.vercel.app/api"
-  },
   "functions": {
     "api/health.js": { "maxDuration": 10 },
     "api/auth-consolidated.js": { "maxDuration": 30 },
@@ -118,6 +67,5 @@
     "api/password.js": { "maxDuration": 30 },
     "api/applications.js": { "maxDuration": 30 }
   },
-  "regions": ["iad1"],
-  "framework": "vite"
+  "regions": ["iad1"]
 }
