@@ -139,7 +139,7 @@ const StudyDetailPage: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Participants</h3>
+        <h3 className="text-lg font-semibold mb-4">Participants for "{study.title}"</h3>
         <div className="text-center py-8 text-gray-500">
           <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
           <p>Participant management interface coming soon</p>
@@ -154,7 +154,7 @@ const StudyDetailPage: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Team Collaboration</h3>
+        <h3 className="text-lg font-semibold mb-4">Team Collaboration - {study.title}</h3>
         <div className="text-center py-8 text-gray-500">
           <Activity className="h-12 w-12 mx-auto mb-4 text-gray-300" />
           <p>Study-specific collaboration features coming soon</p>
@@ -169,7 +169,7 @@ const StudyDetailPage: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Study Settings</h3>
+        <h3 className="text-lg font-semibold mb-4">Settings for "{study.title}"</h3>
         <div className="text-center py-8 text-gray-500">
           <Settings className="h-12 w-12 mx-auto mb-4 text-gray-300" />
           <p>Study settings interface coming soon</p>
