@@ -24,7 +24,11 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!api|_next|.*\\.).*)",
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!api|assets|js|css|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
