@@ -1,5 +1,82 @@
 [
   {
+    "_id": "3",
+    "id": "3",
+    "title": "fgdfgf",
+    "description": "fdgdfgdfgdfgdfg",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [
+      {
+        "id": "block_1755462967805_welcome",
+        "order": 1,
+        "type": "welcome_screen",
+        "title": "Welcome",
+        "description": "Welcome to our study!",
+        "settings": {
+          "title": "Welcome to our usability study",
+          "message": "Thank you for participating in our usability research. Your feedback will help us improve our product.",
+          "showContinueButton": true
+        }
+      },
+      {
+        "id": "block_1755462968646",
+        "order": 2,
+        "type": "task_instruction",
+        "title": "Task Instructions",
+        "description": "Instructions for a specific task",
+        "settings": {
+          "title": "Task Instructions",
+          "instruction": "Please complete the following task:",
+          "task": "Navigate to the homepage and find the contact information.",
+          "timeLimit": 0,
+          "successCriteria": "Successfully locate and view contact information"
+        }
+      },
+      {
+        "id": "block_1755462969230",
+        "order": 3,
+        "type": "feedback_collection",
+        "title": "Feedback Collection",
+        "description": "Share your thoughts and feedback",
+        "settings": {
+          "question": "Please share your thoughts about this task",
+          "placeholder": "Describe your experience, any difficulties you encountered, or suggestions for improvement...",
+          "required": false,
+          "maxLength": 1000
+        }
+      },
+      {
+        "id": "block_1755462967805_thank_you",
+        "order": 4,
+        "type": "thank_you_screen",
+        "title": "Thank You",
+        "description": "Thank you for participating!",
+        "settings": {
+          "title": "Thank you for your participation!",
+          "message": "Your feedback is valuable and will help us improve our product. We appreciate the time you spent on this usability study.",
+          "showCompletionCode": false,
+          "redirectUrl": ""
+        }
+      }
+    ],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-08-17T20:36:24.198Z",
+    "updated_at": "2025-08-17T20:36:24.198Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
     "_id": "2",
     "id": "2",
     "title": "Demo Study - Test Data",

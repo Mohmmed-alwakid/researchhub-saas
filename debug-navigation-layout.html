@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Layout Debug - August 17, 2025</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .debug-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .critical {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+        .solution {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.critical {
+            background: #dc2626;
+        }
+        .button.critical:hover {
+            background: #b91c1c;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .inspect-guide {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 12px;
+            margin: 5px;
+        }
+        .status.error { background: #fef2f2; color: #dc2626; }
+        .status.warning { background: #fefbf2; color: #d97706; }
+        .status.success { background: #f0fdf4; color: #16a34a; }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <div class="header">
+            <h1>🚨 Navigation Layout Debug</h1>
+            <p>Deep investigation of horizontal navigation issue</p>
+            <div>
+                <span class="status error">❌ ISSUE PERSISTS</span>
+                <span class="status warning">🔍 DEBUGGING MODE</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="debug-section critical">
+                <h3>🎯 Current Issue</h3>
+                <p><strong>Problem:</strong> Navigation items are still appearing horizontally (next to each other) instead of vertically stacked.</p>
+                <p><strong>Expected:</strong> Vertical list of navigation items (Dashboard, Studies, Templates, Participants, Settings)</p>
+                <p><strong>Actual:</strong> All items appearing in a horizontal row</p>
+            </div>
+
+            <div class="debug-section">
+                <h3>🔍 Current CSS Classes Applied</h3>
+                <div class="code-block">
+&lt;nav className="mt-5 flex-1 px-2 bg-white flex flex-col space-y-1"&gt;
+  &lt;Link className="group flex items-center px-2 py-3 text-sm font-medium rounded-md w-full"&gt;
+</div>
+                
+                <h4>Analysis:</h4>
+                <ul>
+                    <li>✅ <code>flex</code> - Makes nav a flex container</li>
+                    <li>✅ <code>flex-col</code> - Sets flex direction to column (vertical)</li>
+                    <li>✅ <code>space-y-1</code> - Adds vertical spacing between children</li>
+                    <li>✅ <code>w-full</code> - Each link takes full width</li>
+                </ul>
+            </div>
+
+            <div class="debug-section">
+                <h3>🧪 Live Testing Environment</h3>
+                <p>Test the current navigation layout:</p>
+                
+                <button class="button" onclick="loadApp()">🚀 Load Application</button>
+                <button class="button" onclick="refreshApp()">🔄 Force Refresh</button>
+                <button class="button critical" onclick="openDevTools()">🔍 Open with DevTools</button>
+                
+                <iframe id="appFrame" src="about:blank"></iframe>
+            </div>
+
+            <div class="inspect-guide">
+                <h3>🔍 Manual Inspection Guide</h3>
+                <h4>Step 1: Open Browser DevTools</h4>
+                <ol>
+                    <li>Click "Open with DevTools" above OR press F12</li>
+                    <li>Navigate to Elements tab</li>
+                    <li>Find the nav element using this selector:</li>
+                </ol>
+                <div class="code-block">
+nav.mt-5.flex-1.px-2.bg-white.flex.flex-col.space-y-1
+</div>
+
+                <h4>Step 2: Check Computed Styles</h4>
+                <ol>
+                    <li>Right-click on the nav element</li>
+                    <li>Select "Inspect" or "Inspect Element"</li>
+                    <li>In the Styles panel, look for:</li>
+                </ol>
+                <div class="code-block">
+display: flex;
+flex-direction: column;  /* This should be 'column', not 'row' */
+</div>
+
+                <h4>Step 3: Check for Overriding CSS</h4>
+                <p>Look for any CSS rules that might be overriding the flex-direction:</p>
+                <div class="code-block">
+/* Look for these problematic rules */
+nav { flex-direction: row !important; }
+.space-y-1 { display: block; }
+/* Or any other conflicting CSS */
+</div>
+            </div>
+
+            <div class="debug-section solution">
+                <h3>🛠️ Debugging Solutions to Try</h3>
+                
+                <h4>Solution 1: Force Flex Direction</h4>
+                <p>Add explicit flex-direction style:</p>
+                <div class="code-block">
+&lt;nav className="mt-5 flex-1 px-2 bg-white flex flex-col space-y-1" 
+     style={{ flexDirection: 'column' }}&gt;
+</div>
+
+                <h4>Solution 2: Use CSS Grid Instead</h4>
+                <p>Replace flex with grid for more predictable layout:</p>
+                <div class="code-block">
+&lt;nav className="mt-5 flex-1 px-2 bg-white grid gap-1"&gt;
+</div>
+
+                <h4>Solution 3: Check Tailwind CSS Build</h4>
+                <p>Verify Tailwind classes are being generated correctly:</p>
+                <div class="code-block">
+# Check if flex-col class exists in built CSS
+npm run build
+# Look in dist/assets/*.css for .flex-col
+</div>
+
+                <h4>Solution 4: Use Block Display</h4>
+                <p>Fallback to block layout:</p>
+                <div class="code-block">
+&lt;nav className="mt-5 flex-1 px-2 bg-white space-y-1" 
+     style={{ display: 'block' }}&gt;
+</div>
+            </div>
+
+            <div class="debug-section">
+                <h3>🔬 Advanced Debugging Commands</h3>
+                <p>Run these in the browser console while on the app:</p>
+                
+                <h4>Check Navigation Element:</h4>
+                <div class="code-block">
+// Find the nav element
+const nav = document.querySelector('nav.mt-5.flex-1.px-2.bg-white.flex.flex-col.space-y-1');
+console.log('Nav element:', nav);
+console.log('Computed styles:', window.getComputedStyle(nav));
+console.log('Flex direction:', window.getComputedStyle(nav).flexDirection);
+console.log('Display:', window.getComputedStyle(nav).display);
+</div>
+
+                <h4>Check All Navigation Links:</h4>
+                <div class="code-block">
+// Check all navigation links
+const links = document.querySelectorAll('nav a');
+console.log('Number of nav links:', links.length);
+links.forEach((link, index) => {
+    console.log(`Link ${index}:`, link.textContent, 'Display:', window.getComputedStyle(link).display);
+});
+</div>
+            </div>
+
+            <div class="debug-section critical">
+                <h3>⚠️ Immediate Action Required</h3>
+                <p>If the issue persists after checking the above, we need to:</p>
+                <ol>
+                    <li><strong>Check browser cache:</strong> Hard refresh (Ctrl+Shift+R)</li>
+                    <li><strong>Verify Tailwind build:</strong> Ensure flex-col class is in CSS</li>
+                    <li><strong>Check for CSS conflicts:</strong> Look for overriding styles</li>
+                    <li><strong>Add inline styles:</strong> Force the layout with inline CSS</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadApp() {
+            const iframe = document.getElementById('appFrame');
+            iframe.src = 'http://localhost:5175';
+        }
+
+        function refreshApp() {
+            const iframe = document.getElementById('appFrame');
+            iframe.src = iframe.src;
+        }
+
+        function openDevTools() {
+            window.open('http://localhost:5175', '_blank');
+        }
+
+        // Auto-load the app
+        window.onload = function() {
+            loadApp();
+        };
+    </script>
+</body>
+</html>
