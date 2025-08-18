@@ -212,14 +212,36 @@ async function saveStudies(studies) {
     // Try to save to Supabase first (if available)
     if (supabase) {
       try {
-        for (const study of studies) {
+        // Only save non-demo studies to avoid conflicts
+        const realStudies = studies.filter(study => !study.id.startsWith('demo-'));
+        
+        for (const study of realStudies) {
+          // Prepare study data for Supabase (remove any UI-only fields)
+          const studyData = {
+            id: study.id,
+            title: study.title,
+            description: study.description,
+            type: study.type,
+            status: study.status,
+            settings: study.settings || {},
+            blocks: study.blocks || [],
+            target_participants: study.target_participants || 10,
+            created_at: study.created_at,
+            updated_at: study.updated_at || new Date().toISOString(),
+            creator_id: study.creator_id || study.created_by,
+            screening_questions: study.screening_questions || []
+          };
+          
           const { error } = await supabase
             .from('studies')
-            .upsert(study, { onConflict: 'id' });
+            .upsert(studyData, { onConflict: 'id' });
           
-          if (error) throw error;
+          if (error) {
+            console.log(`💾 Supabase upsert error for study ${study.id}:`, error.message);
+            throw error;
+          }
         }
-        console.log(`💾 Saved ${studies.length} studies to Supabase database`);
+        console.log(`💾 Saved ${realStudies.length} real studies to Supabase database`);
         return; // Success, no need for file fallback
       } catch (dbError) {
         console.log('💾 Supabase save failed, using file fallback:', dbError.message);
