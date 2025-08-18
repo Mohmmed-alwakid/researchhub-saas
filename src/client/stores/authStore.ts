@@ -514,13 +514,13 @@ export const useAuthStore = create<AuthState>()(
           try {
             // Validate current token by checking auth status
             await get().checkAuth();
-          } catch (error) {
+          } catch {
             debugLog('🔧 Stored token invalid, attempting refresh');
             if (state.refreshToken) {
               try {
                 await get().refreshAccessToken();
                 await get().checkAuth();
-              } catch (refreshError) {
+              } catch {
                 debugLog('🔧 Token refresh failed, clearing auth');
                 await get().logout();
               }
