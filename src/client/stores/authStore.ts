@@ -52,6 +52,8 @@ interface AuthState {
   checkAuth: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
   clearTempAuth: () => void;
+  initializeAuth: () => Promise<void>;
+  isTokenValid: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -493,6 +495,61 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: unknown) {
           await get().logout();
           throw error;
+        }
+      },
+
+      // Initialize authentication on app start
+      initializeAuth: async () => {
+        const state = get();
+        
+        // If already initialized and authenticated, skip
+        if (state.isAuthenticated && state.user && state.token) {
+          debugLog('🔧 Auth already initialized and valid');
+          return;
+        }
+        
+        // Check if we have stored tokens
+        if (state.token) {
+          debugLog('🔧 Initializing auth with stored token');
+          try {
+            // Validate current token by checking auth status
+            await get().checkAuth();
+          } catch (error) {
+            debugLog('🔧 Stored token invalid, attempting refresh');
+            if (state.refreshToken) {
+              try {
+                await get().refreshAccessToken();
+                await get().checkAuth();
+              } catch (refreshError) {
+                debugLog('🔧 Token refresh failed, clearing auth');
+                await get().logout();
+              }
+            } else {
+              debugLog('🔧 No refresh token available, clearing auth');
+              await get().logout();
+            }
+          }
+        }
+      },
+
+      // Check if current token is valid (not expired)
+      isTokenValid: () => {
+        const { token } = get();
+        if (!token) return false;
+        
+        try {
+          // For JWT tokens, check expiration
+          if (token.includes('.')) {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const now = Math.floor(Date.now() / 1000);
+            return payload.exp > now;
+          }
+          
+          // For non-JWT tokens (like fallback tokens), assume they're valid
+          return true;
+        } catch {
+          // If we can't parse the token, assume it's valid for now
+          return true;
         }
       },
     }),

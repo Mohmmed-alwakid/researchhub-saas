@@ -18,16 +18,39 @@ class ApiService {
   }
 
   private setupInterceptors(): void {
-    // Request interceptor to add auth token
+    // Request interceptor to add auth token and validate before requests
     this.api.interceptors.request.use(
-      (config) => {
+      async (config) => {
         // Get token from Zustand store
         const authStorage = localStorage.getItem('auth-storage');
         if (authStorage) {
           try {
             const { state } = JSON.parse(authStorage);
-            const token = state?.token;
+            let token = state?.token;
+            
             if (token) {
+              // Check if token is valid before making request
+              const isValid = this.isTokenValid(token);
+              
+              if (!isValid && state?.refreshToken) {
+                // Token is expired, try to refresh
+                try {
+                  const refreshResponse = await this.refreshToken(state.refreshToken);
+                  if (refreshResponse?.token) {
+                    token = refreshResponse.token;
+                    // Update localStorage with new token
+                    const updatedState = { ...state, token };
+                    localStorage.setItem('auth-storage', JSON.stringify({ 
+                      state: updatedState, 
+                      version: 0 
+                    }));
+                  }
+                } catch (refreshError) {
+                  console.warn('Failed to refresh token in request interceptor:', refreshError);
+                  // Continue with existing token, let response interceptor handle 401
+                }
+              }
+              
               config.headers.Authorization = `Bearer ${token}`;
             }
           } catch (error) {
@@ -115,6 +138,43 @@ class ApiService {
         return Promise.reject(error);
       }
     );
+  }
+
+  // Helper method to check if token is valid (not expired)
+  private isTokenValid(token: string): boolean {
+    try {
+      // For JWT tokens, check expiration
+      if (token.includes('.')) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
+        
+        // If token expires within 5 minutes, consider it invalid to trigger refresh
+        const fiveMinutesFromNow = now + (5 * 60);
+        return payload.exp > fiveMinutesFromNow;
+      }
+      
+      // For non-JWT tokens (like fallback tokens), assume they're valid
+      return true;
+    } catch {
+      // If we can't parse the token, assume it's invalid
+      return false;
+    }
+  }
+
+  // Helper method to refresh token
+  private async refreshToken(refreshToken: string): Promise<{ token?: string } | null> {
+    try {
+      const response = await axios.post(`${this.api.defaults.baseURL}/auth-consolidated?action=refresh`, {
+        refreshToken,
+      });
+      
+      return {
+        token: response.data.session?.access_token || response.data.data?.accessToken || response.data.token
+      };
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      return null;
+    }
   }  private handleApiError(error: unknown): void {
     // Show user-friendly error messages
     if (error && typeof error === 'object' && 'response' in error) {

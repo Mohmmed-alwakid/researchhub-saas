@@ -58,15 +58,18 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const { checkAuth, hasHydrated } = useAuthStore();
+  const { initializeAuth, hasHydrated } = useAuthStore();
 
   useEffect(() => {
-    // Only check authentication after the store has been rehydrated from localStorage
+    // Only initialize authentication after the store has been rehydrated from localStorage
     if (hasHydrated) {
-      console.log('🔄 App - Store has rehydrated, checking auth...');
-      checkAuth();
+      console.log('🔄 App - Store has rehydrated, initializing auth...');
+      initializeAuth().catch((error) => {
+        console.warn('🔄 App - Auth initialization failed:', error);
+        // Don't block the app if auth initialization fails
+      });
     }
-  }, [checkAuth, hasHydrated]);
+  }, [initializeAuth, hasHydrated]);
 
   // Component for role-based redirect
   const RoleBasedRedirect = () => {
