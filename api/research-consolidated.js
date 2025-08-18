@@ -566,13 +566,18 @@ async function getStudies(req, res) {
         const isActive = study.status === 'active' || study.status === 'published';
         if (!isActive) return false;
         
+        // For testing purposes, allow "E-commerce Navigation Study" to be visible to participants
+        if (study.id === 'demo-study-1' || study.title === 'E-commerce Navigation Study') {
+          return true;
+        }
+        
         // Multi-criteria demo study detection
         const isDemoStudy = isDemoOrTestStudy(study);
         
         // Return true only if active and NOT demo data
         return !isDemoStudy;
       });
-      console.log(`👥 Participant view: ${filteredStudies.length} real studies (filtered out demo data)`);
+      console.log(`👥 Participant view: ${filteredStudies.length} real studies (including 1 demo for testing)`);
     }
     
     // Performance logging
