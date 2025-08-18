@@ -16,6 +16,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { IStudy } from '../../../shared/types';
 import StudyCardActions from '../../components/studies/StudyCardActions';
 import RenameStudyModal from '../../components/studies/RenameStudyModal';
+import StudiesLoading from '../../components/studies/StudiesLoading';
 import '../../styles/study-card.css';
 
 const StudiesPage: React.FC = () => {
@@ -119,8 +120,11 @@ const StudiesPage: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this study? This action cannot be undone.')) {
       try {
         await deleteStudy(studyId);
+        // Show success feedback (we'll add proper toast later)
+        alert('Study deleted successfully!');
       } catch (error) {
         console.error('Failed to delete study:', error);
+        alert('Failed to delete study. Please try again.');
       }
     }
   };
@@ -149,6 +153,7 @@ const StudiesPage: React.FC = () => {
       await updateStudy(studyToRename._id, { title: newTitle });
       setShowRenameModal(false);
       setStudyToRename(null);
+      alert('Study renamed successfully!');
     } catch (error) {
       console.error('Failed to rename study:', error);
       alert('Failed to rename study. Please try again.');
@@ -231,11 +236,7 @@ const StudiesPage: React.FC = () => {
   };
 
   if (studiesLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
+    return <StudiesLoading count={6} />;
   }
 
   return (
