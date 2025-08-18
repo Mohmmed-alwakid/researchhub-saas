@@ -57,11 +57,139 @@ async function loadStudies() {
     }
 
     // Fallback to file storage
-    if (!process.env.VERCEL && fs.existsSync(STUDIES_FILE_PATH)) {
-      const data = fs.readFileSync(STUDIES_FILE_PATH, 'utf8');
-      const studies = JSON.parse(data);
-      console.log(`📚 Loaded ${studies.length} studies from file storage`);
+    try {
+      const studiesData = JSON.stringify([
+        {
+          "id": "demo-study-1",
+          "title": "E-commerce Navigation Study",
+          "description": "Test how users navigate through our product pages and complete purchases. Help us improve the shopping experience.",
+          "type": "usability",
+          "status": "active",
+          "target_participants": 10,
+          "creator_id": "researcher-1",
+          "created_at": new Date().toISOString(),
+          "blocks": [
+            {
+              "id": "welcome-1",
+              "order": 1,
+              "type": "welcome_screen", 
+              "title": "Welcome",
+              "description": "Welcome to our study!",
+              "settings": {
+                "title": "Welcome to our E-commerce Study",
+                "message": "Thank you for participating! We'll test navigation and shopping tasks.",
+                "showContinueButton": true
+              }
+            },
+            {
+              "id": "task-1", 
+              "order": 2,
+              "type": "task_instructions",
+              "title": "Navigation Task",
+              "description": "Find and add a product to cart",
+              "settings": {
+                "instructions": "Please navigate to the Electronics section and add a laptop to your cart.",
+                "timeLimit": 300,
+                "required": true
+              }
+            },
+            {
+              "id": "feedback-1",
+              "order": 3, 
+              "type": "feedback_collection",
+              "title": "Your Experience",
+              "description": "Tell us about your experience",
+              "settings": {
+                "question": "How easy was it to find and add the product?",
+                "required": false
+              }
+            },
+            {
+              "id": "thankyou-1",
+              "order": 4,
+              "type": "thank_you",
+              "title": "Thank You",
+              "description": "Thank you for participating!",
+              "settings": {
+                "message": "Your feedback helps us improve!",
+                "redirectUrl": null
+              }
+            }
+          ],
+          "screening_questions": [
+            {
+              "id": "screen-1",
+              "question": "How often do you shop online?",
+              "type": "multiple_choice",
+              "options": ["Daily", "Weekly", "Monthly", "Rarely"],
+              "required": true
+            }
+          ]
+        },
+        {
+          "id": "demo-study-2", 
+          "title": "Mobile App Usability Test",
+          "description": "Test the usability of our mobile application interface and navigation.",
+          "type": "usability",
+          "status": "active",
+          "target_participants": 8,
+          "creator_id": "researcher-1", 
+          "created_at": new Date().toISOString(),
+          "blocks": [
+            {
+              "id": "welcome-2",
+              "order": 1,
+              "type": "welcome_screen",
+              "title": "Welcome", 
+              "description": "Welcome to mobile app testing!",
+              "settings": {
+                "title": "Mobile App Study",
+                "message": "We'll test various app features and navigation.",
+                "showContinueButton": true
+              }
+            },
+            {
+              "id": "task-2",
+              "order": 2, 
+              "type": "task_instructions",
+              "title": "App Navigation",
+              "description": "Complete basic app tasks",
+              "settings": {
+                "instructions": "Sign up for an account and complete your profile.",
+                "timeLimit": 600,
+                "required": true
+              }
+            },
+            {
+              "id": "thankyou-2",
+              "order": 3,
+              "type": "thank_you", 
+              "title": "Thank You",
+              "description": "Thanks for testing our app!",
+              "settings": {
+                "message": "Your feedback is valuable to us!",
+                "redirectUrl": null
+              }
+            }
+          ],
+          "screening_questions": [
+            {
+              "id": "screen-2",
+              "question": "Do you regularly use mobile apps?",
+              "type": "multiple_choice", 
+              "options": ["Yes, daily", "Yes, weekly", "Occasionally", "Rarely"],
+              "required": true
+            }
+          ]
+        }
+      ], null, 2);
+      
+      const studies = JSON.parse(studiesData);
+      console.log(`📚 Using demo studies (${studies.length} studies available)`);
       return studies;
+    } catch (parseError) {
+      console.error('Error parsing demo studies:', parseError);
+      return [];
     }
 
     // If no studies found anywhere, return empty array
