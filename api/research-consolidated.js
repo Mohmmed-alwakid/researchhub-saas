@@ -50,9 +50,12 @@ async function loadStudies() {
         if (!error && studies && studies.length > 0) {
           console.log(`📚 Loaded ${studies.length} studies from Supabase database`);
           return studies;
+        } else {
+          console.log(`📚 No studies found in Supabase, using demo data`);
+          // Fall through to demo data
         }
       } catch (dbError) {
-        console.log('📚 Supabase query failed, trying file fallback:', dbError.message);
+        console.log('📚 Supabase query failed, trying demo data:', dbError.message);
       }
     }
 
@@ -443,6 +446,93 @@ async function getStudies(req, res) {
         study.created_by === userId || study.creator_id === userId
       );
       console.log(`🔬 Researcher view: ${filteredStudies.length} studies (filtered by creator: ${userId})`);
+      
+      // If researcher has no studies, provide demo studies for testing
+      if (filteredStudies.length === 0) {
+        console.log(`📚 No studies found for researcher ${userId}, providing demo studies for testing`);
+        // Directly provide demo studies without calling loadStudies again
+        filteredStudies = [
+          {
+            "id": "demo-study-1",
+            "title": "E-commerce Navigation Study",
+            "description": "Test how users navigate through our product pages and complete purchases. Help us improve the shopping experience.",
+            "type": "usability",
+            "status": "active",
+            "target_participants": 10,
+            "creator_id": userId, // Assign to current user
+            "created_at": new Date().toISOString(),
+            "blocks": [
+              {
+                "id": "welcome-1",
+                "order": 1,
+                "type": "welcome_screen", 
+                "title": "Welcome",
+                "description": "Welcome to our study!",
+                "settings": {
+                  "title": "Welcome to our E-commerce Study",
+                  "message": "Thank you for participating! We'll test navigation and shopping tasks.",
+                  "showContinueButton": true
+                }
+              },
+              {
+                "id": "task-1", 
+                "order": 2,
+                "type": "task_instructions",
+                "title": "Navigation Task",
+                "description": "Find and add a product to cart",
+                "settings": {
+                  "instructions": "Please navigate to the Electronics section and add a laptop to your cart.",
+                  "timeLimit": 300,
+                  "required": true
+                }
+              }
+            ],
+            "screening_questions": [
+              {
+                "id": "age-check",
+                "question": "What is your age range?",
+                "type": "multiple_choice",
+                "required": true,
+                "options": ["18-25", "26-35", "36-45", "46-55", "56+"]
+              }
+            ]
+          },
+          {
+            "id": "demo-study-2",
+            "title": "Mobile App Usability Test",
+            "description": "Evaluate the user experience of our new mobile application interface.",
+            "type": "usability",
+            "status": "active", 
+            "target_participants": 15,
+            "creator_id": userId, // Assign to current user
+            "created_at": new Date().toISOString(),
+            "blocks": [
+              {
+                "id": "welcome-2",
+                "order": 1,
+                "type": "welcome_screen",
+                "title": "Welcome",
+                "description": "Welcome to our mobile app study!",
+                "settings": {
+                  "title": "Mobile App Usability Test",
+                  "message": "Help us improve our mobile app experience!",
+                  "showContinueButton": true
+                }
+              }
+            ],
+            "screening_questions": [
+              {
+                "id": "device-check",
+                "question": "What type of mobile device do you primarily use?",
+                "type": "multiple_choice",
+                "required": true,
+                "options": ["iPhone", "Android", "Other"]
+              }
+            ]
+          }
+        ];
+        console.log(`📚 Provided ${filteredStudies.length} demo studies for researcher`);
+      }
     } else if (userRole === 'admin') {
       // Admins see all studies including demo data for debugging
       filteredStudies = localStudies;
