@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Video, Mic, MicOff, VideoOff, Clock, Users, ExternalLink, AlertCircle, CheckCircle, PhoneOff } from 'lucide-react';
-import ZoomMtgEmbedded from '@zoom/meetingsdk/embedded';
+
+// Conditional Zoom SDK import to prevent React version conflicts
+let ZoomMtgEmbedded: any = null;
+try {
+  // Dynamic import to prevent bundling issues in production
+  if (typeof window !== 'undefined') {
+    import('@zoom/meetingsdk/embedded').then(module => {
+      ZoomMtgEmbedded = module.default;
+    }).catch(err => {
+      console.warn('Zoom SDK not available:', err);
+    });
+  }
+} catch (error) {
+  console.warn('Zoom SDK import failed:', error);
+}
 
 interface ZoomMeetingConfig {
   meetingNumber: string;
