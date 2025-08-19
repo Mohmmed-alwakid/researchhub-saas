@@ -333,6 +333,9 @@ export default async function handler(req, res) {
       case 'apply':
         return await applyToStudy(req, res);
       
+      case 'clear-demo-data':
+        return await clearDemoData(req, res);
+      
       default:
         return res.status(400).json({
           success: false,
@@ -1156,6 +1159,57 @@ async function applyToStudy(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Failed to submit application'
+    });
+  }
+}
+
+/**
+ * Clear demo data (Development only)
+ */
+async function clearDemoData(req, res) {
+  try {
+    console.log('🧹 Clearing demo data...');
+    
+    // Only allow in development/staging environments
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({
+        success: false,
+        error: 'Demo data clearing is not allowed in production'
+      });
+    }
+    
+    // Ensure studies are loaded first
+    await ensureStudiesLoaded();
+    
+    // Filter out demo studies
+    const beforeCount = localStudies.length;
+    localStudies = localStudies.filter(study => 
+      !study.id.startsWith('demo-study-') && 
+      !study.title.includes('Demo') &&
+      !study.title.includes('E-commerce Navigation Study') &&
+      !study.title.includes('Mobile App Usability Test')
+    );
+    
+    const afterCount = localStudies.length;
+    const removedCount = beforeCount - afterCount;
+    
+    // Save the cleaned studies
+    await saveStudies(localStudies);
+    
+    console.log(`✅ Demo data cleared: removed ${removedCount} demo studies, ${afterCount} studies remaining`);
+    
+    return res.status(200).json({
+      success: true,
+      message: `Demo data cleared successfully`,
+      removed_count: removedCount,
+      remaining_count: afterCount
+    });
+    
+  } catch (error) {
+    console.error('Clear demo data error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to clear demo data'
     });
   }
 }

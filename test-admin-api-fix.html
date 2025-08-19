@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin API Test - Development Mode</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .loading { opacity: 0.6; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Admin API Test - Development Mode</h1>
+    <p>Testing the admin users API with local development fallback authentication</p>
+
+    <div class="test-section info">
+        <h3>📡 Test Configuration</h3>
+        <p><strong>API Endpoint:</strong> http://localhost:3003/api/admin?action=users</p>
+        <p><strong>Authentication:</strong> Fallback token for development mode</p>
+        <p><strong>Expected Result:</strong> Mock users data without Supabase errors</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 Admin Users API Test</h3>
+        <button onclick="testAdminUsersAPI()">Test Admin Users API</button>
+        <div id="adminResult" class="status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 Health Check Test</h3>
+        <button onclick="testHealthCheck()">Test Health Check</button>
+        <div id="healthResult" class="status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Test Summary</h3>
+        <div id="testSummary"></div>
+    </div>
+
+    <script>
+        async function testAdminUsersAPI() {
+            const resultDiv = document.getElementById('adminResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing admin users API...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/admin?action=users', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer fallback-token-admin',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Admin Users API Success</h4>
+                            <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                            <p><strong>Users Found:</strong> ${data.data?.length || 0}</p>
+                            <p><strong>Development Mode:</strong> Using mock data</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Admin Users API Failed</h4>
+                            <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                            <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Network Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Make sure the development server is running on port 3003</p>
+                    </div>
+                `;
+            }
+            
+            updateTestSummary();
+        }
+
+        async function testHealthCheck() {
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing health check...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/health');
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Health Check Success</h4>
+                            <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                            <p><strong>Server:</strong> ${data.server || 'Running'}</p>
+                            <p><strong>Development Mode:</strong> ${data.development_mode ? 'Enabled' : 'Disabled'}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Health Check Failed</h4>
+                            <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Network Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            updateTestSummary();
+        }
+
+        function updateTestSummary() {
+            const adminResult = document.getElementById('adminResult').innerHTML;
+            const healthResult = document.getElementById('healthResult').innerHTML;
+            const summaryDiv = document.getElementById('testSummary');
+            
+            let successCount = 0;
+            let totalTests = 0;
+            
+            if (adminResult.includes('✅')) {
+                successCount++;
+            }
+            if (adminResult) totalTests++;
+            
+            if (healthResult.includes('✅')) {
+                successCount++;
+            }
+            if (healthResult) totalTests++;
+            
+            if (totalTests > 0) {
+                const successRate = Math.round((successCount / totalTests) * 100);
+                summaryDiv.innerHTML = `
+                    <div class="${successRate === 100 ? 'success' : successRate > 50 ? 'info' : 'error'}">
+                        <h4>📊 Test Results Summary</h4>
+                        <p><strong>Success Rate:</strong> ${successCount}/${totalTests} (${successRate}%)</p>
+                        <p><strong>Admin API:</strong> ${adminResult.includes('✅') ? '✅ Working' : adminResult.includes('❌') ? '❌ Failed' : '⏳ Not tested'}</p>
+                        <p><strong>Health Check:</strong> ${healthResult.includes('✅') ? '✅ Working' : healthResult.includes('❌') ? '❌ Failed' : '⏳ Not tested'}</p>
+                        ${successRate === 100 ? '<p><strong>🎉 All tests passed! Development mode is working correctly.</strong></p>' : ''}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testHealthCheck();
+                setTimeout(() => {
+                    testAdminUsersAPI();
+                }, 1000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -13,6 +13,8 @@ import { SentryErrorBoundary } from './components/common/SentryErrorBoundary';
 import ConnectivityStatusBanner from './components/common/ConnectivityStatusBanner';
 // Performance monitoring
 import { PerformanceMonitor } from './client/components/performance/PerformanceMonitor';
+// Lazy load error boundary
+import LazyLoadErrorBoundary from './client/components/common/LazyLoadErrorBoundary';
 import { useAuthStore } from './client/stores/authStore';
 import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
 
@@ -44,7 +46,7 @@ const SettingsPage = lazy(() => import('./client/pages/settings/SettingsPage'));
 const AdminDashboard = lazy(() => import('./client/pages/admin/AdminDashboard'));
 const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPaymentPage.tsx'));
 const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage.tsx'));
-const ProfessionalStudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage'));
+const StudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage'));
 const OrganizationDashboard = lazy(() => import('./client/pages/organization/OrganizationDashboard'));
 
 // Create a client
@@ -131,7 +133,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Router>
           <div className="min-h-screen bg-gray-50">
-            <Suspense fallback={<RouteLoadingSpinner />}>
+            <LazyLoadErrorBoundary componentName="App Routes">
+              <Suspense fallback={<RouteLoadingSpinner />}>
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
@@ -183,12 +186,12 @@ function App() {
               } />
               <Route path="studies/create" element={
                 <ProtectedRoute allowedRoles={['researcher']}>
-                  <ProfessionalStudyBuilderPage />
+                  <StudyBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="study-builder" element={
                 <ProtectedRoute allowedRoles={['researcher']}>
-                  <ProfessionalStudyBuilderPage />
+                  <StudyBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/creative-journey" element={
@@ -203,7 +206,7 @@ function App() {
               } />
               <Route path="studies/:id/edit" element={
                 <ProtectedRoute allowedRoles={['researcher']}>
-                  <ProfessionalStudyBuilderPage />
+                  <StudyBuilderPage />
                 </ProtectedRoute>
               } />
               <Route path="studies/:id/results" element={
@@ -279,7 +282,8 @@ function App() {
               } />
             </Route>
           </Routes>
-            </Suspense>
+              </Suspense>
+            </LazyLoadErrorBoundary>
           <Toaster position="top-right" />
           <ConnectivityStatusBanner />
           <PerformanceMonitor />

@@ -8,7 +8,7 @@ import { StudyFormData } from '../../components/study-builder/types';
 // Define types locally
 type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
 
-export const StudyBuilderPage: React.FC = () => {
+const StudyBuilderPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [initialData, setInitialData] = useState<Partial<StudyFormData> | undefined>();

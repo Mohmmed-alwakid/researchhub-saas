@@ -6,7 +6,6 @@ import { CheckCircle, AlertCircle, Edit2, Eye, BookOpen, Users, Clock, HelpCircl
 
 export const ReviewStep: React.FC<StepProps> = ({
   formData,
-  onNext,
   onPrevious
 }) => {
   const [showPreview, setShowPreview] = useState(false);
@@ -354,31 +353,6 @@ export const ReviewStep: React.FC<StepProps> = ({
                     </svg>
                     <span>Previous Step</span>
                   </button>
-                  
-                  {isReady ? (
-                    <button
-                      onClick={onNext}
-                      className="w-full px-4 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center space-x-2 text-lg"
-                    >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-3.707-8.293l2-2a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L9 10.414l-1.293 1.293a1 1 0 01-1.414-1.414z" clipRule="evenodd"/>
-                      </svg>
-                      <span>🚀 Launch Study Now</span>
-                    </button>
-                  ) : (
-                    <div className="w-full">
-                      <button
-                        disabled
-                        className="w-full px-4 py-3 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed flex items-center justify-center space-x-2"
-                      >
-                        <span>Fix Issues First</span>
-                      </button>
-                      <p className="text-xs text-red-600 text-center mt-1">
-                        {errors.length} issue{errors.length !== 1 ? 's' : ''} to resolve
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

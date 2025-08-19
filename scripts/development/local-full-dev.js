@@ -24,20 +24,13 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Supabase configuration (using environment variables)
-const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Development Mode: Disable Supabase entirely for local development
+console.log('🔧 DEVELOPMENT MODE: Disabling Supabase connections for local development');
+console.log('🔧 Using fallback authentication and file storage only');
 
-// Regular Supabase client (for general operations)
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-// Admin Supabase client (for admin operations that need service role)
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseKey);
-
-console.log('🔑 Supabase Configuration:');
-console.log('   URL:', supabaseUrl);
-console.log('   Service Role Key:', supabaseServiceKey ? '✅ Set' : '❌ Missing');
+// Set environment to indicate pure local development
+process.env.LOCAL_DEVELOPMENT_ONLY = 'true';
+process.env.NODE_ENV = 'development';
 
 // Import consolidated API handlers
 import authHandler from '../../api/auth-consolidated.js';
@@ -204,8 +197,32 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
+// Development utility functions
+async function clearDemoDataOnStart() {
+  try {
+    console.log('🧹 Clearing demo data on development server start...');
+    
+    const response = await fetch(`http://localhost:${API_PORT}/api/research-consolidated?action=clear-demo-data`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer fallback-token-admin-admin-admin@example.com'
+      }
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ Demo data cleared:', result.message);
+    } else {
+      console.log('⚠️ Could not clear demo data:', response.statusText);
+    }
+  } catch (error) {
+    console.log('⚠️ Demo data clearing error:', error.message);
+  }
+}
+
 // Start backend server
-app.listen(API_PORT, () => {
+app.listen(API_PORT, async () => {
   console.log('🚀 LOCAL FULLSTACK DEVELOPMENT SERVER');
   console.log(`📡 Backend API: http://localhost:${API_PORT}`);
   console.log(`🌐 Frontend: http://localhost:${FRONTEND_PORT}`);
@@ -216,6 +233,9 @@ app.listen(API_PORT, () => {
   console.log('');
   console.log('✅ Server is running and ready for development!');
   console.log('🧪 Use test accounts from TESTING_RULES_MANDATORY.md');
+  
+  // Clear demo data after a short delay to ensure the server is ready
+  setTimeout(clearDemoDataOnStart, 2000);
 });
 
 // Start frontend development server (directly call Vite to avoid conflicts)

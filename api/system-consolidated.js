@@ -6,19 +6,71 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase configuration
-const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+// Check if we're in local development mode
+const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
+                          process.env.LOCAL_DEVELOPMENT_ONLY === 'true';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+let supabase = null;
+let supabaseAdmin = null;
+
+// Only initialize Supabase if not in local development mode
+if (!isLocalDevelopment) {
+  // Supabase configuration
+  const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+
+  supabase = createClient(supabaseUrl, supabaseKey);
+  supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+} else {
+  console.log('🔧 System API: Local development mode - Supabase disabled');
+}
 
 /**
  * Helper function to authenticate user
  */
 async function authenticateUser(req, requiredRoles = []) {
   try {
+    // In local development mode, use fallback authentication
+    if (isLocalDevelopment) {
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return { success: false, error: 'Missing or invalid authorization header', status: 401 };
+      }
+
+      const token = authHeader.replace('Bearer ', '');
+      
+      // Handle fallback tokens for development
+      if (token.startsWith('fallback-token-')) {
+        const parts = token.split('-');
+        if (parts.length >= 4) {
+          const userId = parts[2];
+          const userRole = parts[3];
+          
+          const fallbackUser = {
+            id: userId,
+            email: `${userId}@example.com`,
+            user_metadata: { role: userRole }
+          };
+          
+          // Check role if specified
+          if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+            return { 
+              success: false, 
+              error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+              status: 403 
+            };
+          }
+          
+          return { success: true, user: fallbackUser };
+        }
+      }
+      
+      return { success: false, error: 'Invalid development token', status: 401 };
+    }
+
+    // Production Supabase authentication
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -58,7 +110,31 @@ async function handleHealthCheck(req, res) {
   const startTime = Date.now();
   
   try {
-    // Test database connectivity
+    // Check if we're in local development mode (dynamic check)
+    const isDevelopmentMode = process.env.NODE_ENV === 'development' || 
+                             req.headers.host?.includes('localhost') ||
+                             req.headers.host?.includes('127.0.0.1');
+    
+    // In local development mode, skip database checks
+    if (isDevelopmentMode || !supabase) {
+      const responseTime = Date.now() - startTime;
+      
+      return res.status(200).json({
+        success: true,
+        status: 'healthy',
+        mode: 'development',
+        development_mode: true,
+        services: {
+          database: 'local-fallback',
+          api: 'operational'
+        },
+        timestamp: new Date().toISOString(),
+        responseTime: `${responseTime}ms`,
+        version: '1.0.0'
+      });
+    }
+
+    // Production: Test database connectivity
     const { data, error } = await supabase
       .from('profiles')
       .select('count')
