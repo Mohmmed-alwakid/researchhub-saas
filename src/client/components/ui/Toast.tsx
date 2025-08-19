@@ -1,5 +1,6 @@
 import React, { createContext, useState, useCallback } from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+import { useToast } from '../../hooks/useToast';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -25,10 +26,16 @@ interface ToastContextType {
   info: (title: string, message?: string) => void;
 }
 
+export { type ToastContextType };
+
 export const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
 
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -43,11 +50,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         removeToast(id);
       }, duration);
     }
-  }, []);
-
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  }, []);
+  }, [removeToast]);
 
   const success = useCallback((title: string, message?: string) => {
     addToast({ type: 'success', title, message });
@@ -88,7 +91,7 @@ const ToastContainer: React.FC = () => {
 
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-      {toasts.map(toast => (
+      {toasts.map((toast: Toast) => (
         <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
       ))}
     </div>

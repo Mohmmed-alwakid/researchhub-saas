@@ -1,8 +1,9 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import toast from 'react-hot-toast';
+import { apiCache } from './api.cache';
 
 /**
- * API configuration and interceptors
+ * API configuration and interceptors with performance caching
  */
 class ApiService {
   private api: AxiosInstance;  constructor() {
@@ -193,6 +194,28 @@ class ApiService {
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.api.get<T>(url, config);
     return response.data;
+  }
+
+  // Cached GET method for performance optimization
+  async getCached<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    // Check cache first
+    const cached = apiCache.get<T>(url, config?.params);
+    if (cached) {
+      return cached;
+    }
+
+    // Cache miss - fetch data
+    const response = await this.api.get<T>(url, config);
+    
+    // Store in cache
+    apiCache.set(url, response.data, config?.params);
+    
+    return response.data;
+  }
+
+  // Invalidate cache for specific patterns (useful after mutations)
+  invalidateCache(pattern: string): void {
+    apiCache.invalidate(pattern);
   }
   async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.api.post<T>(url, data, config);

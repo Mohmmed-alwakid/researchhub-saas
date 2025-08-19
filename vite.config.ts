@@ -23,7 +23,7 @@ export default defineConfig({
     minify: 'esbuild',
     target: 'es2020',
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500, // Reduced from 1000 for better chunking
     rollupOptions: {
       onwarn(warning, warn) {
         // Suppress specific warnings
@@ -32,14 +32,15 @@ export default defineConfig({
         warn(warning);
       },
       output: {
-        // Enhanced chunking strategy for optimal caching
+        // Enhanced chunking strategy for optimal caching and performance
         manualChunks: {
           // Core React (Most Critical) - Changes rarely
           'react-core': ['react', 'react-dom'],
           'react-router': ['react-router-dom'],
           
           // UI & Forms (Frequently Used) - Medium cache
-          'ui-components': ['lucide-react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+          'ui-components': ['lucide-react'],
+          'dnd-kit': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
           'form-handling': ['react-hook-form', '@hookform/resolvers', 'zod'],
           
           // Data & API (Heavy Libraries) - Long cache
