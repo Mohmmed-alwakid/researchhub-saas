@@ -3,7 +3,7 @@
  * Separated for React Fast Refresh compatibility
  */
 
-import { createContext } from 'react';
+import React, { createContext } from 'react';
 import { Theme } from './theme';
 import { colors, spacing, typography, shadows, borderRadius, transitions, componentTokens } from './tokens';
 

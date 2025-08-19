@@ -3,7 +3,14 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({
+    // Fix React createContext issues in production
+    jsxRuntime: 'automatic',
+    jsxImportSource: 'react',
+    babel: {
+      plugins: []
+    }
+  })],
   root: '.',
   server: {
     port: 5175, // YOUR PREFERRED PORT - LOCKED!
@@ -22,6 +29,10 @@ export default defineConfig({
       'react': 'react',
       'react-dom': 'react-dom'
     }
+  },
+  define: {
+    // Ensure React is available globally in production
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
   },
   build: {
     outDir: 'dist',
