@@ -1,0 +1,385 @@
+{
+  "name": "ResearchHub Study Creation Validation Workflow",
+  "meta": {
+    "instanceId": "researchhub-study-validation"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "interval": 2
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger-study",
+      "name": "Every 2 Hours Study Test",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://researchhub-saas.vercel.app/api/research-consolidated",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "action",
+              "value": "create-study"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "User-Agent",
+              "value": "n8n-ResearchHub-StudyValidator/1.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "{\n  \"title\": \"n8n Automated Test Study {{ new Date().toISOString() }}\",\n  \"description\": \"Automated test study for validation\",\n  \"type\": \"unmoderated\",\n  \"status\": \"draft\",\n  \"blocks\": [\n    {\n      \"type\": \"welcome\",\n      \"title\": \"Welcome\",\n      \"description\": \"Test welcome block\",\n      \"order\": 1,\n      \"settings\": {}\n    },\n    {\n      \"type\": \"thank_you\",\n      \"title\": \"Thank You\",\n      \"description\": \"Test completion block\",\n      \"order\": 2,\n      \"settings\": {}\n    }\n  ]\n}",
+        "options": {
+          "timeout": 15000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 2
+          }
+        }
+      },
+      "id": "create-test-study",
+      "name": "Create Test Study",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [400, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "getAll",
+        "tableId": "studies",
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "title",
+              "keyValue": "={{ 'n8n Automated Test Study ' + $node['Create Test Study'].json.timestamp }}",
+              "condition": "like"
+            }
+          ]
+        },
+        "options": {
+          "limit": 1
+        }
+      },
+      "id": "validate-study-creation",
+      "name": "Validate Study in Database",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [600, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://researchhub-saas.vercel.app/api/research-consolidated?action=get-study&studyId=' + $node['Create Test Study'].json.studyId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-ResearchHub-StudyValidator/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 2
+          }
+        }
+      },
+      "id": "validate-study-api",
+      "name": "Validate Study via API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [800, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "={{ 'https://researchhub-saas.vercel.app/api/research-consolidated?action=delete-study&studyId=' + $node['Create Test Study'].json.studyId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-ResearchHub-StudyValidator/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 2
+          }
+        }
+      },
+      "id": "cleanup-test-study",
+      "name": "Cleanup Test Study",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate study creation validation results\nconst createResult = $node['Create Test Study'].json;\nconst dbValidation = $node['Validate Study in Database'].json;\nconst apiValidation = $node['Validate Study via API'].json;\nconst cleanup = $node['Cleanup Test Study'].json;\n\nconst results = {\n  timestamp: new Date().toISOString(),\n  studyCreationTest: {\n    created: createResult?.statusCode === 200 || createResult?.studyId ? 'PASS' : 'FAIL',\n    statusCode: createResult?.statusCode || 'ERROR',\n    studyId: createResult?.studyId || 'N/A'\n  },\n  databaseValidation: {\n    found: dbValidation?.length > 0 ? 'PASS' : 'FAIL',\n    count: dbValidation?.length || 0\n  },\n  apiValidation: {\n    accessible: apiValidation?.statusCode === 200 ? 'PASS' : 'FAIL',\n    statusCode: apiValidation?.statusCode || 'ERROR'\n  },\n  cleanup: {\n    deleted: cleanup?.statusCode === 200 ? 'PASS' : 'FAIL',\n    statusCode: cleanup?.statusCode || 'ERROR'\n  }\n};\n\n// Calculate overall status\nconst allPassed = Object.values(results).slice(1).every(test => \n  Object.values(test).every(value => value === 'PASS' || typeof value === 'number' || typeof value === 'string')\n);\n\nresults.overallStatus = allPassed ? 'ALL_PASS' : 'SOME_FAIL';\n\n// Count failures\nresults.failureCount = Object.values(results).slice(1).reduce((count, test) => {\n  return count + Object.values(test).filter(value => value === 'FAIL').length;\n}, 0);\n\nreturn results;"
+      },
+      "id": "aggregate-study-results",
+      "name": "Aggregate Study Test Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.overallStatus }}",
+              "rightValue": "ALL_PASS",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "route-study-results",
+      "name": "Route Study Test Results",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1400, 200]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channel": "#researchhub-monitoring",
+        "text": "✅ **ResearchHub Study Creation: ALL TESTS PASSED**",
+        "attachments": [
+          {
+            "color": "#36a64f",
+            "title": "={{ 'Study Creation Validation Results - ' + $json.timestamp }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Study Creation",
+                  "value": "={{ $json.studyCreationTest.created + ' (' + $json.studyCreationTest.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Database Validation",
+                  "value": "={{ $json.databaseValidation.found + ' (Found: ' + $json.databaseValidation.count + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "API Validation",
+                  "value": "={{ $json.apiValidation.accessible + ' (' + $json.apiValidation.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Cleanup",
+                  "value": "={{ $json.cleanup.deleted + ' (' + $json.cleanup.statusCode + ')' }}",
+                  "short": true
+                }
+              ]
+            },
+            "footer": "ResearchHub Study Validator",
+            "footer_icon": "https://researchhub-saas.vercel.app/favicon.ico"
+          }
+        ]
+      },
+      "id": "study-success-notification",
+      "name": "Study Success Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1600, 100],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channel": "#researchhub-alerts",
+        "text": "🚨 **ResearchHub Study Creation: VALIDATION FAILURES**",
+        "attachments": [
+          {
+            "color": "#ff0000",
+            "title": "={{ 'Study Creation Test Failures - ' + $json.timestamp }}",
+            "text": "={{ $json.failureCount + ' validation step(s) failed. Study creation system needs attention.' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Study Creation",
+                  "value": "={{ $json.studyCreationTest.created + ' (' + $json.studyCreationTest.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Database Validation",
+                  "value": "={{ $json.databaseValidation.found + ' (Found: ' + $json.databaseValidation.count + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "API Validation",
+                  "value": "={{ $json.apiValidation.accessible + ' (' + $json.apiValidation.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Cleanup",
+                  "value": "={{ $json.cleanup.deleted + ' (' + $json.cleanup.statusCode + ')' }}",
+                  "short": true
+                }
+              ]
+            },
+            "footer": "ResearchHub Study Validator - CRITICAL",
+            "footer_icon": "https://researchhub-saas.vercel.app/favicon.ico"
+          }
+        ]
+      },
+      "id": "study-failure-notification",
+      "name": "Study Failure Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1600, 300],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every 2 Hours Study Test": {
+      "main": [
+        [
+          {
+            "node": "Create Test Study",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Test Study": {
+      "main": [
+        [
+          {
+            "node": "Validate Study in Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Study in Database": {
+      "main": [
+        [
+          {
+            "node": "Validate Study via API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Study via API": {
+      "main": [
+        [
+          {
+            "node": "Cleanup Test Study",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cleanup Test Study": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Study Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Study Test Results": {
+      "main": [
+        [
+          {
+            "node": "Route Study Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Study Test Results": {
+      "main": [
+        [
+          {
+            "node": "Study Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Study Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "UTC",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
+  "tags": [
+    {
+      "id": "researchhub",
+      "name": "ResearchHub"
+    },
+    {
+      "id": "study-validation",
+      "name": "Study Validation"
+    },
+    {
+      "id": "production",
+      "name": "Production"
+    }
+  ]
+}

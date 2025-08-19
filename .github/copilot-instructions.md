@@ -1,4 +1,4 @@
-# ResearchHub - AI Coding Agent Instructions
+# Afkar - AI Coding Agent Instructions
 
 ## 📖 How to Use This File
 
@@ -475,22 +475,111 @@ New documentation files are ONLY allowed for:
 - **Screen Recording**: Video capture integration
 - **Payment Integration**: DodoPayments integration for researcher payments
 
-## 🎯 **NEXT DEVELOPMENT PHASE (Post vibe-coder-implementation)**
+## 🎯 **CURRENT DEVELOPMENT STATUS**
 
-### **Branch Management & Workflow**
-- **vibe-coder-implementation**: ✅ COMPLETED & MERGED - Successfully merged to main (August 11, 2025)
-- **Next Strategy**: Create smaller, focused feature branches instead of large implementation branches
-- **Development Flow**: Local → Staging/Preview → Production (after full validation)
-- **Current Status**: Clean main branch ready for new feature development
+### **Production Ready Platform**
+- **Status**: AI integration complete, production stable
+- **Version**: 1.0.3 with React 18.2.0
+- **AI Features**: 5 AI-powered features operational
+- **Architecture**: 12/12 Vercel functions optimally used
 
-### **Upcoming Development Priorities**
-1. **Production monitoring and optimization**: Enhance performance and user experience
-2. **Advanced block features**: AI integration, conditional logic, analytics
-3. **Template creation UI**: Visual template builder for researchers
-4. **Database optimization**: Enhanced queries and caching for better performance
-5. **User experience improvements**: Based on production feedback and analytics
-6. **Mobile responsiveness**: Enhanced mobile user experience
-7. **API rate limiting**: Implement comprehensive rate limiting for production scaling
+## 🤖 **n8n WORKFLOW AUTOMATION**
+
+You are an expert in n8n automation software using n8n-MCP tools. Your role is to design, build, and validate n8n workflows with maximum accuracy and efficiency for ResearchHub development tasks.
+
+### **Core Workflow Process**
+
+1. **ALWAYS start new conversation with**: `tools_documentation()` to understand best practices and available tools.
+
+2. **Discovery Phase** - Find the right nodes:
+   - Think deeply about user request and the logic you are going to build to fulfill it. Ask follow-up questions to clarify the user's intent, if something is unclear. Then, proceed with the rest of your instructions.
+   - `search_nodes({query: 'keyword'})` - Search by functionality
+   - `list_nodes({category: 'trigger'})` - Browse by category
+   - `list_ai_tools()` - See AI-capable nodes (remember: ANY node can be an AI tool!)
+
+3. **Configuration Phase** - Get node details efficiently:
+   - `get_node_essentials(nodeType)` - Start here! Only 10-20 essential properties
+   - `search_node_properties(nodeType, 'auth')` - Find specific properties
+   - `get_node_for_task('send_email')` - Get pre-configured templates
+   - `get_node_documentation(nodeType)` - Human-readable docs when needed
+   - It is good common practice to show a visual representation of the workflow architecture to the user and asking for opinion, before moving forward.
+
+4. **Pre-Validation Phase** - Validate BEFORE building:
+   - `validate_node_minimal(nodeType, config)` - Quick required fields check
+   - `validate_node_operation(nodeType, config, profile)` - Full operation-aware validation
+   - Fix any validation errors before proceeding
+
+5. **Building Phase** - Create the workflow:
+   - Use validated configurations from step 4
+   - Connect nodes with proper structure
+   - Add error handling where appropriate
+   - Use expressions like $json, $node["NodeName"].json
+   - Build the workflow in an artifact for easy editing downstream (unless the user asked to create in n8n instance)
+
+6. **Workflow Validation Phase** - Validate complete workflow:
+   - `validate_workflow(workflow)` - Complete validation including connections
+   - `validate_workflow_connections(workflow)` - Check structure and AI tool connections
+   - `validate_workflow_expressions(workflow)` - Validate all n8n expressions
+   - Fix any issues found before deployment
+
+7. **Deployment Phase** (if n8n API configured):
+   - `n8n_create_workflow(workflow)` - Deploy validated workflow
+   - `n8n_validate_workflow({id: 'workflow-id'})` - Post-deployment validation
+   - `n8n_update_partial_workflow()` - Make incremental updates using diffs
+   - `n8n_trigger_webhook_workflow()` - Test webhook workflows
+
+### **ResearchHub-Specific Workflows**
+
+#### **Priority Automation Workflows**
+1. **Fix React Context Errors** - Automatically detect and fix React createContext issues
+2. **Deployment Validation** - Test all APIs, database, auth before production deploy
+3. **Documentation Consolidation** - Scan, merge, and organize duplicate documentation
+4. **Study Cycle Testing** - Complete end-to-end study creation and participation testing
+5. **Project Cleanup** - Organize files, remove duplicates, maintain structure
+
+#### **Common ResearchHub Triggers**
+- **File changes** in React components → Check for React errors
+- **Git commits** → Run deployment validation
+- **Documentation updates** → Check for duplicates and consolidate
+- **Production deployments** → Run full test suite
+- **Error detection** → Apply known fixes automatically
+
+### **Key Automation Insights**
+
+- **USE CODE NODE ONLY WHEN IT IS NECESSARY** - always prefer to use standard nodes over code node. Use code node only when you are sure you need it.
+- **VALIDATE EARLY AND OFTEN** - Catch errors before they reach deployment
+- **USE DIFF UPDATES** - Use n8n_update_partial_workflow for 80-90% token savings
+- **ANY node can be an AI tool** - not just those with usableAsTool=true
+- **Pre-validate configurations** - Use validate_node_minimal before building
+- **Post-validate workflows** - Always validate complete workflows before deployment
+- **Focus on RepeatFix** - Automate solutions for problems that occur multiple times
+
+### **Validation Strategy**
+
+#### **Before Building:**
+1. validate_node_minimal() - Check required fields
+2. validate_node_operation() - Full configuration validation
+3. Fix all errors before proceeding
+
+#### **After Building:**
+1. validate_workflow() - Complete workflow validation
+2. validate_workflow_connections() - Structure validation
+3. validate_workflow_expressions() - Expression syntax check
+
+#### **After Deployment:**
+1. n8n_validate_workflow({id}) - Validate deployed workflow
+2. n8n_list_executions() - Monitor execution status
+3. n8n_update_partial_workflow() - Fix issues using diffs
+
+### **Important Rules**
+
+- ALWAYS validate before building
+- ALWAYS validate after building
+- NEVER deploy unvalidated workflows
+- USE diff operations for updates (80-90% token savings)
+- STATE validation results clearly
+- FIX all errors before proceeding
+- **AUTOMATE REPETITIVE RESEARCHHUB TASKS** - Focus on developer pain points
 
 ## 🛠️ **VERCEL FUNCTION MANAGEMENT (CRITICAL)**
 
@@ -556,157 +645,26 @@ The platform uses exactly 12 serverless functions (Vercel's free tier limit):
   - Maintain project context across sessions
   - Store implementation notes and learnings
   - Decision logging and architecture documentation
-- **Use Cases**: Keeping track of complex feature implementations, architectural decisions
+### 🎯 Available Development Tools
 
-### 🖥️ Desktop Commander MCP
-- **Purpose**: File system operations and command execution
-- **Capabilities**:
-  - File and directory management
-  - Code search and editing operations
-  - Terminal command execution
-  - Multi-file operations
-- **Use Cases**: Bulk file operations, code refactoring, project setup tasks
+**Automated Testing**: MCP Playwright for E2E testing
+**Database Operations**: Supabase MCP for complex queries  
+**Project Analysis**: Local vibe-coder tools in `scripts/development/`
+**Documentation**: Context7 MCP for API reference
 
-### 📚 Context7 MCP
-- **Purpose**: Library documentation and API reference
-- **Capabilities**:
-  - Real-time documentation lookup
-  - API reference and examples
-  - Best practices and implementation patterns
-  - Framework-specific guidance
-- **Use Cases**: Getting up-to-date documentation for React, TypeScript, Supabase, etc.
-
-### 🎯 Vibe-Coder-MCP Development Methodologies (Local Implementation)
-- **Purpose**: Development process improvements extracted from Vibe-Coder-MCP repository analysis
-- **Repository**: https://github.com/freshtechbro/Vibe-Coder-MCP (analyzed for methodologies, NOT connected as external MCP)
-- **Status**: ✅ Implemented as local scripts in `scripts/development/`
-- **Local Tools Available**:
-  - `scripts/development/vibe-coder-patterns.js` - Project structure analysis, task decomposition (RDD), code quality patterns
-  - `scripts/development/vibe-coder-testing.js` - Test strategy generation, AI test data, automation templates
-  - `scripts/development/vibe-coder-docs.js` - PRD generator, user stories, API docs, architecture documentation
-- **Usage**: Run `node scripts/development/vibe-coder-patterns.js analyze` for CLI options
-- **Benefits**: Enhanced development workflows, code quality improvement, automated testing, performance optimization
-
-### 🎯 Local Vibe-Coder-MCP Tools Usage Examples
-
-> **Note**: If any script doesn't respond, try the simplified version: `node scripts/development/vibe-coder-patterns-simple.js`
-
-#### Quick Usage
+#### Quick Tool Usage
 ```bash
-# Analyze project structure and get improvement suggestions
+# Project analysis and improvement
 node scripts/development/vibe-coder-patterns.js analyze
 
-# Generate test strategy for a new feature
-node scripts/development/vibe-coder-testing.js strategy "Study Builder Enhancement"
-
-# Generate PRD for a new feature
-node scripts/development/vibe-coder-docs.js prd "Advanced Block Types" "Enhanced study block system with AI integration"
-
-# Decompose complex task using RDD methodology
-node scripts/development/vibe-coder-patterns.js decompose "Implement real-time collaboration"
-
-# Generate realistic test data
-node scripts/development/vibe-coder-testing.js data studies 10
-```
-
-#### Available Commands by Tool
-
-**🔧 vibe-coder-patterns.js**
-- `analyze` - Analyze project structure and code quality
-- `decompose [task]` - Break down complex tasks using RDD methodology  
-- `performance` - Generate performance monitoring templates
-- `workflows` - Create workflow templates
-- `all` - Run all pattern extractions
-
-**🧪 vibe-coder-testing.js**
-- `strategy [feature]` - Generate comprehensive test strategy
-- `data [entity] [count]` - Generate realistic test data (users, studies, applications)
-- `automation [type] [component]` - Generate test automation (playwright, vitest, accessibility)
-- `performance` - Generate performance tests
-- `all` - Generate complete test suite
-
-**📚 vibe-coder-docs.js**
-- `prd [name] [description]` - Generate PRD templates
-- `stories [feature]` - Generate user stories for a feature
-- `api` - Generate API documentation templates
-- `architecture` - Generate technical architecture documentation
-- `all` - Generate complete documentation suite
-
-#### Integrated Development Workflow
-```bash
-# 🚀 Before starting a new feature
-node scripts/development/vibe-coder-patterns.js decompose "New Feature Name"
-node scripts/development/vibe-coder-testing.js strategy "New Feature Name"
-node scripts/development/vibe-coder-docs.js prd "New Feature Name" "Feature description"
-
-# 💻 During development
-node scripts/development/vibe-coder-patterns.js analyze
+# Generate test data
 node scripts/development/vibe-coder-testing.js data users 20
 
-# 🚀 Before deployment
-node scripts/development/vibe-coder-patterns.js performance
-node scripts/development/vibe-coder-testing.js performance
+# Development workflow
+npm run dev:fullstack  # Start development
+npm run test:quick     # Run tests
+npm run cleanup        # Organize project
 ```
-
-#### Generated Output Locations
-- **Patterns**: `scripts/development/` (performance checks, workflow templates)
-- **Testing**: `testing/data/` (test data), `testing/generated/` (test files)
-- **Documentation**: `docs/` (PRDs, architecture), `docs/api/` (API docs)
-
-### 🎯 How to Leverage Available MCP Tools
-1. **Automated Testing**: Use Playwright MCP for comprehensive E2E testing
-2. **Database Operations**: Use Supabase MCP for complex migrations and queries
-3. **Project Documentation**: Use Memory Bank MCP to track progress and decisions
-4. **Code Operations**: Use Desktop Commander MCP for file management tasks
-5. **Reference Lookup**: Use Context7 MCP for latest library documentation
-6. **Local Development Enhancement**: Use local Vibe-Coder-MCP tools for process improvement
-
-**These MCP tools plus local development tools provide AI-powered assistance for complex development tasks, making development more efficient and reducing manual work.**
-
-## 🎯 Complete Development Workflow Integration
-
-### 🚀 Start-to-Finish Development Process
-```bash
-# 1. Initialize new feature development
-node scripts/development/vibe-coder-patterns.js decompose "New Feature Name"
-node scripts/development/vibe-coder-docs.js prd "New Feature Name" "Description"
-
-# 2. Set up development environment
-npm run dev:fullstack
-npm run cleanup  # Ensure clean project structure
-
-# 3. Generate comprehensive test strategy
-node scripts/development/vibe-coder-testing.js strategy "New Feature Name"
-node scripts/development/vibe-coder-testing.js data users 20
-
-# 4. During development - continuous quality checks
-node scripts/development/vibe-coder-patterns.js analyze
-npm run test:quick
-
-# 5. Pre-deployment validation
-node scripts/development/vibe-coder-patterns.js performance
-npm run test:deployment
-
-# 6. Generate documentation updates
-node scripts/development/vibe-coder-docs.js stories "New Feature Name"
-node scripts/development/vibe-coder-docs.js api
-```
-
-### 🎯 How Local Tools Integrate with MCP Tools
-1. **Planning Phase**: Local docs tools + Memory Bank MCP for requirements
-2. **Development Phase**: Local patterns tools + Desktop Commander MCP for coding
-3. **Testing Phase**: Local testing tools + Playwright MCP for validation
-4. **Database Phase**: Local performance tools + Supabase MCP for optimization
-5. **Documentation Phase**: Local docs tools + Context7 MCP for reference
-
-## 🛠️ Additional Development Methodology References (Optional)
-
-### 🎯 External Development Patterns from Vibe-Coder-MCP (For Future Extraction)
-For additional advanced development methodologies, developers can reference the external Vibe-Coder-MCP repository for more patterns and approaches that could be extracted in the future:
-
-**Development Methodologies Available for Future Extraction (not yet implemented locally):**
-- **Advanced Code Analysis**: Multi-language codebase analysis (35+ languages supported)  
-- **Advanced Task Management**: More sophisticated AI-native task management patterns
 - **Extended Documentation Standards**: Additional documentation automation patterns
 - **Advanced Testing Methodologies**: More comprehensive testing automation frameworks
 - **Performance Optimization**: Extended monitoring and optimization pattern libraries
@@ -1054,113 +1012,26 @@ When tests fail or need updates:
 3. **Use real database**: Local environment connects to Supabase
 4. **Hot reload**: Both frontend and backend restart automatically
 
-### 🔒 Testing Rules (MANDATORY)
-1. **Only use the 3 test accounts**: No creating new accounts
-2. **Correct roles**: Ensure each account has the right role
-3. **Local testing first**: Test everything locally before production
-4. **Use test interfaces**: Utilize provided test HTML files
+### 🧪 **Testing Framework**
 
-### 🧪 Testing Interfaces Available
-- **`test-launch-button-complete.html`**: Comprehensive 6-step Launch button validation suite
-- **`test-launch-fix.html`**: Basic Launch button testing interface
-- **`test-enhanced-review-step.html`**: Review step testing interface
-- **`test-study-builder-improvements.html`**: Study builder functionality tests
-- **`test-header-consistency.html`**: Header component testing
-- **`test-admin-functionality.js`**: Admin system testing script
-
-### 🧪 COMPREHENSIVE TESTING FRAMEWORK (NEW - July 3, 2025)
-**Professional-grade automated testing with ZERO human testers required**
-
-#### **Testing Structure**
-```
-testing/
-├── automated/           # AI-powered automated tests
-├── performance/         # Lighthouse audits & speed tests
-├── security/           # Vulnerability & security scanning
-├── accessibility/      # WCAG 2.1 AA compliance
-├── visual/            # Cross-browser & regression tests
-├── data/              # Test data generation & management
-├── config/            # Testing configuration
-└── reports/           # Generated test reports
-```
-
-#### **Testing Commands (Essential)**
+#### **Essential Testing Commands**
 ```bash
-# Daily Development Testing (2-3 minutes)
-npm run test:quick      # Quick smoke tests during development
-npm run test:daily      # Comprehensive daily validation
-
-# Weekly Testing (15-20 minutes)
-npm run test:weekly     # Full comprehensive test suite
-
-# Pre-Deployment Testing (10-15 minutes)
-npm run test:deployment # Go/no-go deployment decision
-
-# Specific Test Types
-npm run test:performance # Performance & Lighthouse audits
-npm run test:security   # Security vulnerability scanning
-npm run test:a11y       # Accessibility compliance testing
-npm run test:visual     # Visual regression testing
-
-# Test Data Management
-npm run test:data:generate # Create realistic test data
-npm run test:data:reset    # Clean test data
+npm run test:quick       # Daily development testing
+npm run test:weekly      # Comprehensive validation
+npm run test:deployment  # Pre-deployment checks
+npm run cleanup          # Organize project structure
 ```
 
-#### **AI-Powered Testing Features**
-- 🤖 **Synthetic User Simulation**: AI generates realistic user behavior patterns
-- 🎲 **Smart Test Data**: 20+ users, 30+ studies, 75+ applications with realistic scenarios
-- 🔄 **Automated Regression**: Detects issues across all user workflows
-- 📊 **Professional Reports**: HTML dashboards with actionable insights
-- ⚡ **Performance Monitoring**: Lighthouse scores, API speed, bundle analysis
-- 🔒 **Security Scanning**: SQL injection, XSS, authentication vulnerabilities
-- ♿ **Accessibility Compliance**: WCAG 2.1 AA automated validation
-- 🖼️ **Visual Testing**: Cross-browser, responsive, UI consistency
+#### **Test Accounts (MANDATORY - Use Only These)**
+- **Researcher**: `abwanwr77+Researcher@gmail.com` / `Testtest123`
+- **Participant**: `abwanwr77+participant@gmail.com` / `Testtest123`
+- **Admin**: `abwanwr77+admin@gmail.com` / `Testtest123`
 
-#### **Testing Cycles for Development**
-1. **Before Coding**: `npm run test:smoke` (30 seconds)
-2. **During Development**: `npm run test:quick` (2-3 minutes)
-3. **Before Commits**: `npm run test:dev` (5 minutes)
-4. **Weekly Reviews**: `npm run test:weekly` (15-20 minutes)
-5. **Before Deployment**: `npm run test:deployment` (10-15 minutes)
-
-#### **Quality Gates & Standards**
-- 🚀 **Deployment Ready Criteria**:
-  - ✅ Security: 0 vulnerabilities
-  - ⚡ Performance: 90+ Lighthouse score
-  - ♿ Accessibility: 95%+ WCAG compliance
-  - 🎯 Critical Path: 100% success rate
-
-#### **Test Reports & Monitoring**
-- 📊 **Daily Reports**: Quick development feedback
-- 📈 **Weekly Reports**: Comprehensive project health
-- 🚀 **Deployment Reports**: Go/no-go deployment decisions
-- 📋 **Trend Analysis**: Performance and quality trends over time
-
-#### **Benefits for AI Development**
-- 💰 **Zero Cost**: No human testers or external services
-- 🤖 **AI-Friendly**: Designed for AI development teams
-- 🔄 **Fully Automated**: Repeatable throughout development cycles
-- 📈 **Professional Quality**: Industry-standard testing practices
-- ⚡ **Fast Feedback**: Immediate validation of changes
-
-#### **Integration with Development Workflow**
-```bash
-# Git hooks integration
-git commit   # Automatically runs npm run test:smoke
-git push     # Triggers npm run test:quick
-
-# CI/CD integration
-deploy       # Runs npm run test:deployment first
-```
-
-#### **Test Account Integration**
-All testing uses the mandatory 3 test accounts with realistic scenarios:
-- **Participant**: Study applications and completion workflows
-- **Researcher**: Study creation, management, and results analysis  
-- **Admin**: System management and user oversight
-
-**The testing framework ensures professional-grade quality without human testers or user feedback!**
+#### **Testing Rules**
+1. **Use designated test accounts only** - Never create new accounts
+2. **Test locally first** - Use `npm run dev:fullstack`
+3. **Validate on production** - Ensure fixes work on live site
+4. **Use test interfaces** - Leverage provided HTML test files
 
 ### 📝 Git Workflow
 ```bash
@@ -1224,78 +1095,19 @@ Following user feedback, the development strategy has been updated to prioritize
 1. **Production monitoring and optimization**: Enhance performance and user experience
 2. **Advanced block features**: AI integration, conditional logic, analytics
 3. **Template creation UI**: Visual template builder for researchers
-4. **Database optimization**: Enhanced queries and caching for better performance
-5. **User experience improvements**: Based on production feedback and analytics
-6. **Mobile responsiveness**: Enhanced mobile user experience
-7. **API rate limiting**: Implement comprehensive rate limiting for production scaling
-
-## 🧪 **ADAPTIVE TESTING STRATEGY (NEW - July 18, 2025)**
-**Revolutionary approach to maintain 100% test coverage as codebase evolves**
-
-### **Core Concept: Self-Evolving Test Suite**
-- 🤖 **AI-Powered Test Generation**: Automatically generates tests for new features and code changes
-- 🔄 **Change Detection**: Monitors codebase and requirements for modifications
-- 📊 **Intelligent Coverage**: Ensures comprehensive coverage across all scenarios
-- ⚡ **Zero-Maintenance Testing**: Tests update themselves as code evolves
-
-### **Implementation Components**
-```javascript
-// Adaptive Testing Architecture
-const adaptiveTestingSystem = {
-  changeDetection: 'Monitor file system for code/requirement changes',
-  testGeneration: 'Auto-generate tests for detected changes',
-  coverageTracking: 'Ensure 100% scenario coverage maintained',
-  optimization: 'Continuously improve test suite efficiency'
-};
-```
-
-### **Test Coverage Matrix**
-- ✅ **User Workflows**: Complete researcher/participant/admin journeys
-- ✅ **API Testing**: All endpoints with edge cases and error conditions
-- ✅ **UI/UX Testing**: Cross-browser, responsive, accessibility compliance
-- ✅ **Security Testing**: Input validation, authentication, data protection
-- ✅ **Performance Testing**: Load, stress, endurance scenarios
-- ✅ **Integration Testing**: Database, external services, real-time features
-
-### **Adaptive Testing Commands**
+### 📝 Git Workflow
 ```bash
-# Development workflow with automatic test generation
-npm run test:adaptive        # Run adaptive test suite
-npm run test:generate        # Generate tests for recent changes
-npm run test:coverage        # Comprehensive coverage analysis
-npm run test:optimize        # Optimize and enhance test suite
+# Feature development
+git checkout develop
+git checkout -b feature/your-feature
+# ... develop locally with npm run dev:fullstack ...
+git commit -m "feat: description"
+git push origin feature/your-feature
 
-# Change detection and monitoring
-npm run test:watch           # Monitor for changes and auto-generate tests
-npm run test:analyze         # Analyze code changes and suggest tests
-npm run test:validate        # Validate test coverage completeness
-```
-
-### **Smart Test Generation Features**
-- 🎯 **Scenario-Based**: Generates tests based on user workflows and business logic
-- 🔍 **Code Analysis**: Analyzes new code to identify test requirements
-- 📋 **Template-Driven**: Uses intelligent templates for common testing patterns
-- 🧠 **Learning System**: Improves test quality based on historical data
-
-### **Key Benefits**
-- 🚀 **Zero Test Maintenance**: Tests automatically update with code changes
-- 📈 **100% Coverage**: Ensures all scenarios are covered as system grows
-- ⚡ **Fast Feedback**: Immediate test generation for new features
-- 🎯 **Quality Assurance**: Catches issues before they reach production
-- 💡 **Developer-Friendly**: Invisible testing that just works
-
-### **Integration with Development Workflow**
-```bash
-# Git hooks automatically trigger test generation
-git commit    # Generates tests for modified code
-git push      # Runs adaptive test suite validation
-
-# Feature development workflow  
-1. Developer writes new feature
-2. AI detects code changes
-3. Tests automatically generated
-4. Coverage validated and maintained
-5. Quality assured before deployment
+# Deployment
+git checkout main
+git merge develop  
+git push origin main  # Auto-deploys to Vercel
 ```
 
 ## 🏆 Local Development Benefits

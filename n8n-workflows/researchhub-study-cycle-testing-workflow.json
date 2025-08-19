@@ -1,0 +1,401 @@
+{
+  "name": "ResearchHub Study Cycle Testing Workflow",
+  "meta": {
+    "instanceId": "researchhub-production-testing"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "interval": 1
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Hourly Testing Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://researchhub-saas.vercel.app/api/health",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-ResearchHub-Monitor/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 3
+          }
+        }
+      },
+      "id": "health-check",
+      "name": "Health Check API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [400, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://researchhub-saas.vercel.app/api/auth-consolidated",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "action",
+              "value": "health-check"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "User-Agent",
+              "value": "n8n-ResearchHub-Monitor/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 2
+          }
+        }
+      },
+      "id": "auth-test",
+      "name": "Authentication API Test",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [600, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://researchhub-saas.vercel.app/api/research-consolidated",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "action",
+              "value": "health-check"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-ResearchHub-Monitor/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 2
+          }
+        }
+      },
+      "id": "study-api-test",
+      "name": "Study API Test",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [800, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://researchhub-saas.vercel.app/api/templates-consolidated",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "action",
+              "value": "get-templates"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-ResearchHub-Monitor/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 2
+          }
+        }
+      },
+      "id": "template-test",
+      "name": "Template API Test",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate all test results from previous HTTP Request nodes\nconst items = $input.all();\n\nconst results = {\n  timestamp: new Date().toISOString(),\n  tests: {\n    health: {\n      status: items[0]?.statusCode === 200 ? 'PASS' : 'FAIL',\n      statusCode: items[0]?.statusCode || 'ERROR',\n      responseTime: items[0]?.responseTime || 'N/A'\n    },\n    auth: {\n      status: items[1]?.statusCode === 200 ? 'PASS' : 'FAIL',\n      statusCode: items[1]?.statusCode || 'ERROR',\n      responseTime: items[1]?.responseTime || 'N/A'\n    },\n    study: {\n      status: items[2]?.statusCode === 200 ? 'PASS' : 'FAIL',\n      statusCode: items[2]?.statusCode || 'ERROR',\n      responseTime: items[2]?.responseTime || 'N/A'\n    },\n    template: {\n      status: items[3]?.statusCode === 200 ? 'PASS' : 'FAIL',\n      statusCode: items[3]?.statusCode || 'ERROR',\n      responseTime: items[3]?.responseTime || 'N/A'\n    }\n  }\n};\n\n// Calculate overall status\nconst allPassed = Object.values(results.tests).every(test => test.status === 'PASS');\nresults.overallStatus = allPassed ? 'ALL_PASS' : 'SOME_FAIL';\n\n// Count failures\nresults.failureCount = Object.values(results.tests).filter(test => test.status === 'FAIL').length;\n\nreturn results;"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Test Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.overallStatus }}",
+              "rightValue": "ALL_PASS",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "test-results-router",
+      "name": "Route Test Results",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1400, 200]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channel": "#researchhub-monitoring",
+        "text": "✅ **ResearchHub Platform Status: ALL SYSTEMS OPERATIONAL**",
+        "attachments": [
+          {
+            "color": "#36a64f",
+            "title": "={{ 'Automated Testing Results - ' + $json.timestamp }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Health API",
+                  "value": "={{ $json.tests.health.status + ' (' + $json.tests.health.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Auth API", 
+                  "value": "={{ $json.tests.auth.status + ' (' + $json.tests.auth.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Study API",
+                  "value": "={{ $json.tests.study.status + ' (' + $json.tests.study.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Template API",
+                  "value": "={{ $json.tests.template.status + ' (' + $json.tests.template.statusCode + ')' }}",
+                  "short": true
+                }
+              ]
+            },
+            "footer": "ResearchHub Automated Monitor",
+            "footer_icon": "https://researchhub-saas.vercel.app/favicon.ico"
+          }
+        ]
+      },
+      "id": "success-notification",
+      "name": "Success Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1600, 100],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channel": "#researchhub-alerts",
+        "text": "🚨 **ResearchHub Platform Alert: ISSUES DETECTED**",
+        "attachments": [
+          {
+            "color": "#ff0000",
+            "title": "={{ 'Automated Testing Failures - ' + $json.timestamp }}",
+            "text": "={{ $json.failureCount + ' out of 4 tests failed. Immediate attention required.' }}",
+            "fields": {
+              "item": [
+                {
+                  "title": "Health API",
+                  "value": "={{ $json.tests.health.status + ' (' + $json.tests.health.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Auth API",
+                  "value": "={{ $json.tests.auth.status + ' (' + $json.tests.auth.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Study API",
+                  "value": "={{ $json.tests.study.status + ' (' + $json.tests.study.statusCode + ')' }}",
+                  "short": true
+                },
+                {
+                  "title": "Template API",
+                  "value": "={{ $json.tests.template.status + ' (' + $json.tests.template.statusCode + ')' }}",
+                  "short": true
+                }
+              ]
+            },
+            "footer": "ResearchHub Emergency Monitor",
+            "footer_icon": "https://researchhub-saas.vercel.app/favicon.ico"
+          }
+        ]
+      },
+      "id": "failure-notification",
+      "name": "Failure Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1600, 300],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Hourly Testing Schedule": {
+      "main": [
+        [
+          {
+            "node": "Health Check API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Check API": {
+      "main": [
+        [
+          {
+            "node": "Authentication API Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Authentication API Test": {
+      "main": [
+        [
+          {
+            "node": "Study API Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Study API Test": {
+      "main": [
+        [
+          {
+            "node": "Template API Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Template API Test": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Test Results": {
+      "main": [
+        [
+          {
+            "node": "Route Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Test Results": {
+      "main": [
+        [
+          {
+            "node": "Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "UTC",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
+  "tags": [
+    {
+      "id": "researchhub",
+      "name": "ResearchHub"
+    },
+    {
+      "id": "monitoring",
+      "name": "Monitoring"
+    },
+    {
+      "id": "production",
+      "name": "Production"
+    }
+  ]
+}
