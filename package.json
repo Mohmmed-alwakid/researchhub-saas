@@ -1,7 +1,7 @@
 {
   "name": "afkar",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Afkar - SaaS platform for user testing research and feedback collection",
   "type": "module",
   "engines": {
