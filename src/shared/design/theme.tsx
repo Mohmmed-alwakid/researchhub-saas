@@ -3,8 +3,9 @@
  * Provides design tokens to React components through context
  */
 
-import React, { createContext, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { colors, spacing, typography, shadows, borderRadius, transitions, componentTokens } from './tokens';
+import { ThemeContext, defaultTheme } from './context';
 
 // Theme interface
 export interface Theme {
@@ -16,20 +17,6 @@ export interface Theme {
   transitions: typeof transitions;
   componentTokens: typeof componentTokens;
 }
-
-// Default theme object
-const defaultTheme: Theme = {
-  colors,
-  spacing,
-  typography,
-  shadows,
-  borderRadius,
-  transitions,
-  componentTokens,
-};
-
-// Theme context
-const ThemeContext = createContext<Theme>(defaultTheme);
 
 // Theme provider component
 interface ThemeProviderProps {

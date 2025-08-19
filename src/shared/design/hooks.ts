@@ -5,6 +5,7 @@
 
 import { useContext } from 'react';
 import { colors, spacing, typography, shadows, borderRadius, transitions, componentTokens } from './tokens';
+import { ThemeContext, defaultTheme } from './context';
 
 // Theme interface
 export interface Theme {
@@ -17,28 +18,10 @@ export interface Theme {
   componentTokens: typeof componentTokens;
 }
 
-// Default theme object
-const defaultTheme: Theme = {
-  colors,
-  spacing,
-  typography,
-  shadows,
-  borderRadius,
-  transitions,
-  componentTokens,
-};
-
-// Theme context (imported from theme.tsx)
-import React from 'react';
-const ThemeContext = React.createContext<Theme>(defaultTheme);
-
 // Hook for accessing theme tokens
 export const useTheme = (): Theme => {
   const context = useContext(ThemeContext);
-  if (!context) {
-    return defaultTheme; // Fallback to default theme if no provider
-  }
-  return context;
+  return context || defaultTheme; // Use context or fallback to default theme
 };
 
 // Helper hooks for specific token types

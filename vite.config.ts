@@ -16,6 +16,13 @@ export default defineConfig({
       }
     }
   },
+  resolve: {
+    alias: {
+      // Ensure consistent React resolution
+      'react': 'react',
+      'react-dom': 'react-dom'
+    }
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
