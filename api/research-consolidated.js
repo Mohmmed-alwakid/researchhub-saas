@@ -336,6 +336,22 @@ export default async function handler(req, res) {
       case 'clear-demo-data':
         return await clearDemoData(req, res);
       
+      // AI-powered features (Vercel AI Gateway)
+      case 'ai-study-suggestions':
+        return await handleAIStudySuggestions(req, res);
+      
+      case 'ai-analyze-responses':
+        return await handleAIAnalyzeResponses(req, res);
+      
+      case 'ai-follow-up-questions':
+        return await handleAIFollowUpQuestions(req, res);
+      
+      case 'ai-recommend-templates':
+        return await handleAIRecommendTemplates(req, res);
+      
+      case 'ai-generate-report':
+        return await handleAIGenerateReport(req, res);
+      
       default:
         return res.status(400).json({
           success: false,
@@ -1212,4 +1228,123 @@ async function clearDemoData(req, res) {
       error: 'Failed to clear demo data'
     });
   }
+}
+
+// ============================================================================
+// AI-POWERED FEATURES (Vercel AI Gateway Integration)
+// ============================================================================
+
+// Import AI service dynamically to avoid build issues if not available
+let ResearchHubAI = null;
+try {
+  const aiModule = await import('./lib/ResearchHubAI.js');
+  ResearchHubAI = aiModule.default || aiModule.ResearchHubAI;
+  console.log('✅ AI features loaded successfully');
+} catch (error) {
+  console.log('⚠️ AI features not available:', error.message);
+}
+
+// Generate study suggestions using AI
+async function handleAIStudySuggestions(req, res) {
+  if (!ResearchHubAI) {
+    return res.status(503).json({ 
+      success: false, 
+      error: 'AI features not available. Please configure AI_GATEWAY_API_KEY.' 
+    });
+  }
+
+  const { researchGoals, industry } = req.body;
+
+  if (!researchGoals || !industry) {
+    return res.status(400).json({ 
+      error: 'Missing required fields: researchGoals, industry' 
+    });
+  }
+
+  const result = await ResearchHubAI.generateStudySuggestions(researchGoals, industry);
+  return res.status(200).json(result);
+}
+
+// Analyze participant responses with AI
+async function handleAIAnalyzeResponses(req, res) {
+  if (!ResearchHubAI) {
+    return res.status(503).json({ 
+      success: false, 
+      error: 'AI features not available. Please configure AI_GATEWAY_API_KEY.' 
+    });
+  }
+
+  const { responses } = req.body;
+
+  if (!responses || !Array.isArray(responses)) {
+    return res.status(400).json({ 
+      error: 'Missing or invalid responses array' 
+    });
+  }
+
+  const result = await ResearchHubAI.analyzeResponses(responses);
+  return res.status(200).json(result);
+}
+
+// Generate follow-up questions with AI
+async function handleAIFollowUpQuestions(req, res) {
+  if (!ResearchHubAI) {
+    return res.status(503).json({ 
+      success: false, 
+      error: 'AI features not available. Please configure AI_GATEWAY_API_KEY.' 
+    });
+  }
+
+  const { context, previousResponses } = req.body;
+
+  if (!context || !previousResponses || !Array.isArray(previousResponses)) {
+    return res.status(400).json({ 
+      error: 'Missing required fields: context, previousResponses (array)' 
+    });
+  }
+
+  const result = await ResearchHubAI.generateFollowUpQuestions(context, previousResponses);
+  return res.status(200).json(result);
+}
+
+// Recommend templates with AI
+async function handleAIRecommendTemplates(req, res) {
+  if (!ResearchHubAI) {
+    return res.status(503).json({ 
+      success: false, 
+      error: 'AI features not available. Please configure AI_GATEWAY_API_KEY.' 
+    });
+  }
+
+  const { description, goals } = req.body;
+
+  if (!description || !goals || !Array.isArray(goals)) {
+    return res.status(400).json({ 
+      error: 'Missing required fields: description, goals (array)' 
+    });
+  }
+
+  const result = await ResearchHubAI.recommendTemplates(description, goals);
+  return res.status(200).json(result);
+}
+
+// Generate study report with AI
+async function handleAIGenerateReport(req, res) {
+  if (!ResearchHubAI) {
+    return res.status(503).json({ 
+      success: false, 
+      error: 'AI features not available. Please configure AI_GATEWAY_API_KEY.' 
+    });
+  }
+
+  const { studyData, responses } = req.body;
+
+  if (!studyData || !responses || !Array.isArray(responses)) {
+    return res.status(400).json({ 
+      error: 'Missing required fields: studyData, responses (array)' 
+    });
+  }
+
+  const result = await ResearchHubAI.generateStudyReport(studyData, responses);
+  return res.status(200).json(result);
 }

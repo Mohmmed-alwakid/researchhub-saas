@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel AI Gateway Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .test-section { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .result { background: white; padding: 15px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .success { border-color: #28a745; }
+        .error { border-color: #dc3545; }
+        button { background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .status { padding: 5px 10px; border-radius: 4px; font-weight: bold; }
+        .ready { background: #d4edda; color: #155724; }
+        .not-ready { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🤖 Vercel AI Gateway Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Setup Status</h2>
+        <div id="setup-status">Checking setup...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test AI Study Suggestions</h2>
+        <div>
+            <label>Research Goals:</label><br>
+            <input type="text" id="research-goals" value="Improve mobile app onboarding" style="width: 100%; padding: 8px; margin: 5px 0;">
+        </div>
+        <div>
+            <label>Industry:</label><br>
+            <input type="text" id="industry" value="Fintech" style="width: 100%; padding: 8px; margin: 5px 0;">
+        </div>
+        <button onclick="testStudySuggestions()">Generate Study Suggestions</button>
+        <div id="suggestions-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Response Analysis</h2>
+        <button onclick="testResponseAnalysis()">Analyze Sample Responses</button>
+        <div id="analysis-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>❓ Test Follow-up Questions</h2>
+        <button onclick="testFollowUpQuestions()">Generate Follow-up Questions</button>
+        <div id="questions-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Test Template Recommendations</h2>
+        <button onclick="testTemplateRecommendations()">Get Template Recommendations</button>
+        <div id="templates-result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        
+        // Check setup status
+        async function checkSetup() {
+            const statusDiv = document.getElementById('setup-status');
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusDiv.innerHTML = `
+                        <div class="status ready">✅ Server Running</div>
+                        <div class="status ready">✅ API Endpoints Available</div>
+                        <div class="status ${process.env.AI_GATEWAY_API_KEY ? 'ready' : 'not-ready'}">
+                            ${process.env.AI_GATEWAY_API_KEY ? '✅' : '⚠️'} AI Gateway ${process.env.AI_GATEWAY_API_KEY ? 'Configured' : 'Not Configured'}
+                        </div>
+                        <p><strong>Note:</strong> AI features require AI_GATEWAY_API_KEY environment variable.</p>
+                    `;
+                } else {
+                    statusDiv.innerHTML = '<div class="status not-ready">❌ Server Not Available</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status not-ready">❌ Connection Error</div>';
+            }
+        }
+
+        // Test study suggestions
+        async function testStudySuggestions() {
+            const resultDiv = document.getElementById('suggestions-result');
+            const goals = document.getElementById('research-goals').value;
+            const industry = document.getElementById('industry').value;
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Generating study suggestions...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/research-consolidated?action=ai-study-suggestions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ researchGoals: goals, industry: industry })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h4>✅ Study Suggestions Generated:</h4>
+                        <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<h4>❌ Error:</h4><p>${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<h4>❌ Request Failed:</h4><p>${error.message}</p>`;
+            }
+        }
+
+        // Test response analysis
+        async function testResponseAnalysis() {
+            const resultDiv = document.getElementById('analysis-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Analyzing responses...';
+            
+            const sampleResponses = [
+                { question: "How easy was the checkout process?", answer: "It was confusing, took too many steps" },
+                { question: "What frustrated you most?", answer: "The payment form kept asking for too much information" },
+                { question: "Would you use this again?", answer: "Maybe, if it was simpler" }
+            ];
+            
+            try {
+                const response = await fetch(`${API_BASE}/research-consolidated?action=ai-analyze-responses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ responses: sampleResponses })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h4>✅ AI Analysis:</h4>
+                        <p>${data.insights}</p>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<h4>❌ Error:</h4><p>${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<h4>❌ Request Failed:</h4><p>${error.message}</p>`;
+            }
+        }
+
+        // Test follow-up questions
+        async function testFollowUpQuestions() {
+            const resultDiv = document.getElementById('questions-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Generating follow-up questions...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/research-consolidated?action=ai-follow-up-questions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        context: "User testing checkout flow",
+                        previousResponses: ["The checkout was confusing", "Too many form fields"] 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h4>✅ Follow-up Questions:</h4>
+                        <ul>
+                            ${data.data.questions.map(q => `<li>${q}</li>`).join('')}
+                        </ul>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<h4>❌ Error:</h4><p>${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<h4>❌ Request Failed:</h4><p>${error.message}</p>`;
+            }
+        }
+
+        // Test template recommendations
+        async function testTemplateRecommendations() {
+            const resultDiv = document.getElementById('templates-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Getting template recommendations...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/research-consolidated?action=ai-recommend-templates`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        description: "Testing mobile app navigation for new users",
+                        goals: ["usability", "user experience", "onboarding"] 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h4>✅ Template Recommendations:</h4>
+                        <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<h4>❌ Error:</h4><p>${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<h4>❌ Request Failed:</h4><p>${error.message}</p>`;
+            }
+        }
+
+        // Check setup on page load
+        window.onload = checkSetup;
+    </script>
+</body>
+</html>
