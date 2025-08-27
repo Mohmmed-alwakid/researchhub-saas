@@ -55,18 +55,22 @@ export default defineConfig({
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks: (id: string) => {
+          // React MUST load first - put in separate chunk
+          if (id.includes('node_modules/react/') || 
+              id.includes('node_modules/react-dom/')) {
+            return 'react-base';
+          }
+          
+          // React Query and data fetching - after React loads
+          if (id.includes('node_modules/@tanstack/react-query') ||
+              id.includes('node_modules/@supabase')) {
+            return 'data-fetching';
+          }
+          
           // Handle pages as separate chunks with stable names
           if (id.includes('/pages/')) {
             const pageName = id.split('/pages/')[1].split('/')[0];
             return `page-${pageName}`;
-          }
-          
-          // Keep React with data-fetching to prevent createContext errors
-          if (id.includes('node_modules/react') || 
-              id.includes('node_modules/react-dom') ||
-              id.includes('node_modules/@tanstack/react-query') ||
-              id.includes('node_modules/@supabase')) {
-            return 'react-core';
           }
           
           if (id.includes('node_modules/react-router')) {
