@@ -47,6 +47,11 @@ export default defineConfig({
         // Suppress specific warnings
         if (warning.code === 'CSS_UNKNOWN_RULE') return;
         if (warning.message?.includes('bg-gray-50')) return;
+        if (warning.code === 'CIRCULAR_DEPENDENCY') {
+          // Log circular dependencies for debugging but don't fail build
+          console.warn('Circular dependency detected:', warning.message);
+          return;
+        }
         warn(warning);
       },
       output: {
@@ -55,56 +60,53 @@ export default defineConfig({
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks: (id: string) => {
-          // React MUST load first - put in separate chunk
+          // React and its ecosystem MUST be together and load first
           if (id.includes('node_modules/react/') || 
-              id.includes('node_modules/react-dom/')) {
-            return 'react-base';
+              id.includes('node_modules/react-dom/') ||
+              id.includes('node_modules/react-jsx-runtime') ||
+              id.includes('node_modules/scheduler')) {
+            return 'react-core';
           }
           
-          // React Query and data fetching - after React loads
+          // React ecosystem that depends on react-core
           if (id.includes('node_modules/@tanstack/react-query') ||
-              id.includes('node_modules/@supabase')) {
-            return 'data-fetching';
+              id.includes('node_modules/react-router') ||
+              id.includes('node_modules/react-hook-form') || 
+              id.includes('node_modules/@hookform')) {
+            return 'react-ecosystem';
           }
           
-          // Handle pages as separate chunks with stable names
-          if (id.includes('/pages/')) {
-            const pageName = id.split('/pages/')[1].split('/')[0];
-            return `page-${pageName}`;
+          // UI and rendering libraries that don't depend on React internals
+          if (id.includes('node_modules/lucide-react') ||
+              id.includes('node_modules/@dnd-kit') ||
+              id.includes('node_modules/recharts')) {
+            return 'ui-libraries';
           }
           
-          if (id.includes('node_modules/react-router')) {
-            return 'react-router';
+          // Supabase and data libraries
+          if (id.includes('node_modules/@supabase')) {
+            return 'data-services';
           }
           
-          // UI libraries
-          if (id.includes('node_modules/lucide-react')) {
-            return 'ui-icons';
-          }
-          if (id.includes('node_modules/@dnd-kit')) {
-            return 'dnd-kit';
+          // Form validation
+          if (id.includes('node_modules/zod')) {
+            return 'validation';
           }
           
-          // Form handling
-          if (id.includes('node_modules/react-hook-form') || 
-              id.includes('node_modules/@hookform') ||
-              id.includes('node_modules/zod')) {
-            return 'form-handling';
-          }
-          
-          // Charts
-          if (id.includes('node_modules/recharts')) {
-            return 'charts';
-          }
-          
-          // Utilities
+          // Utilities that don't depend on React
           if (id.includes('node_modules/date-fns') ||
               id.includes('node_modules/clsx') ||
               id.includes('node_modules/tailwind-merge')) {
             return 'utilities';
           }
           
-          // Other vendor libraries
+          // Handle app pages as separate chunks
+          if (id.includes('/pages/')) {
+            const pageName = id.split('/pages/')[1].split('/')[0];
+            return `page-${pageName}`;
+          }
+          
+          // All other vendor libraries
           if (id.includes('node_modules/')) {
             return 'vendor';
           }
