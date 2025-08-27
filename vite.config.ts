@@ -61,10 +61,14 @@ export default defineConfig({
             return `page-${pageName}`;
           }
           
-          // Core dependencies - most stable
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+          // Keep React with data-fetching to prevent createContext errors
+          if (id.includes('node_modules/react') || 
+              id.includes('node_modules/react-dom') ||
+              id.includes('node_modules/@tanstack/react-query') ||
+              id.includes('node_modules/@supabase')) {
             return 'react-core';
           }
+          
           if (id.includes('node_modules/react-router')) {
             return 'react-router';
           }
@@ -82,12 +86,6 @@ export default defineConfig({
               id.includes('node_modules/@hookform') ||
               id.includes('node_modules/zod')) {
             return 'form-handling';
-          }
-          
-          // Data fetching
-          if (id.includes('node_modules/@tanstack/react-query') ||
-              id.includes('node_modules/@supabase')) {
-            return 'data-fetching';
           }
           
           // Charts
