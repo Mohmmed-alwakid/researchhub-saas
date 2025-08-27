@@ -19,7 +19,7 @@ This file provides workspace-specific instructions to GitHub Copilot. To enable 
 ---
 
 ## 🎯 SINGLE SOURCE OF TRUTH
-**ALL specifications are in `docs/requirements/` - never contradict this folder.**
+**ALL specifications are in `requirements/` - never contradict this folder.**
 
 ## � **PRODUCTION SITE PRIORITY (MANDATORY)**
 **FIRST PRIORITY: Always focus on the live production site unless explicitly told otherwise.**
@@ -146,7 +146,7 @@ const getNavigationForRole = () => {
 
 ### **Mandatory Directory Organization**
 ```
-docs/requirements/    ← All specifications (single source of truth)
+requirements/        ← All specifications (single source of truth)
 testing/             ← All tests and test interfaces  
 scripts/             ← Development utilities
 api/                 ← Vercel serverless functions (24 total)
