@@ -191,6 +191,7 @@ async function loadStudies() {
       ];
       
       console.log(`📚 Using demo studies (${studiesData.length} studies available)`);
+      console.log('📚 Demo studies created:', studiesData.map(s => ({ id: s.id, title: s.title, status: s.status })));
       return studiesData;
     } catch (parseError) {
       console.error('Error creating demo studies:', parseError);
