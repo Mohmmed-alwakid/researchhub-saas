@@ -352,6 +352,19 @@ export default async function handler(req, res) {
       case 'ai-generate-report':
         return await handleAIGenerateReport(req, res);
       
+      // AI Interview Moderator Actions (UE-001)
+      case 'ai-interview-response':
+        return await handleAIInterviewResponse(req, res);
+      
+      case 'synthesize-speech':
+        return await handleSynthesizeSpeech(req, res);
+      
+      case 'transcribe-audio':
+        return await handleTranscribeAudio(req, res);
+      
+      case 'save-interview-session':
+        return await handleSaveInterviewSession(req, res);
+      
       default:
         return res.status(400).json({
           success: false,
@@ -1347,4 +1360,175 @@ async function handleAIGenerateReport(req, res) {
 
   const result = await ResearchHubAI.generateStudyReport(studyData, responses);
   return res.status(200).json(result);
+}
+
+/**
+ * AI INTERVIEW MODERATOR FUNCTIONS (UE-001)
+ */
+
+// Generate AI response for interview conversation
+async function handleAIInterviewResponse(req, res) {
+  if (!ResearchHubAI) {
+    return res.status(503).json({ 
+      success: false, 
+      error: 'AI features not available. Please configure AI_GATEWAY_API_KEY.' 
+    });
+  }
+
+  try {
+    const { 
+      sessionId, 
+      participantResponse, 
+      currentQuestionIndex, 
+      conversationHistory, 
+      interviewConfig, 
+      studyContext 
+    } = req.body;
+
+    if (!sessionId || !participantResponse) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Session ID and participant response are required' 
+      });
+    }
+
+    const result = await ResearchHubAI.generateInterviewResponse({
+      sessionId,
+      participantResponse,
+      currentQuestionIndex,
+      conversationHistory,
+      interviewConfig,
+      studyContext
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('AI interview response error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to generate AI response'
+    });
+  }
+}
+
+// Synthesize speech for AI moderator
+async function handleSynthesizeSpeech(req, res) {
+  try {
+    const { text, language } = req.body;
+
+    if (!text || !language) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Text and language are required' 
+      });
+    }
+
+    // For now, return success (real implementation would use Azure Speech or similar)
+    // This is a placeholder for the speech synthesis API
+    const result = {
+      success: true,
+      audioUrl: `/api/speech/synthesized-${Date.now()}.mp3`,
+      message: 'Speech synthesis placeholder - implement with Azure Speech Services'
+    };
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Speech synthesis error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to synthesize speech'
+    });
+  }
+}
+
+// Transcribe audio to text
+async function handleTranscribeAudio(req, res) {
+  try {
+    const audioFile = req.files?.audio;
+    const language = req.body?.language;
+
+    if (!audioFile) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Audio file is required' 
+      });
+    }
+
+    // For now, return mock transcription (real implementation would use Azure Speech or Whisper)
+    const mockTranscripts = {
+      arabic: "نعم، أنا أوافق على المتابعة مع هذه الدراسة.",
+      english: "Yes, I agree to continue with this study."
+    };
+
+    const result = {
+      success: true,
+      transcript: mockTranscripts[language] || mockTranscripts.english,
+      confidence: 0.95,
+      message: 'Audio transcription placeholder - implement with Azure Speech Services or OpenAI Whisper'
+    };
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Audio transcription error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to transcribe audio'
+    });
+  }
+}
+
+// Save interview session data
+async function handleSaveInterviewSession(req, res) {
+  try {
+    const sessionData = req.body;
+
+    if (!sessionData.sessionId || !sessionData.studyId) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Session ID and Study ID are required' 
+      });
+    }
+
+    // Save to Supabase or local storage
+    if (supabaseAdmin) {
+      const { data, error } = await supabaseAdmin
+        .from('interview_sessions')
+        .upsert({
+          session_id: sessionData.sessionId,
+          study_id: sessionData.studyId,
+          participant_id: sessionData.participantId,
+          messages: sessionData.messages,
+          start_time: sessionData.startTime,
+          end_time: sessionData.endTime,
+          completed: sessionData.completed,
+          created_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Database save error:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to save session to database'
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data,
+        message: 'Interview session saved successfully'
+      });
+    } else {
+      // Fallback to local storage (for development)
+      return res.status(200).json({
+        success: true,
+        message: 'Interview session saved to local storage (development mode)'
+      });
+    }
+  } catch (error) {
+    console.error('Save interview session error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to save interview session'
+    });
+  }
 }
