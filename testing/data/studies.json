@@ -1,17 +1,41 @@
 [
   {
+    "_id": "2",
+    "id": "2",
+    "title": "Test Study - Ownership Verification",
+    "description": "Testing study ownership and filtering",
+    "type": "unmoderated",
+    "status": "active",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-08-29T04:53:46.333Z",
+    "updated_at": "2025-08-29T04:53:46.333Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
     "_id": "1",
     "id": "1",
-    "title": "ghjghj",
-    "description": "ghjghjhjghjghjgj",
+    "title": "Demo E-commerce Study",
+    "description": "Test how users navigate through our product pages and complete purchases",
     "type": "usability",
     "status": "active",
     "settings": {
-      "recordScreen": false,
+      "recordScreen": true,
       "recordAudio": false,
       "recordWebcam": false,
       "trackClicks": true,
-      "trackHovers": true,
+      "trackHovers": false,
       "trackScrolls": true
     },
     "blocks": [],
@@ -21,8 +45,8 @@
       "completed": 0,
       "target": 10
     },
-    "created_at": "2025-08-29T03:34:12.962Z",
-    "updated_at": "2025-08-29T03:34:12.962Z",
+    "created_at": "2025-08-29T04:11:47.506Z",
+    "updated_at": "2025-08-29T04:11:47.506Z",
     "created_by": "test-user",
     "creator_id": "test-user",
     "profiles": {

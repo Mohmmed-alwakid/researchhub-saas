@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Ownership Testing Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .token-input { width: 100%; padding: 8px; margin: 5px 0; font-family: monospace; font-size: 12px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Study Ownership & Authentication Testing</h1>
+    <p>This interface tests the study ownership and filtering fixes.</p>
+
+    <div class="test-section">
+        <h3>Step 1: Get Authentication Token</h3>
+        <button onclick="loginAsResearcher()">Login as Researcher</button>
+        <div id="loginResult"></div>
+        <textarea id="tokenInput" class="token-input" placeholder="Authentication token will appear here..." rows="8"></textarea>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 2: Test Unauthenticated API (Participant View)</h3>
+        <button onclick="testUnauthenticatedAPI()">Test Without Auth</button>
+        <div id="unauthResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 3: Test Authenticated API (Researcher View)</h3>
+        <button onclick="testAuthenticatedAPI()">Test With Auth Token</button>
+        <div id="authResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 4: Create Study (Authenticated)</h3>
+        <button onclick="createStudy()">Create Test Study</button>
+        <div id="createResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 5: Verify Study Appears in Researcher's List</h3>
+        <button onclick="verifyStudyOwnership()">Check Study Ownership</button>
+        <div id="verifyResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3003' : 'https://researchhub-saas.vercel.app';
+        const RESEARCHER_EMAIL = 'abwanwr77+researcher@gmail.com';
+        const PASSWORD = 'Testtest123';
+        
+        let authToken = '';
+
+        async function loginAsResearcher() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = '<div class="info">Logging in as researcher...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: RESEARCHER_EMAIL,
+                        password: PASSWORD
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.session?.access_token) {
+                    authToken = data.session.access_token;
+                    document.getElementById('tokenInput').value = authToken;
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Login successful!</div>
+                        <div class="info">User ID: ${data.user.id}</div>
+                        <div class="info">Role: ${data.user.role}</div>
+                        <div class="info">Email: ${data.user.email}</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${data.error || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Login error: ${error.message}</div>`;
+            }
+        }
+
+        async function testUnauthenticatedAPI() {
+            const resultDiv = document.getElementById('unauthResult');
+            resultDiv.innerHTML = '<div class="info">Testing unauthenticated API...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=get-studies`, {
+                    method: 'GET'
+                });
+
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Unauthenticated API call successful</div>
+                    <div class="info">Studies returned: ${data.studies?.length || 0}</div>
+                    <div class="info">Should show only public studies (or empty if no public studies)</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Unauthenticated API error: ${error.message}</div>`;
+            }
+        }
+
+        async function testAuthenticatedAPI() {
+            const resultDiv = document.getElementById('authResult');
+            const token = document.getElementById('tokenInput').value || authToken;
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No authentication token available. Please login first.</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="info">Testing authenticated API...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=get-studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Authenticated API call successful</div>
+                    <div class="info">Studies returned: ${data.studies?.length || 0}</div>
+                    <div class="info">Should show only researcher's own studies</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Authenticated API error: ${error.message}</div>`;
+            }
+        }
+
+        async function createStudy() {
+            const resultDiv = document.getElementById('createResult');
+            const token = document.getElementById('tokenInput').value || authToken;
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No authentication token available. Please login first.</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="info">Creating test study...</div>';
+
+            try {
+                const studyData = {
+                    title: `Test Study - Ownership Verification ${new Date().toISOString()}`,
+                    description: 'Testing study ownership and filtering',
+                    type: 'unmoderated',
+                    isPublic: false
+                };
+
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Study created successfully!</div>
+                        <div class="info">Study ID: ${data.study?.id}</div>
+                        <div class="info">Title: ${data.study?.title}</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Study creation failed: ${data.error || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Study creation error: ${error.message}</div>`;
+            }
+        }
+
+        async function verifyStudyOwnership() {
+            const resultDiv = document.getElementById('verifyResult');
+            const token = document.getElementById('tokenInput').value || authToken;
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No authentication token available. Please login first.</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="info">Verifying study ownership...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=get-studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const studyCount = data.studies?.length || 0;
+                    if (studyCount > 0) {
+                        resultDiv.innerHTML = `
+                            <div class="success">✅ Study ownership verification successful!</div>
+                            <div class="info">Found ${studyCount} studies for this researcher</div>
+                            <div class="info">This proves the filtering is working correctly</div>
+                            <pre>${JSON.stringify(data.studies, null, 2)}</pre>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="info">ℹ️ No studies found for this researcher</div>
+                            <div class="info">This could mean: 1) No studies created yet, or 2) Filtering is working (no public studies)</div>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Verification failed: ${data.error || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Verification error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-detect environment and update API base
+        document.addEventListener('DOMContentLoaded', () => {
+            const envInfo = document.createElement('div');
+            envInfo.className = 'info';
+            envInfo.innerHTML = `<strong>Testing Environment:</strong> ${API_BASE}`;
+            document.body.insertBefore(envInfo, document.body.firstChild);
+        });
+    </script>
+</body>
+</html>
