@@ -419,7 +419,9 @@ async function getStudies(req, res) {
     if (userRole === 'researcher') {
       // Researchers see only their own studies
       filteredStudies = localStudies.filter(study => 
-        study.created_by === userId || study.creator_id === userId
+        study.created_by === userId || 
+        study.creator_id === userId || 
+        study.researcher_id === userId
       );
       console.log(`🔬 Researcher view: ${filteredStudies.length} studies (filtered by creator: ${userId})`);
       
