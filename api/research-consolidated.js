@@ -510,13 +510,16 @@ async function getStudies(req, res) {
       filteredStudies = localStudies;
       console.log(`👑 Admin view: ${filteredStudies.length} studies (including demo data for debugging)`);
     } else {
-      // Participants see all active studies (temporarily simplified for debugging)
+      // Participants see active/published studies
       filteredStudies = localStudies.filter(study => {
         const isActive = study.status === 'active' || study.status === 'published';
-        console.log(`📊 Study filter check: ${study.title} - Active: ${isActive}, Status: ${study.status}`);
-        return isActive;
+        if (!isActive) return false;
+        
+        // Allow all active studies for participants
+        // In the future, you can add more specific filtering here
+        return true;
       });
-      console.log(`👥 Participant view: ${filteredStudies.length} active studies total`);
+      console.log(`👥 Participant view: ${filteredStudies.length} active studies available`);
     }
     
     // Performance logging
