@@ -59,9 +59,10 @@ async function loadStudies() {
       }
     }
 
-    // Fallback to file storage
+    // Fallback to demo data
     try {
-      const studiesData = JSON.stringify([
+      console.log('📚 Creating demo studies data...');
+      const studiesData = [
         {
           "id": "demo-study-1",
           "title": "E-commerce Navigation Study",
@@ -185,13 +186,12 @@ async function loadStudies() {
             }
           ]
         }
-      ], null, 2);
+      ];
       
-      const studies = JSON.parse(studiesData);
-      console.log(`📚 Using demo studies (${studies.length} studies available)`);
-      return studies;
+      console.log(`📚 Using demo studies (${studiesData.length} studies available)`);
+      return studiesData;
     } catch (parseError) {
-      console.error('Error parsing demo studies:', parseError);
+      console.error('Error creating demo studies:', parseError);
       return [];
     }
 
