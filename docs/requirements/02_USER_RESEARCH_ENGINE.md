@@ -36,7 +36,7 @@ Enable any team member to conduct professional-quality user research without exp
 **Acceptance Criteria:**
 - [ ] AI moderator can conduct structured interviews using predefined scripts
 - [ ] Natural language processing enables dynamic follow-up questions
-- [ ] Multi-language support for global participants (40+ languages)
+- [ ] Multi-language support for Arabic and English participants
 - [ ] Real-time adaptation based on participant responses
 - [ ] Professional, conversational tone maintained throughout session
 
