@@ -64,6 +64,7 @@ async function loadStudies() {
       console.log('📚 Creating demo studies data...');
       const studiesData = [
         {
+          "_id": "demo-study-1",
           "id": "demo-study-1",
           "title": "E-commerce Navigation Study",
           "description": "Test how users navigate through our product pages and complete purchases. Help us improve the shopping experience.",
@@ -131,6 +132,7 @@ async function loadStudies() {
           ]
         },
         {
+          "_id": "demo-study-2",
           "id": "demo-study-2", 
           "title": "Mobile App Usability Test",
           "description": "Test the usability of our mobile application interface and navigation.",
@@ -279,6 +281,9 @@ async function ensureStudiesLoaded() {
     localStudies = await loadStudies();
     studiesInitialized = true;
     console.log(`📚 Loaded ${localStudies.length} studies from storage`);
+    console.log('📚 First study preview:', localStudies[0] ? `${localStudies[0].id}: ${localStudies[0].title}` : 'No studies');
+  } else {
+    console.log(`📚 Studies already loaded: ${localStudies.length} available`);
   }
 }
 
