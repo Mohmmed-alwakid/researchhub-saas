@@ -347,6 +347,8 @@ async function getStudies(req, res) {
     await ensureStudiesLoaded();
     
     console.log(`📚 Getting studies - count: ${localStudies.length}`);
+    console.log(`🔍 Request details: Method=${req.method}, URL=${req.url}`);
+    console.log(`🔑 Authorization header: ${req.headers.authorization ? 'Present' : 'Missing'}`);
     
     // Try to get user info from token (optional for public studies)
     let userRole = 'participant'; // Default to participant (most restrictive)
@@ -408,6 +410,8 @@ async function getStudies(req, res) {
     } else {
       console.log('👤 No authorization header, treating as participant request');
     }
+    
+    console.log(`👤 Final user context determined: userId=${userId}, userRole=${userRole}`);
     
     let filteredStudies = [...localStudies];
     
@@ -510,16 +514,20 @@ async function getStudies(req, res) {
       filteredStudies = localStudies;
       console.log(`👑 Admin view: ${filteredStudies.length} studies (including demo data for debugging)`);
     } else {
-      // Participants see active/published studies
+      // Participants see only public/published studies that are open for participation
       filteredStudies = localStudies.filter(study => {
         const isActive = study.status === 'active' || study.status === 'published';
         if (!isActive) return false;
         
-        // Allow all active studies for participants
-        // In the future, you can add more specific filtering here
-        return true;
+        // For participants, exclude private studies and show only those intended for public participation
+        // Demo studies are allowed for testing
+        const isDemo = study.id && study.id.startsWith('demo-');
+        const isPublicStudy = study.is_public === true || study.status === 'published';
+        
+        // Allow demo studies or explicitly public studies
+        return isDemo || isPublicStudy;
       });
-      console.log(`👥 Participant view: ${filteredStudies.length} active studies available`);
+      console.log(`👥 Participant view: ${filteredStudies.length} public studies available for participation`);
     }
     
     // Performance logging
