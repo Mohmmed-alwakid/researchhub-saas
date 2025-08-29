@@ -510,24 +510,13 @@ async function getStudies(req, res) {
       filteredStudies = localStudies;
       console.log(`👑 Admin view: ${filteredStudies.length} studies (including demo data for debugging)`);
     } else {
-      // Participants see active/public studies, but exclude demo/test data
+      // Participants see all active studies (temporarily simplified for debugging)
       filteredStudies = localStudies.filter(study => {
-        // Must be active or published to be visible to participants
         const isActive = study.status === 'active' || study.status === 'published';
-        if (!isActive) return false;
-        
-        // For testing purposes, allow "E-commerce Navigation Study" to be visible to participants
-        if (study.id === 'demo-study-1' || study.title === 'E-commerce Navigation Study') {
-          return true;
-        }
-        
-        // Multi-criteria demo study detection
-        const isDemoStudy = isDemoOrTestStudy(study);
-        
-        // Return true only if active and NOT demo data
-        return !isDemoStudy;
+        console.log(`📊 Study filter check: ${study.title} - Active: ${isActive}, Status: ${study.status}`);
+        return isActive;
       });
-      console.log(`👥 Participant view: ${filteredStudies.length} real studies (including 1 demo for testing)`);
+      console.log(`👥 Participant view: ${filteredStudies.length} active studies total`);
     }
     
     // Performance logging
