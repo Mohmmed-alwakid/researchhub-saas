@@ -1249,12 +1249,20 @@ async function clearDemoData(req, res) {
 
 // Import AI service dynamically to avoid build issues if not available
 let ResearchHubAI = null;
-try {
-  const aiModule = await import('./lib/ResearchHubAI.js');
-  ResearchHubAI = aiModule.default || aiModule.ResearchHubAI;
-  console.log('✅ AI features loaded successfully');
-} catch (error) {
-  console.log('⚠️ AI features not available:', error.message);
+
+// Initialize AI features
+async function initializeAI() {
+  if (ResearchHubAI) return ResearchHubAI; // Already loaded
+  
+  try {
+    const aiModule = await import('./lib/ResearchHubAI.js');
+    ResearchHubAI = aiModule.default || aiModule.ResearchHubAI;
+    console.log('✅ AI features loaded successfully');
+    return ResearchHubAI;
+  } catch (error) {
+    console.log('⚠️ AI features not available:', error.message);
+    return null;
+  }
 }
 
 // Generate study suggestions using AI
@@ -1368,7 +1376,9 @@ async function handleAIGenerateReport(req, res) {
 
 // Generate AI response for interview conversation
 async function handleAIInterviewResponse(req, res) {
-  if (!ResearchHubAI) {
+  // Initialize AI service
+  const ai = await initializeAI();
+  if (!ai) {
     return res.status(503).json({ 
       success: false, 
       error: 'AI features not available. Please configure AI_GATEWAY_API_KEY.' 
@@ -1385,21 +1395,28 @@ async function handleAIInterviewResponse(req, res) {
       studyContext 
     } = req.body;
 
-    if (!sessionId || !participantResponse) {
+    if (!participantResponse) {
       return res.status(400).json({ 
         success: false,
-        error: 'Session ID and participant response are required' 
+        error: 'Participant response is required' 
       });
     }
 
-    const result = await ResearchHubAI.generateInterviewResponse({
-      sessionId,
+    // Provide defaults for missing fields
+    const interviewData = {
+      sessionId: sessionId || 'default-session',
       participantResponse,
-      currentQuestionIndex,
-      conversationHistory,
-      interviewConfig,
-      studyContext
-    });
+      currentQuestionIndex: currentQuestionIndex || 0,
+      conversationHistory: conversationHistory || [],
+      interviewConfig: {
+        language: 'english',
+        moderatorPersonality: 'professional',
+        ...interviewConfig
+      },
+      studyContext: studyContext || { title: 'Research Study', type: 'interview' }
+    };
+
+    const result = await ai.generateInterviewResponse(interviewData);
 
     return res.status(200).json(result);
   } catch (error) {
