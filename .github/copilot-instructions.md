@@ -19,7 +19,149 @@ This file provides workspace-specific instructions to GitHub Copilot. To enable 
 ---
 
 ## 🎯 SINGLE SOURCE OF TRUTH
-**ALL specifications are in `requirements/` - never contradict this folder.**
+**ALL specifications are in `docs/requirements/` - never contradict this folder.**
+
+## 📋 **REQUIREMENTS ORGANIZATION & STORY ID BEST PRACTICES**
+
+### **Folder Structure (Feature-Based Organization)**
+```
+docs/requirements/
+├── 00_MASTER_INDEX.md              # Central navigation
+├── core-platform/                  # Platform foundation stories
+│   ├── 02_USER_RESEARCH_ENGINE.md  # UE-001 to UE-999
+│   ├── 03_PARTICIPANT_MANAGEMENT.md # PM-001 to PM-999
+│   └── 04_STUDY_EXECUTION.md       # SE-001 to SE-999
+├── analytics-insights/              # Analytics & reporting
+│   └── 05_ANALYTICS_INSIGHTS.md    # AI-001 to AI-999
+├── enterprise/                      # Enterprise features
+│   ├── 06_ENTERPRISE_FEATURES.md   # EF-001 to EF-999
+│   └── 07_INTEGRATIONS_API.md      # IA-001 to IA-999
+├── user-experience/                 # User-facing features
+│   └── 08_MOBILE_EXPERIENCE.md     # ME-001 to ME-999
+├── business/                        # Business operations
+│   └── 09_MONETIZATION_BILLING.md  # MB-001 to MB-999
+└── user-stories/                    # Cross-referenced stories
+    ├── by-role/                     # Organized by user role
+    │   ├── researcher/              # Stories for researchers
+    │   ├── participant/             # Stories for participants
+    │   └── admin/                   # Stories for administrators
+    └── by-priority/                 # Organized by priority
+        ├── p0-critical/             # P0 stories
+        ├── p1-important/            # P1 stories
+        └── p2-enhancement/          # P2 stories
+```
+
+### **Unique Story ID Convention (MANDATORY)**
+```
+Format: [PREFIX]-[NUMBER]
+Examples:
+- UE-001: User Engine Story #1
+- PM-047: Participant Management Story #47  
+- SE-023: Study Execution Story #23
+- AI-012: Analytics Insights Story #12
+- EF-008: Enterprise Features Story #8
+- IA-015: Integrations API Story #15
+- ME-033: Mobile Experience Story #33
+- MB-019: Monetization Billing Story #19
+```
+
+### **Story ID Prefixes**
+| **Prefix** | **Feature Area** | **File** | **Range** |
+|------------|------------------|----------|-----------|
+| `UE-` | User Research Engine | 02_USER_RESEARCH_ENGINE.md | UE-001 to UE-999 |
+| `PM-` | Participant Management | 03_PARTICIPANT_MANAGEMENT.md | PM-001 to PM-999 |
+| `SE-` | Study Execution | 04_STUDY_EXECUTION.md | SE-001 to SE-999 |
+| `AI-` | Analytics & Insights | 05_ANALYTICS_INSIGHTS.md | AI-001 to AI-999 |
+| `EF-` | Enterprise Features | 06_ENTERPRISE_FEATURES.md | EF-001 to EF-999 |
+| `IA-` | Integrations & API | 07_INTEGRATIONS_API.md | IA-001 to IA-999 |
+| `ME-` | Mobile Experience | 08_MOBILE_EXPERIENCE.md | ME-001 to ME-999 |
+| `MB-` | Monetization & Billing | 09_MONETIZATION_BILLING.md | MB-001 to MB-999 |
+
+### **Story Cross-Reference System**
+```markdown
+#### **Story UE-001: AI-Powered Interview Moderator**
+- **Epic**: AI Research Automation
+- **Feature Area**: User Research Engine
+- **Related Stories**: PM-015 (Quality Scoring), SE-008 (Video Recording)
+- **Dependencies**: AI-003 (Sentiment Analysis), EF-012 (SSO Integration)
+- **Stakeholders**: Researchers, Product Managers
+- **User Roles**: Researcher (primary), Admin (secondary)
+```
+
+### **Cross-Role Story Organization**
+Stories should be **primarily organized by feature area** but **cross-referenced by role**:
+
+```
+✅ RECOMMENDED: Feature-based primary organization
+docs/requirements/core-platform/02_USER_RESEARCH_ENGINE.md
+└── Contains: UE-001, UE-002, UE-003... (all User Engine stories)
+
+✅ CROSS-REFERENCE: Role-based secondary organization  
+docs/requirements/user-stories/by-role/researcher/
+├── researcher-stories-index.md     # Links to UE-001, PM-005, SE-012...
+├── researcher-workflows.md         # End-to-end workflows
+└── researcher-permissions.md       # Access control requirements
+
+docs/requirements/user-stories/by-role/participant/
+├── participant-stories-index.md    # Links to PM-020, SE-003, ME-001...
+├── participant-experience.md       # Journey mapping
+└── participant-onboarding.md       # Onboarding requirements
+```
+
+### **Story Management Best Practices**
+
+#### **1. Story Creation Process**
+```bash
+# When creating new stories:
+1. Check existing story IDs to avoid conflicts
+2. Use next available number in sequence (UE-001, UE-002, etc.)
+3. Add cross-references to related stories
+4. Update role-based indexes
+5. Link to relevant epics and features
+```
+
+#### **2. Story Template (MANDATORY)**
+```markdown
+#### **Story [PREFIX]-[NUMBER]: [Clear Story Title]**
+- **As a** [User Role]
+- **I want** [Functionality]
+- **So that** [Business Value]
+
+**Epic**: [Epic Name]
+**Feature Area**: [Feature Area Name]
+**Related Stories**: [List related story IDs]
+**Dependencies**: [List dependent story IDs]
+**Stakeholders**: [List stakeholders]
+**User Roles**: [Primary role], [Secondary roles]
+
+**Acceptance Criteria:**
+- [ ] [Specific, testable criteria]
+- [ ] [Include UI/UX requirements]
+- [ ] [Include technical requirements]
+- [ ] [Include success metrics]
+
+**Priority:** P0/P1/P2 | **Effort:** XS/S/M/L/XL | **Dependencies:** [Story IDs]
+
+---
+```
+
+#### **3. Story Lifecycle Management**
+- **Draft → Review → Approved → In Development → Testing → Done**
+- **Status Tracking**: Use story status in file headers
+- **Change Management**: Update related stories when dependencies change
+- **Traceability**: Maintain backward/forward links between stories
+
+#### **4. Global Story Registry**
+Maintain `docs/requirements/00_MASTER_INDEX.md` with:
+```markdown
+## 📊 **STORY REGISTRY**
+
+| **Story ID** | **Title** | **Feature Area** | **Priority** | **Status** |
+|-------------|-----------|------------------|--------------|------------|
+| UE-001 | AI Interview Moderator | User Research | P0 | ✅ Complete |
+| PM-001 | Global Recruitment | Participants | P0 | 🔄 In Progress |
+| SE-001 | Video Recording | Study Execution | P0 | 📋 Planned |
+```
 
 ## � **PRODUCTION SITE PRIORITY (MANDATORY)**
 **FIRST PRIORITY: Always focus on the live production site unless explicitly told otherwise.**
@@ -146,12 +288,21 @@ const getNavigationForRole = () => {
 
 ### **Mandatory Directory Organization**
 ```
-requirements/        ← All specifications (single source of truth)
-testing/             ← All tests and test interfaces  
-scripts/             ← Development utilities
-api/                 ← Vercel serverless functions (24 total)
-src/client/          ← React frontend components
-database/            ← Migration scripts
+docs/requirements/        ← All specifications (single source of truth)
+├── 00_MASTER_INDEX.md   ← Central hub with story registry
+├── core-platform/       ← Platform foundation (UE, PM, SE stories)
+├── analytics-insights/   ← Analytics & reporting (AI stories)  
+├── enterprise/          ← Enterprise features (EF, IA stories)
+├── user-experience/     ← UX & mobile (ME stories)
+├── business/            ← Business operations (MB stories)
+└── user-stories/        ← Cross-reference organization
+    ├── by-role/         ← Researcher, Participant, Admin views
+    └── by-priority/     ← P0, P1, P2 story groupings
+testing/                 ← All tests and test interfaces  
+scripts/                 ← Development utilities
+api/                     ← Vercel serverless functions (12 total)
+src/client/              ← React frontend components
+database/                ← Migration scripts
 ```
 
 ### **Component Naming (STRICT)**
@@ -808,6 +959,9 @@ Role: admin
 - **Authentication Flow**: Complete login/register/refresh cycle
 
 ## 📚 Key Documentation References
+- `docs/requirements/00_MASTER_INDEX.md` - Central hub with story registry and navigation
+- `docs/requirements/core-platform/` - Platform foundation requirements (UE, PM, SE)
+- `docs/requirements/user-stories/by-role/` - Role-based story organization
 - `docs/STUDY_BLOCKS_SYSTEM.md` - Complete study blocks architecture and implementation
 - `docs/TEMPLATE_SYSTEM.md` - Template management and usage system  
 - `docs/STUDY_BLOCKS_IMPLEMENTATION_PROGRESS.md` - Current implementation status and roadmap
