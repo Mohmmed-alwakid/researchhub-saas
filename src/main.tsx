@@ -10,42 +10,23 @@ import './utils/devConsoleManager'
 import { initSentry } from './config/sentry'
 initSentry()
 
-// NUCLEAR OPTION: Immediate, ultra-aggressive console suppression
-// Define all error patterns to suppress
-const suppressPatterns = [
-  // Exact patterns from your reports
+// Enhanced error filtering: Only suppress browser extension noise, allow real errors
+const browserNoisePatterns = [
+  // Browser extension interference (safe to suppress)
   'permissions-policy',
-  'this page is not reloaded',
   'browsing-topics',
-  'run-ad-auction',
-  'join-ad-interest-group',
   'private-state-token',
   'private-aggregation',
   'attribution-reporting',
   'contentscript.js',
-  'error with permissions-policy header',
-  'unrecognized feature',
-  'origin trial controlled feature',
-  'contentscript.js:193',
-  'private-state-token-redemption',
-  'private-state-token-issuance',
-  'failed to load resource',
-  'status of 404',
-  '/api/studies:1',
-  'the server responded with a status of 404',
-  'cannot read properties of undefined',
-  'google oauth is not configured',
-  'vite_google_client_id',
-  'a listener indicated an asynchronous response',
-  'message channel closed',
-  'hook.js',
-  'extensions/',
   'chrome-extension://',
-  'moz-extension://'
+  'moz-extension://',
+  'extensions/',
+  'hook.js'
 ];
 
-// Store original methods
-const orig = {
+// Store original methods for selective restoration
+const originalConsole = {
   warn: console.warn,
   error: console.error,
   info: console.info,
@@ -53,34 +34,48 @@ const orig = {
   log: console.log
 };
 
-// Helper to check suppression
+// Production-safe error filtering
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const suppress = (args: any[]) => {
-  const msg = args.map(a => String(a)).join(' ').toLowerCase();
-  return suppressPatterns.some(p => msg.includes(p.toLowerCase()));
+const isBrowserNoise = (args: any[]): boolean => {
+  const message = args.map(arg => String(arg)).join(' ').toLowerCase();
+  return browserNoisePatterns.some(pattern => message.includes(pattern.toLowerCase()));
 };
 
-// Override console methods IMMEDIATELY
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-console.warn = (...args: any[]) => !suppress(args) && orig.warn.apply(console, args);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-console.error = (...args: any[]) => !suppress(args) && orig.error.apply(console, args);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-console.info = (...args: any[]) => !suppress(args) && orig.info.apply(console, args);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-console.debug = (...args: any[]) => !suppress(args) && orig.debug.apply(console, args);
+// Enhanced console methods - suppress only browser noise, preserve real errors
+if (import.meta.env.PROD) {
+  // In production: Filter browser noise but allow application errors
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.warn = (...args: any[]) => {
+    if (!isBrowserNoise(args)) {
+      originalConsole.warn.apply(console, args);
+    }
+  };
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.error = (...args: any[]) => {
+    if (!isBrowserNoise(args)) {
+      originalConsole.error.apply(console, args);
+    }
+  };
+} else {
+  // In development: Show everything for debugging
+  console.warn = originalConsole.warn;
+  console.error = originalConsole.error;
+}
 
-// Global error handlers
+// Global error handlers - only suppress browser extension noise
 if (typeof window !== 'undefined') {
   window.onerror = (msg, src, _ln, _col, err) => {
-    const errMsg = [msg, src, err?.message].join(' ');
-    return suppress([errMsg]);
+    const errorMessage = [msg, src, err?.message].join(' ');
+    // Only suppress if it's clearly browser extension noise
+    return isBrowserNoise([errorMessage]);
   };
 
-  window.onunhandledrejection = (e) => {
-    const reason = e.reason?.message || e.reason || '';
-    if (suppress([reason])) {
-      e.preventDefault();
+  window.onunhandledrejection = (event) => {
+    const reason = event.reason?.message || event.reason || '';
+    // Only suppress if it's browser extension noise
+    if (isBrowserNoise([reason])) {
+      event.preventDefault();
       return true;
     }
     return false;

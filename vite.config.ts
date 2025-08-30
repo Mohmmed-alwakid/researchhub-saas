@@ -42,7 +42,10 @@ export default defineConfig({
     target: 'es2020',
     cssCodeSplit: true,
     chunkSizeWarningLimit: 500,
+    // Enhanced bundle optimization
     rollupOptions: {
+      // External dependencies that can be loaded from CDN (optional)
+      external: [],
       onwarn(warning, warn) {
         // Suppress specific warnings
         if (warning.code === 'CSS_UNKNOWN_RULE') return;
@@ -59,6 +62,7 @@ export default defineConfig({
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
+        // Optimized manual chunks for better caching and loading
         manualChunks: (id: string) => {
           // CRITICAL: React and its ecosystem MUST be together and load first
           // This prevents circular dependencies that cause "Cannot read properties of undefined (reading 'memo')"
