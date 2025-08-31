@@ -1441,11 +1441,42 @@ async function getStudyResults(req, res) {
         const token = authHeader.substring(7);
         console.log(`🔐 [RESULTS] Processing auth token: ${token.substring(0, 20)}...`);
         
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (!error && user) {
-          userId = user.id;
-          userRole = user.user_metadata?.role || 'researcher';
-          console.log(`👤 [RESULTS] Authenticated user: ${userId} (${userRole})`);
+        if (token.startsWith('fallback-token-')) {
+          // Parse fallback token: fallback-token-{userId}-{role}-{email}
+          // Need to handle UUID with hyphens: fallback-token-4c3d798b-2975-4ec4-b9e2-c6f128b8a066-researcher-email
+          const afterPrefix = token.substring('fallback-token-'.length);
+          
+          // Find role by looking for known roles
+          const validRoles = ['participant', 'researcher', 'admin'];
+          let roleIndex = -1;
+          let foundRole = null;
+          
+          for (const role of validRoles) {
+            const index = afterPrefix.indexOf('-' + role + '-');
+            if (index !== -1) {
+              roleIndex = index;
+              foundRole = role;
+              break;
+            }
+          }
+          
+          if (roleIndex !== -1 && foundRole) {
+            userId = afterPrefix.substring(0, roleIndex);
+            userRole = foundRole;
+            console.log(`✅ [RESULTS] Fallback token parsed: userId=${userId}, role=${userRole}`);
+          } else {
+            console.log(`⚠️ [RESULTS] Could not parse fallback token structure`);
+          }
+        } else {
+          // Try JWT validation through Supabase
+          const { data: { user }, error } = await supabase.auth.getUser(token);
+          if (!error && user) {
+            userId = user.id;
+            userRole = user.user_metadata?.role || 'researcher';
+            console.log(`👤 [RESULTS] Authenticated user: ${userId} (${userRole})`);
+          } else {
+            console.log('🔐 [RESULTS] JWT validation failed:', error?.message);
+          }
         }
       } catch (authError) {
         console.log('🔐 [RESULTS] Auth token validation failed:', authError.message);
