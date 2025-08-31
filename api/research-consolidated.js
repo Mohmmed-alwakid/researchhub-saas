@@ -377,6 +377,12 @@ export default async function handler(req, res) {
       case 'apply':
         return await applyToStudy(req, res);
       
+      case 'submit-response':
+        return await submitParticipantResponse(req, res);
+      
+      case 'get-study-results':
+        return await getStudyResults(req, res);
+      
       case 'clear-demo-data':
         return await clearDemoData(req, res);
       
@@ -1261,6 +1267,220 @@ async function clearDemoData(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Failed to clear demo data'
+    });
+  }
+}
+
+// ============================================================================
+// PARTICIPANT FLOW FUNCTIONS
+// ============================================================================
+
+/**
+ * Submit participant response to a study
+ */
+async function submitParticipantResponse(req, res) {
+  try {
+    console.log('📝 [PARTICIPANT] Processing study response submission');
+    
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
+    const { study_id, participant_id, responses, completion_time, completed_at } = req.body;
+    
+    if (!study_id || !participant_id || !responses || !Array.isArray(responses)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: study_id, participant_id, responses (array)'
+      });
+    }
+    
+    // Find the study
+    const study = localStudies.find(s => s.id === study_id);
+    if (!study) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+    
+    // Check if study is active/accepting responses
+    if (study.status !== 'active' && study.status !== 'published') {
+      return res.status(400).json({
+        success: false,
+        error: 'Study is not currently accepting responses'
+      });
+    }
+    
+    // Create participant response record
+    const participantResponse = {
+      id: `response-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      study_id,
+      participant_id,
+      responses,
+      completion_time: completion_time || 0,
+      completed_at: completed_at || new Date().toISOString(),
+      submitted_at: new Date().toISOString(),
+      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      user_agent: req.headers['user-agent']
+    };
+    
+    // Initialize study responses array if it doesn't exist
+    if (!study.participant_responses) {
+      study.participant_responses = [];
+    }
+    
+    // Add the response to the study
+    study.participant_responses.push(participantResponse);
+    
+    // Update study statistics
+    if (!study.participants) {
+      study.participants = { enrolled: 0, completed: 0, target: study.target_participants || 10 };
+    }
+    study.participants.completed = study.participant_responses.length;
+    study.updated_at = new Date().toISOString();
+    
+    // Save updated studies
+    await saveStudies(localStudies);
+    
+    console.log(`✅ [PARTICIPANT] Response submitted successfully for study ${study_id} by participant ${participant_id}`);
+    
+    return res.status(201).json({
+      success: true,
+      message: 'Response submitted successfully',
+      response_id: participantResponse.id,
+      study: {
+        id: study.id,
+        title: study.title,
+        status: study.status
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ [PARTICIPANT] Submit response error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to submit response'
+    });
+  }
+}
+
+/**
+ * Get study results and analytics for researchers
+ */
+async function getStudyResults(req, res) {
+  try {
+    console.log('📊 [RESULTS] Processing study results request');
+    
+    // Ensure studies are loaded from persistent storage
+    await ensureStudiesLoaded();
+    
+    const { id } = req.query;
+    
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+    
+    // Get user authentication info
+    let userId = null;
+    let userRole = null;
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        console.log(`🔐 [RESULTS] Processing auth token: ${token.substring(0, 20)}...`);
+        
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (!error && user) {
+          userId = user.id;
+          userRole = user.user_metadata?.role || 'researcher';
+          console.log(`👤 [RESULTS] Authenticated user: ${userId} (${userRole})`);
+        }
+      } catch (authError) {
+        console.log('🔐 [RESULTS] Auth token validation failed:', authError.message);
+      }
+    }
+    
+    // Find the study
+    const study = localStudies.find(s => s.id === id);
+    if (!study) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found'
+      });
+    }
+    
+    // Check if user can view results (study owner or admin)
+    if (userRole !== 'admin' && study.created_by !== userId && study.creator_id !== userId && study.researcher_id !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied: You can only view results for your own studies'
+      });
+    }
+    
+    // Prepare study results
+    const responses = study.participant_responses || [];
+    const totalResponses = responses.length;
+    
+    // Calculate basic analytics
+    const analytics = {
+      total_responses: totalResponses,
+      completion_rate: study.participants ? 
+        ((study.participants.completed / (study.participants.target || 10)) * 100).toFixed(1) : 0,
+      average_completion_time: totalResponses > 0 ? 
+        Math.round(responses.reduce((sum, r) => sum + (r.completion_time || 0), 0) / totalResponses) : 0,
+      response_dates: responses.map(r => r.completed_at),
+      first_response: totalResponses > 0 ? responses[0].completed_at : null,
+      latest_response: totalResponses > 0 ? responses[totalResponses - 1].completed_at : null
+    };
+    
+    // Process responses by block type
+    const responsesByBlock = {};
+    study.blocks?.forEach(block => {
+      responsesByBlock[block.id] = {
+        block_info: {
+          id: block.id,
+          type: block.type,
+          title: block.title,
+          description: block.description
+        },
+        responses: responses.map(r => {
+          const blockResponse = r.responses.find(br => br.block_id === block.id);
+          return blockResponse ? {
+            participant_id: r.participant_id,
+            response: blockResponse.response || blockResponse.value,
+            completed: blockResponse.completed,
+            timestamp: blockResponse.timestamp
+          } : null;
+        }).filter(Boolean)
+      };
+    });
+    
+    console.log(`✅ [RESULTS] Returning results for study ${id}: ${totalResponses} responses`);
+    
+    return res.status(200).json({
+      success: true,
+      study: {
+        id: study.id,
+        title: study.title,
+        description: study.description,
+        status: study.status,
+        created_at: study.created_at,
+        updated_at: study.updated_at
+      },
+      analytics,
+      responses: responsesByBlock,
+      raw_responses: responses // Include raw data for advanced analysis
+    });
+    
+  } catch (error) {
+    console.error('❌ [RESULTS] Get study results error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve study results'
     });
   }
 }
