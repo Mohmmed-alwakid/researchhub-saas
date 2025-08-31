@@ -200,7 +200,8 @@ async function saveStudies(studies) {
             target_participants: study.target_participants || 10,
             created_at: study.created_at,
             updated_at: study.updated_at || new Date().toISOString(),
-            creator_id: study.creator_id || study.created_by,
+            created_by: study.created_by, // CRITICAL: Include created_by field
+            creator_id: study.creator_id || study.created_by, // Keep for compatibility
             screening_questions: study.screening_questions || []
           };
           
