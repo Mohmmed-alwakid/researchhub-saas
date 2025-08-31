@@ -483,20 +483,32 @@ async function getStudies(req, res) {
         const token = authHeader.replace('Bearer ', '');
         
         if (token.startsWith('fallback-token-')) {
-          // Parse fallback token: fallback-token-{userId}-{role}
-          const parts = token.split('-');
-          if (parts.length >= 4) {
-            userId = parts[2];
-            userRole = parts[3];
-            
-            // Validate role
-            const validRoles = ['participant', 'researcher', 'admin'];
-            if (!validRoles.includes(userRole)) {
-              console.log(`⚠️ Invalid role '${userRole}', defaulting to participant`);
-              userRole = 'participant';
+          // Parse fallback token: fallback-token-{userId}-{role}-{email}
+          // Need to handle UUID with hyphens: fallback-token-4c3d798b-2975-4ec4-b9e2-c6f128b8a066-researcher-email
+          const afterPrefix = token.substring('fallback-token-'.length);
+          
+          // Find role by looking for known roles
+          const validRoles = ['participant', 'researcher', 'admin'];
+          let roleIndex = -1;
+          let foundRole = null;
+          
+          for (const role of validRoles) {
+            const index = afterPrefix.indexOf('-' + role + '-');
+            if (index !== -1) {
+              roleIndex = index;
+              foundRole = role;
+              break;
             }
+          }
+          
+          if (roleIndex !== -1 && foundRole) {
+            userId = afterPrefix.substring(0, roleIndex);
+            userRole = foundRole;
+            console.log(`✅ Fallback token parsed: userId=${userId}, role=${userRole}`);
           } else {
-            console.log(`⚠️ Invalid token format, expected 4+ parts, got ${parts.length}`);
+            console.log(`⚠️ Could not parse fallback token structure`);
+            userRole = 'participant';
+            userId = null;
           }
         } else {
           // Handle JWT tokens - decode to get user role
@@ -632,14 +644,35 @@ async function createStudy(req, res) {
         const token = authHeader.replace('Bearer ', '');
         
         if (token.startsWith('fallback-token-')) {
-          // Parse fallback token: fallback-token-{userId}-{role}
-          const parts = token.split('-');
-          if (parts.length >= 4) {
-            userId = parts[2];
-            // Try to extract email from parts[4] if available
-            if (parts.length >= 5) {
-              userEmail = decodeURIComponent(parts[4]);
+          // Parse fallback token: fallback-token-{userId}-{role}-{email}
+          // Need to handle UUID with hyphens: fallback-token-4c3d798b-2975-4ec4-b9e2-c6f128b8a066-researcher-email
+          const afterPrefix = token.substring('fallback-token-'.length);
+          
+          // Find role by looking for known roles
+          const validRoles = ['participant', 'researcher', 'admin'];
+          let roleIndex = -1;
+          let foundRole = null;
+          
+          for (const role of validRoles) {
+            const index = afterPrefix.indexOf('-' + role + '-');
+            if (index !== -1) {
+              roleIndex = index;
+              foundRole = role;
+              break;
             }
+          }
+          
+          if (roleIndex !== -1 && foundRole) {
+            userId = afterPrefix.substring(0, roleIndex);
+            console.log(`✅ Create study fallback token parsed: userId=${userId}, role=${foundRole}`);
+            
+            // Try to extract email (after role)
+            const emailPart = afterPrefix.substring(roleIndex + foundRole.length + 2);
+            if (emailPart) {
+              userEmail = decodeURIComponent(emailPart);
+            }
+          } else {
+            console.log(`⚠️ Could not parse create study fallback token structure`);
           }
         } else {
           // Handle JWT tokens - decode to get user info (CRITICAL FIX)
