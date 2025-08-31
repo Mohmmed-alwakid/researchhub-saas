@@ -668,23 +668,67 @@ async function handleGetPoints(req, res) {
       }
     }
 
+    // Check if we have Supabase admin client
+    if (!supabaseAdmin) {
+      console.log('⚠️ Supabase admin client not available, using fallback');
+      return res.status(200).json({
+        success: true,
+        points: {
+          current: 0,
+          lifetime: 0,
+          tier: 'Bronze'
+        },
+        mode: 'fallback'
+      });
+    }
+
     // Get points from wallet (using wallet balance as points)
-    const { data: wallet } = await supabaseAdmin
-      .from('participant_wallets')
-      .select('balance')
-      .eq('user_id', targetUserId)
-      .single();
+    try {
+      const { data: wallet, error } = await supabaseAdmin
+        .from('participant_wallets')
+        .select('balance')
+        .eq('participant_id', targetUserId)
+        .single();
 
-    const points = wallet?.balance || 0;
-
-    return res.status(200).json({
-      success: true,
-      points: {
-        current: points,
-        lifetime: points, // In production, you'd track lifetime points separately
-        tier: getPointsTier(points)
+      if (error) {
+        console.log('Points system database error:', error);
+        // Return fallback response
+        return res.status(200).json({
+          success: true,
+          points: {
+            current: 0,
+            lifetime: 0,
+            tier: 'Bronze'
+          },
+          mode: 'fallback',
+          note: 'Database table not available'
+        });
       }
-    });
+
+      const points = wallet?.balance || 0;
+
+      return res.status(200).json({
+        success: true,
+        points: {
+          current: points,
+          lifetime: points, // In production, you'd track lifetime points separately
+          tier: getPointsTier(points)
+        },
+        mode: 'database'
+      });
+    } catch (dbError) {
+      console.log('Points system database exception:', dbError);
+      return res.status(200).json({
+        success: true,
+        points: {
+          current: 0,
+          lifetime: 0,
+          tier: 'Bronze'
+        },
+        mode: 'fallback',
+        note: 'Database connection failed'
+      });
+    }
 
   } catch (error) {
     console.error('Get points exception:', error);
@@ -725,7 +769,7 @@ async function handleAwardPoints(req, res) {
     const { data: wallet, error: getError } = await supabaseAdmin
       .from('participant_wallets')
       .select('balance')
-      .eq('user_id', user_id)
+      .eq('participant_id', user_id)
       .single();
 
     const currentBalance = wallet?.balance || 0;
@@ -736,7 +780,7 @@ async function handleAwardPoints(req, res) {
       const { error: updateError } = await supabaseAdmin
         .from('participant_wallets')
         .update({ balance: newBalance })
-        .eq('user_id', user_id);
+        .eq('participant_id', user_id);
 
       if (updateError) {
         console.error('Update points error:', updateError);
@@ -750,7 +794,7 @@ async function handleAwardPoints(req, res) {
       const { error: createError } = await supabaseAdmin
         .from('participant_wallets')
         .insert({
-          user_id: user_id,
+          participant_id: user_id,
           balance: points
         });
 

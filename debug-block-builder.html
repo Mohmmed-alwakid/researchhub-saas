@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Builder Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Block Builder Debug Test</h1>
+    <p><strong>Issue:</strong> Block Builder not adding blocks when clicked in study creation</p>
+    
+    <div class="test-section">
+        <h2>Test 1: API Connectivity</h2>
+        <button onclick="testAPIHealth()">Test API Health</button>
+        <div id="api-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Study Creation API</h2>
+        <button onclick="testStudyCreation()">Test Study Creation</button>
+        <div id="study-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Block Validation Logic</h2>
+        <button onclick="testBlockValidation()">Test Block Validation</button>
+        <div id="validation-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Authentication Status</h2>
+        <button onclick="testAuth()">Check Auth Status</button>
+        <div id="auth-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Investigation Results</h2>
+        <div id="investigation" class="result">
+            <p><strong>Expected Issue:</strong></p>
+            <ul>
+                <li>Block Library click handlers are working</li>
+                <li>addBlock function is called</li>
+                <li>But blocks are not being added to formData.blocks</li>
+                <li>This causes validation to fail (requires at least 1 block)</li>
+                <li>Continue button stays disabled</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Test API endpoints
+        async function testAPIHealth() {
+            const result = document.getElementById('api-result');
+            result.innerHTML = '<span class="info">Testing API health...</span>';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/health');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<span class="pass">✅ API Health: ${JSON.stringify(data)}</span>`;
+                } else {
+                    result.innerHTML = `<span class="fail">❌ API Health Failed: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="fail">❌ API Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testStudyCreation() {
+            const result = document.getElementById('study-result');
+            result.innerHTML = '<span class="info">Testing study creation endpoint...</span>';
+            
+            try {
+                // Test the research-consolidated endpoint that handles study creation
+                const response = await fetch('http://localhost:3003/api/research-consolidated?action=get-studies', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<span class="pass">✅ Study API Working: ${JSON.stringify(data)}</span>`;
+                } else {
+                    result.innerHTML = `<span class="fail">❌ Study API Failed: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="fail">❌ Study API Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testBlockValidation() {
+            const result = document.getElementById('validation-result');
+            result.innerHTML = '<span class="info">Testing block validation logic...</span>';
+            
+            // Simulate the validation logic from StudyCreationWizard
+            const testFormData = {
+                type: 'usability',
+                blocks: []  // Empty blocks array - this should fail validation
+            };
+            
+            // Simulate validation
+            let errors = {};
+            if (testFormData.type === 'usability') {
+                if (!testFormData.blocks || testFormData.blocks.length === 0) {
+                    errors.blocks = 'At least one block is required to create a usability study';
+                }
+            }
+            
+            if (Object.keys(errors).length > 0) {
+                result.innerHTML = `<span class="fail">❌ Validation Failed (as expected): ${JSON.stringify(errors)}</span>`;
+            } else {
+                result.innerHTML = `<span class="pass">✅ Validation Passed</span>`;
+            }
+            
+            // Test with blocks
+            testFormData.blocks = [{
+                id: 'test-block',
+                type: 'task_instruction',
+                title: 'Test Block',
+                description: 'Test block description',
+                order: 0,
+                settings: {}
+            }];
+            
+            errors = {};
+            if (testFormData.type === 'usability') {
+                if (!testFormData.blocks || testFormData.blocks.length === 0) {
+                    errors.blocks = 'At least one block is required to create a usability study';
+                }
+            }
+            
+            const withBlocksResult = Object.keys(errors).length === 0 ? 
+                `<span class="pass">✅ With blocks: Validation PASSED</span>` :
+                `<span class="fail">❌ With blocks: Validation FAILED</span>`;
+            
+            result.innerHTML += `<br>${withBlocksResult}`;
+        }
+
+        async function testAuth() {
+            const result = document.getElementById('auth-result');
+            result.innerHTML = '<span class="info">Testing authentication...</span>';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/auth-consolidated?action=verify-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        token: localStorage.getItem('auth_token') || 'no-token'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<span class="pass">✅ Auth Working: ${JSON.stringify(data)}</span>`;
+                } else {
+                    result.innerHTML = `<span class="fail">❌ Auth Failed: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="fail">❌ Auth Error: ${error.message}</span>`;
+            }
+        }
+
+        // Auto-run tests on page load
+        window.onload = function() {
+            console.log('🧪 Block Builder Debug Test Loaded');
+            console.log('Issue: Block Builder not adding blocks when clicked');
+            console.log('Expected cause: addBlock function not properly updating formData.blocks');
+        };
+    </script>
+</body>
+</html>

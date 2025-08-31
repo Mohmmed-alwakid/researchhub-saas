@@ -84,6 +84,9 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
   };
 
   const addBlock = (type: BlockType) => {
+    console.log('🧩 Adding block:', type);
+    console.log('📊 Current blocks before:', blocks.length);
+    
     // Find the thank you block to insert before it
     const thankYouIndex = blocks.findIndex(block => block.type === 'thank_you_screen');
     const insertOrder = thankYouIndex >= 0 ? thankYouIndex : blocks.length;
@@ -97,6 +100,8 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
       settings: getDefaultBlockSettings(type)
     };
 
+    console.log('✨ New block created:', newBlock);
+
     // Update orders for blocks after insertion point
     const updatedBlocks = blocks.map(block => 
       block.order >= insertOrder 
@@ -105,7 +110,11 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
     );
 
     const finalBlocks = [...updatedBlocks, newBlock].sort((a, b) => a.order - b.order);
+    console.log('📋 Final blocks array:', finalBlocks);
+    console.log('📊 Content blocks count:', finalBlocks.filter(b => b.type !== 'welcome_screen' && b.type !== 'thank_you_screen').length);
+    
     onUpdateFormData({ blocks: finalBlocks });
+    console.log('✅ Block added successfully');
   };
 
   const removeBlock = (blockId: string) => {

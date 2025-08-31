@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Studies API - ResearchHub</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success { background: #d1fae5; border: 1px solid #10b981; color: #059669; }
+        .error { background: #fee2e2; border: 1px solid #ef4444; color: #dc2626; }
+        .info { background: #dbeafe; border: 1px solid #3b82f6; color: #2563eb; }
+        .loading { background: #fef3c7; border: 1px solid #f59e0b; color: #d97706; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            margin: 5px 0;
+        }
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+        h2 { color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+        h3 { color: #374151; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Studies API - ResearchHub</h1>
+        <p><strong>Purpose:</strong> Diagnose why the Studies page is not loading data</p>
+        
+        <div class="section">
+            <h2>🔐 Authentication Test</h2>
+            <div>
+                <label>Email:</label>
+                <input type="text" id="email" value="abwanwr77+Researcher@gmail.com" placeholder="Email">
+                <label>Password:</label>
+                <input type="password" id="password" value="Testtest123" placeholder="Password">
+                <button onclick="testAuth()">🔑 Login & Get Token</button>
+            </div>
+            <div id="auth-result" class="result info">Click login to get authentication token</div>
+        </div>
+
+        <div class="section">
+            <h2>📡 API Tests</h2>
+            <button onclick="testGetStudies()">📚 Test Get Studies API</button>
+            <button onclick="testCreateStudy()">➕ Test Create Study API</button>
+            <button onclick="testHealthCheck()">❤️ Test Health Check</button>
+            <div id="api-results" class="result info">Click buttons above to test API endpoints</div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Frontend State Debug</h2>
+            <button onclick="testFrontendState()">🖥️ Test Frontend App State</button>
+            <div id="frontend-result" class="result info">Click to test if frontend state management is working</div>
+        </div>
+
+        <div class="section">
+            <h2>🌐 Network Debug</h2>
+            <button onclick="testNetworkCalls()">📶 Monitor Network Calls</button>
+            <div id="network-result" class="result info">Click to monitor network requests</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003/api';
+        let authToken = null;
+        let networkMonitoring = false;
+
+        // Show result in designated div
+        function showResult(elementId, message, isError = false, isLoading = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${isError ? 'error' : isLoading ? 'loading' : 'success'}`;
+        }
+
+        // Authentication Test
+        async function testAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showResult('auth-result', '❌ Please enter email and password', true);
+                return;
+            }
+
+            try {
+                showResult('auth-result', '🔄 Authenticating...', false, true);
+
+                const response = await fetch(`${API_BASE}/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                console.log('Auth response:', data);
+
+                if (response.ok && data.success) {
+                    authToken = data.session?.access_token || data.access_token;
+                    if (authToken) {
+                        showResult('auth-result', 
+                            `✅ Authentication successful!\n` +
+                            `User: ${data.user?.email || email}\n` +
+                            `Role: ${data.user?.role || 'researcher'}\n` +
+                            `Token: ${authToken.substring(0, 20)}...`
+                        );
+                    } else {
+                        showResult('auth-result', '❌ No token received in response', true);
+                    }
+                } else {
+                    showResult('auth-result', `❌ Authentication failed: ${data.message || 'Unknown error'}`, true);
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                showResult('auth-result', `❌ Authentication error: ${error.message}`, true);
+            }
+        }
+
+        // Test Get Studies API
+        async function testGetStudies() {
+            if (!authToken) {
+                showResult('api-results', '❌ Please login first to get auth token', true);
+                return;
+            }
+
+            try {
+                showResult('api-results', '🔄 Testing Get Studies API...', false, true);
+
+                const response = await fetch(`${API_BASE}/research-consolidated?action=get-studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Get Studies Response Status:', response.status);
+                console.log('Get Studies Response Headers:', Object.fromEntries(response.headers.entries()));
+
+                const data = await response.json();
+                console.log('Get Studies Response Data:', data);
+
+                if (response.ok && data.success) {
+                    const studies = data.studies || [];
+                    let resultText = `✅ Get Studies API working!\n\n`;
+                    resultText += `📊 Found ${studies.length} studies:\n`;
+                    
+                    if (studies.length > 0) {
+                        studies.forEach((study, i) => {
+                            resultText += `\n${i+1}. ${study.title || 'Untitled'}\n`;
+                            resultText += `   - ID: ${study.id || study._id || 'No ID'}\n`;
+                            resultText += `   - Status: ${study.status || 'No status'}\n`;
+                            resultText += `   - Type: ${study.type || 'No type'}\n`;
+                            resultText += `   - Creator: ${study.creator_id || 'No creator'}\n`;
+                        });
+                        
+                        resultText += `\n\n✅ DIAGNOSIS: API is working correctly!`;
+                        resultText += `\n🔍 ISSUE: Frontend is not displaying the data properly.`;
+                    } else {
+                        resultText += `\n⚠️ No studies found in database.`;
+                        resultText += `\n🔍 Check if studies were actually created.`;
+                    }
+                    
+                    showResult('api-results', resultText);
+                } else {
+                    showResult('api-results', 
+                        `❌ Get Studies API failed:\n` +
+                        `Status: ${response.status}\n` +
+                        `Error: ${data.message || data.error || 'Unknown error'}\n` +
+                        `Response: ${JSON.stringify(data, null, 2)}`, 
+                        true
+                    );
+                }
+            } catch (error) {
+                console.error('Get Studies API error:', error);
+                showResult('api-results', `❌ Get Studies API error: ${error.message}`, true);
+            }
+        }
+
+        // Test Create Study API
+        async function testCreateStudy() {
+            if (!authToken) {
+                showResult('api-results', '❌ Please login first to get auth token', true);
+                return;
+            }
+
+            try {
+                showResult('api-results', '🔄 Testing Create Study API...', false, true);
+
+                const testStudyData = {
+                    title: `API Test Study ${Date.now()}`,
+                    description: 'Test study created by API debug tool',
+                    participantLimit: 5,
+                    compensation: 30,
+                    blocks: [
+                        {
+                            id: 'welcome-' + Date.now(),
+                            type: 'welcome_screen',
+                            order: 0,
+                            title: 'Welcome',
+                            description: 'Welcome to our test study',
+                            settings: {
+                                title: 'Welcome!',
+                                message: 'Thank you for participating in our test study.',
+                                showContinueButton: true
+                            }
+                        },
+                        {
+                            id: 'thanks-' + Date.now(),
+                            type: 'thank_you',
+                            order: 1,
+                            title: 'Thank You',
+                            description: 'Thank you for completing the study',
+                            settings: {
+                                title: 'Thank You!',
+                                message: 'You have completed the study.'
+                            }
+                        }
+                    ]
+                };
+
+                const response = await fetch(`${API_BASE}/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testStudyData)
+                });
+
+                const data = await response.json();
+                console.log('Create Study Response:', data);
+
+                if (response.ok && data.success) {
+                    showResult('api-results', 
+                        `✅ Create Study API working!\n\n` +
+                        `📝 Created study: ${data.study?.title || 'New Study'}\n` +
+                        `🆔 Study ID: ${data.study?.id || 'No ID'}\n` +
+                        `📊 Status: ${data.study?.status || 'No status'}\n\n` +
+                        `✅ DIAGNOSIS: Study creation is working correctly!`
+                    );
+                } else {
+                    showResult('api-results', 
+                        `❌ Create Study API failed:\n` +
+                        `Status: ${response.status}\n` +
+                        `Error: ${data.message || data.error || 'Unknown error'}`, 
+                        true
+                    );
+                }
+            } catch (error) {
+                console.error('Create Study API error:', error);
+                showResult('api-results', `❌ Create Study API error: ${error.message}`, true);
+            }
+        }
+
+        // Test Health Check
+        async function testHealthCheck() {
+            try {
+                showResult('api-results', '🔄 Testing Health Check...', false, true);
+
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+
+                if (response.ok && data.status === 'ok') {
+                    showResult('api-results', 
+                        `✅ Health Check passed!\n\n` +
+                        `📊 Server Status: ${data.status}\n` +
+                        `🕐 Timestamp: ${data.timestamp}\n` +
+                        `💾 Database: ${data.database || 'Unknown'}\n` +
+                        `📡 API: Running correctly`
+                    );
+                } else {
+                    showResult('api-results', `❌ Health Check failed: ${JSON.stringify(data)}`, true);
+                }
+            } catch (error) {
+                showResult('api-results', `❌ Health Check error: ${error.message}`, true);
+            }
+        }
+
+        // Test Frontend State
+        async function testFrontendState() {
+            showResult('frontend-result', '🔄 Testing frontend access...', false, true);
+            
+            try {
+                // Try to access the main app
+                const response = await fetch('http://localhost:5175/app/studies');
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    
+                    if (text.includes('Studies') && text.includes('research')) {
+                        showResult('frontend-result', 
+                            `✅ Frontend is accessible!\n\n` +
+                            `📱 App loads correctly\n` +
+                            `🔍 Studies page exists\n` +
+                            `⚠️ ISSUE: Data fetching or state management problem\n\n` +
+                            `🔧 NEXT STEPS:\n` +
+                            `- Check React state management\n` +
+                            `- Verify API calls in browser network tab\n` +
+                            `- Check for JavaScript errors`
+                        );
+                    } else {
+                        showResult('frontend-result', '⚠️ Frontend loads but content missing', true);
+                    }
+                } else {
+                    showResult('frontend-result', '❌ Frontend not accessible', true);
+                }
+            } catch (error) {
+                showResult('frontend-result', `❌ Frontend test error: ${error.message}`, true);
+            }
+        }
+
+        // Monitor Network Calls
+        async function testNetworkCalls() {
+            if (networkMonitoring) {
+                showResult('network-result', '🔄 Network monitoring already active. Check browser console for details.');
+                return;
+            }
+
+            networkMonitoring = true;
+            showResult('network-result', '📶 Network monitoring started. Check console for API calls.', false, true);
+
+            // Override fetch to monitor calls
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                const url = args[0];
+                const options = args[1] || {};
+                
+                console.log('🌐 NETWORK CALL:', {
+                    url: url,
+                    method: options.method || 'GET',
+                    headers: options.headers,
+                    timestamp: new Date().toISOString()
+                });
+
+                return originalFetch.apply(this, args)
+                    .then(response => {
+                        console.log('📡 NETWORK RESPONSE:', {
+                            url: url,
+                            status: response.status,
+                            statusText: response.statusText,
+                            headers: Object.fromEntries(response.headers.entries()),
+                            timestamp: new Date().toISOString()
+                        });
+                        return response;
+                    })
+                    .catch(error => {
+                        console.error('❌ NETWORK ERROR:', {
+                            url: url,
+                            error: error.message,
+                            timestamp: new Date().toISOString()
+                        });
+                        throw error;
+                    });
+            };
+
+            showResult('network-result', 
+                `✅ Network monitoring active!\n\n` +
+                `📊 All API calls will be logged to console\n` +
+                `🔍 Open browser dev tools to see details\n` +
+                `🌐 Now navigate to http://localhost:5175/app/studies\n` +
+                `📱 Watch console for network activity`
+            );
+        }
+
+        // Auto-run health check on page load
+        window.onload = function() {
+            console.log('🔍 Studies API Debug Tool Loaded');
+            testHealthCheck();
+        };
+    </script>
+</body>
+</html>

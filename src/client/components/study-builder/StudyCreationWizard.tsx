@@ -194,10 +194,26 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
       case 'blocks':
         // Only validate blocks for usability studies
         if (formData.type === 'usability') {
-          if (!formData.blocks || formData.blocks.length === 0) {
-            errors.blocks = 'At least one block is required to create a usability study';
-          } else if (formData.blocks.length > 50) {
+          console.log('🔍 Validating blocks step');
+          console.log('📊 Total blocks:', (formData.blocks || []).length);
+          console.log('📋 All blocks:', formData.blocks);
+          
+          // Check for blocks that are not welcome or thank you screens
+          const contentBlocks = (formData.blocks || []).filter(
+            block => block.type !== 'welcome_screen' && block.type !== 'thank_you_screen'
+          );
+          
+          console.log('📝 Content blocks:', contentBlocks.length);
+          console.log('📝 Content blocks list:', contentBlocks);
+          
+          if (contentBlocks.length === 0) {
+            console.log('❌ Validation failed: No content blocks');
+            errors.blocks = 'At least one content block is required to create a usability study';
+          } else if ((formData.blocks || []).length > 50) {
+            console.log('❌ Validation failed: Too many blocks');
             errors.blocks = 'Maximum 50 blocks allowed per study';
+          } else {
+            console.log('✅ Blocks validation passed');
           }
         }
         break;

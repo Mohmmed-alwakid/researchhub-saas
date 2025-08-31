@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Admin API Test Suite</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+        .loading { background-color: #fff3cd; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { margin: 5px; padding: 8px 15px; cursor: pointer; }
+        .summary { font-weight: bold; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Complete Admin API Test Suite</h1>
+    <div id="summary" class="summary">Initializing tests...</div>
+    
+    <button onclick="runAllTests()">Run All Tests</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        const API_BASE = 'http://localhost:3003/api/admin-consolidated';
+        const AUTH_HEADER = 'Bearer fallback-token-admin';
+        
+        let testResults = {
+            passed: 0,
+            failed: 0,
+            total: 0
+        };
+        
+        async function testEndpoint(name, action, method = 'GET', body = null) {
+            const resultsDiv = document.getElementById('results');
+            const testId = `test-${action}`;
+            
+            // Create test section
+            const testSection = document.createElement('div');
+            testSection.className = 'test-section loading';
+            testSection.id = testId;
+            testSection.innerHTML = `
+                <h3>🧪 Testing: ${name}</h3>
+                <p>Action: ${action} | Method: ${method}</p>
+                <p>Status: <span class="status">Testing...</span></p>
+                <div class="response"></div>
+            `;
+            resultsDiv.appendChild(testSection);
+            
+            try {
+                testResults.total++;
+                
+                const url = `${API_BASE}?action=${action}`;
+                const options = {
+                    method: method,
+                    headers: {
+                        'Authorization': AUTH_HEADER,
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (body && method !== 'GET') {
+                    options.body = JSON.stringify(body);
+                }
+                
+                console.log(`Testing ${name} (${action})...`);
+                const start = Date.now();
+                const response = await fetch(url, options);
+                const data = await response.json();
+                const duration = Date.now() - start;
+                
+                const statusSpan = testSection.querySelector('.status');
+                const responseDiv = testSection.querySelector('.response');
+                
+                if (response.ok && data.success !== false) {
+                    testSection.className = 'test-section success';
+                    statusSpan.textContent = `✅ PASSED (${duration}ms)`;
+                    testResults.passed++;
+                } else {
+                    testSection.className = 'test-section error';
+                    statusSpan.textContent = `❌ FAILED (${duration}ms)`;
+                    testResults.failed++;
+                }
+                
+                responseDiv.innerHTML = `
+                    <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                    <p><strong>Duration:</strong> ${duration}ms</p>
+                    <p><strong>Response:</strong></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                updateSummary();
+                
+            } catch (error) {
+                testResults.failed++;
+                testResults.total++;
+                
+                testSection.className = 'test-section error';
+                testSection.querySelector('.status').textContent = '❌ FAILED (Network Error)';
+                testSection.querySelector('.response').innerHTML = `
+                    <p style="color: red;"><strong>Error:</strong> ${error.message}</p>
+                `;
+                
+                updateSummary();
+                console.error(`Test ${name} failed:`, error);
+            }
+        }
+        
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            const passRate = testResults.total > 0 ? ((testResults.passed / testResults.total) * 100).toFixed(1) : 0;
+            summaryDiv.innerHTML = `
+                📊 Test Results: ${testResults.passed}/${testResults.total} passed (${passRate}%) | 
+                ✅ ${testResults.passed} passed | 
+                ❌ ${testResults.failed} failed
+            `;
+        }
+        
+        async function runAllTests() {
+            clearResults();
+            console.log('🚀 Starting comprehensive admin API tests...');
+            
+            // Test all admin endpoints
+            await testEndpoint('Admin Overview', 'admin-overview');
+            await testEndpoint('User Management', 'users');
+            await testEndpoint('Get Subscriptions', 'subscriptions');
+            await testEndpoint('Get Points', 'get-points');
+            
+            // Test POST endpoints
+            await testEndpoint('Create Subscription', 'create-subscription', 'POST', {
+                userId: 'test-user-123',
+                planId: 'pro-plan',
+                amount: 29.99
+            });
+            
+            await testEndpoint('Award Points', 'award-points', 'POST', {
+                participantId: 'test-participant-456',
+                points: 150,
+                reason: 'Completed comprehensive admin test'
+            });
+            
+            console.log('✅ All admin API tests completed!');
+            
+            // Final summary
+            setTimeout(() => {
+                const finalPassRate = (testResults.passed / testResults.total) * 100;
+                if (finalPassRate >= 85) {
+                    alert(`🎉 Admin API Testing Complete!\n\nResults: ${testResults.passed}/${testResults.total} tests passed (${finalPassRate.toFixed(1)}%)\n\nAdmin functionality is working excellently!`);
+                } else {
+                    alert(`⚠️ Admin API Testing Complete\n\nResults: ${testResults.passed}/${testResults.total} tests passed (${finalPassRate.toFixed(1)}%)\n\nSome issues detected. Please review failed tests.`);
+                }
+            }, 1000);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            testResults = { passed: 0, failed: 0, total: 0 };
+            updateSummary();
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

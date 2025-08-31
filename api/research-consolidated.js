@@ -61,7 +61,8 @@ async function loadStudies() {
 
         if (studies && studies.length > 0) {
           console.log(`📚 [SUCCESS] Loaded ${studies.length} studies from Supabase database`);
-          console.log(`📚 [DEBUG] First study:`, studies[0]);
+          console.log(`📚 [DEBUG] First study structure:`, JSON.stringify(studies[0], null, 2));
+          console.log(`📚 [DEBUG] First study creator fields: created_by="${studies[0].created_by}", creator_id="${studies[0].creator_id}"`);
           return studies;
         } else {
           console.log(`📚 [DEBUG] No studies found in Supabase database, checking file storage...`);

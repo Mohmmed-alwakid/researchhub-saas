@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Points Award System</title>
+</head>
+<body>
+    <h1>Points Award System Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testAwardPoints() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                console.log('Testing award points endpoint...');
+                
+                const response = await fetch('http://localhost:3003/api/admin-consolidated?action=award-points', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer fallback-token-admin'
+                    },
+                    body: JSON.stringify({
+                        participantId: 'test-user-123',
+                        points: 100,
+                        reason: 'Test award from admin panel'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <h3>Award Points Test Result:</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Success:</strong> ${data.success}</p>
+                    <p><strong>Response:</strong></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                console.log('Award points result:', data);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <h3>Error Testing Award Points:</h3>
+                    <p style="color: red;">${error.message}</p>
+                `;
+                console.error('Error:', error);
+            }
+        }
+        
+        // Auto-run test when page loads
+        window.addEventListener('load', testAwardPoints);
+    </script>
+</body>
+</html>
