@@ -524,12 +524,19 @@ async function getStudies(req, res) {
     
     // Filter studies based on user role
     if (userRole === 'researcher') {
+      // DEBUGGING: Log all studies and their creator fields
+      console.log(`🔍 DEBUGGING: All ${localStudies.length} studies in backend:`);
+      localStudies.forEach((study, index) => {
+        console.log(`  ${index + 1}. "${study.title}" - created_by:"${study.created_by}", creator_id:"${study.creator_id}", researcher_id:"${study.researcher_id}"`);
+      });
+      console.log(`🔍 DEBUGGING: Looking for studies where creator matches userId: "${userId}"`);
+      
       // Researchers see only their own studies
-      filteredStudies = localStudies.filter(study => 
-        study.created_by === userId || 
-        study.creator_id === userId || 
-        study.researcher_id === userId
-      );
+      filteredStudies = localStudies.filter(study => {
+        const matches = study.created_by === userId || study.creator_id === userId || study.researcher_id === userId;
+        console.log(`  - "${study.title}": created_by="${study.created_by}" === "${userId}" ? ${study.created_by === userId} | creator_id="${study.creator_id}" === "${userId}" ? ${study.creator_id === userId} | researcher_id="${study.researcher_id}" === "${userId}" ? ${study.researcher_id === userId} => MATCH: ${matches}`);
+        return matches;
+      });
       console.log(`🔬 Researcher view: ${filteredStudies.length} studies (filtered by creator: ${userId})`);
       
       // If researcher has no studies, provide demo studies for testing
