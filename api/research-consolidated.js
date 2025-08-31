@@ -690,6 +690,7 @@ async function createStudy(req, res) {
       updated_at: new Date().toISOString(),
       created_by: userId,
       creator_id: userId, // Also add this for compatibility
+      researcher_id: userId, // CRITICAL: Set database field for proper filtering
       profiles: { email: userEmail, full_name: 'Researcher' }
     };
 
@@ -1414,10 +1415,27 @@ async function getStudyResults(req, res) {
     }
     
     // Check if user can view results (study owner or admin)
-    if (userRole !== 'admin' && study.created_by !== userId && study.creator_id !== userId && study.researcher_id !== userId) {
+    console.log(`🔍 [RESULTS] Authorization check - User: ${userId}, Role: ${userRole}`);
+    console.log(`🔍 [RESULTS] Study ownership - created_by: "${study.created_by}", creator_id: "${study.creator_id}", researcher_id: "${study.researcher_id}"`);
+    
+    const isOwner = study.created_by === userId || study.creator_id === userId || study.researcher_id === userId;
+    const canAccess = userRole === 'admin' || isOwner;
+    
+    console.log(`🔍 [RESULTS] Access check - isOwner: ${isOwner}, canAccess: ${canAccess}`);
+    
+    if (!canAccess) {
       return res.status(403).json({
         success: false,
-        error: 'Access denied: You can only view results for your own studies'
+        error: 'Access denied: You can only view results for your own studies',
+        debug: {
+          userId,
+          userRole,
+          study_created_by: study.created_by,
+          study_creator_id: study.creator_id,
+          study_researcher_id: study.researcher_id,
+          isOwner,
+          canAccess
+        }
       });
     }
     
