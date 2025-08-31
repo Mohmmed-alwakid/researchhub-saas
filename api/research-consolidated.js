@@ -61,9 +61,17 @@ async function loadStudies() {
 
         if (studies && studies.length > 0) {
           console.log(`📚 [SUCCESS] Loaded ${studies.length} studies from Supabase database`);
-          console.log(`📚 [DEBUG] First study structure:`, JSON.stringify(studies[0], null, 2));
-          console.log(`📚 [DEBUG] First study creator fields: created_by="${studies[0].created_by}", creator_id="${studies[0].creator_id}"`);
-          return studies;
+          
+          // Normalize field names from database to internal format
+          const normalizedStudies = studies.map(study => ({
+            ...study,
+            created_by: study.researcher_id,  // Map database field to internal field
+            creator_id: study.researcher_id   // Also set creator_id for compatibility
+          }));
+          
+          console.log(`📚 [DEBUG] First study structure after normalization:`, JSON.stringify(normalizedStudies[0], null, 2));
+          console.log(`📚 [DEBUG] First study creator fields: created_by="${normalizedStudies[0].created_by}", creator_id="${normalizedStudies[0].creator_id}", researcher_id="${normalizedStudies[0].researcher_id}"`);
+          return normalizedStudies;
         } else {
           console.log(`📚 [DEBUG] No studies found in Supabase database, checking file storage...`);
         }
@@ -201,8 +209,7 @@ async function saveStudies(studies) {
             target_participants: study.target_participants || 10,
             created_at: study.created_at,
             updated_at: study.updated_at || new Date().toISOString(),
-            created_by: study.created_by, // CRITICAL: Include created_by field
-            creator_id: study.creator_id || study.created_by, // Keep for compatibility
+            researcher_id: study.created_by || study.creator_id || study.researcher_id, // FIXED: Use correct database field
             screening_questions: study.screening_questions || []
           };
           
