@@ -623,8 +623,8 @@ async function createStudy(req, res) {
     }
 
     // Get user info from token (same logic as getStudies function)
-    let userId = 'test-user'; // Fallback only
-    let userEmail = 'researcher@test.com'; // Fallback only
+    let userId = null; // No fallback - require valid authentication
+    let userEmail = null; // No fallback - require valid authentication
     
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -665,6 +665,20 @@ async function createStudy(req, res) {
       } catch (error) {
         console.log('⚠️ Could not parse token, using default user');
       }
+    }
+
+    // Validate user ID is present
+    if (!userId) {
+      console.log('❌ No valid user ID found in token - cannot create study');
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication required - no valid user ID found',
+        debug: { 
+          hasToken: !!authToken, 
+          tokenLength: authToken?.length,
+          tokenType: authToken?.startsWith('fallback-token') ? 'fallback' : 'jwt'
+        }
+      });
     }
 
     // Generate new ID
