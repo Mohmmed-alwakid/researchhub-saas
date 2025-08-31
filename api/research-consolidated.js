@@ -38,26 +38,59 @@ const STUDIES_FILE_PATH = process.env.VERCEL
 
 // Function to load studies from Supabase or file fallback
 async function loadStudies() {
+  console.log(`📚 [DEBUG] loadStudies called`);
+  console.log(`📚 [DEBUG] Supabase client exists: ${!!supabase}`);
+  
   try {
     // Try to load from Supabase first (if available)
     if (supabase) {
       try {
+        console.log(`📚 [DEBUG] Attempting to load from Supabase...`);
         const { data: studies, error } = await supabase
           .from('studies')
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!error && studies && studies.length > 0) {
-          console.log(`📚 Loaded ${studies.length} studies from Supabase database`);
+        console.log(`📚 [DEBUG] Supabase query result - Error: ${!!error}, Data length: ${studies?.length || 0}`);
+        
+        if (error) {
+          console.error(`📚 [ERROR] Supabase query failed:`, error);
+          console.error(`📚 [ERROR] Error details:`, error.message, error.code, error.hint);
+          throw error;
+        }
+
+        if (studies && studies.length > 0) {
+          console.log(`📚 [SUCCESS] Loaded ${studies.length} studies from Supabase database`);
+          console.log(`📚 [DEBUG] First study:`, studies[0]);
           return studies;
         } else {
-          console.log(`📚 No studies found in Supabase, using demo data`);
-          // Fall through to demo data
+          console.log(`📚 [DEBUG] No studies found in Supabase database, checking file storage...`);
         }
       } catch (dbError) {
-        console.log('📚 Supabase query failed, trying demo data:', dbError.message);
+        console.error('📚 [ERROR] Supabase query failed, trying file storage:', dbError);
       }
+    } else {
+      console.log('📚 [DEBUG] No Supabase client, checking file storage...');
     }
+
+    // Try to load from file storage
+    console.log(`📚 [DEBUG] Attempting to load from file: ${STUDIES_FILE_PATH}`);
+    if (!process.env.VERCEL && fs.existsSync(STUDIES_FILE_PATH)) {
+      try {
+        const fileData = fs.readFileSync(STUDIES_FILE_PATH, 'utf8');
+        const studies = JSON.parse(fileData);
+        console.log(`📚 [SUCCESS] Loaded ${studies.length} studies from file storage`);
+        console.log(`📚 [DEBUG] First study from file:`, studies[0]);
+        return studies;
+      } catch (fileError) {
+        console.error('📚 [ERROR] File storage load failed:', fileError);
+      }
+    } else {
+      console.log(`📚 [DEBUG] File storage not available or file doesn't exist`);
+    }
+
+    // Fallback to demo data
+    console.log('📚 [DEBUG] All storage methods failed, creating demo data...');
 
     // Fallback to demo data
     try {
@@ -136,14 +169,25 @@ async function loadStudies() {
 
 // Function to save studies to Supabase and file fallback
 async function saveStudies(studies) {
+  console.log(`💾 [DEBUG] saveStudies called with ${studies.length} studies`);
+  console.log(`💾 [DEBUG] Supabase client exists: ${!!supabase}`);
+  
   try {
     // Try to save to Supabase first (if available)
     if (supabase) {
       try {
+        console.log(`💾 [DEBUG] Attempting Supabase save...`);
         // Only save non-demo studies to avoid conflicts
         const realStudies = studies.filter(study => !study.id.startsWith('demo-'));
+        console.log(`💾 [DEBUG] Filtered to ${realStudies.length} real studies (non-demo)`);
+        
+        if (realStudies.length === 0) {
+          console.log(`💾 [DEBUG] No real studies to save, skipping Supabase`);
+          return;
+        }
         
         for (const study of realStudies) {
+          console.log(`💾 [DEBUG] Preparing study ${study.id} for Supabase upsert`);
           // Prepare study data for Supabase (remove any UI-only fields)
           const studyData = {
             id: study.id,
@@ -160,33 +204,46 @@ async function saveStudies(studies) {
             screening_questions: study.screening_questions || []
           };
           
-          const { error } = await supabase
+          console.log(`💾 [DEBUG] Upserting study data:`, JSON.stringify(studyData, null, 2));
+          
+          const { data, error } = await supabase
             .from('studies')
-            .upsert(studyData, { onConflict: 'id' });
+            .upsert(studyData, { onConflict: 'id' })
+            .select();
           
           if (error) {
-            console.log(`💾 Supabase upsert error for study ${study.id}:`, error.message);
+            console.error(`💾 [ERROR] Supabase upsert failed for study ${study.id}:`, error);
+            console.error(`💾 [ERROR] Error details:`, error.message, error.code, error.hint);
             throw error;
           }
+          
+          console.log(`💾 [SUCCESS] Study ${study.id} saved to Supabase:`, data);
         }
-        console.log(`💾 Saved ${realStudies.length} real studies to Supabase database`);
+        console.log(`💾 [SUCCESS] Saved ${realStudies.length} real studies to Supabase database`);
         return; // Success, no need for file fallback
       } catch (dbError) {
-        console.log('💾 Supabase save failed, using file fallback:', dbError.message);
+        console.error('💾 [ERROR] Supabase save failed, using file fallback:', dbError);
+        console.error('💾 [ERROR] Full error object:', JSON.stringify(dbError, null, 2));
       }
+    } else {
+      console.log('💾 [DEBUG] No Supabase client, skipping to file fallback');
     }
       
     // Fallback to file storage
     if (!process.env.VERCEL) {
+      console.log(`💾 [DEBUG] Attempting file storage fallback`);
       const dbDir = path.dirname(STUDIES_FILE_PATH);
       if (!fs.existsSync(dbDir)) {
         fs.mkdirSync(dbDir, { recursive: true });
+        console.log(`💾 [DEBUG] Created directory: ${dbDir}`);
       }
       fs.writeFileSync(STUDIES_FILE_PATH, JSON.stringify(studies, null, 2));
-      console.log(`💾 Saved ${studies.length} studies to file storage`);
+      console.log(`💾 [SUCCESS] Saved ${studies.length} studies to file storage: ${STUDIES_FILE_PATH}`);
+    } else {
+      console.log(`💾 [DEBUG] Running on Vercel, no file storage available`);
     }
   } catch (error) {
-    console.error('Error saving studies:', error);
+    console.error('💾 [FATAL] Error saving studies:', error);
   }
 }
 
@@ -210,6 +267,53 @@ async function ensureStudiesLoaded() {
     console.log('📚 First study preview:', localStudies[0] ? `${localStudies[0].id}: ${localStudies[0].title}` : 'No studies');
   } else {
     console.log(`📚 Studies already loaded: ${localStudies.length} available`);
+  }
+}
+
+/**
+ * Debug backend state
+ */
+async function debugBackendState(req, res) {
+  console.log('🔧 [DEBUG] debugBackendState called');
+  
+  try {
+    await ensureStudiesLoaded();
+    
+    const debugInfo = {
+      timestamp: new Date().toISOString(),
+      localStudies: {
+        count: localStudies.length,
+        studies: localStudies.map(s => ({
+          id: s.id,
+          title: s.title,
+          status: s.status,
+          created_at: s.created_at,
+          isDemoStudy: s.id.startsWith('demo-')
+        }))
+      },
+      supabaseConfigured: !!supabase,
+      studiesInitialized: studiesInitialized,
+      environment: {
+        nodeEnv: process.env.NODE_ENV,
+        vercel: !!process.env.VERCEL,
+        supabaseUrl: !!process.env.SUPABASE_URL,
+        supabaseKey: !!process.env.SUPABASE_ANON_KEY
+      }
+    };
+    
+    console.log('🔧 [DEBUG] Backend state:', JSON.stringify(debugInfo, null, 2));
+    
+    return res.status(200).json({
+      success: true,
+      debug: debugInfo
+    });
+    
+  } catch (error) {
+    console.error('🔧 [ERROR] Debug state error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 }
 
@@ -282,6 +386,9 @@ export default async function handler(req, res) {
       
       case 'ai-generate-report':
         return await handleAIGenerateReport(req, res);
+      
+      case 'debug-state':
+        return await debugBackendState(req, res);
       
       default:
         return res.status(400).json({
@@ -576,14 +683,15 @@ async function createStudy(req, res) {
       });
     }
 
-    // Get user info from token
-    let userId = 'test-user';
-    let userEmail = 'researcher@test.com';
+    // Get user info from token (same logic as getStudies function)
+    let userId = 'test-user'; // Fallback only
+    let userEmail = 'researcher@test.com'; // Fallback only
     
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.replace('Bearer ', '');
+        
         if (token.startsWith('fallback-token-')) {
           // Parse fallback token: fallback-token-{userId}-{role}
           const parts = token.split('-');
@@ -594,7 +702,26 @@ async function createStudy(req, res) {
               userEmail = decodeURIComponent(parts[4]);
             }
           }
+        } else {
+          // Handle JWT tokens - decode to get user info (CRITICAL FIX)
+          console.log('🔑 JWT token detected in createStudy, parsing with Supabase');
+          
+          try {
+            // Try to decode JWT token with Supabase
+            const { data: { user }, error } = await supabase.auth.getUser(token);
+            
+            if (user && !error) {
+              userId = user.id; // Use actual Supabase user ID
+              userEmail = user.email || userEmail;
+              console.log(`✅ JWT parsed in createStudy: id=${userId}, email=${userEmail}`);
+            } else {
+              console.log(`⚠️ JWT parsing failed in createStudy: ${error?.message}, using fallback`);
+            }
+          } catch (jwtError) {
+            console.log(`⚠️ JWT parsing error in createStudy: ${jwtError.message}, using fallback`);
+          }
         }
+        
         console.log(`👤 Creating study for user: ${userId} (${userEmail})`);
       } catch (error) {
         console.log('⚠️ Could not parse token, using default user');
