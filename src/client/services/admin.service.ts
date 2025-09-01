@@ -200,7 +200,7 @@ export const createUser = async (data: {
     }
   }
   
-  const response = await fetch('/api/admin/user-actions', {
+  const response = await fetch('/api/admin?action=user-actions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

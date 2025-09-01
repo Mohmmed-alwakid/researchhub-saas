@@ -17,6 +17,15 @@ import {
 } from 'lucide-react';
 import { getAllUsers, updateUser, createUser, deleteUser } from '../../services/admin.service';
 
+// API Response interface to handle backend responses
+interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+  user?: User;
+}
+
 interface User {
   id: string;
   _id?: string; // Support both ID formats
@@ -156,14 +165,14 @@ const UserManagement: React.FC = () => {
     
     try {
       console.log('🔄 Fetching users...');
-      const response = await getAllUsers({});
+      const response = await getAllUsers({}) as unknown as ApiResponse<User[]>;
       console.log('📦 API Response:', response);
       
       if (response.success && response.data) {
         const rawUsers = Array.isArray(response.data) ? response.data : 
-                        (response.data.users || response.data.data || []);
+                        ((response.data as Record<string, unknown>)?.users || (response.data as Record<string, unknown>)?.data || []);
         
-        const transformedUsers = rawUsers.map(transformUser);
+        const transformedUsers = (rawUsers as User[]).map(transformUser);
         console.log('✅ Transformed users:', transformedUsers);
         
         setUsers(transformedUsers);
@@ -254,7 +263,7 @@ const UserManagement: React.FC = () => {
     } else if (action === 'delete') {
       if (window.confirm('Are you sure you want to delete this user?')) {
         try {
-          const response = await deleteUser(user.id || user._id || '');
+          const response = await deleteUser(user.id || user._id || '') as unknown as ApiResponse;
           if (response.success) {
             await fetchUsers();
           } else {
@@ -269,7 +278,7 @@ const UserManagement: React.FC = () => {
         const newStatus = !user.isActive;
         const response = await updateUser(user.id || user._id || '', {
           isActive: newStatus
-        });
+        }) as unknown as ApiResponse;
         
         if (response.success) {
           await fetchUsers();
@@ -284,7 +293,7 @@ const UserManagement: React.FC = () => {
 
   const handleSaveUser = async (userData: UserModalData) => {
     try {
-      let response;
+      let response: ApiResponse;
       
       if (userData.id) {
         // Update existing user
@@ -295,7 +304,7 @@ const UserManagement: React.FC = () => {
           isActive: userData.isActive
         };
         
-        response = await updateUser(userData.id, updateData);
+        response = await updateUser(userData.id, updateData) as unknown as ApiResponse;
       } else {
         // Create new user - need to add password
         const password = 'TempPassword123!'; // Generate or prompt for password
@@ -306,7 +315,7 @@ const UserManagement: React.FC = () => {
           role: userData.role
         };
         
-        response = await createUser(createData);
+        response = await createUser(createData) as unknown as ApiResponse;
       }
       
       if (response.success) {

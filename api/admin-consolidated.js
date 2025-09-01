@@ -261,11 +261,14 @@ async function handleUserManagement(req, res) {
       case 'delete':
         return await handleDeleteUser(req, res, user_id);
       
+      case 'create':
+        return await handleCreateUser(req, res);
+      
       default:
         return res.status(400).json({
           success: false,
           error: `Invalid sub-action: ${subAction}`,
-          availableActions: ['list', 'activate', 'deactivate', 'delete'],
+          availableActions: ['list', 'activate', 'deactivate', 'delete', 'create'],
           note: 'If no sub-action is provided, defaults to "list"'
         });
     }
@@ -288,9 +291,10 @@ async function handleListUsers(req, res) {
     const { search, role, status, limit = 50, offset = 0 } = req.query;
 
     // Check if running in local development mode or no Supabase
-    const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
-                              req.headers.host?.includes('localhost') ||
-                              req.headers.host?.includes('127.0.0.1');
+    // TEMPORARILY DISABLED: Force real Supabase data even in development
+    const isLocalDevelopment = false; // process.env.NODE_ENV === 'development' || 
+                              // req.headers.host?.includes('localhost') ||
+                              // req.headers.host?.includes('127.0.0.1');
     
     const hasSupabaseAdmin = supabaseAdmin !== null;
     
@@ -515,6 +519,153 @@ async function handleDeleteUser(req, res, userId) {
 
   } catch (error) {
     console.error('Delete user exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Create user (admin only)
+ */
+async function handleCreateUser(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({
+      success: false,
+      error: 'Method not allowed'
+    });
+  }
+
+  try {
+    const { name, email, password, role = 'participant' } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name, email, password, and role are required'
+      });
+    }
+
+    if (!supabaseAdmin) {
+      console.log('⚠️ Supabase admin client not available, using mock response');
+      return res.status(201).json({
+        success: true,
+        user: {
+          id: `user_${Date.now()}`,
+          email,
+          first_name: name.split(' ')[0],
+          last_name: name.split(' ').slice(1).join(' ') || '',
+          role,
+          created_at: new Date().toISOString()
+        },
+        message: 'User created successfully (mock mode)'
+      });
+    }
+
+    // Create user in Supabase Auth with invitation email
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+      data: {
+        first_name: name.split(' ')[0],
+        last_name: name.split(' ').slice(1).join(' ') || '',
+        role: role
+      },
+      redirectTo: `${process.env.SITE_URL || 'http://localhost:5175'}/auth/callback`
+    });
+
+    if (authError) {
+      console.error('Create auth user error:', authError);
+      return res.status(400).json({
+        success: false,
+        error: authError.message || 'Failed to create user'
+      });
+    }
+
+    // Create profile record
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert([{
+        id: authData.user.id,
+        email: email,
+        first_name: name.split(' ')[0],
+        last_name: name.split(' ').slice(1).join(' ') || '',
+        role: role,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }]);
+
+    if (profileError) {
+      console.error('Create profile error:', profileError);
+      // Don't fail the request if profile creation fails
+    }
+
+    return res.status(201).json({
+      success: true,
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
+        first_name: name.split(' ')[0],
+        last_name: name.split(' ').slice(1).join(' ') || '',
+        role: role,
+        created_at: authData.user.created_at
+      },
+      message: 'User created successfully'
+    });
+
+  } catch (error) {
+    console.error('Create user exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Handle user actions (create, update) - endpoint for frontend compatibility
+ */
+async function handleUserActions(req, res) {
+  try {
+    const auth = await authenticateUser(req, ['admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    switch (req.method) {
+      case 'POST':
+        // Create user - delegate to handleCreateUser
+        return await handleCreateUser(req, res);
+      
+      case 'PUT':
+        // Update user - for future implementation
+        const { userId } = req.query;
+        if (!userId) {
+          return res.status(400).json({
+            success: false,
+            error: 'User ID is required for updates'
+          });
+        }
+        
+        // For now, return a placeholder response
+        return res.status(501).json({
+          success: false,
+          error: 'User updates not yet implemented',
+          message: 'This feature will be available in a future update'
+        });
+      
+      default:
+        return res.status(405).json({
+          success: false,
+          error: 'Method not allowed',
+          allowedMethods: ['POST', 'PUT']
+        });
+    }
+
+  } catch (error) {
+    console.error('User actions exception:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
@@ -865,6 +1016,9 @@ export default async function handler(req, res) {
       case 'user-management':
         return await handleUserManagement(req, res);
       
+      case 'user-actions':
+        return await handleUserActions(req, res);
+      
       // Subscriptions
       case 'subscriptions':
       case 'get-subscriptions':
@@ -886,7 +1040,7 @@ export default async function handler(req, res) {
           success: false,
           error: 'Invalid action',
           availableActions: [
-            'overview', 'admin-overview', 'users', 'user-management',
+            'overview', 'admin-overview', 'users', 'user-management', 'user-actions',
             'subscriptions', 'get-subscriptions', 'create-subscription',
             'points', 'get-points', 'award-points'
           ]

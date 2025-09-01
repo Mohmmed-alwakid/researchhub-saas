@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-08-31T11:09:33.831Z",
+  "tests": {
+    "create_study": {
+      "status": "PASS",
+      "details": {
+        "responseStatus": 201,
+        "hasSuccess": true,
+        "hasValidUserId": true
+      }
+    },
+    "load_studies": {
+      "status": "PASS",
+      "details": {
+        "responseStatus": 200,
+        "studiesFound": 2,
+        "hasFilteredResults": true
+      }
+    },
+    "view_results": {
+      "status": "PASS",
+      "details": {
+        "responseStatus": 200,
+        "hasSuccess": true,
+        "hasAnalytics": true
+      }
+    },
+    "uuid_parsing": {
+      "status": "PASS",
+      "details": {
+        "tokenContainsFullUuid": true,
+        "studyHasCorrectUserId": true,
+        "expectedUserId": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066",
+        "actualUserId": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066"
+      }
+    }
+  },
+  "overall": "PASS",
+  "issues": []
+}
