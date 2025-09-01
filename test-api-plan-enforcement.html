@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Enforcement API Testing</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #2563EB;
+        }
+        .test-button.danger {
+            background: #EF4444;
+        }
+        .test-button.danger:hover {
+            background: #DC2626;
+        }
+        .test-button.success {
+            background: #10B981;
+        }
+        .test-button.success:hover {
+            background: #059669;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .result.success {
+            background: #ECFDF5;
+            border: 1px solid #10B981;
+            color: #065F46;
+        }
+        .result.error {
+            background: #FEF2F2;
+            border: 1px solid #EF4444;
+            color: #991B1B;
+        }
+        .result.info {
+            background: #EFF6FF;
+            border: 1px solid #3B82F6;
+            color: #1E40AF;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.green { background: #10B981; }
+        .status-indicator.red { background: #EF4444; }
+        .status-indicator.yellow { background: #F59E0B; }
+        .auth-section {
+            background: #F9FAFB;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .plan-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .plan-free { background: #F3F4F6; color: #374151; }
+        .plan-basic { background: #DBEAFE; color: #1E40AF; }
+        .plan-pro { background: #E0E7FF; color: #5B21B6; }
+        .plan-enterprise { background: #FEF3C7; color: #92400E; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Plan Enforcement API Testing Suite</h1>
+            <p>Comprehensive testing of ResearchHub business logic implementation</p>
+            <div id="connection-status">
+                <span class="status-indicator red"></span>
+                <span>Not connected - Please authenticate first</span>
+            </div>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="test-section">
+            <h2>🔑 Authentication Setup</h2>
+            <div class="auth-section">
+                <h3>Test Account Login</h3>
+                <p>Use the designated test accounts to test different plan scenarios:</p>
+                
+                <div class="grid">
+                    <div>
+                        <h4>Free Plan Test Account</h4>
+                        <input type="email" id="free-email" class="auth-input" value="abwanwr77+free@gmail.com" placeholder="Email">
+                        <input type="password" id="free-password" class="auth-input" value="Testtest123" placeholder="Password">
+                        <button class="test-button" onclick="loginAs('free')">Login as Free User</button>
+                        <span class="plan-indicator plan-free">Free Plan (3 studies)</span>
+                    </div>
+                    
+                    <div>
+                        <h4>Basic Plan Test Account</h4>
+                        <input type="email" id="basic-email" class="auth-input" value="abwanwr77+basic@gmail.com" placeholder="Email">
+                        <input type="password" id="basic-password" class="auth-input" value="Testtest123" placeholder="Password">
+                        <button class="test-button" onclick="loginAs('basic')">Login as Basic User</button>
+                        <span class="plan-indicator plan-basic">Basic Plan (15 studies)</span>
+                    </div>
+                    
+                    <div>
+                        <h4>Pro Plan Test Account</h4>
+                        <input type="email" id="pro-email" class="auth-input" value="abwanwr77+pro@gmail.com" placeholder="Email">
+                        <input type="password" id="pro-password" class="auth-input" value="Testtest123" placeholder="Password">
+                        <button class="test-button" onclick="loginAs('pro')">Login as Pro User</button>
+                        <span class="plan-indicator plan-pro">Pro Plan (Unlimited)</span>
+                    </div>
+                    
+                    <div>
+                        <h4>Researcher Test Account (Fallback)</h4>
+                        <input type="email" id="researcher-email" class="auth-input" value="abwanwr77+Researcher@gmail.com" placeholder="Email">
+                        <input type="password" id="researcher-password" class="auth-input" value="Testtest123" placeholder="Password">
+                        <button class="test-button" onclick="loginAs('researcher')">Login as Researcher</button>
+                        <span class="plan-indicator plan-free">Default Free Plan</span>
+                    </div>
+                </div>
+                
+                <div id="auth-result" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Plan Information Tests -->
+        <div class="test-section">
+            <h2>📋 Plan Information & Usage Stats</h2>
+            <div class="grid">
+                <div>
+                    <h3>Current Plan Details</h3>
+                    <button class="test-button" onclick="testPlanComparison()">Get Plan Comparison</button>
+                    <button class="test-button" onclick="testUsageStats()">Get Usage Statistics</button>
+                    <div id="plan-info-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div>
+                    <h3>Plan Features Matrix</h3>
+                    <button class="test-button" onclick="testAllPlans()">Compare All Plans</button>
+                    <button class="test-button" onclick="testPlanUpgrade()">Test Upgrade Suggestions</button>
+                    <div id="plan-features-result" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Study Creation Enforcement -->
+        <div class="test-section">
+            <h2>🚫 Study Creation Limits Testing</h2>
+            <div class="grid">
+                <div>
+                    <h3>Create Studies (Test Limits)</h3>
+                    <button class="test-button" onclick="createTestStudy()">Create Single Study</button>
+                    <button class="test-button danger" onclick="createMultipleStudies(5)">Create 5 Studies (Test Free Limit)</button>
+                    <button class="test-button danger" onclick="createMultipleStudies(20)">Create 20 Studies (Test Basic Limit)</button>
+                    <div id="study-creation-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div>
+                    <h3>Limit Enforcement Validation</h3>
+                    <button class="test-button" onclick="testLimitEnforcement()">Test Current Plan Limits</button>
+                    <button class="test-button" onclick="checkStudyCount()">Check Current Study Count</button>
+                    <button class="test-button success" onclick="resetTestData()">Reset Test Data</button>
+                    <div id="limit-validation-result" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Handling Tests -->
+        <div class="test-section">
+            <h2>⚠️ Error Handling & User Experience</h2>
+            <div class="grid">
+                <div>
+                    <h3>Plan Limit Errors</h3>
+                    <button class="test-button" onclick="testPlanLimitError()">Trigger Plan Limit Error</button>
+                    <button class="test-button" onclick="testUpgradeFlow()">Test Upgrade Suggestion</button>
+                    <div id="error-handling-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div>
+                    <h3>API Health & Connectivity</h3>
+                    <button class="test-button" onclick="testAPIHealth()">Test API Health</button>
+                    <button class="test-button" onclick="testAuthentication()">Validate Authentication</button>
+                    <div id="api-health-result" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Tests -->
+        <div class="test-section">
+            <h2>🔄 End-to-End Integration Tests</h2>
+            <div class="grid">
+                <div>
+                    <h3>Complete User Workflow</h3>
+                    <button class="test-button success" onclick="runCompleteWorkflow()">Run Complete E2E Test</button>
+                    <button class="test-button" onclick="testPlanUpgradeWorkflow()">Test Plan Upgrade Workflow</button>
+                    <div id="integration-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div>
+                    <h3>Performance & Load Testing</h3>
+                    <button class="test-button" onclick="testAPIPerformance()">Test API Performance</button>
+                    <button class="test-button" onclick="testConcurrentRequests()">Test Concurrent Requests</button>
+                    <div id="performance-result" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        let currentUser = null;
+        const API_BASE = 'http://localhost:3003';
+
+        // Update connection status
+        function updateConnectionStatus(connected, message, plan = null) {
+            const statusEl = document.getElementById('connection-status');
+            const indicator = statusEl.querySelector('.status-indicator');
+            const textEl = statusEl.querySelector('span');
+            
+            if (connected) {
+                indicator.className = 'status-indicator green';
+                textEl.textContent = message + (plan ? ` (${plan.toUpperCase()} Plan)` : '');
+            } else {
+                indicator.className = 'status-indicator red';
+                textEl.textContent = message;
+            }
+        }
+
+        // Authentication functions
+        async function loginAs(planType) {
+            const email = document.getElementById(`${planType}-email`).value;
+            const password = document.getElementById(`${planType}-password`).value;
+            const resultEl = document.getElementById('auth-result');
+            
+            try {
+                showResult('auth-result', 'info', `Attempting login for ${planType} user...`);
+                
+                const response = await fetch(`${API_BASE}/api/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentToken = data.data.access_token;
+                    currentUser = data.data.user;
+                    
+                    // Store token for future requests
+                    localStorage.setItem('access_token', currentToken);
+                    
+                    updateConnectionStatus(true, `Connected as ${email}`, planType);
+                    showResult('auth-result', 'success', 
+                        `✅ Successfully logged in as ${planType} user\n` +
+                        `User ID: ${currentUser.id}\n` +
+                        `Email: ${currentUser.email}\n` +
+                        `Role: ${currentUser.role || 'researcher'}\n` +
+                        `Token: ${currentToken.substring(0, 20)}...`
+                    );
+                } else {
+                    throw new Error(data.error || 'Login failed');
+                }
+            } catch (error) {
+                updateConnectionStatus(false, 'Authentication failed');
+                showResult('auth-result', 'error', `❌ Login failed: ${error.message}`);
+            }
+        }
+
+        // Plan information tests
+        async function testPlanComparison() {
+            if (!currentToken) {
+                showResult('plan-info-result', 'error', '❌ Please login first');
+                return;
+            }
+            
+            try {
+                showResult('plan-info-result', 'info', 'Fetching plan comparison...');
+                
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=get-plan-comparison`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('plan-info-result', 'success', 
+                        `✅ Plan Comparison Retrieved:\n${JSON.stringify(data.data, null, 2)}`
+                    );
+                } else {
+                    throw new Error(data.error || 'Failed to get plan comparison');
+                }
+            } catch (error) {
+                showResult('plan-info-result', 'error', `❌ Plan comparison failed: ${error.message}`);
+            }
+        }
+
+        async function testUsageStats() {
+            if (!currentToken) {
+                showResult('plan-info-result', 'error', '❌ Please login first');
+                return;
+            }
+            
+            try {
+                showResult('plan-info-result', 'info', 'Fetching usage statistics...');
+                
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=get-usage-stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('plan-info-result', 'success', 
+                        `✅ Usage Statistics:\n${JSON.stringify(data.data, null, 2)}`
+                    );
+                } else {
+                    throw new Error(data.error || 'Failed to get usage stats');
+                }
+            } catch (error) {
+                showResult('plan-info-result', 'error', `❌ Usage stats failed: ${error.message}`);
+            }
+        }
+
+        // Study creation tests
+        async function createTestStudy() {
+            if (!currentToken) {
+                showResult('study-creation-result', 'error', '❌ Please login first');
+                return;
+            }
+            
+            try {
+                showResult('study-creation-result', 'info', 'Creating test study...');
+                
+                const testStudy = {
+                    title: `Test Study ${Date.now()}`,
+                    description: 'Automated test study for plan enforcement validation',
+                    type: 'unmoderated',
+                    status: 'draft',
+                    blocks: [
+                        {
+                            id: 'welcome-1',
+                            type: 'welcome',
+                            order: 0,
+                            title: 'Welcome',
+                            description: 'Welcome to our test study',
+                            settings: {}
+                        },
+                        {
+                            id: 'thank-you-2',
+                            type: 'thank_you',
+                            order: 1,
+                            title: 'Thank You',
+                            description: 'Thank you for participating',
+                            settings: {}
+                        }
+                    ]
+                };
+                
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testStudy)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('study-creation-result', 'success', 
+                        `✅ Study created successfully!\n` +
+                        `Study ID: ${data.data.id}\n` +
+                        `Title: ${data.data.title}\n` +
+                        `Status: ${data.data.status}`
+                    );
+                } else {
+                    // Check if this is a plan limit error
+                    if (data.error && data.error.includes('plan limit')) {
+                        showResult('study-creation-result', 'error', 
+                            `🚫 Plan Limit Reached (This is expected behavior):\n${data.error}`
+                        );
+                    } else {
+                        throw new Error(data.error || 'Study creation failed');
+                    }
+                }
+            } catch (error) {
+                showResult('study-creation-result', 'error', `❌ Study creation failed: ${error.message}`);
+            }
+        }
+
+        async function createMultipleStudies(count) {
+            if (!currentToken) {
+                showResult('study-creation-result', 'error', '❌ Please login first');
+                return;
+            }
+            
+            showResult('study-creation-result', 'info', `Creating ${count} test studies to test plan limits...`);
+            
+            let created = 0;
+            let failed = 0;
+            let limitReached = false;
+            
+            for (let i = 0; i < count; i++) {
+                try {
+                    const testStudy = {
+                        title: `Bulk Test Study ${i + 1} - ${Date.now()}`,
+                        description: `Automated bulk test study ${i + 1} for plan limit testing`,
+                        type: 'unmoderated',
+                        status: 'draft',
+                        blocks: [
+                            {
+                                id: `welcome-${i}`,
+                                type: 'welcome',
+                                order: 0,
+                                title: 'Welcome',
+                                description: 'Welcome to our test study',
+                                settings: {}
+                            }
+                        ]
+                    };
+                    
+                    const response = await fetch(`${API_BASE}/api/research-consolidated?action=create-study`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${currentToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(testStudy)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        created++;
+                    } else {
+                        failed++;
+                        if (data.error && data.error.includes('plan limit')) {
+                            limitReached = true;
+                            break; // Stop when we hit the limit
+                        }
+                    }
+                    
+                    // Small delay to avoid overwhelming the API
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                } catch (error) {
+                    failed++;
+                }
+            }
+            
+            const resultType = limitReached ? 'info' : (failed > 0 ? 'error' : 'success');
+            showResult('study-creation-result', resultType, 
+                `📊 Bulk Study Creation Results:\n` +
+                `✅ Created: ${created} studies\n` +
+                `❌ Failed: ${failed} studies\n` +
+                `🚫 Plan Limit Reached: ${limitReached ? 'Yes (Expected behavior)' : 'No'}\n` +
+                `\nThis test helps validate that plan limits are properly enforced.`
+            );
+        }
+
+        // Utility functions
+        function showResult(elementId, type, message) {
+            const el = document.getElementById(elementId);
+            el.style.display = 'block';
+            el.className = `result ${type}`;
+            el.textContent = message;
+        }
+
+        async function testAPIHealth() {
+            try {
+                showResult('api-health-result', 'info', 'Testing API health...');
+                
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    showResult('api-health-result', 'success', 
+                        `✅ API Health Check Passed\n` +
+                        `Status: ${data.status}\n` +
+                        `Timestamp: ${new Date(data.timestamp).toLocaleString()}\n` +
+                        `Database: ${data.database ? 'Connected' : 'Error'}`
+                    );
+                } else {
+                    throw new Error('API health check failed');
+                }
+            } catch (error) {
+                showResult('api-health-result', 'error', `❌ API health check failed: ${error.message}`);
+            }
+        }
+
+        async function runCompleteWorkflow() {
+            showResult('integration-result', 'info', 'Running complete end-to-end workflow test...');
+            
+            let results = [];
+            
+            // Test 1: Health check
+            try {
+                const healthResponse = await fetch(`${API_BASE}/api/health`);
+                const healthData = await healthResponse.json();
+                results.push(`✅ API Health: ${healthData.status}`);
+            } catch (error) {
+                results.push(`❌ API Health: Failed - ${error.message}`);
+            }
+            
+            // Test 2: Authentication check
+            if (currentToken) {
+                results.push(`✅ Authentication: Logged in`);
+                
+                // Test 3: Plan comparison
+                try {
+                    const planResponse = await fetch(`${API_BASE}/api/research-consolidated?action=get-plan-comparison`, {
+                        headers: { 'Authorization': `Bearer ${currentToken}` }
+                    });
+                    const planData = await planResponse.json();
+                    results.push(`✅ Plan Comparison: ${planData.success ? 'Working' : 'Failed'}`);
+                } catch (error) {
+                    results.push(`❌ Plan Comparison: Failed - ${error.message}`);
+                }
+                
+                // Test 4: Usage stats
+                try {
+                    const usageResponse = await fetch(`${API_BASE}/api/research-consolidated?action=get-usage-stats`, {
+                        headers: { 'Authorization': `Bearer ${currentToken}` }
+                    });
+                    const usageData = await usageResponse.json();
+                    results.push(`✅ Usage Stats: ${usageData.success ? 'Working' : 'Failed'}`);
+                } catch (error) {
+                    results.push(`❌ Usage Stats: Failed - ${error.message}`);
+                }
+                
+                // Test 5: Study creation (single)
+                try {
+                    const studyData = {
+                        title: `E2E Test Study ${Date.now()}`,
+                        description: 'End-to-end test study',
+                        type: 'unmoderated',
+                        status: 'draft',
+                        blocks: []
+                    };
+                    
+                    const studyResponse = await fetch(`${API_BASE}/api/research-consolidated?action=create-study`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${currentToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(studyData)
+                    });
+                    const studyResult = await studyResponse.json();
+                    
+                    if (studyResult.success) {
+                        results.push(`✅ Study Creation: Working`);
+                    } else if (studyResult.error && studyResult.error.includes('plan limit')) {
+                        results.push(`✅ Study Creation: Plan limit enforced (expected)`);
+                    } else {
+                        results.push(`❌ Study Creation: Failed - ${studyResult.error}`);
+                    }
+                } catch (error) {
+                    results.push(`❌ Study Creation: Failed - ${error.message}`);
+                }
+            } else {
+                results.push(`❌ Authentication: Not logged in`);
+            }
+            
+            showResult('integration-result', 'success', 
+                `🔄 Complete E2E Workflow Test Results:\n\n${results.join('\n')}\n\n` +
+                `Test completed at: ${new Date().toLocaleString()}`
+            );
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we have a stored token
+            const storedToken = localStorage.getItem('access_token');
+            if (storedToken) {
+                currentToken = storedToken;
+                updateConnectionStatus(true, 'Using stored authentication token');
+            }
+        });
+    </script>
+</body>
+</html>

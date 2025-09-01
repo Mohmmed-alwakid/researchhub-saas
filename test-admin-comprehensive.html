@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Comprehensive API Testing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .loading { background-color: #fff3cd; border-color: #ffeaa7; }
+        button { margin: 10px 5px; padding: 10px 15px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .endpoint { font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Admin Comprehensive API Testing</h1>
+    
+    <div class="test-section">
+        <h2>Authentication Setup</h2>
+        <button onclick="setupAuth()">Setup Test Auth Token</button>
+        <div id="auth-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Dashboard Analytics</h2>
+        <button onclick="testDashboardAnalytics()">Test Dashboard Analytics</button>
+        <div id="dashboard-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>User Management</h2>
+        <button onclick="testGetAllUsers()">Get All Users</button>
+        <button onclick="testGetUserDetails()">Get User Details</button>
+        <div id="user-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>System Monitoring</h2>
+        <button onclick="testSystemAlerts()">Get System Alerts</button>
+        <button onclick="testUserActivity()">Get User Activity</button>
+        <div id="system-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Revenue Analytics</h2>
+        <button onclick="testRevenueAnalytics()">Get Revenue Analytics</button>
+        <div id="revenue-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Notifications</h2>
+        <button onclick="testSendNotification()">Send Test Notification</button>
+        <div id="notification-results"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        
+        // Setup authentication
+        async function setupAuth() {
+            const authDiv = document.getElementById('auth-status');
+            authDiv.innerHTML = '<div class="loading">Setting up authentication...</div>';
+            
+            try {
+                // Try to get existing token from localStorage
+                authToken = localStorage.getItem('access_token');
+                
+                if (!authToken) {
+                    // Try to login with test admin account
+                    const loginResponse = await fetch('/api/auth-consolidated?action=login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: 'abwanwr77+admin@gmail.com',
+                            password: 'Testtest123'
+                        })
+                    });
+                    
+                    const loginData = await loginResponse.json();
+                    if (loginData.success && loginData.data?.token) {
+                        authToken = loginData.data.token;
+                        localStorage.setItem('access_token', authToken);
+                    }
+                }
+                
+                if (authToken) {
+                    authDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Authentication successful<br>
+                            Token: ${authToken.substring(0, 20)}...
+                        </div>
+                    `;
+                } else {
+                    authDiv.innerHTML = '<div class="error">❌ Failed to authenticate</div>';
+                }
+            } catch (error) {
+                authDiv.innerHTML = `<div class="error">❌ Auth error: ${error.message}</div>`;
+            }
+        }
+        
+        // API call helper
+        async function makeAdminCall(action, method = 'GET', body = null) {
+            if (!authToken) {
+                throw new Error('No auth token available. Run authentication setup first.');
+            }
+            
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            const response = await fetch(`/api/admin-comprehensive?action=${action}`, options);
+            const data = await response.json();
+            
+            return {
+                status: response.status,
+                ok: response.ok,
+                data
+            };
+        }
+        
+        // Test dashboard analytics
+        async function testDashboardAnalytics() {
+            const resultsDiv = document.getElementById('dashboard-results');
+            resultsDiv.innerHTML = '<div class="loading">Testing dashboard analytics...</div>';
+            
+            try {
+                const result = await makeAdminCall('dashboard-analytics&period=30d');
+                
+                resultsDiv.innerHTML = `
+                    <div class="${result.ok ? 'success' : 'error'}">
+                        <span class="endpoint">GET /admin-comprehensive?action=dashboard-analytics</span><br>
+                        Status: ${result.status}<br>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test get all users
+        async function testGetAllUsers() {
+            const resultsDiv = document.getElementById('user-results');
+            resultsDiv.innerHTML = '<div class="loading">Testing get all users...</div>';
+            
+            try {
+                const result = await makeAdminCall('get-all-users&limit=10');
+                
+                resultsDiv.innerHTML = `
+                    <div class="${result.ok ? 'success' : 'error'}">
+                        <span class="endpoint">GET /admin-comprehensive?action=get-all-users</span><br>
+                        Status: ${result.status}<br>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test get user details
+        async function testGetUserDetails() {
+            const resultsDiv = document.getElementById('user-results');
+            resultsDiv.innerHTML = '<div class="loading">Testing get user details...</div>';
+            
+            try {
+                // First get a user ID from the users list
+                const usersResult = await makeAdminCall('get-all-users&limit=1');
+                if (usersResult.ok && usersResult.data?.users?.length > 0) {
+                    const userId = usersResult.data.users[0].id;
+                    const result = await makeAdminCall(`get-user-details&userId=${userId}`);
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="${result.ok ? 'success' : 'error'}">
+                            <span class="endpoint">GET /admin-comprehensive?action=get-user-details</span><br>
+                            Status: ${result.status}<br>
+                            <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">❌ No users found to test user details</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test system alerts
+        async function testSystemAlerts() {
+            const resultsDiv = document.getElementById('system-results');
+            resultsDiv.innerHTML = '<div class="loading">Testing system alerts...</div>';
+            
+            try {
+                const result = await makeAdminCall('system-alerts&status=open&limit=10');
+                
+                resultsDiv.innerHTML = `
+                    <div class="${result.ok ? 'success' : 'error'}">
+                        <span class="endpoint">GET /admin-comprehensive?action=system-alerts</span><br>
+                        Status: ${result.status}<br>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test user activity
+        async function testUserActivity() {
+            const resultsDiv = document.getElementById('system-results');
+            resultsDiv.innerHTML = '<div class="loading">Testing user activity...</div>';
+            
+            try {
+                const result = await makeAdminCall('user-activity&limit=10');
+                
+                resultsDiv.innerHTML = `
+                    <div class="${result.ok ? 'success' : 'error'}">
+                        <span class="endpoint">GET /admin-comprehensive?action=user-activity</span><br>
+                        Status: ${result.status}<br>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test revenue analytics
+        async function testRevenueAnalytics() {
+            const resultsDiv = document.getElementById('revenue-results');
+            resultsDiv.innerHTML = '<div class="loading">Testing revenue analytics...</div>';
+            
+            try {
+                const result = await makeAdminCall('revenue-analytics&period=30d');
+                
+                resultsDiv.innerHTML = `
+                    <div class="${result.ok ? 'success' : 'error'}">
+                        <span class="endpoint">GET /admin-comprehensive?action=revenue-analytics</span><br>
+                        Status: ${result.status}<br>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test send notification
+        async function testSendNotification() {
+            const resultsDiv = document.getElementById('notification-results');
+            resultsDiv.innerHTML = '<div class="loading">Testing send notification...</div>';
+            
+            try {
+                // First get a user to send notification to
+                const usersResult = await makeAdminCall('get-all-users&limit=1');
+                if (usersResult.ok && usersResult.data?.users?.length > 0) {
+                    const userId = usersResult.data.users[0].id;
+                    
+                    const result = await makeAdminCall('send-notification', 'POST', {
+                        recipientId: userId,
+                        type: 'admin_message',
+                        title: 'Test Admin Notification',
+                        message: 'This is a test notification from the admin panel'
+                    });
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="${result.ok ? 'success' : 'error'}">
+                            <span class="endpoint">POST /admin-comprehensive?action=send-notification</span><br>
+                            Status: ${result.status}<br>
+                            <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">❌ No users found to send notification to</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Auto-setup auth on page load
+        window.onload = function() {
+            setupAuth();
+        };
+    </script>
+</body>
+</html>

@@ -1,5 +1,77 @@
 [
   {
+    "_id": "16",
+    "id": "16",
+    "title": "Test Study 3",
+    "description": "Third test study",
+    "type": "unmoderated",
+    "status": "draft",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-09-01T10:17:37.238Z",
+    "updated_at": "2025-09-01T10:17:37.238Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
+    "_id": "15",
+    "id": "15",
+    "title": "Test Study 2",
+    "description": "Second test study",
+    "type": "unmoderated",
+    "status": "draft",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-09-01T10:17:06.933Z",
+    "updated_at": "2025-09-01T10:17:06.933Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
+    "_id": "14",
+    "id": "14",
+    "title": "Test Study",
+    "description": "Test study for plan enforcement",
+    "type": "unmoderated",
+    "status": "draft",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-09-01T10:16:58.239Z",
+    "updated_at": "2025-09-01T10:16:58.239Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
     "_id": "13",
     "id": "13",
     "title": "Participant Test Study 1756704408251",

@@ -1,11 +1,13 @@
 /**
  * CONSOLIDATED RESEARCH MANAGEMENT API
  * Handles: Study management, sessions, applications, and block types
+ * Features: Plan enforcement, usage tracking, subscription limits
  */
 
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
+import { enforcePlanLimits, updateUsageAfterAction, getPlanComparison, getUserSubscription, getUserUsage } from './planEnforcementMiddleware.js';
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -342,7 +344,18 @@ export default async function handler(req, res) {
         return await getStudies(req, res);
       
       case 'create-study':
-        return await createStudy(req, res);
+        // Apply plan enforcement for study creation
+        await enforcePlanLimits(req, res, async () => {
+          const result = await createStudy(req, res);
+          
+          // Update usage after successful creation
+          if (req.userId && result && result.statusCode !== 500) {
+            await updateUsageAfterAction(req.userId, 'create-study');
+          }
+          
+          return result;
+        });
+        return;
       
       case 'get-study':
         return await getStudy(req, res);
@@ -392,6 +405,12 @@ export default async function handler(req, res) {
       
       case 'ai-generate-report':
         return await handleAIGenerateReport(req, res);
+      
+      case 'get-plan-comparison':
+        return await handleGetPlanComparison(req, res);
+      
+      case 'get-usage-stats':
+        return await handleGetUsageStats(req, res);
       
       case 'debug-state':
         return await debugBackendState(req, res);
@@ -1752,6 +1771,120 @@ async function getStudyAnalytics(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: 'Failed to get study analytics' 
+    });
+  }
+}
+
+// ============================================================================
+// PLAN ENFORCEMENT & USAGE TRACKING HANDLERS
+// ============================================================================
+
+/**
+ * Get plan comparison data for upgrade prompts
+ */
+async function handleGetPlanComparison(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader ? authHeader.replace('Bearer ', '') : null;
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    // Extract user info and get current plan
+    let userId = 'anonymous';
+    let currentPlan = 'free';
+    
+    if (token.startsWith('fallback-token-')) {
+      const parts = token.split('-');
+      userId = parts[2] || 'anonymous';
+      
+      // Test account plan assignments
+      if (parts[3] && parts[3].includes('admin')) {
+        currentPlan = 'enterprise';
+      } else if (parts[3] && parts[3].includes('Researcher')) {
+        currentPlan = 'pro';
+      }
+    }
+
+    const planComparison = getPlanComparison(currentPlan);
+    
+    console.log(`📊 Plan comparison requested for user ${userId} (${currentPlan})`);
+    
+    return res.status(200).json({
+      success: true,
+      data: planComparison
+    });
+
+  } catch (error) {
+    console.error('Get plan comparison error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to get plan comparison'
+    });
+  }
+}
+
+/**
+ * Get user usage statistics
+ */
+async function handleGetUsageStats(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader ? authHeader.replace('Bearer ', '') : null;
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    // Extract user info
+    let userId = 'anonymous';
+    let userEmail = null;
+    
+    if (token.startsWith('fallback-token-')) {
+      const parts = token.split('-');
+      userId = parts[2] || 'anonymous';
+      userEmail = parts[3] ? `${parts[3]}@gmail.com` : null;
+    }
+
+    // Import the functions from the middleware
+    const subscription = await getUserSubscription(userId, userEmail);
+    const usage = await getUserUsage(userId);
+    
+    // Calculate usage percentages
+    const usagePercentages = {
+      studies: subscription.features.maxStudies === -1 ? 0 : 
+        Math.round((usage.studiesCreated / subscription.features.maxStudies) * 100),
+      recording: subscription.features.recordingMinutes === -1 ? 0 :
+        Math.round((usage.recordingMinutesUsed / subscription.features.recordingMinutes) * 100)
+    };
+
+    console.log(`📈 Usage stats requested for user ${userId} (${subscription.plan})`);
+    
+    return res.status(200).json({
+      success: true,
+      data: {
+        subscription,
+        usage,
+        usagePercentages,
+        warningsActive: {
+          studiesNearLimit: usagePercentages.studies > 80,
+          recordingNearLimit: usagePercentages.recording > 80
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Get usage stats error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to get usage statistics'
     });
   }
 }

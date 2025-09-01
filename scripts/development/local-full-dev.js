@@ -36,6 +36,7 @@ process.env.NODE_ENV = 'development';
 import authHandler from '../../api/auth-consolidated.js';
 import templatesHandler from '../../api/templates-consolidated.js';
 import paymentsHandler from '../../api/payments-consolidated-full.js';
+import paypalHandler from '../../api/paypal-consolidated.js';
 import userProfileHandler from '../../api/user-profile-consolidated.js';
 import systemHandler from '../../api/system-consolidated.js';
 import researchHandler from '../../api/research-consolidated.js';
@@ -85,6 +86,11 @@ app.all('/api/wallets*', async (req, res) => {
 
 app.all('/api/payments*', async (req, res) => {
   await paymentsHandler(req, res);
+});
+
+// PayPal endpoints (NEW - PayPal integration)
+app.all('/api/paypal-consolidated*', async (req, res) => {
+  await paypalHandler(req, res);
 });
 
 // Templates endpoints

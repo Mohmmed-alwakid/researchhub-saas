@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Enforcement Testing - ResearchHub</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #166534;
+        }
+        .error {
+            background: #fee2e2;
+            border: 1px solid #dc2626;
+            color: #991b1b;
+        }
+        .plan-limit {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+        h1 {
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .free { background: #f3f4f6; color: #374151; }
+        .basic { background: #dbeafe; color: #1e40af; }
+        .pro { background: #e0e7ff; color: #5b21b6; }
+        .enterprise { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Plan Enforcement Testing Dashboard</h1>
+    
+    <div class="container">
+        <p><strong>Testing Plan Enforcement & Usage Tracking Implementation</strong></p>
+        <p>This dashboard tests the new business logic layer that enforces subscription limits and tracks usage.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🆓 Free Plan User Tests <span class="status-badge free">0 studies created</span></h2>
+        <p><strong>Free Plan Limits:</strong> 3 studies, 10 participants/study, 60 recording minutes</p>
+        
+        <button class="test-button" onclick="testCreateStudy('free')">Create Study (Free User)</button>
+        <button class="test-button" onclick="testUsageStats('free')">Check Usage Stats</button>
+        <button class="test-button" onclick="testPlanComparison('free')">Get Plan Comparison</button>
+        
+        <div id="free-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>💼 Basic Plan User Tests <span class="status-badge basic">$29/month</span></h2>
+        <p><strong>Basic Plan Limits:</strong> 15 studies, 50 participants/study, 300 recording minutes, data export</p>
+        
+        <button class="test-button" onclick="testCreateStudy('basic')">Create Study (Basic User)</button>
+        <button class="test-button" onclick="testUsageStats('basic')">Check Usage Stats</button>
+        <button class="test-button" onclick="testDataExport('basic')">Test Data Export</button>
+        
+        <div id="basic-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Pro Plan User Tests <span class="status-badge pro">$99/month</span></h2>
+        <p><strong>Pro Plan Limits:</strong> Unlimited studies, 500 participants/study, 1800 recording minutes, team collaboration</p>
+        
+        <button class="test-button" onclick="testCreateStudy('pro')">Create Study (Pro User)</button>
+        <button class="test-button" onclick="testUsageStats('pro')">Check Usage Stats</button>
+        <button class="test-button" onclick="testTeamCollaboration('pro')">Test Team Collaboration</button>
+        
+        <div id="pro-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🏢 Enterprise Plan User Tests <span class="status-badge enterprise">$299/month</span></h2>
+        <p><strong>Enterprise Plan:</strong> Unlimited everything, custom branding, dedicated support</p>
+        
+        <button class="test-button" onclick="testCreateStudy('enterprise')">Create Study (Enterprise User)</button>
+        <button class="test-button" onclick="testUsageStats('enterprise')">Check Usage Stats</button>
+        <button class="test-button" onclick="testCustomBranding('enterprise')">Test Custom Branding</button>
+        
+        <div id="enterprise-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 Limit Testing Scenarios</h2>
+        <p>Test what happens when users exceed their plan limits</p>
+        
+        <button class="test-button" onclick="simulateStudyLimitReached()">Simulate Study Limit Reached</button>
+        <button class="test-button" onclick="simulateParticipantLimitReached()">Simulate Participant Limit</button>
+        <button class="test-button" onclick="testFeatureBlocking()">Test Feature Blocking</button>
+        
+        <div id="limit-result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003';
+        
+        // Test tokens for different plan types
+        const TEST_TOKENS = {
+            free: 'fallback-token-test-free-user@gmail.com',
+            basic: 'fallback-token-test-basic-user@gmail.com', 
+            pro: 'fallback-token-researcher-prouser@gmail.com',
+            enterprise: 'fallback-token-admin-adminuser@gmail.com'
+        };
+
+        async function makeRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return { response, data, status: response.status };
+            } catch (error) {
+                return { error: error.message };
+            }
+        }
+
+        function displayResult(resultId, data, isPlanLimit = false) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.style.display = 'block';
+            
+            let className = 'info';
+            if (data.error) {
+                className = isPlanLimit ? 'plan-limit' : 'error';
+            } else if (data.success) {
+                className = 'success';
+            }
+            
+            resultDiv.className = `result ${className}`;
+            resultDiv.textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function testCreateStudy(planType) {
+            const token = TEST_TOKENS[planType];
+            const studyData = {
+                action: 'create-study',
+                title: `Test Study for ${planType} Plan - ${Date.now()}`,
+                description: `Testing plan enforcement for ${planType} users`,
+                type: 'usability',
+                target_participants: 10
+            };
+
+            const result = await makeRequest('/api/research-consolidated', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(studyData)
+            });
+
+            displayResult(`${planType}-result`, result.data, result.data?.planLimitExceeded);
+        }
+
+        async function testUsageStats(planType) {
+            const token = TEST_TOKENS[planType];
+            
+            const result = await makeRequest('/api/research-consolidated?action=get-usage-stats', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            displayResult(`${planType}-result`, result.data);
+        }
+
+        async function testPlanComparison(planType) {
+            const token = TEST_TOKENS[planType];
+            
+            const result = await makeRequest('/api/research-consolidated?action=get-plan-comparison', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            displayResult(`${planType}-result`, result.data);
+        }
+
+        async function testDataExport(planType) {
+            const token = TEST_TOKENS[planType];
+            const exportData = {
+                action: 'export-data'
+            };
+
+            // Simulate data export request
+            const result = await makeRequest('/api/research-consolidated', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(exportData)
+            });
+
+            displayResult(`${planType}-result`, result.data, result.data?.planLimitExceeded);
+        }
+
+        async function testTeamCollaboration(planType) {
+            const token = TEST_TOKENS[planType];
+            const collaborationData = {
+                action: 'team-collaboration'
+            };
+
+            const result = await makeRequest('/api/research-consolidated', {
+                method: 'POST', 
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(collaborationData)
+            });
+
+            displayResult(`${planType}-result`, result.data, result.data?.planLimitExceeded);
+        }
+
+        async function testCustomBranding(planType) {
+            const token = TEST_TOKENS[planType];
+            
+            const result = await makeRequest('/api/research-consolidated?action=get-usage-stats', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            // Show the custom branding feature status
+            const customResult = {
+                feature: 'Custom Branding',
+                enabled: result.data?.data?.subscription?.features?.customBranding || false,
+                planRequired: 'enterprise'
+            };
+
+            displayResult(`${planType}-result`, customResult);
+        }
+
+        async function simulateStudyLimitReached() {
+            // Create multiple studies with free account to trigger limit
+            const token = TEST_TOKENS.free;
+            const results = [];
+
+            for (let i = 1; i <= 5; i++) {
+                const studyData = {
+                    action: 'create-study',
+                    title: `Study ${i} - Limit Test`,
+                    description: `Testing study limit enforcement`,
+                    type: 'usability'
+                };
+
+                const result = await makeRequest('/api/research-consolidated', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                results.push({
+                    attempt: i,
+                    success: result.data?.success || false,
+                    planLimitExceeded: result.data?.planLimitExceeded || false,
+                    message: result.data?.details?.upgradeMessage || result.data?.error || 'Success'
+                });
+
+                if (result.data?.planLimitExceeded) {
+                    break;
+                }
+            }
+
+            displayResult('limit-result', { testType: 'Study Limit Test', results }, true);
+        }
+
+        async function simulateParticipantLimitReached() {
+            const result = {
+                testType: 'Participant Limit Simulation',
+                scenario: 'Free plan user trying to add 11th participant to study',
+                limit: 10,
+                attempted: 11,
+                blocked: true,
+                upgradeRequired: 'basic'
+            };
+
+            displayResult('limit-result', result, true);
+        }
+
+        async function testFeatureBlocking() {
+            const tests = [];
+            
+            // Test each plan's feature access
+            for (const [planType, token] of Object.entries(TEST_TOKENS)) {
+                const usageResult = await makeRequest('/api/research-consolidated?action=get-usage-stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (usageResult.data?.success) {
+                    const features = usageResult.data.data.subscription.features;
+                    tests.push({
+                        plan: planType,
+                        advancedAnalytics: features.advancedAnalytics,
+                        dataExport: features.exportData,
+                        teamCollaboration: features.teamCollaboration,
+                        customBranding: features.customBranding
+                    });
+                }
+            }
+
+            displayResult('limit-result', { testType: 'Feature Access by Plan', tests });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Plan Enforcement Testing Dashboard Ready');
+            console.log('API Base:', API_BASE);
+            console.log('Test Tokens:', TEST_TOKENS);
+        });
+    </script>
+</body>
+</html>

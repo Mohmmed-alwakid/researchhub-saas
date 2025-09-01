@@ -138,34 +138,70 @@ class AdminAPIClient {
     }
   }
 
-  // System metrics
+  // System metrics using comprehensive admin API
   async getSystemMetrics(): Promise<SystemMetrics> {
     try {
-      const response = await this.makeRequest<{overview: Record<string, unknown>}>('/admin-consolidated?action=admin-overview');
-      if (response.success && response.data?.overview) {
-        // For now, return mock data since the API structure is still being finalized
-        console.log('Admin API response received, using mock data for now');
+      const response = await this.makeRequest<any>('/admin-comprehensive?action=dashboard-analytics&period=30d');
+      if (response.success && response.data) {
+        const data = response.data;
+        return {
+          totalUsers: data.overview?.totalUsers || 0,
+          activeUsers: data.overview?.activeUsers || 0,
+          totalStudies: data.overview?.totalStudies || 0,
+          activeStudies: data.overview?.activeStudies || 0,
+          totalRevenue: data.overview?.totalRevenue || 0,
+          monthlyRevenue: data.overview?.monthlyRevenue || 0,
+          apiResponseTime: 245, // Mock for now
+          errorRate: 0.02, // Mock for now
+          systemUptime: 99.8, // Mock for now
+          systemHealth: 'healthy',
+          uptime: 86400,
+          memoryUsage: { rss: 75427840, heapTotal: 18042880, heapUsed: 15308072 },
+          lastUpdated: data.generatedAt || new Date().toISOString()
+        };
       }
-    } catch {
-      console.log('Admin API not available, using mock data');
+    } catch (error) {
+      console.log('Admin comprehensive API not available, using mock data:', error);
     }
     return this.getMockMetrics();
   }
 
   async getUserActivity(): Promise<UserActivity[]> {
     try {
-      const response = await this.makeRequest<{users: Record<string, unknown>[]}>('/admin-consolidated?action=users');
-      if (response.success && response.data?.users) {
-        console.log('User data received, using mock activity for consistent typing');
+      const response = await this.makeRequest<{activities: UserActivity[]}>('/admin-comprehensive?action=user-activity&limit=20');
+      if (response.success && response.data?.activities) {
+        return response.data.activities.map((activity: UserActivity) => ({
+          id: activity.id,
+          timestamp: activity.timestamp,
+          userId: activity.userId,
+          userName: activity.userName || 'Unknown User',
+          action: activity.action || 'User Activity',
+          details: activity.details,
+          type: activity.type
+        }));
       }
-    } catch {
-      console.log('User API not available, using mock data');
+    } catch (error) {
+      console.log('User activity API not available, using mock data:', error);
     }
     return this.getMockActivity();
   }
 
   async getSystemAlerts(): Promise<SystemAlert[]> {
-    // For now, return mock alerts since admin-overview doesn't include alerts yet
+    try {
+      const response = await this.makeRequest<{alerts: SystemAlert[]}>('/admin-comprehensive?action=system-alerts&status=open&limit=10');
+      if (response.success && response.data?.alerts) {
+        return response.data.alerts.map((alert: SystemAlert) => ({
+          id: alert.id,
+          type: alert.type,
+          title: alert.title,
+          message: alert.message,
+          timestamp: alert.timestamp,
+          resolved: alert.resolved
+        }));
+      }
+    } catch (error) {
+      console.log('System alerts API not available, using mock data:', error);
+    }
     return this.getMockAlerts();
   }
 
@@ -201,9 +237,48 @@ class AdminAPIClient {
   }
 
   async suspendUser(userId: string, reason: string) {
-    return await this.makeRequest(`/admin-consolidated?action=suspend-user`, {
+    return await this.makeRequest(`/admin-comprehensive?action=suspend-user`, {
       method: 'POST',
       body: JSON.stringify({ userId, reason })
+    });
+  }
+
+  // Additional comprehensive admin API methods
+  async getAllUsers() {
+    return await this.makeRequest('/admin-comprehensive?action=get-all-users&limit=100');
+  }
+
+  async getUserDetails(userId: string) {
+    return await this.makeRequest(`/admin-comprehensive?action=get-user-details&userId=${userId}`);
+  }
+
+  async updateUserStatus(userId: string, status: string, reason: string) {
+    return await this.makeRequest(`/admin-comprehensive?action=update-user-status`, {
+      method: 'POST',
+      body: JSON.stringify({ userId, status, reason })
+    });
+  }
+
+  async getRevenueAnalytics(period = '30d') {
+    return await this.makeRequest(`/admin-comprehensive?action=revenue-analytics&period=${period}`);
+  }
+
+  async sendNotification(notification: {
+    recipientId: string;
+    type: string;
+    title: string;
+    message: string;
+  }) {
+    return await this.makeRequest('/admin-comprehensive?action=send-notification', {
+      method: 'POST',
+      body: JSON.stringify(notification)
+    });
+  }
+
+  async acknowledgeAlert(alertId: string) {
+    return await this.makeRequest('/admin-comprehensive?action=acknowledge-alert', {
+      method: 'POST',
+      body: JSON.stringify({ alertId })
     });
   }
 
