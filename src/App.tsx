@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useEffect, Suspense, lazy } from 'react';
@@ -147,6 +147,9 @@ function App() {
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/auth/callback" element={<OAuthCallbackPage />} />
             <Route path="/auth/google/callback" element={<OAuthCallbackPage />} />
+            
+            {/* Legacy dashboard redirect - SECURITY: Redirect to login if not authenticated */}
+            <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
             
             {/* Admin Dashboard Routes - Separate from AppLayout */}
             <Route path="/app/admin/*" element={
