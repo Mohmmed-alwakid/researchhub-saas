@@ -48,6 +48,7 @@ const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPayme
 const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage.tsx'));
 const StudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage'));
 const OrganizationDashboard = lazy(() => import('./client/pages/organization/OrganizationDashboard'));
+const NotFoundPage = lazy(() => import('./client/pages/NotFoundPage'));
 
 // Create a client
 const queryClient = new QueryClient({
@@ -284,6 +285,9 @@ function App() {
                 </ProtectedRoute>
               } />
             </Route>
+            
+            {/* 404 Catch-all route - Must be last */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
               </Suspense>
             </LazyLoadErrorBoundary>

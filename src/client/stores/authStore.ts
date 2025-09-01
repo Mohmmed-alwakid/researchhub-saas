@@ -272,9 +272,34 @@ export const useAuthStore = create<AuthState>()(
           toast.success('Registration successful!');
         } catch (error: unknown) {
           set({ isLoading: false });
-          const message = error instanceof Error ? error.message : 'Registration failed';
+          
+          // Enhanced error handling for better user experience
+          let message = 'Registration failed. Please try again.';
+          
+          if (error instanceof Error) {
+            const errorMessage = error.message.toLowerCase();
+            
+            // Check for various duplicate email error patterns
+            if (errorMessage.includes('already exists') || 
+                errorMessage.includes('already registered') ||
+                errorMessage.includes('duplicate') ||
+                errorMessage.includes('email already') ||
+                errorMessage.includes('user already exists')) {
+              message = 'An account with this email already exists. Please try signing in instead.';
+            } else if (errorMessage.includes('invalid email')) {
+              message = 'Please enter a valid email address.';
+            } else if (errorMessage.includes('password')) {
+              message = 'Password does not meet requirements. Please try a stronger password.';
+            } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+              message = 'Network error. Please check your connection and try again.';
+            } else if (error.message) {
+              // Use the original error message if it's user-friendly
+              message = error.message;
+            }
+          }
+          
           toast.error(message);
-          throw error;
+          throw new Error(message);
         }
       },      logout: async () => {
         try {
