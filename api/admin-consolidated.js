@@ -261,14 +261,11 @@ async function handleUserManagement(req, res) {
       case 'delete':
         return await handleDeleteUser(req, res, user_id);
       
-      case 'create':
-        return await handleCreateUser(req, res);
-      
       default:
         return res.status(400).json({
           success: false,
           error: `Invalid sub-action: ${subAction}`,
-          availableActions: ['list', 'activate', 'deactivate', 'delete', 'create'],
+          availableActions: ['list', 'activate', 'deactivate', 'delete'],
           note: 'If no sub-action is provided, defaults to "list"'
         });
     }
@@ -291,10 +288,9 @@ async function handleListUsers(req, res) {
     const { search, role, status, limit = 50, offset = 0 } = req.query;
 
     // Check if running in local development mode or no Supabase
-    // TEMPORARILY DISABLED: Force real Supabase data even in development
-    const isLocalDevelopment = false; // process.env.NODE_ENV === 'development' || 
-                              // req.headers.host?.includes('localhost') ||
-                              // req.headers.host?.includes('127.0.0.1');
+    const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
+                              req.headers.host?.includes('localhost') ||
+                              req.headers.host?.includes('127.0.0.1');
     
     const hasSupabaseAdmin = supabaseAdmin !== null;
     
@@ -527,90 +523,157 @@ async function handleDeleteUser(req, res, userId) {
 }
 
 /**
- * Create user (admin only)
+ * Create a new user (admin only)
  */
 async function handleCreateUser(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({
-      success: false,
-      error: 'Method not allowed'
-    });
-  }
-
   try {
-    const { name, email, password, role = 'participant' } = req.body;
+    const auth = await authenticateUser(req, ['admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
 
+    if (req.method !== 'POST') {
+      return res.status(405).json({
+        success: false,
+        error: 'Method not allowed'
+      });
+    }
+
+    const { name, email, password, role } = req.body;
+
+    // Validate required fields
     if (!name || !email || !password || !role) {
       return res.status(400).json({
         success: false,
-        error: 'Name, email, password, and role are required'
+        error: 'Missing required fields: name, email, password, role'
       });
     }
 
-    if (!supabaseAdmin) {
-      console.log('⚠️ Supabase admin client not available, using mock response');
-      return res.status(201).json({
-        success: true,
-        user: {
-          id: `user_${Date.now()}`,
-          email,
-          first_name: name.split(' ')[0],
-          last_name: name.split(' ').slice(1).join(' ') || '',
-          role,
-          created_at: new Date().toISOString()
-        },
-        message: 'User created successfully (mock mode)'
-      });
-    }
-
-    // Create user in Supabase Auth with invitation email
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: {
-        first_name: name.split(' ')[0],
-        last_name: name.split(' ').slice(1).join(' ') || '',
-        role: role
-      },
-      redirectTo: `${process.env.SITE_URL || 'http://localhost:5175'}/auth/callback`
-    });
-
-    if (authError) {
-      console.error('Create auth user error:', authError);
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       return res.status(400).json({
         success: false,
-        error: authError.message || 'Failed to create user'
+        error: 'Invalid email format'
       });
     }
 
-    // Create profile record
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert([{
-        id: authData.user.id,
+    // Validate role
+    const validRoles = ['admin', 'researcher', 'participant'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid role. Must be one of: ${validRoles.join(', ')}`
+      });
+    }
+
+    // Check if running in local development mode or no Supabase
+    const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
+                              req.headers.host?.includes('localhost') ||
+                              req.headers.host?.includes('127.0.0.1');
+    
+    const hasSupabaseAdmin = supabaseAdmin !== null;
+    
+    if (isLocalDevelopment || !hasSupabaseAdmin) {
+      console.log('🔧 Mock user creation (local development or no Supabase)');
+      
+      // Return mock success response for development/testing
+      const mockUser = {
+        id: `mock-user-${Date.now()}`,
         email: email,
-        first_name: name.split(' ')[0],
+        first_name: name.split(' ')[0] || name,
         last_name: name.split(' ').slice(1).join(' ') || '',
         role: role,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }]);
+        updated_at: new Date().toISOString(),
+        active: true
+      };
 
-    if (profileError) {
-      console.error('Create profile error:', profileError);
-      // Don't fail the request if profile creation fails
+      return res.status(201).json({
+        success: true,
+        message: 'User created successfully (mock)',
+        user: mockUser
+      });
     }
 
-    return res.status(201).json({
-      success: true,
-      user: {
-        id: authData.user.id,
-        email: authData.user.email,
-        first_name: name.split(' ')[0],
-        last_name: name.split(' ').slice(1).join(' ') || '',
-        role: role,
-        created_at: authData.user.created_at
-      },
-      message: 'User created successfully'
-    });
+    try {
+      // Create auth user first
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email: email,
+        password: password,
+        email_confirm: true,
+        user_metadata: {
+          role: role,
+          full_name: name
+        }
+      });
+
+      if (authError) {
+        console.error('Auth user creation error:', authError);
+        return res.status(400).json({
+          success: false,
+          error: authError.message || 'Failed to create user account'
+        });
+      }
+
+      // Create user profile
+      const nameParts = name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          id: authUser.user.id,
+          email: email,
+          first_name: firstName,
+          last_name: lastName,
+          role: role,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        
+        // Cleanup: delete auth user if profile creation fails
+        await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
+        
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to create user profile'
+        });
+      }
+
+      console.log('✅ User created successfully:', email);
+
+      return res.status(201).json({
+        success: true,
+        message: 'User created successfully',
+        user: {
+          id: profile.id,
+          email: profile.email,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          role: profile.role,
+          created_at: profile.created_at,
+          updated_at: profile.updated_at,
+          active: true
+        }
+      });
+
+    } catch (supabaseError) {
+      console.error('Supabase user creation error:', supabaseError);
+      return res.status(500).json({
+        success: false,
+        error: 'Database error during user creation'
+      });
+    }
 
   } catch (error) {
     console.error('Create user exception:', error);
@@ -622,9 +685,9 @@ async function handleCreateUser(req, res) {
 }
 
 /**
- * Handle user actions (create, update) - endpoint for frontend compatibility
+ * Update user (admin only)
  */
-async function handleUserActions(req, res) {
+async function handleUpdateUser(req, res) {
   try {
     const auth = await authenticateUser(req, ['admin']);
     if (!auth.success) {
@@ -634,38 +697,212 @@ async function handleUserActions(req, res) {
       });
     }
 
-    switch (req.method) {
-      case 'POST':
-        // Create user - delegate to handleCreateUser
-        return await handleCreateUser(req, res);
+    if (req.method !== 'PUT') {
+      return res.status(405).json({
+        success: false,
+        error: 'Method not allowed'
+      });
+    }
+
+    const { user_id } = req.query;
+    const { role, isActive, name, email } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'User ID is required'
+      });
+    }
+
+    // Check if running in local development mode or no Supabase
+    const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
+                              req.headers.host?.includes('localhost') ||
+                              req.headers.host?.includes('127.0.0.1');
+    
+    const hasSupabaseAdmin = supabaseAdmin !== null;
+    
+    if (isLocalDevelopment || !hasSupabaseAdmin) {
+      console.log('🔧 Mock user update (local development or no Supabase)');
       
-      case 'PUT':
-        // Update user - for future implementation
-        const { userId } = req.query;
-        if (!userId) {
-          return res.status(400).json({
-            success: false,
-            error: 'User ID is required for updates'
-          });
+      return res.status(200).json({
+        success: true,
+        message: 'User updated successfully (mock)',
+        user: {
+          id: user_id,
+          email: email || 'mock@example.com',
+          first_name: name?.split(' ')[0] || 'Mock',
+          last_name: name?.split(' ').slice(1).join(' ') || 'User',
+          role: role || 'researcher',
+          updated_at: new Date().toISOString(),
+          active: isActive !== undefined ? isActive : true
         }
-        
-        // For now, return a placeholder response
-        return res.status(501).json({
-          success: false,
-          error: 'User updates not yet implemented',
-          message: 'This feature will be available in a future update'
-        });
+      });
+    }
+
+    try {
+      // Prepare update data for profiles table
+      const updateData = {
+        updated_at: new Date().toISOString()
+      };
+
+      if (role) {
+        updateData.role = role;
+      }
       
-      default:
-        return res.status(405).json({
+      if (name) {
+        const nameParts = name.trim().split(' ');
+        updateData.first_name = nameParts[0] || '';
+        updateData.last_name = nameParts.slice(1).join(' ') || '';
+      }
+      
+      if (email) {
+        updateData.email = email;
+      }
+
+      // Update user profile
+      const { data: updatedProfile, error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .update(updateData)
+        .eq('id', user_id)
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        return res.status(500).json({
           success: false,
-          error: 'Method not allowed',
-          allowedMethods: ['POST', 'PUT']
+          error: 'Failed to update user profile'
         });
+      }
+
+      // Update auth user metadata if needed
+      if (role || name) {
+        const authUpdateData = {};
+        if (role) authUpdateData.role = role;
+        if (name) authUpdateData.full_name = name;
+
+        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(
+          user_id,
+          {
+            user_metadata: authUpdateData
+          }
+        );
+
+        if (authError) {
+          console.error('Auth user update error:', authError);
+          // Continue anyway, profile update was successful
+        }
+      }
+
+      console.log('✅ User updated successfully:', user_id);
+
+      return res.status(200).json({
+        success: true,
+        message: 'User updated successfully',
+        user: updatedProfile
+      });
+
+    } catch (supabaseError) {
+      console.error('Supabase user update error:', supabaseError);
+      return res.status(500).json({
+        success: false,
+        error: 'Database error during user update'
+      });
     }
 
   } catch (error) {
-    console.error('User actions exception:', error);
+    console.error('Update user exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Delete user action handler (admin only)
+ */
+async function handleDeleteUserAction(req, res) {
+  try {
+    const auth = await authenticateUser(req, ['admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    if (req.method !== 'DELETE') {
+      return res.status(405).json({
+        success: false,
+        error: 'Method not allowed'
+      });
+    }
+
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'User ID is required'
+      });
+    }
+
+    // Check if running in local development mode or no Supabase
+    const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
+                              req.headers.host?.includes('localhost') ||
+                              req.headers.host?.includes('127.0.0.1');
+    
+    const hasSupabaseAdmin = supabaseAdmin !== null;
+    
+    if (isLocalDevelopment || !hasSupabaseAdmin) {
+      console.log('🔧 Mock user deletion (local development or no Supabase)');
+      
+      return res.status(200).json({
+        success: true,
+        message: 'User deleted successfully (mock)'
+      });
+    }
+
+    try {
+      // Delete from profiles table first
+      const { error: deleteError } = await supabaseAdmin
+        .from('profiles')
+        .delete()
+        .eq('id', user_id);
+
+      if (deleteError) {
+        console.error('Delete user from profiles table error:', deleteError);
+      }
+
+      // Delete auth user
+      const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id);
+
+      if (authDeleteError) {
+        console.error('Delete auth user error:', authDeleteError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to delete user'
+        });
+      }
+
+      console.log('✅ User deleted successfully:', user_id);
+
+      return res.status(200).json({
+        success: true,
+        message: 'User deleted successfully'
+      });
+
+    } catch (supabaseError) {
+      console.error('Supabase user deletion error:', supabaseError);
+      return res.status(500).json({
+        success: false,
+        error: 'Database error during user deletion'
+      });
+    }
+
+  } catch (error) {
+    console.error('Delete user exception:', error);
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
@@ -1016,8 +1253,17 @@ export default async function handler(req, res) {
       case 'user-management':
         return await handleUserManagement(req, res);
       
-      case 'user-actions':
-        return await handleUserActions(req, res);
+      case 'create':
+      case 'create-user':
+        return await handleCreateUser(req, res);
+      
+      case 'update':
+      case 'update-user':
+        return await handleUpdateUser(req, res);
+      
+      case 'delete':
+      case 'delete-user':
+        return await handleDeleteUserAction(req, res);
       
       // Subscriptions
       case 'subscriptions':
@@ -1040,7 +1286,8 @@ export default async function handler(req, res) {
           success: false,
           error: 'Invalid action',
           availableActions: [
-            'overview', 'admin-overview', 'users', 'user-management', 'user-actions',
+            'overview', 'admin-overview', 'users', 'user-management', 
+            'create', 'create-user', 'update', 'update-user', 'delete', 'delete-user',
             'subscriptions', 'get-subscriptions', 'create-subscription',
             'points', 'get-points', 'award-points'
           ]

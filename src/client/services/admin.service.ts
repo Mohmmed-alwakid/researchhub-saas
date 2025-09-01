@@ -166,7 +166,7 @@ export const updateUser = async (userId: string, data: {
     }
   }
   
-  const response = await fetch(`/api/admin/user-actions?userId=${userId}`, {
+  const response = await fetch(`/api/admin-consolidated?action=update&user_id=${userId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ export const createUser = async (data: {
     }
   }
   
-  const response = await fetch('/api/admin?action=user-actions', {
+  const response = await fetch('/api/admin-consolidated?action=create', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -229,7 +229,7 @@ export const deleteUser = async (userId: string): Promise<{ success: boolean; me
     }
   }
   
-  const response = await fetch(`/api/admin/user-actions?userId=${userId}`, {
+  const response = await fetch(`/api/admin-consolidated?action=delete&user_id=${userId}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
