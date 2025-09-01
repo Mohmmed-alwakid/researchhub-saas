@@ -8,7 +8,6 @@ import {
   Activity,
   Users,
   Filter,
-  BarChart3,
   Edit,
   Trash2,
   RefreshCw,
@@ -77,7 +76,7 @@ const UserManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
-  const [showAdvancedMode, setShowAdvancedMode] = useState(false);
+  const showAdvancedMode = true; // Always show advanced mode
   const [sortField, setSortField] = useState<keyof User>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   
@@ -168,12 +167,15 @@ const UserManagement: React.FC = () => {
       const response = await getAllUsers({}) as unknown as ApiResponse<User[]>;
       console.log('📦 API Response:', response);
       
-      if (response.success && response.data) {
-        const rawUsers = Array.isArray(response.data) ? response.data : 
-                        ((response.data as Record<string, unknown>)?.users || (response.data as Record<string, unknown>)?.data || []);
+      if (response.success) {
+        // Handle different response formats - check for users, data, or direct array
+        const responseData = response as unknown as Record<string, unknown>;
+        const rawUsers = responseData.users || 
+                        response.data || 
+                        [];
         
         const transformedUsers = (Array.isArray(rawUsers) ? rawUsers : []).map((user: unknown) => transformUser(user as Record<string, unknown>));
-        console.log('✅ Transformed users:', transformedUsers);
+        console.log('✅ Transformed users:', transformedUsers.length, 'users found');
         
         setUsers(transformedUsers);
         setError(null);
@@ -410,17 +412,6 @@ const UserManagement: React.FC = () => {
           <p className="text-gray-600">Manage and monitor all platform users</p>
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowAdvancedMode(!showAdvancedMode)}
-            className={`px-4 py-2 rounded-lg border transition-colors ${
-              showAdvancedMode 
-                ? 'bg-blue-600 text-white border-blue-600' 
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            <BarChart3 className="h-4 w-4 mr-2 inline" />
-            {showAdvancedMode ? 'Basic Mode' : 'Advanced Mode'}
-          </button>
           <button
             onClick={() => setShowCreateModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
