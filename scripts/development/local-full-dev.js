@@ -69,10 +69,6 @@ app.all('/api/applications*', async (req, res) => {
   await researchHandler(req, res);
 });
 
-app.all('/api/study-sessions*', async (req, res) => {
-  await researchHandler(req, res);
-});
-
 app.all('/api/blocks*', async (req, res) => {
   await researchHandler(req, res);
 });

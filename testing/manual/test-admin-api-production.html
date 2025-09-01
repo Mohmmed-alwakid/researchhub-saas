@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin API - Production</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .test-results { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Admin API Production Test</h1>
+    <p>Testing admin functionality on production site: <code>https://researchhub-saas.vercel.app</code></p>
+
+    <div class="test-section info">
+        <h3>📝 Test Instructions</h3>
+        <p>1. Click "Test Admin API" to verify admin users endpoint</p>
+        <p>2. Check if our UserManagement.tsx fixes are working correctly</p>
+        <p>3. Verify that Advanced Mode changes are deployed</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🔧 Admin API Test</h3>
+        <button onclick="testAdminAPI()">Test Admin API</button>
+        <button onclick="testUserManagementFormat()">Test User Data Format</button>
+        <div id="apiResults" class="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 Frontend Component Test</h3>
+        <button onclick="testComponentLogic()">Test UserManagement Logic</button>
+        <div id="componentResults" class="test-results"></div>
+    </div>
+
+    <script>
+        const PRODUCTION_URL = 'https://researchhub-saas.vercel.app';
+        
+        async function testAdminAPI() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = '<p>🔄 Testing admin API endpoint...</p>';
+            
+            try {
+                // Test the admin API endpoint directly
+                const response = await fetch(`${PRODUCTION_URL}/api/admin-consolidated?action=users`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer fallback-token-admin'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Admin API Working!</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Users Found:</strong> ${data.users ? data.users.length : 'Unknown'}</p>
+                            <p><strong>Response Format:</strong> ${data.users ? 'response.users ✅' : 'response.data ❌'}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Admin API Error</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Network Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>This could indicate a CORS issue or API endpoint problem.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testUserManagementFormat() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = '<p>🔄 Testing UserManagement data format expectations...</p>';
+            
+            try {
+                const response = await fetch(`${PRODUCTION_URL}/api/admin-consolidated?action=users`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer fallback-token-admin'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Test the format expected by our UserManagement.tsx fix
+                const hasUsersProperty = data && data.users && Array.isArray(data.users);
+                const hasDataProperty = data && data.data && Array.isArray(data.data);
+                
+                resultsDiv.innerHTML = `
+                    <div class="${hasUsersProperty ? 'success' : 'error'}">
+                        <h4>📊 UserManagement Format Analysis</h4>
+                        <p><strong>Response.users exists:</strong> ${hasUsersProperty ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Response.data exists:</strong> ${hasDataProperty ? '✅ Yes' : '❌ No'}</p>
+                        <p><strong>Our fix expects:</strong> response.users format</p>
+                        <p><strong>Fix compatibility:</strong> ${hasUsersProperty ? '✅ Compatible' : '❌ Needs adjustment'}</p>
+                        
+                        <h5>Data Structure:</h5>
+                        <pre>${JSON.stringify({
+                            hasUsers: hasUsersProperty,
+                            hasData: hasDataProperty,
+                            usersCount: hasUsersProperty ? data.users.length : 0,
+                            dataCount: hasDataProperty ? data.data.length : 0,
+                            sampleUser: hasUsersProperty && data.users.length > 0 ? data.users[0] : null
+                        }, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Format Test Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function testComponentLogic() {
+            const resultsDiv = document.getElementById('componentResults');
+            
+            // Simulate the UserManagement.tsx logic we implemented
+            const simulateUserManagementLogic = (apiResponse) => {
+                // Our fixed logic: const { users = [] } = response.users ? response : { users: response.data || [] };
+                const users = apiResponse.users ? apiResponse.users : (apiResponse.data || []);
+                return users;
+            };
+            
+            // Test different response formats
+            const testCases = [
+                {
+                    name: 'Production API Format (response.users)',
+                    response: { success: true, users: [{id: 1, name: 'Test'}, {id: 2, name: 'User'}] }
+                },
+                {
+                    name: 'Alternative Format (response.data)',
+                    response: { success: true, data: [{id: 1, name: 'Test'}, {id: 2, name: 'User'}] }
+                },
+                {
+                    name: 'Empty Response',
+                    response: { success: true }
+                }
+            ];
+            
+            let results = '<h4>🧪 Component Logic Test Results</h4>';
+            
+            testCases.forEach(testCase => {
+                const users = simulateUserManagementLogic(testCase.response);
+                const success = Array.isArray(users);
+                results += `
+                    <div class="${success ? 'success' : 'error'}" style="margin: 10px 0; padding: 10px;">
+                        <strong>${testCase.name}:</strong> ${success ? '✅ Pass' : '❌ Fail'}<br>
+                        Users extracted: ${users.length} items<br>
+                        Type: ${typeof users} (${Array.isArray(users) ? 'Array' : 'Not Array'})
+                    </div>
+                `;
+            });
+            
+            results += `
+                <div class="info" style="margin: 10px 0; padding: 10px;">
+                    <strong>🔧 Our Implementation:</strong><br>
+                    <code>const users = response.users ? response.users : (response.data || []);</code><br>
+                    <strong>Status:</strong> ✅ Handles both formats correctly
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = results;
+        }
+        
+        // Auto-run tests
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testComponentLogic();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

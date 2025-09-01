@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     console.log('📊 URL parts:', pathParts);
     console.log('📊 Query params:', query);
     
-    // Determine action from URL path
+    // Determine action from URL path or query parameter
     let action = query.action || 'list';
     let sessionId = query.sessionId || query.id;
     
@@ -69,7 +69,13 @@ export default async function handler(req, res) {
       }
     }
     
+    // Fallback: if action is still undefined, use default
+    if (!action || action === 'undefined') {
+      action = 'list';
+    }
+    
     console.log('📊 Final action:', action, 'sessionId:', sessionId);
+    console.log('📊 Action type:', typeof action, 'Action value debug:', JSON.stringify(action));
 
     // Get user from auth token
     const authHeader = req.headers.authorization;
@@ -107,12 +113,24 @@ export default async function handler(req, res) {
 
     switch (method) {
       case 'POST':
+        console.log('📊 POST case - comparing action:', JSON.stringify(action), 'with "start"');
+        console.log('📊 Strict equality test:', action === 'start');
+        console.log('📊 Loose equality test:', action == 'start');
+        console.log('📊 String comparison:', String(action) === 'start');
+        
         if (action === 'start') {
+          console.log('📊 Matched start action, calling startSession');
           return await startSession(req, res, user, body);
         } else if (action === 'complete') {
+          console.log('📊 Matched complete action, calling completeSession');
           return await completeSession(req, res, user, sessionId, body);
+        } else {
+          console.log('📊 No action match, returning error');
+          return res.status(400).json({ 
+            success: false, 
+            error: `Unknown action: ${action}. Valid POST actions are: start, complete` 
+          });
         }
-        break;
 
       case 'PUT':
         return await saveProgress(req, res, user, sessionId, body);
@@ -148,18 +166,21 @@ export default async function handler(req, res) {
 
 // Start a new study session
 async function startSession(req, res, user, body) {
-  const { studyId, startTime = new Date().toISOString() } = body;
+  const { studyId, study_id, startTime = new Date().toISOString() } = body;
+  
+  // Support both parameter names for flexibility
+  const actualStudyId = studyId || study_id;
 
-  if (!studyId) {
+  if (!actualStudyId) {
     return res.status(400).json({
       success: false,
-      error: 'Study ID is required'
+      error: 'Study ID is required (use studyId or study_id parameter)'
     });
   }
 
   const sessionData = {
     id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    study_id: studyId,
+    study_id: actualStudyId,
     participant_id: user.id,
     participant_email: user.email,
     status: 'in_progress',

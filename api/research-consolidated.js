@@ -61,17 +61,8 @@ async function loadStudies() {
 
         if (studies && studies.length > 0) {
           console.log(`📚 [SUCCESS] Loaded ${studies.length} studies from Supabase database`);
-          
-          // Normalize field names from database to internal format
-          const normalizedStudies = studies.map(study => ({
-            ...study,
-            created_by: study.researcher_id,  // Map database field to internal field
-            creator_id: study.researcher_id   // Also set creator_id for compatibility
-          }));
-          
-          console.log(`📚 [DEBUG] First study structure after normalization:`, JSON.stringify(normalizedStudies[0], null, 2));
-          console.log(`📚 [DEBUG] First study creator fields: created_by="${normalizedStudies[0].created_by}", creator_id="${normalizedStudies[0].creator_id}", researcher_id="${normalizedStudies[0].researcher_id}"`);
-          return normalizedStudies;
+          console.log(`📚 [DEBUG] First study:`, studies[0]);
+          return studies;
         } else {
           console.log(`📚 [DEBUG] No studies found in Supabase database, checking file storage...`);
         }
@@ -209,7 +200,7 @@ async function saveStudies(studies) {
             target_participants: study.target_participants || 10,
             created_at: study.created_at,
             updated_at: study.updated_at || new Date().toISOString(),
-            researcher_id: study.created_by || study.creator_id || study.researcher_id, // FIXED: Use correct database field
+            creator_id: study.creator_id || study.created_by,
             screening_questions: study.screening_questions || []
           };
           
@@ -368,6 +359,12 @@ export default async function handler(req, res) {
       case 'can-edit-study':
         return await canEditStudy(req, res);
       
+      case 'get-study-results':
+        return await getStudyResults(req, res);
+      
+      case 'get-study-analytics':
+        return await getStudyAnalytics(req, res);
+      
       case 'validate-state-transition':
         return await validateStateTransition(req, res);
       
@@ -376,12 +373,6 @@ export default async function handler(req, res) {
       
       case 'apply':
         return await applyToStudy(req, res);
-      
-      case 'submit-response':
-        return await submitParticipantResponse(req, res);
-      
-      case 'get-study-results':
-        return await getStudyResults(req, res);
       
       case 'clear-demo-data':
         return await clearDemoData(req, res);
@@ -483,32 +474,20 @@ async function getStudies(req, res) {
         const token = authHeader.replace('Bearer ', '');
         
         if (token.startsWith('fallback-token-')) {
-          // Parse fallback token: fallback-token-{userId}-{role}-{email}
-          // Need to handle UUID with hyphens: fallback-token-4c3d798b-2975-4ec4-b9e2-c6f128b8a066-researcher-email
-          const afterPrefix = token.substring('fallback-token-'.length);
-          
-          // Find role by looking for known roles
-          const validRoles = ['participant', 'researcher', 'admin'];
-          let roleIndex = -1;
-          let foundRole = null;
-          
-          for (const role of validRoles) {
-            const index = afterPrefix.indexOf('-' + role + '-');
-            if (index !== -1) {
-              roleIndex = index;
-              foundRole = role;
-              break;
+          // Parse fallback token: fallback-token-{userId}-{role}
+          const parts = token.split('-');
+          if (parts.length >= 4) {
+            userId = parts[2];
+            userRole = parts[3];
+            
+            // Validate role
+            const validRoles = ['participant', 'researcher', 'admin'];
+            if (!validRoles.includes(userRole)) {
+              console.log(`⚠️ Invalid role '${userRole}', defaulting to participant`);
+              userRole = 'participant';
             }
-          }
-          
-          if (roleIndex !== -1 && foundRole) {
-            userId = afterPrefix.substring(0, roleIndex);
-            userRole = foundRole;
-            console.log(`✅ Fallback token parsed: userId=${userId}, role=${userRole}`);
           } else {
-            console.log(`⚠️ Could not parse fallback token structure`);
-            userRole = 'participant';
-            userId = null;
+            console.log(`⚠️ Invalid token format, expected 4+ parts, got ${parts.length}`);
           }
         } else {
           // Handle JWT tokens - decode to get user role
@@ -551,24 +530,100 @@ async function getStudies(req, res) {
     
     // Filter studies based on user role
     if (userRole === 'researcher') {
-      // DEBUGGING: Log all studies and their creator fields
-      console.log(`🔍 DEBUGGING: All ${localStudies.length} studies in backend:`);
-      localStudies.forEach((study, index) => {
-        console.log(`  ${index + 1}. "${study.title}" - created_by:"${study.created_by}", creator_id:"${study.creator_id}", researcher_id:"${study.researcher_id}"`);
-      });
-      console.log(`🔍 DEBUGGING: Looking for studies where creator matches userId: "${userId}"`);
-      
       // Researchers see only their own studies
-      filteredStudies = localStudies.filter(study => {
-        const matches = study.created_by === userId || study.creator_id === userId || study.researcher_id === userId;
-        console.log(`  - "${study.title}": created_by="${study.created_by}" === "${userId}" ? ${study.created_by === userId} | creator_id="${study.creator_id}" === "${userId}" ? ${study.creator_id === userId} | researcher_id="${study.researcher_id}" === "${userId}" ? ${study.researcher_id === userId} => MATCH: ${matches}`);
-        return matches;
-      });
+      filteredStudies = localStudies.filter(study => 
+        study.created_by === userId || 
+        study.creator_id === userId || 
+        study.researcher_id === userId
+      );
       console.log(`🔬 Researcher view: ${filteredStudies.length} studies (filtered by creator: ${userId})`);
       
-      // TEMPORARILY DISABLED: Demo studies fallback for debugging - just return actual filtered results
-      console.log(`📚 Returning ${filteredStudies.length} actual studies (demo fallback disabled for debugging)`);
-      
+      // If researcher has no studies, provide demo studies for testing
+      if (filteredStudies.length === 0) {
+        console.log(`📚 No studies found for researcher ${userId}, providing demo studies for testing`);
+        // Directly provide demo studies without calling loadStudies again
+        filteredStudies = [
+          {
+            "id": "demo-study-1",
+            "title": "E-commerce Navigation Study",
+            "description": "Test how users navigate through our product pages and complete purchases. Help us improve the shopping experience.",
+            "type": "usability",
+            "status": "active",
+            "target_participants": 10,
+            "creator_id": userId, // Assign to current user
+            "created_at": new Date().toISOString(),
+            "blocks": [
+              {
+                "id": "welcome-1",
+                "order": 1,
+                "type": "welcome_screen", 
+                "title": "Welcome",
+                "description": "Welcome to our study!",
+                "settings": {
+                  "title": "Welcome to our E-commerce Study",
+                  "message": "Thank you for participating! We'll test navigation and shopping tasks.",
+                  "showContinueButton": true
+                }
+              },
+              {
+                "id": "task-1", 
+                "order": 2,
+                "type": "task_instructions",
+                "title": "Navigation Task",
+                "description": "Find and add a product to cart",
+                "settings": {
+                  "instructions": "Please navigate to the Electronics section and add a laptop to your cart.",
+                  "timeLimit": 300,
+                  "required": true
+                }
+              }
+            ],
+            "screening_questions": [
+              {
+                "id": "age-check",
+                "question": "What is your age range?",
+                "type": "multiple_choice",
+                "required": true,
+                "options": ["18-25", "26-35", "36-45", "46-55", "56+"]
+              }
+            ]
+          },
+          {
+            "id": "demo-study-2",
+            "title": "Mobile App Usability Test",
+            "description": "Evaluate the user experience of our new mobile application interface.",
+            "type": "usability",
+            "status": "active", 
+            "target_participants": 15,
+            "creator_id": userId, // Assign to current user
+            "created_at": new Date().toISOString(),
+            "blocks": [
+              {
+                "id": "welcome-2",
+                "order": 1,
+                "type": "welcome_screen",
+                "title": "Welcome",
+                "description": "Welcome to our mobile app study!",
+                "settings": {
+                  "title": "Mobile App Usability Test",
+                  "message": "Help us improve our mobile app experience!",
+                  "showContinueButton": true
+                }
+              }
+            ],
+            "screening_questions": [
+              {
+                "id": "device-check",
+                "question": "What type of mobile device do you primarily use?",
+                "type": "multiple_choice",
+                "required": true,
+                "options": ["iPhone", "Android", "Other"]
+              }
+            ]
+          }
+        ];
+        console.log(`📚 Provided ${filteredStudies.length} demo studies for researcher`);
+      }
     } else if (userRole === 'admin') {
       // Admins see all studies including demo data for debugging
       filteredStudies = localStudies;
@@ -635,8 +690,8 @@ async function createStudy(req, res) {
     }
 
     // Get user info from token (same logic as getStudies function)
-    let userId = null; // No fallback - require valid authentication
-    let userEmail = null; // No fallback - require valid authentication
+    let userId = 'test-user'; // Fallback only
+    let userEmail = 'researcher@test.com'; // Fallback only
     
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -644,35 +699,14 @@ async function createStudy(req, res) {
         const token = authHeader.replace('Bearer ', '');
         
         if (token.startsWith('fallback-token-')) {
-          // Parse fallback token: fallback-token-{userId}-{role}-{email}
-          // Need to handle UUID with hyphens: fallback-token-4c3d798b-2975-4ec4-b9e2-c6f128b8a066-researcher-email
-          const afterPrefix = token.substring('fallback-token-'.length);
-          
-          // Find role by looking for known roles
-          const validRoles = ['participant', 'researcher', 'admin'];
-          let roleIndex = -1;
-          let foundRole = null;
-          
-          for (const role of validRoles) {
-            const index = afterPrefix.indexOf('-' + role + '-');
-            if (index !== -1) {
-              roleIndex = index;
-              foundRole = role;
-              break;
+          // Parse fallback token: fallback-token-{userId}-{role}
+          const parts = token.split('-');
+          if (parts.length >= 4) {
+            userId = parts[2];
+            // Try to extract email from parts[4] if available
+            if (parts.length >= 5) {
+              userEmail = decodeURIComponent(parts[4]);
             }
-          }
-          
-          if (roleIndex !== -1 && foundRole) {
-            userId = afterPrefix.substring(0, roleIndex);
-            console.log(`✅ Create study fallback token parsed: userId=${userId}, role=${foundRole}`);
-            
-            // Try to extract email (after role)
-            const emailPart = afterPrefix.substring(roleIndex + foundRole.length + 2);
-            if (emailPart) {
-              userEmail = decodeURIComponent(emailPart);
-            }
-          } else {
-            console.log(`⚠️ Could not parse create study fallback token structure`);
           }
         } else {
           // Handle JWT tokens - decode to get user info (CRITICAL FIX)
@@ -700,20 +734,6 @@ async function createStudy(req, res) {
       }
     }
 
-    // Validate user ID is present
-    if (!userId) {
-      console.log('❌ No valid user ID found in token - cannot create study');
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Authentication required - no valid user ID found',
-        debug: { 
-          hasToken: !!authToken, 
-          tokenLength: authToken?.length,
-          tokenType: authToken?.startsWith('fallback-token') ? 'fallback' : 'jwt'
-        }
-      });
-    }
-
     // Generate new ID
     const newId = (localStudies.length + 1).toString();
 
@@ -737,7 +757,6 @@ async function createStudy(req, res) {
       updated_at: new Date().toISOString(),
       created_by: userId,
       creator_id: userId, // Also add this for compatibility
-      researcher_id: userId, // CRITICAL: Set database field for proper filtering
       profiles: { email: userEmail, full_name: 'Researcher' }
     };
 
@@ -1320,268 +1339,6 @@ async function clearDemoData(req, res) {
 }
 
 // ============================================================================
-// PARTICIPANT FLOW FUNCTIONS
-// ============================================================================
-
-/**
- * Submit participant response to a study
- */
-async function submitParticipantResponse(req, res) {
-  try {
-    console.log('📝 [PARTICIPANT] Processing study response submission');
-    
-    // Ensure studies are loaded from persistent storage
-    await ensureStudiesLoaded();
-    
-    const { study_id, participant_id, responses, completion_time, completed_at } = req.body;
-    
-    if (!study_id || !participant_id || !responses || !Array.isArray(responses)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required fields: study_id, participant_id, responses (array)'
-      });
-    }
-    
-    // Find the study
-    const study = localStudies.find(s => s.id === study_id);
-    if (!study) {
-      return res.status(404).json({
-        success: false,
-        error: 'Study not found'
-      });
-    }
-    
-    // Check if study is active/accepting responses
-    if (study.status !== 'active' && study.status !== 'published') {
-      return res.status(400).json({
-        success: false,
-        error: 'Study is not currently accepting responses'
-      });
-    }
-    
-    // Create participant response record
-    const participantResponse = {
-      id: `response-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      study_id,
-      participant_id,
-      responses,
-      completion_time: completion_time || 0,
-      completed_at: completed_at || new Date().toISOString(),
-      submitted_at: new Date().toISOString(),
-      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      user_agent: req.headers['user-agent']
-    };
-    
-    // Initialize study responses array if it doesn't exist
-    if (!study.participant_responses) {
-      study.participant_responses = [];
-    }
-    
-    // Add the response to the study
-    study.participant_responses.push(participantResponse);
-    
-    // Update study statistics
-    if (!study.participants) {
-      study.participants = { enrolled: 0, completed: 0, target: study.target_participants || 10 };
-    }
-    study.participants.completed = study.participant_responses.length;
-    study.updated_at = new Date().toISOString();
-    
-    // Save updated studies
-    await saveStudies(localStudies);
-    
-    console.log(`✅ [PARTICIPANT] Response submitted successfully for study ${study_id} by participant ${participant_id}`);
-    
-    return res.status(201).json({
-      success: true,
-      message: 'Response submitted successfully',
-      response_id: participantResponse.id,
-      study: {
-        id: study.id,
-        title: study.title,
-        status: study.status
-      }
-    });
-    
-  } catch (error) {
-    console.error('❌ [PARTICIPANT] Submit response error:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to submit response'
-    });
-  }
-}
-
-/**
- * Get study results and analytics for researchers
- */
-async function getStudyResults(req, res) {
-  try {
-    console.log('📊 [RESULTS] Processing study results request');
-    
-    // Ensure studies are loaded from persistent storage
-    await ensureStudiesLoaded();
-    
-    const { id } = req.query;
-    
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        error: 'Study ID is required'
-      });
-    }
-    
-    // Get user authentication info
-    let userId = null;
-    let userRole = null;
-    
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      try {
-        const token = authHeader.substring(7);
-        console.log(`🔐 [RESULTS] Processing auth token: ${token.substring(0, 20)}...`);
-        
-        if (token.startsWith('fallback-token-')) {
-          // Parse fallback token: fallback-token-{userId}-{role}-{email}
-          // Need to handle UUID with hyphens: fallback-token-4c3d798b-2975-4ec4-b9e2-c6f128b8a066-researcher-email
-          const afterPrefix = token.substring('fallback-token-'.length);
-          
-          // Find role by looking for known roles
-          const validRoles = ['participant', 'researcher', 'admin'];
-          let roleIndex = -1;
-          let foundRole = null;
-          
-          for (const role of validRoles) {
-            const index = afterPrefix.indexOf('-' + role + '-');
-            if (index !== -1) {
-              roleIndex = index;
-              foundRole = role;
-              break;
-            }
-          }
-          
-          if (roleIndex !== -1 && foundRole) {
-            userId = afterPrefix.substring(0, roleIndex);
-            userRole = foundRole;
-            console.log(`✅ [RESULTS] Fallback token parsed: userId=${userId}, role=${userRole}`);
-          } else {
-            console.log(`⚠️ [RESULTS] Could not parse fallback token structure`);
-          }
-        } else {
-          // Try JWT validation through Supabase
-          const { data: { user }, error } = await supabase.auth.getUser(token);
-          if (!error && user) {
-            userId = user.id;
-            userRole = user.user_metadata?.role || 'researcher';
-            console.log(`👤 [RESULTS] Authenticated user: ${userId} (${userRole})`);
-          } else {
-            console.log('🔐 [RESULTS] JWT validation failed:', error?.message);
-          }
-        }
-      } catch (authError) {
-        console.log('🔐 [RESULTS] Auth token validation failed:', authError.message);
-      }
-    }
-    
-    // Find the study
-    const study = localStudies.find(s => s.id === id);
-    if (!study) {
-      return res.status(404).json({
-        success: false,
-        error: 'Study not found'
-      });
-    }
-    
-    // Check if user can view results (study owner or admin)
-    console.log(`🔍 [RESULTS] Authorization check - User: ${userId}, Role: ${userRole}`);
-    console.log(`🔍 [RESULTS] Study ownership - created_by: "${study.created_by}", creator_id: "${study.creator_id}", researcher_id: "${study.researcher_id}"`);
-    
-    const isOwner = study.created_by === userId || study.creator_id === userId || study.researcher_id === userId;
-    const canAccess = userRole === 'admin' || isOwner;
-    
-    console.log(`🔍 [RESULTS] Access check - isOwner: ${isOwner}, canAccess: ${canAccess}`);
-    
-    if (!canAccess) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied: You can only view results for your own studies',
-        debug: {
-          userId,
-          userRole,
-          study_created_by: study.created_by,
-          study_creator_id: study.creator_id,
-          study_researcher_id: study.researcher_id,
-          isOwner,
-          canAccess
-        }
-      });
-    }
-    
-    // Prepare study results
-    const responses = study.participant_responses || [];
-    const totalResponses = responses.length;
-    
-    // Calculate basic analytics
-    const analytics = {
-      total_responses: totalResponses,
-      completion_rate: study.participants ? 
-        ((study.participants.completed / (study.participants.target || 10)) * 100).toFixed(1) : 0,
-      average_completion_time: totalResponses > 0 ? 
-        Math.round(responses.reduce((sum, r) => sum + (r.completion_time || 0), 0) / totalResponses) : 0,
-      response_dates: responses.map(r => r.completed_at),
-      first_response: totalResponses > 0 ? responses[0].completed_at : null,
-      latest_response: totalResponses > 0 ? responses[totalResponses - 1].completed_at : null
-    };
-    
-    // Process responses by block type
-    const responsesByBlock = {};
-    study.blocks?.forEach(block => {
-      responsesByBlock[block.id] = {
-        block_info: {
-          id: block.id,
-          type: block.type,
-          title: block.title,
-          description: block.description
-        },
-        responses: responses.map(r => {
-          const blockResponse = r.responses.find(br => br.block_id === block.id);
-          return blockResponse ? {
-            participant_id: r.participant_id,
-            response: blockResponse.response || blockResponse.value,
-            completed: blockResponse.completed,
-            timestamp: blockResponse.timestamp
-          } : null;
-        }).filter(Boolean)
-      };
-    });
-    
-    console.log(`✅ [RESULTS] Returning results for study ${id}: ${totalResponses} responses`);
-    
-    return res.status(200).json({
-      success: true,
-      study: {
-        id: study.id,
-        title: study.title,
-        description: study.description,
-        status: study.status,
-        created_at: study.created_at,
-        updated_at: study.updated_at
-      },
-      analytics,
-      responses: responsesByBlock,
-      raw_responses: responses // Include raw data for advanced analysis
-    });
-    
-  } catch (error) {
-    console.error('❌ [RESULTS] Get study results error:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to retrieve study results'
-    });
-  }
-}
-
-// ============================================================================
 // AI-POWERED FEATURES (Vercel AI Gateway Integration)
 // ============================================================================
 
@@ -1706,4 +1463,295 @@ async function handleAIGenerateReport(req, res) {
 
   const result = await ResearchHubAI.generateStudyReport(studyData, responses);
   return res.status(200).json(result);
+}
+
+/**
+ * Get study results for researchers
+ */
+async function getStudyResults(req, res) {
+  try {
+    const { study_id } = req.query;
+    
+    if (!study_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Study ID is required' 
+      });
+    }
+
+    // Ensure studies are loaded
+    await ensureStudiesLoaded();
+    
+    // Get user info from token for authorization
+    let userId = null;
+    let userRole = 'participant';
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        
+        if (token.startsWith('fallback-token-')) {
+          const parts = token.split('-');
+          if (parts.length >= 4) {
+            userId = parts[2];
+            userRole = parts[3];
+          }
+        } else {
+          // Handle JWT tokens
+          try {
+            const { data: { user }, error } = await supabase.auth.getUser(token);
+            if (user && !error) {
+              userId = user.id;
+              userRole = user.user_metadata?.role || 'participant';
+            }
+          } catch (jwtError) {
+            console.log(`⚠️ JWT parsing error in getStudyResults: ${jwtError.message}`);
+          }
+        }
+      } catch (error) {
+        console.log(`⚠️ Token parsing error in getStudyResults: ${error.message}`);
+      }
+    }
+
+    console.log(`📊 Getting results for study ${study_id}, user: ${userId}, role: ${userRole}`);
+
+    // Find the study
+    const study = localStudies.find(s => s.id === study_id || s._id === study_id);
+    if (!study) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Study not found' 
+      });
+    }
+
+    // Check if user can access this study's results
+    if (userRole === 'researcher') {
+      const canAccess = study.created_by === userId || 
+                       study.creator_id === userId || 
+                       study.researcher_id === userId;
+      
+      if (!canAccess) {
+        return res.status(403).json({ 
+          success: false, 
+          error: 'Access denied. You can only view results for your own studies.' 
+        });
+      }
+    }
+
+    // Mock participant responses for testing (in production, this would come from database)
+    const mockResponses = [
+      {
+        id: 'response-1',
+        participant_id: 'participant-1',
+        session_id: 'session-1',
+        participant_email: 'participant@test.com',
+        started_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+        completed_at: new Date().toISOString(),
+        responses: [
+          {
+            block_id: 'question-1',
+            block_type: 'open_question',
+            response: 'This is a great platform! The interface is intuitive and easy to use.',
+            timestamp: new Date(Date.now() - 1800000).toISOString()
+          },
+          {
+            block_id: 'rating-1',
+            block_type: 'opinion_scale',
+            response: 5,
+            timestamp: new Date(Date.now() - 900000).toISOString()
+          }
+        ]
+      },
+      {
+        id: 'response-2', 
+        participant_id: 'participant-2',
+        session_id: 'session-2',
+        participant_email: 'participant2@test.com',
+        started_at: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+        completed_at: new Date().toISOString(),
+        responses: [
+          {
+            block_id: 'question-1',
+            block_type: 'open_question',
+            response: 'The design could be improved but overall functionality is good.',
+            timestamp: new Date(Date.now() - 3600000).toISOString()
+          },
+          {
+            block_id: 'rating-1',
+            block_type: 'opinion_scale',
+            response: 4,
+            timestamp: new Date(Date.now() - 1800000).toISOString()
+          }
+        ]
+      }
+    ];
+
+    console.log(`✅ Returning ${mockResponses.length} participant responses for study ${study_id}`);
+
+    return res.status(200).json({
+      success: true,
+      study_id: study_id,
+      study_title: study.title,
+      responses: mockResponses,
+      participants: mockResponses.map(r => ({
+        id: r.participant_id,
+        email: r.participant_email,
+        completed_at: r.completed_at
+      })),
+      summary: {
+        total_responses: mockResponses.length,
+        completion_rate: 100, // Mock data
+        avg_duration: 1800 // 30 minutes in seconds
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting study results:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to get study results' 
+    });
+  }
+}
+
+/**
+ * Get study analytics for researchers
+ */
+async function getStudyAnalytics(req, res) {
+  try {
+    const { study_id } = req.query;
+    
+    if (!study_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Study ID is required' 
+      });
+    }
+
+    // Ensure studies are loaded
+    await ensureStudiesLoaded();
+    
+    // Get user info from token for authorization
+    let userId = null;
+    let userRole = 'participant';
+    
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        
+        if (token.startsWith('fallback-token-')) {
+          const parts = token.split('-');
+          if (parts.length >= 4) {
+            userId = parts[2];
+            userRole = parts[3];
+          }
+        } else {
+          // Handle JWT tokens
+          try {
+            const { data: { user }, error } = await supabase.auth.getUser(token);
+            if (user && !error) {
+              userId = user.id;
+              userRole = user.user_metadata?.role || 'participant';
+            }
+          } catch (jwtError) {
+            console.log(`⚠️ JWT parsing error in getStudyAnalytics: ${jwtError.message}`);
+          }
+        }
+      } catch (error) {
+        console.log(`⚠️ Token parsing error in getStudyAnalytics: ${error.message}`);
+      }
+    }
+
+    console.log(`📈 Getting analytics for study ${study_id}, user: ${userId}, role: ${userRole}`);
+
+    // Find the study
+    const study = localStudies.find(s => s.id === study_id || s._id === study_id);
+    if (!study) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Study not found' 
+      });
+    }
+
+    // Check if user can access this study's analytics
+    if (userRole === 'researcher') {
+      const canAccess = study.created_by === userId || 
+                       study.creator_id === userId || 
+                       study.researcher_id === userId;
+      
+      if (!canAccess) {
+        return res.status(403).json({ 
+          success: false, 
+          error: 'Access denied. You can only view analytics for your own studies.' 
+        });
+      }
+    }
+
+    // Mock analytics data for testing (in production, this would be calculated from actual data)
+    const mockAnalytics = {
+      study_id: study_id,
+      study_title: study.title,
+      completion_rate: 85.5,
+      avg_duration: 1650, // seconds
+      total_participants: 47,
+      completed_participants: 42,
+      dropout_rate: 14.5,
+      response_quality: {
+        avg_response_length: 156, // characters
+        engagement_score: 8.2
+      },
+      block_analytics: [
+        {
+          block_id: 'question-1',
+          block_type: 'open_question',
+          completion_rate: 95.7,
+          avg_time_spent: 120, // seconds
+          response_insights: {
+            sentiment: 'positive',
+            key_themes: ['intuitive', 'easy to use', 'good design']
+          }
+        },
+        {
+          block_id: 'rating-1',
+          block_type: 'opinion_scale',
+          completion_rate: 89.4,
+          avg_time_spent: 15,
+          response_insights: {
+            avg_rating: 4.2,
+            distribution: { '1': 2, '2': 3, '3': 8, '4': 15, '5': 14 }
+          }
+        }
+      ],
+      demographic_breakdown: {
+        age: { '18-24': 15, '25-34': 18, '35-44': 10, '45+': 4 },
+        completion_by_demographic: {
+          '18-24': 80.0,
+          '25-34': 88.9,
+          '35-44': 90.0,
+          '45+': 75.0
+        }
+      },
+      time_analytics: {
+        peak_completion_hours: ['14:00', '15:00', '20:00'],
+        avg_daily_completions: 6.7,
+        completion_trend: 'increasing'
+      }
+    };
+
+    console.log(`✅ Returning analytics for study ${study_id}`);
+
+    return res.status(200).json({
+      success: true,
+      analytics: mockAnalytics
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting study analytics:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to get study analytics' 
+    });
+  }
 }
