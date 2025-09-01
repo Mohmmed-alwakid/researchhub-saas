@@ -1,5 +1,30 @@
 [
   {
+    "_id": "11",
+    "id": "11",
+    "title": "Fallback Token Test 1756703622448",
+    "description": "Testing with fallback token to verify user ID extraction",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-09-01T05:13:42.452Z",
+    "updated_at": "2025-09-01T05:13:42.452Z",
+    "created_by": "researcher",
+    "creator_id": "researcher",
+    "researcher_id": "researcher",
+    "profiles": {
+      "email": "abwanwr77+admin@gmail.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
     "_id": "10",
     "id": "10",
     "title": "JWT Fix Test 1756634223053",

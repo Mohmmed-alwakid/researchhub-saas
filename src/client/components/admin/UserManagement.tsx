@@ -172,7 +172,7 @@ const UserManagement: React.FC = () => {
         const rawUsers = Array.isArray(response.data) ? response.data : 
                         ((response.data as Record<string, unknown>)?.users || (response.data as Record<string, unknown>)?.data || []);
         
-        const transformedUsers = (rawUsers as User[]).map(transformUser);
+        const transformedUsers = (Array.isArray(rawUsers) ? rawUsers : []).map((user: unknown) => transformUser(user as Record<string, unknown>));
         console.log('✅ Transformed users:', transformedUsers);
         
         setUsers(transformedUsers);
