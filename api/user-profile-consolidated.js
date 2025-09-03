@@ -1076,78 +1076,59 @@ async function handleGetAllUsers(req, res) {
       });
     }
 
-    if (useLocalAuth) {
-      // Return enhanced mock data for testing admin functionality
-      const mockUsers = [
-        {
-          id: 'admin-1',
-          email: 'abwanwr77+admin@gmail.com',
-          role: 'admin',
-          status: 'active',
-          created_at: new Date().toISOString(),
-          last_login: new Date().toISOString()
-        },
-        {
-          id: 'researcher-1',
-          email: 'abwanwr77+researcher@gmail.com',
-          role: 'researcher',
-          status: 'active',
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-          last_login: new Date(Date.now() - 3600000).toISOString()
-        },
-        {
-          id: 'researcher-2',
-          email: 'john.researcher@university.edu',
-          role: 'researcher',
-          status: 'active',
-          created_at: new Date(Date.now() - 172800000).toISOString(),
-          last_login: new Date(Date.now() - 7200000).toISOString()
-        },
-        {
-          id: 'participant-1',
-          email: 'abwanwr77+participant@gmail.com',
-          role: 'participant',
-          status: 'active',
-          created_at: new Date(Date.now() - 172800000).toISOString(),
-          last_login: new Date(Date.now() - 7200000).toISOString()
-        },
-        {
-          id: 'participant-2',
-          email: 'sarah.participant@email.com',
-          role: 'participant',
-          status: 'active',
-          created_at: new Date(Date.now() - 259200000).toISOString(),
-          last_login: new Date(Date.now() - 14400000).toISOString()
-        },
-        {
-          id: 'participant-3',
-          email: 'mike.user@company.com',
-          role: 'participant',
-          status: 'inactive',
-          created_at: new Date(Date.now() - 604800000).toISOString(),
-          last_login: new Date(Date.now() - 432000000).toISOString()
-        },
-        {
-          id: 'researcher-3',
-          email: 'dr.analysis@research.org',
-          role: 'researcher',
-          status: 'active',
-          created_at: new Date(Date.now() - 345600000).toISOString(),
-          last_login: new Date(Date.now() - 86400000).toISOString()
-        }
-      ];
-      
-      return res.status(200).json({
-        success: true,
-        data: mockUsers
-      });
-    }
-
-    // Real database query
-    const { data: users, error } = await supabaseAdmin
+    // Try getting users from custom users table first
+    let { data: users, error } = await supabaseAdmin
       .from('users')
       .select('id, email, role, status, created_at, last_login, login_attempts, locked_until')
       .order('created_at', { ascending: false });
+
+    // If users table is empty or doesn't exist, get from auth.users
+    if (!users || users.length === 0) {
+      console.log('🔄 No users in custom table, fetching from auth.users...');
+      console.log('🔧 Supabase Admin Debug:', {
+        hasSupabaseAdmin: !!supabaseAdmin,
+        supabaseUrl: process.env.SUPABASE_URL?.substring(0, 30) + '...',
+        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+      });
+      
+      const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error('❌ Error fetching auth users:', authError);
+        console.error('🔧 Auth Error Details:', {
+          message: authError.message,
+          status: authError.status,
+          statusText: authError.statusText
+        });
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to fetch users from auth: ' + authError.message
+        });
+      }
+
+      // Transform auth users to match our expected format
+      users = authUsers.users.map(user => ({
+        id: user.id,
+        email: user.email,
+        role: user.user_metadata?.role || 'participant',
+        status: user.email_confirmed_at ? 'active' : 'pending',
+        created_at: user.created_at,
+        last_login: user.last_sign_in_at || user.created_at,
+        login_attempts: 0,
+        locked_until: null,
+        first_name: user.user_metadata?.first_name || '',
+        last_name: user.user_metadata?.last_name || ''
+      }));
+
+      console.log(`✅ Successfully transformed ${users.length} users from auth.users`);
+      console.log('🔧 Sample user data:', users.slice(0, 2).map(u => ({
+        email: u.email,
+        role: u.role,
+        status: u.status
+      })));
+    } else {
+      console.log(`✅ Found ${users.length} users from custom users table`);
+    }
 
     if (error) {
       console.error('Error fetching all users:', error);
@@ -1272,10 +1253,36 @@ async function handleAdminStats(req, res) {
       });
     }
 
-    // Real database queries
-    const { data: allUsers, error: usersError } = await supabaseAdmin
+    // Try getting users from custom users table first
+    let { data: allUsers, error: usersError } = await supabaseAdmin
       .from('users')
       .select('role, status, created_at');
+
+    // If users table is empty or doesn't exist, get from auth.users
+    if (!allUsers || allUsers.length === 0) {
+      console.log('🔄 No users in custom table for stats, fetching from auth.users...');
+      
+      const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error('Error fetching auth users for stats:', authError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to fetch users for statistics'
+        });
+      }
+
+      // Transform auth users to match our expected format
+      allUsers = authUsers.users.map(user => ({
+        role: user.user_metadata?.role || 'participant',
+        status: user.email_confirmed_at ? 'active' : 'pending',
+        created_at: user.created_at
+      }));
+
+      console.log(`✅ Using ${allUsers.length} users from auth.users for stats`);
+    } else {
+      console.log(`✅ Using ${allUsers.length} users from custom users table for stats`);
+    }
 
     if (usersError) {
       console.error('Error fetching user stats:', usersError);
