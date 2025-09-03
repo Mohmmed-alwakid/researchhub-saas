@@ -970,6 +970,16 @@ export default async function handler(req, res) {
       case 'update-role':
         return await handleUpdateUserRole(req, res);
       
+      // ADMIN ACTIONS
+      case 'get-all-users':
+        return await handleGetAllUsers(req, res);
+      
+      case 'update-user-status':
+        return await handleUpdateUserStatus(req, res);
+      
+      case 'admin-stats':
+        return await handleAdminStats(req, res);
+      
       default:
         // Default to get profile if no action specified
         if (req.method === 'GET') {
@@ -984,7 +994,8 @@ export default async function handler(req, res) {
           success: false,
           error: 'Invalid action',
           availableActions: [
-            'get', 'profile', 'update', 'update-demographics', 'delete', 'stats', 'search', 'update-role'
+            'get', 'profile', 'update', 'update-demographics', 'delete', 'stats', 'search', 'update-role',
+            'get-all-users', 'update-user-status', 'admin-stats'
           ]
         });
     }
@@ -996,3 +1007,225 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// =====================================================================================
+// ADMIN HANDLER FUNCTIONS
+// =====================================================================================
+
+/**
+ * Get all users for admin panel
+ */
+async function handleGetAllUsers(req, res) {
+  try {
+    // Verify admin access
+    const authResult = await authenticateUser(req, ['admin']);
+    if (!authResult.success) {
+      return res.status(authResult.status || 401).json({
+        success: false,
+        error: authResult.error
+      });
+    }
+
+    if (useLocalAuth) {
+      // Return fallback data for testing
+      const mockUsers = [
+        {
+          id: 'admin-1',
+          email: 'abwanwr77+admin@gmail.com',
+          role: 'admin',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString()
+        },
+        {
+          id: 'researcher-1',
+          email: 'abwanwr77+Researcher@gmail.com',
+          role: 'researcher',
+          status: 'active',
+          created_at: new Date(Date.now() - 86400000).toISOString(),
+          last_login: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+          id: 'participant-1',
+          email: 'abwanwr77+participant@gmail.com',
+          role: 'participant',
+          status: 'active',
+          created_at: new Date(Date.now() - 172800000).toISOString(),
+          last_login: new Date(Date.now() - 7200000).toISOString()
+        }
+      ];
+      
+      return res.status(200).json({
+        success: true,
+        data: mockUsers
+      });
+    }
+
+    // Real database query
+    const { data: users, error } = await supabaseAdmin
+      .from('users')
+      .select('id, email, role, status, created_at, last_login, login_attempts, locked_until')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching all users:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch users'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: users || []
+    });
+
+  } catch (error) {
+    console.error('Error in handleGetAllUsers:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Update user status (admin only)
+ */
+async function handleUpdateUserStatus(req, res) {
+  try {
+    // Verify admin access
+    const authResult = await authenticateUser(req, ['admin']);
+    if (!authResult.success) {
+      return res.status(authResult.status || 401).json({
+        success: false,
+        error: authResult.error
+      });
+    }
+
+    const { userId, status } = req.body;
+
+    if (!userId || !status) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing userId or status'
+      });
+    }
+
+    if (useLocalAuth) {
+      // Mock successful update for testing
+      return res.status(200).json({
+        success: true,
+        message: `User status updated to ${status}`,
+        data: { userId, status }
+      });
+    }
+
+    // Real database update
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user status:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update user status'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'User status updated successfully',
+      data
+    });
+
+  } catch (error) {
+    console.error('Error in handleUpdateUserStatus:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get admin statistics
+ */
+async function handleAdminStats(req, res) {
+  try {
+    // Verify admin access
+    const authResult = await authenticateUser(req, ['admin']);
+    if (!authResult.success) {
+      return res.status(authResult.status || 401).json({
+        success: false,
+        error: authResult.error
+      });
+    }
+
+    if (useLocalAuth) {
+      // Return mock stats for testing
+      const mockStats = {
+        totalUsers: 3,
+        activeUsers: 3,
+        researcherCount: 1,
+        participantCount: 1,
+        adminCount: 1,
+        todaySignups: 0,
+        weeklySignups: 2,
+        monthlySignups: 3
+      };
+      
+      return res.status(200).json({
+        success: true,
+        data: mockStats
+      });
+    }
+
+    // Real database queries
+    const { data: allUsers, error: usersError } = await supabaseAdmin
+      .from('users')
+      .select('role, status, created_at');
+
+    if (usersError) {
+      console.error('Error fetching user stats:', usersError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch user statistics'
+      });
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const stats = {
+      totalUsers: allUsers.length,
+      activeUsers: allUsers.filter(u => u.status === 'active').length,
+      researcherCount: allUsers.filter(u => u.role === 'researcher').length,
+      participantCount: allUsers.filter(u => u.role === 'participant').length,
+      adminCount: allUsers.filter(u => u.role === 'admin').length,
+      todaySignups: allUsers.filter(u => new Date(u.created_at) >= today).length,
+      weeklySignups: allUsers.filter(u => new Date(u.created_at) >= weekAgo).length,
+      monthlySignups: allUsers.filter(u => new Date(u.created_at) >= monthAgo).length
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: stats
+    });
+
+  } catch (error) {
+    console.error('Error in handleAdminStats:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+

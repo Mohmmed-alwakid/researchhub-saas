@@ -343,6 +343,9 @@ export default async function handler(req, res) {
       case 'get-studies':
         return await getStudies(req, res);
       
+      case 'get-all-studies':
+        return await getAllStudiesAdmin(req, res);
+      
       case 'create-study':
         // Apply plan enforcement for study creation
         await enforcePlanLimits(req, res, async () => {
@@ -418,7 +421,15 @@ export default async function handler(req, res) {
       default:
         return res.status(400).json({
           success: false,
-          error: `Unknown action: ${action}`
+          error: `Unknown action: ${action}`,
+          availableActions: [
+            'get-studies', 'get-all-studies', 'create-study', 'get-study', 'update-study', 'delete-study',
+            'dashboard-analytics', 'can-edit-study', 'get-study-results', 'get-study-analytics',
+            'validate-state-transition', 'archive-study', 'apply', 'clear-demo-data',
+            'ai-study-suggestions', 'ai-analyze-responses', 'ai-follow-up-questions',
+            'ai-recommend-templates', 'ai-generate-report', 'get-plan-comparison', 
+            'get-usage-stats', 'debug-state'
+          ]
         });
     }
 
@@ -685,6 +696,88 @@ async function getStudies(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: 'Failed to fetch studies' 
+    });
+  }
+}
+
+/**
+ * Get all studies for admin panel (admin only)
+ */
+async function getAllStudiesAdmin(req, res) {
+  try {
+    console.log('🔐 Admin requesting all studies');
+    
+    // Verify admin access
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authorization required for admin access'
+      });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    let userRole = 'participant';
+    
+    if (token.startsWith('fallback-token-')) {
+      const parts = token.split('-');
+      if (parts.length >= 4) {
+        userRole = parts[3];
+      }
+    } else {
+      // Handle JWT tokens
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (user) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          if (userData) {
+            userRole = userData.role;
+          }
+        }
+      } catch (error) {
+        console.error('Error verifying admin token:', error);
+      }
+    }
+
+    // Check admin access
+    if (userRole !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        error: 'Admin access required'
+      });
+    }
+
+    // Load studies
+    await ensureStudiesLoaded();
+    
+    // Return all studies with additional admin info
+    const allStudies = localStudies.map(study => ({
+      id: study.id,
+      title: study.title,
+      status: study.status,
+      created_at: study.created_at || new Date().toISOString(),
+      researcher_id: study.researcher_id || 'unknown',
+      type: study.type || 'unmoderated',
+      participant_count: study.participants?.length || 0,
+      response_count: study.responses?.length || 0
+    }));
+
+    console.log(`✅ Admin: Returning ${allStudies.length} studies`);
+    
+    return res.status(200).json({
+      success: true,
+      data: allStudies
+    });
+
+  } catch (error) {
+    console.error('❌ Error in getAllStudiesAdmin:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch studies for admin'
     });
   }
 }
