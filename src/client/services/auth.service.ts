@@ -173,13 +173,12 @@ export const authService = {  /**
   },
 
   /**
-   * Reset password with tokens
+   * Reset password with reset token
    */
-  async resetPassword(accessToken: string, refreshToken: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
     return apiService.post('password?action=reset', { 
-      accessToken, 
-      refreshToken, 
-      newPassword 
+      token, 
+      password: newPassword 
     });
   },
 
