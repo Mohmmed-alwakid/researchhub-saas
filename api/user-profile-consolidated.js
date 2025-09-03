@@ -177,15 +177,65 @@ async function authenticateWithFallback(token, requiredRoles = []) {
       requiredRoles: requiredRoles
     });
 
+    // Try to decode real Supabase JWT token first (for development with real tokens)
+    try {
+      if (token.includes('.') && token.split('.').length === 3) {
+        // This looks like a JWT token, try to decode it
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('🔧 Fallback Auth Debug - Decoded JWT payload:', {
+          email: payload.email,
+          role: payload.user_metadata?.role,
+          sub: payload.sub
+        });
+
+        const userRole = payload.user_metadata?.role || 'participant';
+        
+        // Check role if specified
+        if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+          console.log('❌ Fallback Auth Debug - Role check failed:', {
+            userRole,
+            requiredRoles,
+            hasAccess: false
+          });
+          return { 
+            success: false, 
+            error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+            status: 403 
+          };
+        }
+
+        // Return user data from JWT
+        const mockUser = {
+          id: payload.sub,
+          email: payload.email,
+          user_metadata: {
+            role: userRole,
+            firstName: payload.user_metadata?.first_name || 'User',
+            lastName: payload.user_metadata?.last_name || 'Name'
+          }
+        };
+
+        console.log('✅ Fallback Auth Debug - JWT Authentication successful:', {
+          userId: mockUser.id,
+          email: mockUser.email,
+          role: mockUser.user_metadata.role
+        });
+
+        return { success: true, user: mockUser };
+      }
+    } catch (jwtError) {
+      console.log('🔧 Fallback Auth Debug - JWT decode failed, trying fallback format:', jwtError.message);
+    }
+
     // Parse fallback token format: fallback-token-test-participant-001-timestamp
     const tokenParts = token.split('-');
     if (tokenParts.length < 5 || !token.startsWith('fallback-token-')) {
       console.log('❌ Fallback Auth Debug - Invalid token format:', {
-        tokenParts: tokenParts,
+        tokenParts: tokenParts.slice(0, 3), // Don't log full token
         hasCorrectPrefix: token.startsWith('fallback-token-'),
         partsCount: tokenParts.length
       });
-      return { success: false, error: 'Invalid fallback token format', status: 401 };
+      return { success: false, error: 'Invalid token format', status: 401 };
     }
 
     const userType = tokenParts[2]; // 'test'

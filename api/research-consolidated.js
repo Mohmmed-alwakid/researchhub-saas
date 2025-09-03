@@ -725,17 +725,38 @@ async function getAllStudiesAdmin(req, res) {
         userRole = parts[3];
       }
     } else {
-      // Handle JWT tokens
+      // Handle JWT tokens - check if supabase is available first
       try {
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (user) {
-          const { data: userData } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-          if (userData) {
-            userRole = userData.role;
+        if (supabase && supabase.auth) {
+          const { data: { user }, error } = await supabase.auth.getUser(token);
+          if (user && !error) {
+            // Try to get user role from database
+            if (supabase) {
+              const { data: userData } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+              if (userData) {
+                userRole = userData.role;
+              }
+            }
+            
+            // Fallback: try to get role from JWT metadata
+            if (userRole === 'participant' && user.user_metadata?.role) {
+              userRole = user.user_metadata.role;
+            }
+          }
+        } else {
+          // If no supabase available, try to decode JWT manually for role info
+          try {
+            if (token.includes('.') && token.split('.').length === 3) {
+              const payload = JSON.parse(atob(token.split('.')[1]));
+              userRole = payload.user_metadata?.role || 'participant';
+              console.log('🔧 Research API - Decoded JWT role:', userRole);
+            }
+          } catch (jwtError) {
+            console.log('🔧 Research API - JWT decode failed:', jwtError.message);
           }
         }
       } catch (error) {
