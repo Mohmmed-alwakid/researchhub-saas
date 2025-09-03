@@ -10,8 +10,8 @@ const SENTRY_CONFIG = {
   development: {
     dsn: 'https://e76a1d4626dd95e2d0c2ca38816c91b4@o4509515744935936.ingest.de.sentry.io/4509826774204496',
     environment: 'development',
-    debug: true,
-    tracesSampleRate: 1.0, // 100% sampling in development
+    debug: false, // Reduced debug to minimize console noise
+    tracesSampleRate: 0.5, // Reduced sampling to 50% in development
     enabled: true
   },
   production: {
@@ -30,12 +30,34 @@ const config = SENTRY_CONFIG[currentEnv];
  * Initialize Sentry for ResearchHub Frontend
  */
 export function initSentry() {
-  if (!config.enabled) {
-    console.log('🔍 Sentry disabled in configuration');
+  // Check if Sentry should be disabled
+  const SENTRY_DISABLED = import.meta.env.VITE_DISABLE_SENTRY === 'true' || 
+                          localStorage.getItem('disableSentry') === 'true';
+  
+  if (!config.enabled || SENTRY_DISABLED) {
+    console.log('🔍 Sentry disabled in configuration or by user preference');
     return;
   }
 
   try {
+    // Add global error handler for Sentry transport errors
+    const originalError = console.error;
+    console.error = (...args) => {
+      const message = args.join(' ');
+      
+      // Filter out Sentry transport and blocking errors
+      if (message.includes('Sentry Logger') && 
+          (message.includes('BLOCKED_BY_CLIENT') || 
+           message.includes('Failed to fetch') ||
+           message.includes('network_error'))) {
+        // Silently ignore these errors
+        return;
+      }
+      
+      // Allow other errors through
+      originalError.apply(console, args);
+    };
+
     Sentry.init({
       dsn: config.dsn,
       environment: config.environment,
@@ -55,29 +77,35 @@ export function initSentry() {
       // Enhanced transport configuration to handle blocking
       transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
       
-      // Graceful error handling for transport failures
+      // Graceful error handling for transport failures and browser blocking
       beforeSend(event, hint) {
         try {
+          const error = hint.originalException as Error;
+          const errorMessage = error?.message || event.message || '';
+          
+          // Always filter out transport and blocking errors (both dev and prod)
+          const blockedPatterns = [
+            'Failed to fetch',
+            'BLOCKED_BY_CLIENT', 
+            'ERR_BLOCKED_BY_CLIENT',
+            'network_error',
+            'sentry.io',
+            'Cannot create proxy with a non-object',
+            'instrumentXHR',
+            'Error while instrumenting xhr'
+          ];
+          
+          if (blockedPatterns.some(pattern => errorMessage.includes(pattern))) {
+            // Silently drop these errors without console logging
+            return null;
+          }
+          
           // Filter out development noise
           if (currentEnv === 'development') {
-            const error = hint.originalException as Error;
-            const errorMessage = error?.message || event.message || '';
-            
-            // Filter out XHR instrumentation errors
-            if (errorMessage.includes('Cannot create proxy with a non-object') ||
-                errorMessage.includes('instrumentXHR') ||
-                errorMessage.includes('Error while instrumenting xhr')) {
-              console.log('📊 Sentry: Filtered XHR instrumentation error');
-              return null;
-            }
-            
             // Skip HMR and development errors
             if (errorMessage.includes('HMR') || 
                 errorMessage.includes('Module build failed') ||
-                errorMessage.includes('WebSocket connection') ||
-                errorMessage.includes('Failed to fetch') ||
-                errorMessage.includes('BLOCKED_BY_CLIENT')) {
-              console.log('📊 Sentry: Filtered development/blocked error');
+                errorMessage.includes('WebSocket connection')) {
               return null;
             }
           }

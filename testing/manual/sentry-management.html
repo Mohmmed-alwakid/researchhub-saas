@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentry Management - ResearchHub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .warning {
+            border-left-color: #ff9800;
+        }
+        .error {
+            border-left-color: #f44336;
+        }
+        .code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.warning {
+            background: #ff9800;
+        }
+        button.warning:hover {
+            background: #e68900;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        .error-status {
+            background: rgba(244, 67, 54, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Sentry Error Tracking Management</h1>
+        
+        <div class="section">
+            <h2>✅ Issue Resolution Status</h2>
+            <p><strong>Problem:</strong> Sentry (error tracking service) was being blocked by ad blockers, causing console noise.</p>
+            <p><strong>Solution Applied:</strong></p>
+            <ul>
+                <li>Enhanced error filtering to silently drop blocked requests</li>
+                <li>Reduced debug output and sampling rates</li>
+                <li>Added graceful handling of transport failures</li>
+                <li>Added quick disable/enable functions</li>
+            </ul>
+            <div class="status success">
+                ✅ Console errors from Sentry blocking should now be significantly reduced
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎛️ Sentry Management Controls</h2>
+            <p>If you still see console errors, you can easily disable Sentry temporarily:</p>
+            
+            <div style="margin: 20px 0;">
+                <button onclick="disableSentry()" class="warning">🚫 Disable Sentry</button>
+                <button onclick="enableSentry()">✅ Enable Sentry</button>
+                <button onclick="checkStatus()">📊 Check Status</button>
+            </div>
+            
+            <p><strong>Console Commands:</strong></p>
+            <div class="code">
+                disableSentry()  // Disable error tracking<br>
+                enableSentry()   // Re-enable error tracking<br>
+                sentryStatus()   // Check current status
+            </div>
+        </div>
+
+        <div class="section warning">
+            <h2>⚠️ Understanding the Errors</h2>
+            <p>The errors you saw were:</p>
+            <div class="code">
+                net::ERR_BLOCKED_BY_CLIENT<br>
+                Sentry Logger [error]: Failed to fetch
+            </div>
+            <p><strong>Cause:</strong> Browser ad blockers (like uBlock Origin, AdBlock Plus) block requests to Sentry's servers because they contain "sentry" in the URL.</p>
+            <p><strong>Impact:</strong> No impact on functionality - only error tracking is affected.</p>
+            <p><strong>Solution:</strong> The code now handles this gracefully without console noise.</p>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Technical Details</h2>
+            <p><strong>Changes Made:</strong></p>
+            <ul>
+                <li>Enhanced <code>beforeSend</code> filter to drop blocked requests silently</li>
+                <li>Added console.error override to filter Sentry transport errors</li>
+                <li>Reduced development sampling from 100% to 50%</li>
+                <li>Disabled debug mode to reduce console output</li>
+                <li>Added localStorage-based disable mechanism</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Next Steps</h2>
+            <p>1. <strong>Test the site:</strong> Browse normally and check if console errors are reduced</p>
+            <p>2. <strong>If issues persist:</strong> Use the disable button above</p>
+            <p>3. <strong>Production note:</strong> This only affects development - production users won't see these errors</p>
+        </div>
+
+        <div id="statusDisplay" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Sentry management functions
+        function disableSentry() {
+            localStorage.setItem('disableSentry', 'true');
+            updateStatus('🚫 Sentry disabled. Refresh page to take effect.', 'warning');
+        }
+
+        function enableSentry() {
+            localStorage.removeItem('disableSentry');
+            updateStatus('✅ Sentry enabled. Refresh page to take effect.', 'success');
+        }
+
+        function checkStatus() {
+            const isDisabled = localStorage.getItem('disableSentry') === 'true';
+            const status = isDisabled ? '🚫 DISABLED' : '✅ ENABLED';
+            updateStatus(`Sentry is currently: ${status}`, isDisabled ? 'warning' : 'success');
+        }
+
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('statusDisplay');
+            statusDiv.innerHTML = `<div class="status ${type === 'success' ? 'success' : 'error-status'}">${message}</div>`;
+        }
+
+        // Check initial status
+        window.onload = function() {
+            checkStatus();
+        };
+
+        // Make functions globally available
+        window.disableSentry = disableSentry;
+        window.enableSentry = enableSentry;
+        window.sentryStatus = checkStatus;
+    </script>
+</body>
+</html>

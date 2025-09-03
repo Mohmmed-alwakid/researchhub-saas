@@ -8,6 +8,7 @@ import './utils/devConsoleManager'
 
 // Initialize Sentry for comprehensive error tracking
 import { initSentry } from './config/sentry'
+import './utils/sentryManagement' // Enable Sentry management functions in development
 initSentry()
 
 // Enhanced error filtering: Only suppress browser extension noise, allow real errors
