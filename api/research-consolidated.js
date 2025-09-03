@@ -348,7 +348,7 @@ export default async function handler(req, res) {
       
       case 'create-study':
         // Apply plan enforcement for study creation
-        await enforcePlanLimits(req, res, async () => {
+        return enforcePlanLimits(req, res, async () => {
           const result = await createStudy(req, res);
           
           // Update usage after successful creation
@@ -358,7 +358,6 @@ export default async function handler(req, res) {
           
           return result;
         });
-        return;
       
       case 'get-study':
         return await getStudy(req, res);
