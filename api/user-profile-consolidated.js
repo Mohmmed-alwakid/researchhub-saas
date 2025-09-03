@@ -1077,7 +1077,7 @@ async function handleGetAllUsers(req, res) {
     }
 
     if (useLocalAuth) {
-      // Return fallback data for testing
+      // Return enhanced mock data for testing admin functionality
       const mockUsers = [
         {
           id: 'admin-1',
@@ -1089,11 +1089,19 @@ async function handleGetAllUsers(req, res) {
         },
         {
           id: 'researcher-1',
-          email: 'abwanwr77+Researcher@gmail.com',
+          email: 'abwanwr77+researcher@gmail.com',
           role: 'researcher',
           status: 'active',
           created_at: new Date(Date.now() - 86400000).toISOString(),
           last_login: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+          id: 'researcher-2',
+          email: 'john.researcher@university.edu',
+          role: 'researcher',
+          status: 'active',
+          created_at: new Date(Date.now() - 172800000).toISOString(),
+          last_login: new Date(Date.now() - 7200000).toISOString()
         },
         {
           id: 'participant-1',
@@ -1102,6 +1110,30 @@ async function handleGetAllUsers(req, res) {
           status: 'active',
           created_at: new Date(Date.now() - 172800000).toISOString(),
           last_login: new Date(Date.now() - 7200000).toISOString()
+        },
+        {
+          id: 'participant-2',
+          email: 'sarah.participant@email.com',
+          role: 'participant',
+          status: 'active',
+          created_at: new Date(Date.now() - 259200000).toISOString(),
+          last_login: new Date(Date.now() - 14400000).toISOString()
+        },
+        {
+          id: 'participant-3',
+          email: 'mike.user@company.com',
+          role: 'participant',
+          status: 'inactive',
+          created_at: new Date(Date.now() - 604800000).toISOString(),
+          last_login: new Date(Date.now() - 432000000).toISOString()
+        },
+        {
+          id: 'researcher-3',
+          email: 'dr.analysis@research.org',
+          role: 'researcher',
+          status: 'active',
+          created_at: new Date(Date.now() - 345600000).toISOString(),
+          last_login: new Date(Date.now() - 86400000).toISOString()
         }
       ];
       
@@ -1217,16 +1249,21 @@ async function handleAdminStats(req, res) {
     }
 
     if (useLocalAuth) {
-      // Return mock stats for testing
+      // Return enhanced mock stats reflecting realistic admin dashboard data
       const mockStats = {
-        totalUsers: 3,
-        activeUsers: 3,
-        researcherCount: 1,
-        participantCount: 1,
+        totalUsers: 7,
+        activeUsers: 6,
+        researcherCount: 3,
+        participantCount: 3,
         adminCount: 1,
-        todaySignups: 0,
-        weeklySignups: 2,
-        monthlySignups: 3
+        todaySignups: 1,
+        weeklySignups: 4,
+        monthlySignups: 7,
+        totalRevenue: 2485.50,
+        monthlyRevenue: 485.50,
+        totalStudies: 12,
+        activeStudies: 8,
+        completedStudies: 4
       };
       
       return res.status(200).json({
