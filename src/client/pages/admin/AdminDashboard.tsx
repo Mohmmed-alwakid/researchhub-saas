@@ -3,9 +3,10 @@ import { useAuthStore } from '../../stores/authStore';
 import { Navigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, BarChart3, Settings, 
-  Shield, LogOut, DollarSign,
-  FileText, Database, Activity 
+  LogOut, DollarSign,
+  FileText, Activity 
 } from 'lucide-react';
+import AfkarLogo from '../../../assets/brand/AfkarLogo';
 
 interface AdminStats {
   totalUsers: number;
@@ -414,8 +415,8 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Database className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-spin" />
-          <p className="text-gray-600">Loading admin dashboard...</p>
+          <AfkarLogo size="lg" className="mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Loading Afkar admin dashboard...</p>
         </div>
       </div>
     );
@@ -428,8 +429,8 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Shield className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-xl font-semibold text-gray-900">ResearchHub Admin</h1>
+              <AfkarLogo size="sm" className="mr-3" />
+              <h1 className="text-xl font-semibold text-gray-900">Afkar Admin</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Welcome, {user.email}</span>

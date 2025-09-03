@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, AlertCircle, CheckCircle, Shield } from 'lucide-react';
-import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
+import AfkarLogo from '../../../assets/brand/AfkarLogo';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
 import { authService } from '../../services';
@@ -183,7 +183,10 @@ const ResetPasswordPage = () => {
   if (isValidToken === null) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <div className="text-center">
+          <AfkarLogo size="lg" className="mx-auto animate-pulse" />
+          <p className="mt-4 text-sm text-gray-600">Validating reset link...</p>
+        </div>
       </div>
     );
   }

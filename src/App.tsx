@@ -17,6 +17,7 @@ import { PerformanceMonitor } from './client/components/performance/PerformanceM
 import LazyLoadErrorBoundary from './client/components/common/LazyLoadErrorBoundary';
 import { useAuthStore } from './client/stores/authStore';
 import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
+import AfkarLogo from './assets/brand/AfkarLogo';
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./client/pages/LandingPage'));
@@ -120,9 +121,9 @@ function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-sm text-gray-600">
-            {currentIsLoading ? 'Loading user data...' : 'Redirecting...'}
+          <AfkarLogo size="lg" className="mx-auto animate-pulse" />
+          <p className="mt-4 text-sm text-gray-600">
+            {currentIsLoading ? 'Loading Afkar...' : 'Redirecting...'}
           </p>
         </div>
       </div>
