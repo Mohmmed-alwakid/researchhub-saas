@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production JWT Fix Verification</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; 
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .info { color: #007bff; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .button { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        .button:hover { background: #0056b3; }
+        .button:disabled { background: #6c757d; cursor: not-allowed; }
+        .results { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+            border-left: 4px solid #007bff; 
+        }
+        pre { 
+            background: #f1f1f1; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto; 
+            max-height: 400px;
+        }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .step-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .production-badge { 
+            background: #dc3545; 
+            color: white; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            margin-left: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Production JWT Fix Verification <span class="production-badge">LIVE</span></h1>
+    <p class="info">Testing JWT parsing fix on production environment: https://researchhub-saas.vercel.app</p>
+
+    <div class="container">
+        <h2>Production Test Configuration</h2>
+        <div id="config">
+            <p><strong>Environment:</strong> Production (Live)</p>
+            <p><strong>API Base:</strong> https://researchhub-saas.vercel.app</p>
+            <p><strong>Test User:</strong> abwanwr77+researcher@gmail.com</p>
+            <p><strong>Expected User ID:</strong> 4c3d798b-2975-4ec4-b9e2-c6f128b8a066</p>
+            <p><strong>Test Objective:</strong> Verify JWT parsing works in production Vercel environment</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 1: Production Authentication Test</div>
+        <p>Test authentication on live production environment</p>
+        <button class="button" onclick="testProductionAuth()">Test Production Login</button>
+        <div id="authResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 2: Production Study Creation</div>
+        <p>Create a study on production to test JWT parsing</p>
+        <button class="button" onclick="createProductionStudy()" id="createBtn" disabled>Create Production Study</button>
+        <div id="createResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 3: Production Study Retrieval</div>
+        <p>Verify study appears in researcher dashboard</p>
+        <button class="button" onclick="getProductionStudies()" id="getBtn" disabled>Get Production Studies</button>
+        <div id="getResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 4: Production vs Local Comparison</div>
+        <p>Compare production behavior with local development results</p>
+        <button class="button" onclick="compareEnvironments()" id="compareBtn" disabled>Compare Environments</button>
+        <div id="compareResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 5: Production Participant Flow Test</div>
+        <p>Test participant workflow on production environment</p>
+        <button class="button" onclick="testProductionParticipantFlow()" id="participantBtn" disabled>Test Participant Flow</button>
+        <div id="participantResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Production Test Summary</h2>
+        <div id="testSummary" class="results">
+            <p class="info">Production tests not yet started. Click buttons above to run tests.</p>
+        </div>
+    </div>
+
+    <script>
+        const PRODUCTION_API = 'https://researchhub-saas.vercel.app';
+        const LOCAL_API = 'http://localhost:3003';
+        const EXPECTED_USER_ID = '4c3d798b-2975-4ec4-b9e2-c6f128b8a066';
+        
+        let productionToken = null;
+        let productionStudyId = null;
+        let productionResults = {
+            auth: false,
+            create: false,
+            retrieve: false,
+            comparison: false,
+            participant: false
+        };
+
+        async function testProductionAuth() {
+            const resultsDiv = document.getElementById('authResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Testing production authentication...</p>';
+
+            try {
+                const response = await fetch(`${PRODUCTION_API}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                let html = '<h4>Production Authentication Results</h4>';
+                
+                if (result.success && result.session?.access_token) {
+                    productionToken = result.session.access_token;
+                    
+                    // Parse JWT to verify user ID
+                    const payload = JSON.parse(atob(productionToken.split('.')[1]));
+                    const userId = payload.sub;
+                    const userRole = payload.role || payload.user_metadata?.role;
+                    
+                    html += `
+                        <p class="success">✅ Production authentication successful!</p>
+                        <p><strong>Token received:</strong> ${productionToken.substring(0, 50)}...</p>
+                        <p><strong>User ID from JWT:</strong> ${userId}</p>
+                        <p><strong>User Role:</strong> ${userRole}</p>
+                        <p><strong>User Email:</strong> ${payload.email}</p>
+                        <p><strong>Expected ID:</strong> ${EXPECTED_USER_ID}</p>
+                        <p><strong>ID Match:</strong> ${userId === EXPECTED_USER_ID ? '✅ YES' : '❌ NO'}</p>
+                        <details>
+                            <summary>Full JWT Payload</summary>
+                            <pre>${JSON.stringify(payload, null, 2)}</pre>
+                        </details>
+                    `;
+                    
+                    productionResults.auth = true;
+                    document.getElementById('createBtn').disabled = false;
+                } else {
+                    html += `<p class="error">❌ Production authentication failed: ${JSON.stringify(result)}</p>`;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Production auth error: ${error.message}</p>`;
+            }
+        }
+
+        async function createProductionStudy() {
+            const resultsDiv = document.getElementById('createResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Creating study on production...</p>';
+
+            try {
+                const studyData = {
+                    title: `Production JWT Test ${new Date().toLocaleTimeString()}`,
+                    description: 'Testing JWT parsing fix on production Vercel environment',
+                    type: 'usability',
+                    status: 'active',
+                    target_participants: 5,
+                    blocks: [
+                        {
+                            type: 'welcome',
+                            title: 'Production Test Welcome',
+                            description: 'Testing production environment',
+                            settings: {}
+                        }
+                    ]
+                };
+
+                const response = await fetch(`${PRODUCTION_API}/api/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${productionToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                
+                let html = '<h4>Production Study Creation Results</h4>';
+                
+                if (result.success && (result.data?.id || result.study?.id)) {
+                    productionStudyId = result.data?.id || result.study?.id;
+                    const study = result.data || result.study;
+                    
+                    html += `
+                        <p class="success">✅ Production study created successfully!</p>
+                        <p><strong>Study ID:</strong> ${productionStudyId}</p>
+                        <p><strong>Title:</strong> ${study.title}</p>
+                        <p><strong>Creator ID:</strong> ${study.creator_id || study.created_by}</p>
+                        <p><strong>Expected User ID:</strong> ${EXPECTED_USER_ID}</p>
+                        <p><strong>Creator Match:</strong> ${(study.creator_id === EXPECTED_USER_ID || study.created_by === EXPECTED_USER_ID) ? '✅ YES' : '❌ NO'}</p>
+                        <details>
+                            <summary>Full Study Data</summary>
+                            <pre>${JSON.stringify(study, null, 2)}</pre>
+                        </details>
+                    `;
+                    
+                    productionResults.create = true;
+                    document.getElementById('getBtn').disabled = false;
+                } else {
+                    html += `<p class="error">❌ Production study creation failed:</p>`;
+                    html += `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Production study creation error: ${error.message}</p>`;
+            }
+        }
+
+        async function getProductionStudies() {
+            const resultsDiv = document.getElementById('getResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Retrieving production studies...</p>';
+
+            try {
+                const response = await fetch(`${PRODUCTION_API}/api/research-consolidated?action=get-studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${productionToken}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                let html = '<h4>Production Study Retrieval Results</h4>';
+                
+                if (result.success && (result.data || result.studies)) {
+                    const studies = result.data || result.studies;
+                    const ourStudy = studies.find(s => s.id === productionStudyId);
+                    
+                    html += `
+                        <p class="success">✅ Production studies retrieved successfully!</p>
+                        <p><strong>Total Studies:</strong> ${studies.length}</p>
+                        <p><strong>Our Study Found:</strong> ${ourStudy ? '✅ YES' : '❌ NO'}</p>
+                    `;
+                    
+                    if (ourStudy) {
+                        html += `
+                            <p><strong>Study Title:</strong> ${ourStudy.title}</p>
+                            <p><strong>Creator ID:</strong> ${ourStudy.creator_id || ourStudy.created_by}</p>
+                            <p><strong>Creator Match:</strong> ${(ourStudy.creator_id === EXPECTED_USER_ID || ourStudy.created_by === EXPECTED_USER_ID) ? '✅ YES' : '❌ NO'}</p>
+                        `;
+                        productionResults.retrieve = true;
+                    }
+                    
+                    html += `
+                        <details>
+                            <summary>All Studies (${studies.length})</summary>
+                            <pre>${JSON.stringify(studies, null, 2)}</pre>
+                        </details>
+                    `;
+                    
+                    document.getElementById('compareBtn').disabled = false;
+                } else {
+                    html += `<p class="error">❌ Production study retrieval failed:</p>`;
+                    html += `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Production study retrieval error: ${error.message}</p>`;
+            }
+        }
+
+        async function compareEnvironments() {
+            const resultsDiv = document.getElementById('compareResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Comparing production vs local environments...</p>';
+
+            let html = '<h4>Environment Comparison Results</h4>';
+            
+            // Local vs Production comparison
+            html += `
+                <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                    <tr style="background: #f8f9fa;">
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Feature</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Local (Dev)</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Production</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Status</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Authentication</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">✅ Working</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.auth ? '✅ Working' : '❌ Failed'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.auth ? '✅ Match' : '❌ Mismatch'}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">JWT Parsing</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">✅ Fixed</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.auth ? '✅ Fixed' : '❌ Still Broken'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.auth ? '✅ Match' : '❌ Mismatch'}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Study Creation</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">✅ Working</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.create ? '✅ Working' : '❌ Failed'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.create ? '✅ Match' : '❌ Mismatch'}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Study Persistence</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">✅ Working</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.retrieve ? '✅ Working' : '❌ Failed'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${productionResults.retrieve ? '✅ Match' : '❌ Mismatch'}</td>
+                    </tr>
+                </table>
+            `;
+
+            const allWorking = productionResults.auth && productionResults.create && productionResults.retrieve;
+            
+            if (allWorking) {
+                html += `<p class="success">🎉 JWT fix is working perfectly in both environments!</p>`;
+                productionResults.comparison = true;
+                document.getElementById('participantBtn').disabled = false;
+            } else {
+                html += `<p class="error">⚠️ Issues found in production environment - further debugging needed</p>`;
+            }
+
+            resultsDiv.innerHTML = html;
+            updateSummary();
+        }
+
+        async function testProductionParticipantFlow() {
+            const resultsDiv = document.getElementById('participantResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Testing production participant workflow...</p>';
+
+            try {
+                // Test participant login
+                const participantLoginResponse = await fetch(`${PRODUCTION_API}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+participant@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const participantLoginResult = await participantLoginResponse.json();
+                
+                let html = '<h4>Production Participant Flow Results</h4>';
+                
+                if (participantLoginResult.success && participantLoginResult.session?.access_token) {
+                    const participantToken = participantLoginResult.session.access_token;
+                    
+                    html += `<p class="success">✅ Participant authentication successful</p>`;
+                    
+                    // Test study discovery
+                    try {
+                        const discoveryResponse = await fetch(`${PRODUCTION_API}/api/research-consolidated?action=get-public-studies`, {
+                            method: 'GET'
+                        });
+                        
+                        const discoveryResult = await discoveryResponse.json();
+                        
+                        if (discoveryResult.success) {
+                            const studies = discoveryResult.data || discoveryResult.studies || [];
+                            const ourStudy = studies.find(s => s.id === productionStudyId);
+                            
+                            html += `
+                                <p class="success">✅ Study discovery working</p>
+                                <p><strong>Public Studies:</strong> ${studies.length}</p>
+                                <p><strong>Our Study Visible:</strong> ${ourStudy ? '✅ YES' : '❌ NO'}</p>
+                            `;
+                            
+                            if (ourStudy) {
+                                productionResults.participant = true;
+                            }
+                        } else {
+                            html += `<p class="error">❌ Study discovery failed</p>`;
+                        }
+                    } catch (error) {
+                        html += `<p class="error">❌ Study discovery error: ${error.message}</p>`;
+                    }
+                    
+                } else {
+                    html += `<p class="error">❌ Participant authentication failed</p>`;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Participant flow error: ${error.message}</p>`;
+            }
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            const totalTests = Object.keys(productionResults).length;
+            const passedTests = Object.values(productionResults).filter(result => result).length;
+            
+            let html = `<h4>Production Test Results Summary</h4>`;
+            html += `<p><strong>Tests Passed:</strong> ${passedTests}/${totalTests}</p>`;
+            
+            Object.entries(productionResults).forEach(([test, passed]) => {
+                const emoji = passed ? '✅' : '❌';
+                const status = passed ? 'PASS' : 'FAIL';
+                html += `<p>${emoji} ${test.charAt(0).toUpperCase() + test.slice(1)}: ${status}</p>`;
+            });
+
+            if (passedTests === totalTests) {
+                html += `
+                    <p class="success">🎉 JWT fix verified on production!</p>
+                    <p class="success">✅ Production environment fully functional</p>
+                    <p class="success">✅ Study persistence working in production</p>
+                `;
+            } else if (passedTests > 0) {
+                html += `<p class="warning">⚠️ Partial success - some production issues remain</p>`;
+            } else {
+                html += `<p class="error">❌ Production environment has issues - needs investigation</p>`;
+            }
+
+            summaryDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

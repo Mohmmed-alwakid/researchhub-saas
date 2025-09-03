@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Persistence Fix Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #4CAF50;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .test-section.success {
+            border-color: #4CAF50;
+            background-color: #f8fff8;
+        }
+        .test-section.error {
+            border-color: #f44336;
+            background-color: #fff8f8;
+        }
+        .test-section.running {
+            border-color: #2196F3;
+            background-color: #f8f9ff;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .status {
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .study-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .flex {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .progress {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background: #4CAF50;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Study Persistence Fix Verification</h1>
+            <p>Testing the enhanced JWT authentication and user association fixes</p>
+            <div class="status info">
+                <strong>Target Issue:</strong> Studies created successfully but don't appear in studies dashboard
+            </div>
+        </div>
+
+        <!-- Test Configuration -->
+        <div class="test-section">
+            <h3>🎯 Test Configuration</h3>
+            <div class="flex">
+                <div>
+                    <label>API Base URL:</label>
+                    <input type="text" id="apiUrl" value="http://localhost:3003/api" style="width: 300px; padding: 8px;">
+                </div>
+                <div>
+                    <label>Test User Email:</label>
+                    <input type="text" id="testEmail" value="abwanwr77+Researcher@gmail.com" style="width: 300px; padding: 8px;">
+                </div>
+            </div>
+            <div class="flex">
+                <div>
+                    <label>Password:</label>
+                    <input type="password" id="testPassword" value="Testtest123" style="width: 200px; padding: 8px;">
+                </div>
+                <button onclick="authenticateUser()">🔑 Authenticate</button>
+            </div>
+        </div>
+
+        <!-- Authentication Status -->
+        <div class="test-section" id="authSection">
+            <h3>🔑 Authentication Status</h3>
+            <div id="authStatus" class="status info">Not authenticated</div>
+            <div id="authDetails" class="log" style="height: 100px;"></div>
+        </div>
+
+        <!-- Study Creation Test -->
+        <div class="test-section" id="createSection">
+            <h3>📝 Study Creation Test</h3>
+            <div class="flex">
+                <input type="text" id="studyTitle" placeholder="Test Study Title" value="Study Persistence Fix Test" style="width: 300px; padding: 8px;">
+                <button onclick="createTestStudy()" id="createBtn" disabled>📝 Create Study</button>
+            </div>
+            <div id="createStatus" class="status info">Ready to create study</div>
+            <div id="createLog" class="log" style="height: 150px;"></div>
+        </div>
+
+        <!-- Study Retrieval Test -->
+        <div class="test-section" id="retrieveSection">
+            <h3>📚 Study Retrieval Test</h3>
+            <div class="flex">
+                <button onclick="getStudies()" id="retrieveBtn" disabled>📚 Get Studies</button>
+                <button onclick="clearLogs()">🧹 Clear Logs</button>
+            </div>
+            <div id="retrieveStatus" class="status info">Ready to retrieve studies</div>
+            <div id="retrieveLog" class="log" style="height: 200px;"></div>
+        </div>
+
+        <!-- Test Results Summary -->
+        <div class="test-section" id="resultsSection">
+            <h3>📊 Test Results Summary</h3>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div id="testResults">
+                <div class="status info">Tests not started</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let userId = null;
+        let createdStudyId = null;
+        let testResults = {
+            auth: false,
+            create: false,
+            retrieve: false,
+            persistence: false
+        };
+
+        function updateProgress() {
+            const completed = Object.values(testResults).filter(r => r).length;
+            const total = Object.keys(testResults).length;
+            const percentage = (completed / total) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            
+            let resultHtml = `<div class="status info">Progress: ${completed}/${total} tests passed</div>`;
+            
+            for (const [test, passed] of Object.entries(testResults)) {
+                const status = passed ? 'success' : 'error';
+                const icon = passed ? '✅' : '❌';
+                resultHtml += `<div class="status ${status}">${icon} ${test.toUpperCase()}: ${passed ? 'PASSED' : 'PENDING'}</div>`;
+            }
+            
+            document.getElementById('testResults').innerHTML = resultHtml;
+        }
+
+        function log(elementId, message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById(elementId);
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${elementId}] ${message}`);
+        }
+
+        function setStatus(elementId, message, type = 'info') {
+            const statusElement = document.getElementById(elementId);
+            statusElement.className = `status ${type}`;
+            statusElement.textContent = message;
+        }
+
+        async function authenticateUser() {
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            const apiUrl = document.getElementById('apiUrl').value;
+            
+            setStatus('authStatus', 'Authenticating...', 'info');
+            log('authDetails', 'Starting authentication process...');
+            
+            try {
+                const response = await fetch(`${apiUrl}/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                log('authDetails', `Auth response: ${JSON.stringify(result, null, 2)}`);
+                
+                if (result.success && result.session) {
+                    authToken = result.session.access_token;
+                    userId = result.user?.id || result.session?.user?.id;
+                    
+                    setStatus('authStatus', `✅ Authenticated as ${email}`, 'success');
+                    log('authDetails', `Token obtained: ${authToken.substring(0, 20)}...`);
+                    log('authDetails', `User ID: ${userId}`);
+                    
+                    // Enable other test buttons
+                    document.getElementById('createBtn').disabled = false;
+                    document.getElementById('retrieveBtn').disabled = false;
+                    
+                    testResults.auth = true;
+                    updateProgress();
+                } else {
+                    setStatus('authStatus', `❌ Authentication failed: ${result.error}`, 'error');
+                    log('authDetails', `Authentication failed: ${result.error}`);
+                }
+            } catch (error) {
+                setStatus('authStatus', `❌ Network error: ${error.message}`, 'error');
+                log('authDetails', `Network error: ${error.message}`);
+            }
+        }
+
+        async function createTestStudy() {
+            if (!authToken) {
+                alert('Please authenticate first');
+                return;
+            }
+            
+            const title = document.getElementById('studyTitle').value;
+            const apiUrl = document.getElementById('apiUrl').value;
+            
+            setStatus('createStatus', 'Creating study...', 'info');
+            log('createLog', 'Starting study creation...');
+            log('createLog', `Study title: ${title}`);
+            log('createLog', `Using token: ${authToken.substring(0, 20)}...`);
+            
+            const studyData = {
+                title: title,
+                description: 'Test study to verify persistence fix',
+                type: 'usability',
+                status: 'active',
+                target_participants: 5,
+                blocks: [
+                    {
+                        id: 'welcome',
+                        type: 'welcome',
+                        title: 'Welcome',
+                        description: 'Welcome to our test study'
+                    },
+                    {
+                        id: 'task',
+                        type: 'open_question',
+                        title: 'Test Task',
+                        description: 'Please complete this test task'
+                    },
+                    {
+                        id: 'thankyou',
+                        type: 'thank_you',
+                        title: 'Thank You',
+                        description: 'Thank you for participating'
+                    }
+                ]
+            };
+            
+            try {
+                const response = await fetch(`${apiUrl}/research?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+                
+                const result = await response.json();
+                log('createLog', `Create response: ${JSON.stringify(result, null, 2)}`);
+                
+                if (result.success && result.study) {
+                    createdStudyId = result.study.id;
+                    setStatus('createStatus', `✅ Study created successfully: ${createdStudyId}`, 'success');
+                    log('createLog', `Study ID: ${createdStudyId}`);
+                    log('createLog', `Study creator_id: ${result.study.creator_id}`);
+                    log('createLog', `Study created_by: ${result.study.created_by}`);
+                    
+                    testResults.create = true;
+                    updateProgress();
+                } else {
+                    setStatus('createStatus', `❌ Study creation failed: ${result.error}`, 'error');
+                    log('createLog', `Creation failed: ${result.error}`);
+                }
+            } catch (error) {
+                setStatus('createStatus', `❌ Network error: ${error.message}`, 'error');
+                log('createLog', `Network error: ${error.message}`);
+            }
+        }
+
+        async function getStudies() {
+            if (!authToken) {
+                alert('Please authenticate first');
+                return;
+            }
+            
+            const apiUrl = document.getElementById('apiUrl').value;
+            
+            setStatus('retrieveStatus', 'Retrieving studies...', 'info');
+            log('retrieveLog', 'Starting study retrieval...');
+            log('retrieveLog', `Using token: ${authToken.substring(0, 20)}...`);
+            log('retrieveLog', `Looking for user studies for ID: ${userId}`);
+            
+            try {
+                const response = await fetch(`${apiUrl}/research?action=get-studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const result = await response.json();
+                log('retrieveLog', `Retrieve response: ${JSON.stringify(result, null, 2)}`);
+                
+                if (result.success) {
+                    const studies = result.studies || [];
+                    setStatus('retrieveStatus', `✅ Retrieved ${studies.length} studies`, 'success');
+                    
+                    // Log each study for debugging
+                    studies.forEach((study, index) => {
+                        log('retrieveLog', `Study ${index + 1}: ${study.title} (${study.id})`);
+                        log('retrieveLog', `  - Creator ID: ${study.creator_id || study.created_by}`);
+                        log('retrieveLog', `  - Status: ${study.status}`);
+                    });
+                    
+                    // Check if our created study is in the list
+                    if (createdStudyId) {
+                        const foundStudy = studies.find(s => s.id === createdStudyId);
+                        if (foundStudy) {
+                            setStatus('retrieveStatus', `✅ Created study found in list! Persistence works!`, 'success');
+                            log('retrieveLog', `🎉 SUCCESS: Created study "${foundStudy.title}" found in studies list!`);
+                            testResults.persistence = true;
+                        } else {
+                            setStatus('retrieveStatus', `❌ Created study NOT found in list. Persistence issue confirmed.`, 'error');
+                            log('retrieveLog', `❌ ISSUE: Created study ${createdStudyId} not found in retrieved studies`);
+                        }
+                    }
+                    
+                    testResults.retrieve = true;
+                    updateProgress();
+                } else {
+                    setStatus('retrieveStatus', `❌ Retrieval failed: ${result.error}`, 'error');
+                    log('retrieveLog', `Retrieval failed: ${result.error}`);
+                }
+            } catch (error) {
+                setStatus('retrieveStatus', `❌ Network error: ${error.message}`, 'error');
+                log('retrieveLog', `Network error: ${error.message}`);
+            }
+        }
+
+        function clearLogs() {
+            document.getElementById('authDetails').textContent = '';
+            document.getElementById('createLog').textContent = '';
+            document.getElementById('retrieveLog').textContent = '';
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

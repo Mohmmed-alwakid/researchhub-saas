@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Fix Verification Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; 
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .info { color: #007bff; font-weight: bold; }
+        .button { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        .button:hover { background: #0056b3; }
+        .results { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+            border-left: 4px solid #007bff; 
+        }
+        pre { 
+            background: #f1f1f1; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 JWT Fix Verification Test</h1>
+    <p class="info">Testing that JWT parsing correctly extracts user ID and studies persist with correct creator_id</p>
+
+    <div class="container">
+        <h2>Test Configuration</h2>
+        <div id="config">
+            <p><strong>API Endpoint:</strong> http://localhost:3003</p>
+            <p><strong>Test User:</strong> abwanwr77+researcher@gmail.com</p>
+            <p><strong>Expected User ID:</strong> 4c3d798b-2975-4ec4-b9e2-c6f128b8a066</p>
+            <p><strong>Test Plan:</strong> Create study → Verify it appears in dashboard → Check creator_id</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Step 1: Get Auth Token</h2>
+        <button class="button" onclick="getAuthToken()">Login & Get Token</button>
+        <div id="authResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 2: Create Test Study</h2>
+        <button class="button" onclick="createTestStudy()" id="createBtn" disabled>Create Study with JWT</button>
+        <div id="createResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 3: Verify Study Appears</h2>
+        <button class="button" onclick="getStudies()" id="listBtn" disabled>Get My Studies</button>
+        <div id="listResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 4: Verify Creator ID</h2>
+        <button class="button" onclick="verifyCreatorId()" id="verifyBtn" disabled>Check Creator ID Match</button>
+        <div id="verifyResults" class="results" style="display: none;"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let createdStudyId = null;
+        let userStudies = [];
+        
+        const API_BASE = 'http://localhost:3003';
+        const EXPECTED_USER_ID = '4c3d798b-2975-4ec4-b9e2-c6f128b8a066';
+
+        async function getAuthToken() {
+            const resultsDiv = document.getElementById('authResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Authenticating...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.session?.access_token) {
+                    authToken = result.session.access_token;
+                    
+                    // Parse JWT to verify user ID
+                    const payload = JSON.parse(atob(authToken.split('.')[1]));
+                    const userId = payload.sub;
+                    
+                    resultsDiv.innerHTML = `
+                        <p class="success">✅ Authentication successful!</p>
+                        <p><strong>Token received:</strong> ${authToken.substring(0, 50)}...</p>
+                        <p><strong>User ID from JWT:</strong> ${userId}</p>
+                        <p><strong>Expected ID:</strong> ${EXPECTED_USER_ID}</p>
+                        <p><strong>ID Match:</strong> ${userId === EXPECTED_USER_ID ? '✅ YES' : '❌ NO'}</p>
+                        <pre>${JSON.stringify(payload, null, 2)}</pre>
+                    `;
+                    
+                    document.getElementById('createBtn').disabled = false;
+                } else {
+                    resultsDiv.innerHTML = `<p class="error">❌ Authentication failed: ${JSON.stringify(result)}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function createTestStudy() {
+            const resultsDiv = document.getElementById('createResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Creating test study...</p>';
+
+            try {
+                const studyData = {
+                    title: `JWT Fix Verification ${new Date().toLocaleTimeString()}`,
+                    description: 'Testing that JWT parsing correctly assigns creator_id',
+                    type: 'usability',
+                    status: 'active',
+                    target_participants: 5,
+                    blocks: [
+                        {
+                            type: 'welcome',
+                            title: 'Welcome',
+                            description: 'Test welcome block',
+                            settings: {}
+                        }
+                    ]
+                };
+
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.data?.id) {
+                    createdStudyId = result.data.id;
+                    
+                    resultsDiv.innerHTML = `
+                        <p class="success">✅ Study created successfully!</p>
+                        <p><strong>Study ID:</strong> ${createdStudyId}</p>
+                        <p><strong>Title:</strong> ${result.data.title}</p>
+                        <p><strong>Creator ID:</strong> ${result.data.creator_id || result.data.created_by}</p>
+                        <p><strong>Expected User ID:</strong> ${EXPECTED_USER_ID}</p>
+                        <p><strong>Creator Match:</strong> ${(result.data.creator_id === EXPECTED_USER_ID || result.data.created_by === EXPECTED_USER_ID) ? '✅ YES' : '❌ NO'}</p>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    `;
+                    
+                    document.getElementById('listBtn').disabled = false;
+                } else {
+                    resultsDiv.innerHTML = `<p class="error">❌ Study creation failed: ${JSON.stringify(result)}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function getStudies() {
+            const resultsDiv = document.getElementById('listResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Fetching studies...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/research-consolidated?action=get-studies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    userStudies = result.data;
+                    
+                    // Find our created study
+                    const ourStudy = userStudies.find(s => s.id === createdStudyId);
+                    
+                    resultsDiv.innerHTML = `
+                        <p class="success">✅ Studies retrieved successfully!</p>
+                        <p><strong>Total Studies:</strong> ${userStudies.length}</p>
+                        <p><strong>Our Study Found:</strong> ${ourStudy ? '✅ YES' : '❌ NO'}</p>
+                        ${ourStudy ? `
+                            <p><strong>Study Details:</strong></p>
+                            <pre>${JSON.stringify(ourStudy, null, 2)}</pre>
+                        ` : ''}
+                        <details>
+                            <summary>All Studies (${userStudies.length})</summary>
+                            <pre>${JSON.stringify(userStudies, null, 2)}</pre>
+                        </details>
+                    `;
+                    
+                    document.getElementById('verifyBtn').disabled = false;
+                } else {
+                    resultsDiv.innerHTML = `<p class="error">❌ Failed to get studies: ${JSON.stringify(result)}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function verifyCreatorId() {
+            const resultsDiv = document.getElementById('verifyResults');
+            resultsDiv.style.display = 'block';
+            
+            const ourStudy = userStudies.find(s => s.id === createdStudyId);
+            
+            if (!ourStudy) {
+                resultsDiv.innerHTML = '<p class="error">❌ Study not found in user studies list</p>';
+                return;
+            }
+            
+            const creatorId = ourStudy.creator_id || ourStudy.created_by;
+            const isCorrect = creatorId === EXPECTED_USER_ID;
+            
+            resultsDiv.innerHTML = `
+                <h3>🔍 Creator ID Verification Results</h3>
+                <p><strong>Study ID:</strong> ${ourStudy.id}</p>
+                <p><strong>Study Title:</strong> ${ourStudy.title}</p>
+                <p><strong>Creator ID:</strong> ${creatorId}</p>
+                <p><strong>Expected ID:</strong> ${EXPECTED_USER_ID}</p>
+                <p><strong>Match Result:</strong> ${isCorrect ? '<span class="success">✅ CORRECT</span>' : '<span class="error">❌ INCORRECT</span>'}</p>
+                
+                <h4>Test Summary:</h4>
+                <ul>
+                    <li>${authToken ? '✅' : '❌'} JWT Token obtained</li>
+                    <li>${createdStudyId ? '✅' : '❌'} Study created successfully</li>
+                    <li>${userStudies.length > 0 ? '✅' : '❌'} Studies retrieved</li>
+                    <li>${ourStudy ? '✅' : '❌'} Created study appears in user's studies</li>
+                    <li>${isCorrect ? '✅' : '❌'} Creator ID correctly assigned from JWT</li>
+                </ul>
+                
+                <h4>${isCorrect ? '🎉 JWT FIX VERIFICATION: SUCCESS!' : '⚠️ JWT FIX VERIFICATION: ISSUE FOUND'}</h4>
+                ${isCorrect ? 
+                    '<p class="success">The JWT parsing fix is working correctly. User ID is properly extracted and assigned to created studies.</p>' :
+                    '<p class="error">There is still an issue with JWT parsing or study creation. The creator_id does not match the expected user ID.</p>'
+                }
+            `;
+        }
+    </script>
+</body>
+</html>

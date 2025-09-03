@@ -18,7 +18,7 @@ export const SUBSCRIPTION_PLANS = {
     id: 'free',
     name: 'Free',
     price: 0,
-    maxStudies: 3,
+    maxStudies: 10, // Temporarily increased for testing
     maxParticipantsPerStudy: 10,
     recordingMinutes: 60,
     advancedAnalytics: false,

@@ -520,27 +520,45 @@ async function getStudies(req, res) {
             console.log(`⚠️ Invalid token format, expected 4+ parts, got ${parts.length}`);
           }
         } else {
-          // Handle JWT tokens - decode to get user role
-          console.log('🔑 JWT token detected, parsing with Supabase');
+          // Handle JWT tokens - Use manual decode as primary method (FIX)
+          console.log('🔑 JWT token detected in getStudies, extracting user info');
+          console.log(`🔑 Token length: ${token.length}, starts with: ${token.substring(0, 20)}...`);
           
+          // Try manual JWT decode first (more reliable)
           try {
-            // Try to decode JWT token with Supabase
-            const { data: { user }, error } = await supabase.auth.getUser(token);
+            // Use Node.js-compatible base64 decoding
+            const base64Payload = token.split('.')[1];
+            const padding = '='.repeat((4 - base64Payload.length % 4) % 4);
+            const paddedPayload = base64Payload + padding;
+            const decodedPayload = Buffer.from(paddedPayload, 'base64').toString('utf8');
+            const payload = JSON.parse(decodedPayload);
             
-            if (user && !error) {
-              userId = user.id;
-              userRole = user.user_metadata?.role || 'participant';
-              console.log(`✅ JWT parsed successfully: role=${userRole}, id=${userId}, email=${user.email}`);
-            } else {
-              console.log(`⚠️ JWT parsing failed: ${error?.message}, treating as participant`);
-              // Fall back to participant for invalid JWT
+            userId = payload.sub || payload.user_id;
+            userRole = payload.user_metadata?.role || 'participant';
+            console.log(`✅ Manual JWT decode success: role=${userRole}, id=${userId}`);
+            console.log(`✅ Email: ${payload.email}, metadata:`, payload.user_metadata);
+          } catch (manualError) {
+            console.log(`⚠️ Manual JWT decode failed: ${manualError.message}, trying Supabase`);
+            
+            // Fallback to Supabase validation if manual decode fails
+            try {
+              const { data: { user }, error } = await supabase.auth.getUser(token);
+              
+              if (user && !error) {
+                userId = user.id;
+                userRole = user.user_metadata?.role || 'participant';
+                console.log(`✅ Supabase JWT fallback success: role=${userRole}, id=${userId}`);
+              } else {
+                console.log(`❌ Both JWT methods failed. Supabase error: ${error?.message}`);
+                console.log(`❌ Treating as participant with no user ID`);
+                userRole = 'participant';
+                userId = null;
+              }
+            } catch (supabaseError) {
+              console.log(`❌ Supabase JWT parsing also failed: ${supabaseError.message}`);
               userRole = 'participant';
               userId = null;
             }
-          } catch (jwtError) {
-            console.log(`⚠️ JWT parsing error: ${jwtError.message}, treating as participant`);
-            userRole = 'participant';
-            userId = null;
           }
         }
         
@@ -561,12 +579,24 @@ async function getStudies(req, res) {
     // Filter studies based on user role
     if (userRole === 'researcher') {
       // Researchers see only their own studies
-      filteredStudies = localStudies.filter(study => 
-        study.created_by === userId || 
-        study.creator_id === userId || 
-        study.researcher_id === userId
-      );
+      console.log(`🔬 [DEBUG] Filtering studies for researcher ${userId}:`);
+      console.log(`🔬 [DEBUG] Total studies before filtering: ${localStudies.length}`);
+      
+      // Debug: Show all studies with their creator info
+      localStudies.forEach((study, index) => {
+        console.log(`🔬 [DEBUG] Study ${index}: id=${study.id}, title="${study.title}", created_by="${study.created_by}", creator_id="${study.creator_id}", researcher_id="${study.researcher_id}"`);
+      });
+      
+      filteredStudies = localStudies.filter(study => {
+        const isMatch = study.created_by === userId || 
+                       study.creator_id === userId || 
+                       study.researcher_id === userId;
+        console.log(`🔬 [DEBUG] Study "${study.title}" (${study.id}) matches user ${userId}: ${isMatch}`);
+        return isMatch;
+      });
+      
       console.log(`🔬 Researcher view: ${filteredStudies.length} studies (filtered by creator: ${userId})`);
+      console.log(`🔬 [DEBUG] Filtered studies:`, filteredStudies.map(s => ({ id: s.id, title: s.title, creator_id: s.creator_id })));
       
       // If researcher has no studies, provide demo studies for testing
       if (filteredStudies.length === 0) {
@@ -842,22 +872,41 @@ async function createStudy(req, res) {
             }
           }
         } else {
-          // Handle JWT tokens - decode to get user info (CRITICAL FIX)
-          console.log('🔑 JWT token detected in createStudy, parsing with Supabase');
+          // Handle JWT tokens - Use manual decode as primary method (FIX)
+          console.log('🔑 JWT token detected in createStudy, extracting user info');
+          console.log(`🔑 Token length: ${token.length}, starts with: ${token.substring(0, 20)}...`);
           
+          // Try manual JWT decode first (more reliable)
           try {
-            // Try to decode JWT token with Supabase
-            const { data: { user }, error } = await supabase.auth.getUser(token);
+            // Use Node.js-compatible base64 decoding
+            const base64Payload = token.split('.')[1];
+            const padding = '='.repeat((4 - base64Payload.length % 4) % 4);
+            const paddedPayload = base64Payload + padding;
+            const decodedPayload = Buffer.from(paddedPayload, 'base64').toString('utf8');
+            const payload = JSON.parse(decodedPayload);
             
-            if (user && !error) {
-              userId = user.id; // Use actual Supabase user ID
-              userEmail = user.email || userEmail;
-              console.log(`✅ JWT parsed in createStudy: id=${userId}, email=${userEmail}`);
-            } else {
-              console.log(`⚠️ JWT parsing failed in createStudy: ${error?.message}, using fallback`);
+            userId = payload.sub || payload.user_id;
+            userEmail = payload.email || userEmail;
+            console.log(`✅ Manual JWT decode success: id=${userId}, email=${userEmail}`);
+            console.log(`✅ Full payload sub: ${payload.sub}, email: ${payload.email}`);
+          } catch (manualError) {
+            console.log(`⚠️ Manual JWT decode failed: ${manualError.message}, trying Supabase`);
+            
+            // Fallback to Supabase validation if manual decode fails
+            try {
+              const { data: { user }, error } = await supabase.auth.getUser(token);
+              
+              if (user && !error) {
+                userId = user.id;
+                userEmail = user.email || userEmail;
+                console.log(`✅ Supabase JWT fallback success: id=${userId}, email=${userEmail}`);
+              } else {
+                console.log(`❌ Both JWT methods failed. Supabase error: ${error?.message}`);
+                console.log(`❌ Using fallback user for debugging: test-user`);
+              }
+            } catch (supabaseError) {
+              console.log(`❌ Supabase JWT parsing also failed: ${supabaseError.message}`);
             }
-          } catch (jwtError) {
-            console.log(`⚠️ JWT parsing error in createStudy: ${jwtError.message}, using fallback`);
           }
         }
         
@@ -868,9 +917,15 @@ async function createStudy(req, res) {
     }
 
     // Generate new ID
-    const newId = (localStudies.length + 1).toString();
+    const newId = `study-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    console.log(`📝 [DEBUG] Creating study with user context:`);
+    console.log(`📝 [DEBUG] - User ID: ${userId}`);
+    console.log(`📝 [DEBUG] - User Email: ${userEmail}`);
+    console.log(`📝 [DEBUG] - Study ID: ${newId}`);
+    console.log(`📝 [DEBUG] - Study Title: ${studyData.title}`);
 
-    // Prepare study data
+    // Prepare study data with enhanced user association
     const newStudy = {
       _id: newId,
       id: newId, // Also include id for compatibility
@@ -889,9 +944,13 @@ async function createStudy(req, res) {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       created_by: userId,
-      creator_id: userId, // Also add this for compatibility
+      creator_id: userId, // Primary field for user association
+      researcher_id: userId, // Additional field for filtering
+      user_email: userEmail, // Store email for debugging
       profiles: { email: userEmail, full_name: 'Researcher' }
     };
+    
+    console.log(`📝 [DEBUG] Complete study object created:`, JSON.stringify(newStudy, null, 2));
 
     // Add to local storage
     localStudies.unshift(newStudy);

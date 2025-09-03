@@ -1,5 +1,143 @@
 [
   {
+    "_id": "study-1756916347131-61siyivv5",
+    "id": "study-1756916347131-61siyivv5",
+    "title": "JWT Fix Verification 19:19:05",
+    "description": "Testing that JWT parsing correctly assigns creator_id",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [
+      {
+        "title": "Welcome",
+        "description": "Test welcome block",
+        "type": "welcome",
+        "settings": {}
+      }
+    ],
+    "target_participants": 5,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 5
+    },
+    "created_at": "2025-09-03T16:19:07.132Z",
+    "updated_at": "2025-09-03T16:19:07.132Z",
+    "created_by": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066",
+    "creator_id": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066",
+    "researcher_id": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066",
+    "user_email": "abwanwr77+researcher@gmail.com",
+    "profiles": {
+      "email": "abwanwr77+researcher@gmail.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
+    "_id": "study-1756916296462-bcvsukhbi",
+    "id": "study-1756916296462-bcvsukhbi",
+    "title": "JWT Fix Verification 19:18:14",
+    "description": "Testing that JWT parsing correctly assigns creator_id",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [
+      {
+        "title": "Welcome",
+        "description": "Test welcome block",
+        "type": "welcome",
+        "settings": {}
+      }
+    ],
+    "target_participants": 5,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 5
+    },
+    "created_at": "2025-09-03T16:18:16.463Z",
+    "updated_at": "2025-09-03T16:18:16.463Z",
+    "created_by": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066",
+    "creator_id": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066",
+    "researcher_id": "4c3d798b-2975-4ec4-b9e2-c6f128b8a066",
+    "user_email": "abwanwr77+researcher@gmail.com",
+    "profiles": {
+      "email": "abwanwr77+researcher@gmail.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
+    "_id": "19",
+    "id": "19",
+    "title": "JWT FIX TEST 18:11:32",
+    "description": "Testing manual JWT decode fix",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 2,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 2
+    },
+    "created_at": "2025-09-03T15:11:33.315Z",
+    "updated_at": "2025-09-03T15:11:33.315Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
+    "_id": "18",
+    "id": "18",
+    "title": "JWT Debug Test 18:09:44",
+    "description": "Testing JWT user ID extraction",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 2,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 2
+    },
+    "created_at": "2025-09-03T15:09:46.496Z",
+    "updated_at": "2025-09-03T15:09:46.496Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
+    "_id": "17",
+    "id": "17",
+    "title": "Persistence Fix Test 18:07:16",
+    "description": "Testing the study persistence fix - this should now appear in the dashboard",
+    "type": "usability",
+    "status": "active",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 3,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 3
+    },
+    "created_at": "2025-09-03T15:07:18.038Z",
+    "updated_at": "2025-09-03T15:07:18.038Z",
+    "created_by": "test-user",
+    "creator_id": "test-user",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
     "_id": "16",
     "id": "16",
     "title": "Test Study 3",

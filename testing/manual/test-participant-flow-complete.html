@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participant Flow Complete Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; 
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .info { color: #007bff; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .button { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        .button:hover { background: #0056b3; }
+        .button:disabled { background: #6c757d; cursor: not-allowed; }
+        .results { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+            border-left: 4px solid #007bff; 
+        }
+        pre { 
+            background: #f1f1f1; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto; 
+            max-height: 400px;
+        }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .step-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Complete Participant Flow Test</h1>
+    <p class="info">Testing the complete participant study discovery and participation workflow</p>
+
+    <div class="container">
+        <h2>Test Overview</h2>
+        <p><strong>Purpose:</strong> Verify that participants can discover and access studies created by researchers</p>
+        <p><strong>Test Study:</strong> Using the JWT verification study we just created</p>
+        <p><strong>Study ID:</strong> <span id="studyId">study-1756916347131-61siyivv5</span></p>
+        <p><strong>Expected Issues:</strong> 404 errors or accessibility problems in participant flow</p>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 1: Test Study Discovery (Public Access)</div>
+        <p>Test if participants can discover available studies</p>
+        <button class="button" onclick="testStudyDiscovery()">Test Study Discovery</button>
+        <div id="discoveryResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 2: Test Study Access (Participant View)</div>
+        <p>Test if participants can access the study details and start participation</p>
+        <button class="button" onclick="testStudyAccess()" id="accessBtn" disabled>Test Study Access</button>
+        <div id="accessResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 3: Test Participant Authentication</div>
+        <p>Test participant login and authentication flow</p>
+        <button class="button" onclick="testParticipantAuth()" id="authBtn" disabled>Test Participant Login</button>
+        <div id="authResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 4: Test Study Participation</div>
+        <p>Test the complete study participation workflow</p>
+        <button class="button" onclick="testStudyParticipation()" id="participateBtn" disabled>Test Participation</button>
+        <div id="participateResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-title">Step 5: Test Study Session APIs</div>
+        <p>Test study session creation and block rendering</p>
+        <button class="button" onclick="testStudySessionAPIs()" id="sessionBtn" disabled>Test Session APIs</button>
+        <div id="sessionResults" class="results" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Summary</h2>
+        <div id="testSummary" class="results">
+            <p class="info">Tests not yet started. Click buttons above to run tests.</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3003';
+        const STUDY_ID = 'study-1756916347131-61siyivv5';
+        let participantToken = null;
+        let testResults = {
+            discovery: false,
+            access: false,
+            auth: false,
+            participation: false,
+            sessions: false
+        };
+
+        async function testStudyDiscovery() {
+            const resultsDiv = document.getElementById('discoveryResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Testing study discovery...</p>';
+
+            try {
+                // Test 1: Public study listing
+                const publicResponse = await fetch(`${API_BASE}/api/research-consolidated?action=get-public-studies`, {
+                    method: 'GET'
+                });
+
+                const publicResult = await publicResponse.json();
+                
+                let html = `<h4>Public Study Discovery Test</h4>`;
+                
+                if (publicResult.success) {
+                    const studies = publicResult.data || publicResult.studies || [];
+                    const ourStudy = studies.find(s => s.id === STUDY_ID);
+                    
+                    html += `
+                        <p class="success">✅ Public API accessible</p>
+                        <p><strong>Public Studies Found:</strong> ${studies.length}</p>
+                        <p><strong>Our Study Visible:</strong> ${ourStudy ? '✅ YES' : '❌ NO'}</p>
+                    `;
+                    
+                    if (ourStudy) {
+                        html += `<p><strong>Study Details:</strong> ${ourStudy.title}</p>`;
+                        testResults.discovery = true;
+                        document.getElementById('accessBtn').disabled = false;
+                    } else {
+                        html += `<p class="warning">⚠️ Study not found in public listing</p>`;
+                    }
+                } else {
+                    html += `<p class="error">❌ Public API failed: ${JSON.stringify(publicResult)}</p>`;
+                }
+
+                // Test 2: Direct study access
+                try {
+                    const directResponse = await fetch(`${API_BASE}/api/research-consolidated?action=get-study&id=${STUDY_ID}`, {
+                        method: 'GET'
+                    });
+                    
+                    const directResult = await directResponse.json();
+                    
+                    html += `<h4>Direct Study Access Test</h4>`;
+                    if (directResult.success) {
+                        html += `<p class="success">✅ Direct study access works</p>`;
+                        testResults.discovery = true;
+                        document.getElementById('accessBtn').disabled = false;
+                    } else {
+                        html += `<p class="error">❌ Direct study access failed: ${JSON.stringify(directResult)}</p>`;
+                    }
+                } catch (error) {
+                    html += `<h4>Direct Study Access Test</h4><p class="error">❌ Direct access error: ${error.message}</p>`;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Discovery test error: ${error.message}</p>`;
+            }
+        }
+
+        async function testStudyAccess() {
+            const resultsDiv = document.getElementById('accessResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Testing study access...</p>';
+
+            try {
+                // Test study-specific endpoints
+                const endpoints = [
+                    { name: 'Study Details', url: `/api/research-consolidated?action=get-study&id=${STUDY_ID}` },
+                    { name: 'Study Blocks', url: `/api/research-consolidated?action=get-study-blocks&id=${STUDY_ID}` },
+                    { name: 'Study Info', url: `/api/research-consolidated?action=get-study-info&id=${STUDY_ID}` }
+                ];
+
+                let html = '<h4>Study Access Endpoint Tests</h4>';
+                let accessWorking = false;
+
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(`${API_BASE}${endpoint.url}`, { method: 'GET' });
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            html += `<p class="success">✅ ${endpoint.name}: Working</p>`;
+                            accessWorking = true;
+                        } else {
+                            html += `<p class="error">❌ ${endpoint.name}: ${result.error || 'Failed'}</p>`;
+                        }
+                    } catch (error) {
+                        html += `<p class="error">❌ ${endpoint.name}: ${error.message}</p>`;
+                    }
+                }
+
+                if (accessWorking) {
+                    testResults.access = true;
+                    document.getElementById('authBtn').disabled = false;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Access test error: ${error.message}</p>`;
+            }
+        }
+
+        async function testParticipantAuth() {
+            const resultsDiv = document.getElementById('authResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Testing participant authentication...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+participant@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                let html = '<h4>Participant Authentication Test</h4>';
+                
+                if (result.success && result.session?.access_token) {
+                    participantToken = result.session.access_token;
+                    
+                    // Parse JWT to verify participant role
+                    const payload = JSON.parse(atob(participantToken.split('.')[1]));
+                    const userRole = payload.role || payload.user_metadata?.role;
+                    
+                    html += `
+                        <p class="success">✅ Participant login successful</p>
+                        <p><strong>Token received:</strong> ${participantToken.substring(0, 30)}...</p>
+                        <p><strong>User Role:</strong> ${userRole}</p>
+                        <p><strong>User ID:</strong> ${payload.sub}</p>
+                        <p><strong>Email:</strong> ${payload.email}</p>
+                    `;
+                    
+                    testResults.auth = true;
+                    document.getElementById('participateBtn').disabled = false;
+                } else {
+                    html += `<p class="error">❌ Participant login failed: ${JSON.stringify(result)}</p>`;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Auth test error: ${error.message}</p>`;
+            }
+        }
+
+        async function testStudyParticipation() {
+            const resultsDiv = document.getElementById('participateResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Testing study participation...</p>';
+
+            try {
+                // Test participant-specific endpoints
+                const tests = [];
+
+                // Test 1: Study enrollment
+                try {
+                    const enrollResponse = await fetch(`${API_BASE}/api/research-consolidated?action=enroll-study`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${participantToken}`
+                        },
+                        body: JSON.stringify({ studyId: STUDY_ID })
+                    });
+                    
+                    const enrollResult = await enrollResponse.json();
+                    tests.push({ 
+                        name: 'Study Enrollment', 
+                        success: enrollResult.success, 
+                        result: enrollResult 
+                    });
+                } catch (error) {
+                    tests.push({ 
+                        name: 'Study Enrollment', 
+                        success: false, 
+                        error: error.message 
+                    });
+                }
+
+                // Test 2: Get participant studies
+                try {
+                    const participantStudiesResponse = await fetch(`${API_BASE}/api/research-consolidated?action=get-participant-studies`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${participantToken}` }
+                    });
+                    
+                    const participantStudiesResult = await participantStudiesResponse.json();
+                    tests.push({ 
+                        name: 'Get Participant Studies', 
+                        success: participantStudiesResult.success, 
+                        result: participantStudiesResult 
+                    });
+                } catch (error) {
+                    tests.push({ 
+                        name: 'Get Participant Studies', 
+                        success: false, 
+                        error: error.message 
+                    });
+                }
+
+                let html = '<h4>Study Participation Tests</h4>';
+                let participationWorking = false;
+
+                tests.forEach(test => {
+                    if (test.success) {
+                        html += `<p class="success">✅ ${test.name}: Working</p>`;
+                        participationWorking = true;
+                    } else {
+                        html += `<p class="error">❌ ${test.name}: ${test.error || JSON.stringify(test.result)}</p>`;
+                    }
+                });
+
+                if (participationWorking) {
+                    testResults.participation = true;
+                    document.getElementById('sessionBtn').disabled = false;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Participation test error: ${error.message}</p>`;
+            }
+        }
+
+        async function testStudySessionAPIs() {
+            const resultsDiv = document.getElementById('sessionResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<p class="info">Testing study session APIs...</p>';
+
+            try {
+                // Test session-related endpoints
+                const sessionTests = [];
+
+                // Test 1: Start study session
+                try {
+                    const startResponse = await fetch(`${API_BASE}/api/study-sessions?action=start-session`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${participantToken}`
+                        },
+                        body: JSON.stringify({ studyId: STUDY_ID })
+                    });
+                    
+                    const startResult = await startResponse.json();
+                    sessionTests.push({ 
+                        name: 'Start Study Session', 
+                        success: startResult.success, 
+                        result: startResult 
+                    });
+                } catch (error) {
+                    sessionTests.push({ 
+                        name: 'Start Study Session', 
+                        success: false, 
+                        error: error.message 
+                    });
+                }
+
+                // Test 2: Get study blocks
+                try {
+                    const blocksResponse = await fetch(`${API_BASE}/api/research-consolidated?action=get-study-blocks&id=${STUDY_ID}`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${participantToken}` }
+                    });
+                    
+                    const blocksResult = await blocksResponse.json();
+                    sessionTests.push({ 
+                        name: 'Get Study Blocks', 
+                        success: blocksResult.success, 
+                        result: blocksResult 
+                    });
+                } catch (error) {
+                    sessionTests.push({ 
+                        name: 'Get Study Blocks', 
+                        success: false, 
+                        error: error.message 
+                    });
+                }
+
+                let html = '<h4>Study Session API Tests</h4>';
+                let sessionsWorking = false;
+
+                sessionTests.forEach(test => {
+                    if (test.success) {
+                        html += `<p class="success">✅ ${test.name}: Working</p>`;
+                        if (test.result && test.result.data) {
+                            html += `<details><summary>Response Data</summary><pre>${JSON.stringify(test.result.data, null, 2)}</pre></details>`;
+                        }
+                        sessionsWorking = true;
+                    } else {
+                        html += `<p class="error">❌ ${test.name}: ${test.error || JSON.stringify(test.result)}</p>`;
+                    }
+                });
+
+                if (sessionsWorking) {
+                    testResults.sessions = true;
+                }
+
+                resultsDiv.innerHTML = html;
+                updateSummary();
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Session test error: ${error.message}</p>`;
+            }
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            const totalTests = Object.keys(testResults).length;
+            const passedTests = Object.values(testResults).filter(result => result).length;
+            
+            let html = `<h4>Test Results Summary</h4>`;
+            html += `<p><strong>Tests Passed:</strong> ${passedTests}/${totalTests}</p>`;
+            
+            Object.entries(testResults).forEach(([test, passed]) => {
+                const emoji = passed ? '✅' : '❌';
+                const status = passed ? 'PASS' : 'FAIL';
+                html += `<p>${emoji} ${test.charAt(0).toUpperCase() + test.slice(1)}: ${status}</p>`;
+            });
+
+            if (passedTests === totalTests) {
+                html += `<p class="success">🎉 All participant flow tests passed!</p>`;
+            } else {
+                html += `<p class="warning">⚠️ Some tests failed - issues found in participant flow</p>`;
+            }
+
+            summaryDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
