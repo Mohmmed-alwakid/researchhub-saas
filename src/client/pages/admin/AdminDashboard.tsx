@@ -67,13 +67,18 @@ export default function AdminDashboard() {
 
   const loadStudies = React.useCallback(async () => {
     try {
+      console.log('🔍 Admin loadStudies - Starting API call...');
       const response = await fetch('/api/research-consolidated?action=get-studies', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
+      console.log('🔍 Admin loadStudies - API response:', result);
+      
       if (result.success) {
         // Extract studies from the enhanced API format
-        setStudies(result.data?.studies || []);
+        const studiesData = result.data?.studies || [];
+        console.log('🔍 Admin loadStudies - Setting studies:', studiesData);
+        setStudies(studiesData);
       }
     } catch (error) {
       console.error('Error loading studies:', error);
@@ -86,6 +91,14 @@ export default function AdminDashboard() {
       const totalUsers = users.length;
       const totalStudies = studies.length;
       const activeUsers = users.filter(u => u.status === 'active').length;
+      
+      console.log('📊 Admin Stats Debug:', {
+        totalUsers,
+        totalStudies,
+        activeUsers,
+        studiesArray: studies,
+        usersArray: users
+      });
       
       setStats({
         totalUsers,
@@ -117,9 +130,8 @@ export default function AdminDashboard() {
   }, [loadAdminData]);
 
   useEffect(() => {
-    if (users.length > 0 || studies.length > 0) {
-      loadStats();
-    }
+    // Always recalculate stats when data changes, even if arrays are empty
+    loadStats();
   }, [users, studies, loadStats]);
 
   // Check admin access after hooks
