@@ -70,11 +70,12 @@ const StudyResultsPage: React.FC = () => {
     }
   }, [studyId, studies]);
 
-  const loadStudyResults = async (_studyId: string) => {
+  const loadStudyResults = async (studyId: string) => {
     try {
       setLoading(true);
       
-      // Mock data for now - in real implementation, fetch from API
+      // TODO: Replace with real API call - for now using mock data
+      console.log('Loading results for study:', studyId);
       const mockParticipants: ParticipantResponse[] = [
         {
           participantId: 'p001',

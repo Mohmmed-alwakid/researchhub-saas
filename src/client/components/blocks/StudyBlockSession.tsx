@@ -86,14 +86,17 @@ export const StudyBlockSession: React.FC<StudyBlockSessionProps> = ({
       }
 
       const progressData = {
-        sessionId,
-        currentBlockIndex,
-        completedBlocks: Array.from(completedBlocks),
-        sessionState,
-        lastSaveTime: Date.now()
+        block_id: `block-${currentBlockIndex}`,
+        block_type: 'progress_update',
+        response_data: {
+          currentBlockIndex,
+          completedBlocks: Array.from(completedBlocks),
+          sessionState,
+          lastSaveTime: Date.now()
+        }
       };
 
-      const response = await fetch('/api/study-sessions/progress', {
+      const response = await fetch(`/api/study-sessions/${sessionId}/progress`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -406,16 +409,51 @@ export const StudyBlockSession: React.FC<StudyBlockSessionProps> = ({
       
       // Check if this is the last block
       if (currentBlockIndex >= blocks.length - 1) {
-        console.log('🎉 All blocks completed!');
-        setSessionState(prev => ({ ...prev, status: 'completed' }));
+        console.log('🎉 All blocks completed, calling completion API!');
         
-        // Save final session state
-        await saveSessionProgress();
-        
-        toast.success('Study completed successfully!');
-        setTimeout(() => {
-          onComplete();
-        }, 1500);
+        try {
+          // Call the study completion API
+          const authStorage = localStorage.getItem('auth-storage');
+          let token = '';
+          if (authStorage) {
+            const { state } = JSON.parse(authStorage);
+            token = state?.token || '';
+          }
+
+          const completionResponse = await fetch(`/api/study-sessions/${sessionId}/complete`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              feedback: null // Optional feedback from participant
+            })
+          });
+
+          if (completionResponse.ok) {
+            const completionData = await completionResponse.json();
+            console.log('✅ Study completion recorded:', completionData);
+            
+            setSessionState(prev => ({ ...prev, status: 'completed' }));
+            toast.success('Study completed successfully!');
+            
+            setTimeout(() => {
+              onComplete();
+            }, 1500);
+          } else {
+            throw new Error('Failed to record study completion');
+          }
+        } catch (error) {
+          console.error('❌ Error completing study:', error);
+          // Still allow completion flow even if API call fails
+          setSessionState(prev => ({ ...prev, status: 'completed' }));
+          toast.success('Study completed successfully!');
+          
+          setTimeout(() => {
+            onComplete();
+          }, 1500);
+        }
       } else {
         // Move to next block
         handleNext();

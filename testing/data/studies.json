@@ -1,5 +1,31 @@
 [
   {
+    "_id": "study-1756918518324-1nu2clyu3",
+    "id": "study-1756918518324-1nu2clyu3",
+    "title": "Local API Test Study",
+    "description": "Testing middleware fix",
+    "type": "usability",
+    "status": "draft",
+    "settings": {},
+    "blocks": [],
+    "target_participants": 10,
+    "participants": {
+      "enrolled": 0,
+      "completed": 0,
+      "target": 10
+    },
+    "created_at": "2025-09-03T16:55:18.324Z",
+    "updated_at": "2025-09-03T16:55:18.324Z",
+    "created_by": "researcher",
+    "creator_id": "researcher",
+    "researcher_id": "researcher",
+    "user_email": "researcher@test.com",
+    "profiles": {
+      "email": "researcher@test.com",
+      "full_name": "Researcher"
+    }
+  },
+  {
     "_id": "study-1756916347131-61siyivv5",
     "id": "study-1756916347131-61siyivv5",
     "title": "JWT Fix Verification 19:19:05",
