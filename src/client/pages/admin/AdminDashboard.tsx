@@ -75,8 +75,8 @@ export default function AdminDashboard() {
       console.log('🔍 Admin loadStudies - API response:', result);
       
       if (result.success) {
-        // Extract studies from the enhanced API format
-        const studiesData = result.data?.studies || [];
+        // The API returns studies directly in result.studies, not result.data.studies
+        const studiesData = result.studies || [];
         console.log('🔍 Admin loadStudies - Setting studies:', studiesData);
         setStudies(studiesData);
       }

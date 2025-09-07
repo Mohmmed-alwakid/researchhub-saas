@@ -54,7 +54,7 @@ const AdminStudiesPage: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
-        setStudies(result.data?.studies || []);
+        setStudies(result.studies || []);
       } else {
         throw new Error(result.error || 'Failed to fetch studies');
       }
