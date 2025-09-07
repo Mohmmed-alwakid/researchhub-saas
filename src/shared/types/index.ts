@@ -78,6 +78,7 @@ export interface AuthRequest extends Request {
 // Study types
 export interface IStudy {
   _id: string;
+  id?: string | number; // Enhanced API compatibility - can be string or number
   title: string;
   description: string;
   researcher: string | IUser;

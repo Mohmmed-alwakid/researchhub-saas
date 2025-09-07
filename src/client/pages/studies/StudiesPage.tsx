@@ -131,13 +131,13 @@ const StudiesPage: React.FC = () => {
 
   // New action handlers for simplified study card
   const handleCardClick = (study: IStudy) => {
-    // Navigate to study details/overview page
-    navigate(`/app/studies/${study._id}`);
+    // Navigate to study details/overview page - use id instead of _id for enhanced API compatibility
+    navigate(`/app/studies/${study.id || study._id}`);
   };
 
   const handleEdit = (study: IStudy) => {
     setCurrentStudy(study);
-    navigate(`/app/studies/${study._id}/edit`);
+    navigate(`/app/studies/${study.id || study._id}/edit`);
   };
 
   const handleRename = (study: IStudy) => {
@@ -184,7 +184,7 @@ const StudiesPage: React.FC = () => {
 
   const handleLaunch = async (study: IStudy) => {
     try {
-      console.log('🚀 Launching study:', study._id);
+      console.log('🚀 Launching study:', study.id || study._id);
       
       // Update study status to active
       const updatedStudy = {
@@ -193,7 +193,7 @@ const StudiesPage: React.FC = () => {
         recruitmentStatus: 'recruiting' as const
       };
       
-      await updateStudy(study._id, updatedStudy);
+      await updateStudy(String(study.id || study._id), updatedStudy);
       
       // Refresh studies to show updated status
       await fetchStudies();
@@ -207,7 +207,7 @@ const StudiesPage: React.FC = () => {
 
   const handlePause = async (study: IStudy) => {
     try {
-      console.log('⏸️ Pausing study:', study._id);
+      console.log('⏸️ Pausing study:', study.id || study._id);
       
       // Update study status to paused
       const updatedStudy = {
@@ -216,7 +216,7 @@ const StudiesPage: React.FC = () => {
         recruitmentStatus: 'recruitment_closed' as const
       };
       
-      await updateStudy(study._id, updatedStudy);
+      await updateStudy(String(study.id || study._id), updatedStudy);
       
       // Refresh studies to show updated status
       await fetchStudies();
@@ -229,10 +229,10 @@ const StudiesPage: React.FC = () => {
   };
 
   const handleViewResults = (study: IStudy) => {
-    console.log('📊 Viewing results for study:', study._id);
+    console.log('📊 Viewing results for study:', study.id || study._id);
     // Navigate to results page
     setCurrentStudy(study);
-    navigate(`/results/${study._id}`);
+    navigate(`/results/${study.id || study._id}`);
   };
 
   if (studiesLoading) {
@@ -361,7 +361,7 @@ const StudiesPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStudies.map((study) => (
             <Card 
-              key={study._id} 
+              key={study.id || study._id} 
               className="group relative p-6 hover:shadow-xl hover:shadow-indigo-500/20 transition-all duration-300 cursor-pointer bg-gradient-to-br from-white via-white to-indigo-50/30 border border-gray-200/80 hover:border-indigo-300/60 backdrop-blur-sm hover:scale-[1.02] flex flex-col h-full"
               onClick={() => handleCardClick(study)}
             >
@@ -422,7 +422,7 @@ const StudiesPage: React.FC = () => {
                     onEdit={handleEdit}
                     onRename={handleRename}
                     onDuplicate={handleDuplicate}
-                    onDelete={(study) => handleDelete(study._id)}
+                    onDelete={(study) => handleDelete(String(study.id || study._id))}
                     onLaunch={handleLaunch}
                     onPause={handlePause}
                     onViewResults={handleViewResults}
