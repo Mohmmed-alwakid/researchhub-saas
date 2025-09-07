@@ -39,8 +39,8 @@ const StudyDetailPage: React.FC = () => {
       
       setLoading(true);
       
-      // First try to find the study in the current studies list
-      const existingStudy = studies?.find(s => s._id === id);
+      // First try to find the study in the current studies list - check both id formats
+      const existingStudy = studies?.find(s => s._id === id || String(s.id) === id);
       if (existingStudy) {
         setStudy(existingStudy);
         setCurrentStudy(existingStudy);
@@ -48,7 +48,7 @@ const StudyDetailPage: React.FC = () => {
       } else {
         // If not found, fetch all studies
         await fetchStudies();
-        const foundStudy = studies?.find(s => s._id === id);
+        const foundStudy = studies?.find(s => s._id === id || String(s.id) === id);
         if (foundStudy) {
           setStudy(foundStudy);
           setCurrentStudy(foundStudy);
