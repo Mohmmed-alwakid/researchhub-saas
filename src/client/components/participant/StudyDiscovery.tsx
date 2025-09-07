@@ -85,7 +85,7 @@ class StudyDiscoveryAPI {
   private baseUrl: string;
   private authClient: AuthClient;
 
-  constructor(authClient: AuthClient, baseUrl = 'http://localhost:3003/api') {
+  constructor(authClient: AuthClient, baseUrl = '/api') {
     this.baseUrl = baseUrl;
     this.authClient = authClient;
   }
@@ -169,14 +169,21 @@ class StudyDiscoveryAPI {
       }
 
       const response = await this.makeRequest<{
+        success: boolean;
         studies: PublicStudy[];
-        total: number;
-        pages: number;
-      }>(`/research-consolidated?action=get-studies&${params}`);
+        pagination: {
+          totalStudies: number;
+          totalPages: number;
+        };
+      }>(`/research-consolidated?action=get-studies&role=participant&${params}`);
 
       // If API succeeds and returns data, use it
-      if (response.success && response.data) {
-        return response.data;
+      if (response.success && response.data && response.data.studies) {
+        return {
+          studies: response.data.studies,
+          total: response.data.pagination.totalStudies,
+          pages: response.data.pagination.totalPages
+        };
       }
       
       // If API fails, fallback to mock data with demographic filtering

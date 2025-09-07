@@ -4,7 +4,8 @@
  * Integrates with usage tracking and subscription management
  */
 
-import { createClient } from '@supabase/supabase-js';
+// Convert ES6 import to CommonJS
+const { createClient } = require('@supabase/supabase-js');
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
@@ -13,7 +14,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cC
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Subscription plan definitions with limits
-export const SUBSCRIPTION_PLANS = {
+const SUBSCRIPTION_PLANS = {
   free: {
     id: 'free',
     name: 'Free',
@@ -77,7 +78,8 @@ const inMemoryStorage = {
 /**
  * Get user subscription from database or fallback
  */
-export async function getUserSubscription(userId, userEmail = null) {
+// Get user subscription information
+async function getUserSubscription(userId, userEmail = null) {
   try {
     // Try Supabase first
     const { data, error } = await supabase
@@ -141,7 +143,7 @@ export async function getUserSubscription(userId, userEmail = null) {
 /**
  * Get user usage metrics from database or fallback
  */
-export async function getUserUsage(userId) {
+async function getUserUsage(userId) {
   try {
     // Try Supabase first
     const { data, error } = await supabase
@@ -311,7 +313,7 @@ function getUpgradePlan(currentPlan) {
 /**
  * Plan enforcement middleware function
  */
-export async function enforcePlanLimits(req, res, next) {
+async function enforcePlanLimits(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
     const token = authHeader ? authHeader.replace('Bearer ', '') : null;
@@ -399,7 +401,7 @@ export async function enforcePlanLimits(req, res, next) {
 /**
  * Update usage after successful action
  */
-export async function updateUsageAfterAction(userId, action, actionData = {}) {
+async function updateUsageAfterAction(userId, action, actionData = {}) {
   try {
     const usage = await getUserUsage(userId);
 
@@ -431,7 +433,7 @@ export async function updateUsageAfterAction(userId, action, actionData = {}) {
 /**
  * Get plan comparison data for upgrade prompts
  */
-export function getPlanComparison(currentPlan) {
+function getPlanComparison(currentPlan) {
   const plans = Object.values(SUBSCRIPTION_PLANS);
   const currentIndex = plans.findIndex(p => p.id === currentPlan);
   
@@ -450,7 +452,7 @@ export function getPlanComparison(currentPlan) {
 /**
  * Development helper: Reset user usage (for testing)
  */
-export async function resetUserUsage(userId) {
+async function resetUserUsage(userId) {
   const resetUsage = {
     studiesCreated: 0,
     participantsRecruited: 0,
@@ -465,7 +467,8 @@ export async function resetUserUsage(userId) {
   return { success: true, usage: resetUsage };
 }
 
-export default {
+// Convert from ES6 export to CommonJS
+module.exports = {
   enforcePlanLimits,
   updateUsageAfterAction,
   getPlanComparison,

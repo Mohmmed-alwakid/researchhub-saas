@@ -67,12 +67,13 @@ export default function AdminDashboard() {
 
   const loadStudies = React.useCallback(async () => {
     try {
-      const response = await fetch('/api/research-consolidated?action=get-all-studies', {
+      const response = await fetch('/api/research-consolidated?action=get-studies', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
       if (result.success) {
-        setStudies(result.data || []);
+        // Extract studies from the enhanced API format
+        setStudies(result.data?.studies || []);
       }
     } catch (error) {
       console.error('Error loading studies:', error);

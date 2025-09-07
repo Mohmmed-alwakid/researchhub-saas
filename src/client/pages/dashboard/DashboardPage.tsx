@@ -109,32 +109,32 @@ const DashboardPage = () => {
     navigate('/app/study-builder');
   };
 
-  // Calculate stats for display
+  // Calculate stats for display - add safety checks
   const stats = dashboardData ? [
     { 
       name: 'Total Studies', 
-      value: dashboardData.totalStudies.toString(), 
+      value: (dashboardData.totalStudies || 0).toString(), 
       change: '+2', 
       changeType: 'increase' as const, 
       icon: FileText 
     },
     { 
       name: 'Active Participants', 
-      value: dashboardData.activeParticipants.toString(), 
+      value: (dashboardData.activeParticipants || 0).toString(), 
       change: '+12%', 
       changeType: 'increase' as const, 
       icon: Users 
     },
     { 
       name: 'Completion Rate', 
-      value: `${dashboardData.completionRate}%`, 
+      value: `${dashboardData.completionRate || 0}%`, 
       change: '+3%', 
       changeType: 'increase' as const, 
       icon: Target 
     },
     { 
       name: 'Avg. Session Time', 
-      value: `${dashboardData.avgSessionTime}m`, 
+      value: `${dashboardData.avgSessionTime || 0}m`, 
       change: '-2m', 
       changeType: 'decrease' as const, 
       icon: Clock 

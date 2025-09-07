@@ -64,6 +64,21 @@ export interface DashboardAnalytics {
   }>;
 }
 
+interface ApiDashboardResponse {
+  totalStudies?: number;
+  activeStudies?: number;
+  totalApplications?: number;
+  completedSessions?: number;
+  recentActivity?: Array<{
+    id: string;
+    title: string;
+    status: string;
+    participants: number;
+    completionRate: number;
+    lastUpdate: string;
+  }>;
+}
+
 export interface StudyAnalyticsData {
   overview: StudyAnalyticsOverview;
   trends: AnalyticsTrend[];
@@ -107,8 +122,30 @@ export const analyticsService = {
    * Get dashboard analytics summary
    */
   async getDashboardAnalytics(): Promise<DashboardAnalytics> {
-    const response = await apiService.get<{ data: DashboardAnalytics }>('/research-consolidated?action=dashboard-analytics');
-    return response.data;
+    const response = await apiService.get<{ success: boolean; data: ApiDashboardResponse }>('/research-consolidated?action=dashboard-analytics');
+    
+    // Handle the actual response structure from the API
+    if (response.success && response.data) {
+      // Map the API response to the expected DashboardAnalytics interface
+      return {
+        totalStudies: response.data.totalStudies || 0,
+        activeParticipants: response.data.totalApplications || 0,
+        completionRate: response.data.completedSessions || 0,
+        avgSessionTime: 0, // Not available in current API response
+        activeStudies: response.data.activeStudies || 0,
+        recentStudies: response.data.recentActivity || []
+      };
+    }
+    
+    // Fallback if API response is unexpected
+    return {
+      totalStudies: 0,
+      activeParticipants: 0,
+      completionRate: 0,
+      avgSessionTime: 0,
+      activeStudies: 0,
+      recentStudies: []
+    };
   },
 
   /**
