@@ -67,18 +67,14 @@ export default function AdminDashboard() {
 
   const loadStudies = React.useCallback(async () => {
     try {
-      console.log('🔍 Admin loadStudies - Starting API call...');
       const response = await fetch('/api/research-consolidated?action=get-studies', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
-      console.log('🔍 Admin loadStudies - API response:', result);
       
       if (result.success) {
-        // The API returns studies directly in result.studies, not result.data.studies
-        const studiesData = result.studies || [];
-        console.log('🔍 Admin loadStudies - Setting studies:', studiesData);
-        setStudies(studiesData);
+        // The API returns studies directly in result.studies format
+        setStudies(result.studies || []);
       }
     } catch (error) {
       console.error('Error loading studies:', error);
@@ -91,14 +87,6 @@ export default function AdminDashboard() {
       const totalUsers = users.length;
       const totalStudies = studies.length;
       const activeUsers = users.filter(u => u.status === 'active').length;
-      
-      console.log('📊 Admin Stats Debug:', {
-        totalUsers,
-        totalStudies,
-        activeUsers,
-        studiesArray: studies,
-        usersArray: users
-      });
       
       setStats({
         totalUsers,
