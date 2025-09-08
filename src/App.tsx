@@ -48,6 +48,7 @@ const AdminDashboard = lazy(() => import('./client/pages/admin/AdminDashboard'))
 const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPaymentPage.tsx'));
 const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage.tsx'));
 const StudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage'));
+const ParticipantStudyExecutionPage = lazy(() => import('./client/pages/participant/ParticipantStudyExecutionPage'));
 const OrganizationDashboard = lazy(() => import('./client/pages/organization/OrganizationDashboard'));
 const NotFoundPage = lazy(() => import('./client/pages/NotFoundPage'));
 
@@ -278,6 +279,11 @@ function App() {
               <Route path="studies/:id/session" element={
                 <ProtectedRoute allowedRoles={['participant']}>
                   <StudySessionPage />
+                </ProtectedRoute>
+              } />
+              <Route path="study/:studyId/execute" element={
+                <ProtectedRoute allowedRoles={['participant']}>
+                  <ParticipantStudyExecutionPage />
                 </ProtectedRoute>
               } />
               <Route path="creative-journey" element={

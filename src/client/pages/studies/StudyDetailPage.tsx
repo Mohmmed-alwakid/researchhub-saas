@@ -899,6 +899,19 @@ const StudyDetailPage: React.FC = () => {
                   <Eye className="w-4 h-4 mr-2" />
                   Preview
                 </Button>
+                {study.status === 'active' && (
+                  <Button 
+                    onClick={() => {
+                      const studyId = study.id || study._id;
+                      console.log('🚀 StudyDetailPage: Navigating to participant execution:', studyId);
+                      window.open(`/app/study/${studyId}/execute`, '_blank');
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Take Study
+                  </Button>
+                )}
                 <Button 
                   onClick={() => {
                     // Check if study can be edited based on status
