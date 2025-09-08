@@ -34,7 +34,7 @@ const StudyDetailPage: React.FC = () => {
   const [study, setStudy] = useState<IStudy | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
-  // Load study data with comprehensive ID validation
+  // Load study data with comprehensive ID validation  
   useEffect(() => {
     const loadStudy = async () => {
       console.log('🔍 StudyDetailPage: Loading study with ID:', id);
@@ -49,7 +49,7 @@ const StudyDetailPage: React.FC = () => {
       setLoading(true);
       
       // First try to find the study in the current studies list - check both id formats
-      const existingStudy = studies?.find(s => {
+      let existingStudy = studies?.find(s => {
         const studyId = s._id || String(s.id);
         return studyId === id || String(s.id) === id || s._id === id;
       });
@@ -61,26 +61,50 @@ const StudyDetailPage: React.FC = () => {
         setLoading(false);
       } else {
         console.log('🔄 StudyDetailPage: Study not in cache, fetching...');
-        // If not found, fetch all studies
-        await fetchStudies();
-        const foundStudy = studies?.find(s => {
-          const studyId = s._id || String(s.id);
-          return studyId === id || String(s.id) === id || s._id === id;
-        });
-        
-        if (foundStudy) {
-          console.log('✅ StudyDetailPage: Found study after fetch:', foundStudy.title);
-          setStudy(foundStudy);
-          setCurrentStudy(foundStudy);
-        } else {
-          console.error('❌ StudyDetailPage: Study not found with ID:', id);
+        try {
+          // If not found, fetch all studies and wait for completion
+          await fetchStudies();
+          
+          // Check again after fetch - get fresh reference from the store
+          const currentStudies = useAppStore.getState().studies;
+          const foundStudy = currentStudies?.find(s => {
+            const studyId = s._id || String(s.id);
+            return studyId === id || String(s.id) === id || s._id === id;
+          });
+          
+          if (foundStudy) {
+            console.log('✅ StudyDetailPage: Found study after fetch:', foundStudy.title);
+            setStudy(foundStudy);
+            setCurrentStudy(foundStudy);
+          } else {
+            console.error('❌ StudyDetailPage: Study not found with ID:', id);
+          }
+        } catch (error) {
+          console.error('❌ StudyDetailPage: Error fetching studies:', error);
         }
         setLoading(false);
       }
     };
 
     loadStudy();
-  }, [id, studies, fetchStudies, setCurrentStudy]);
+  }, [id, fetchStudies, setCurrentStudy]);
+
+  // Separate effect to watch for studies updates if needed
+  useEffect(() => {
+    if (studies && studies.length > 0 && !study && id) {
+      const foundStudy = studies.find(s => {
+        const studyId = s._id || String(s.id);
+        return studyId === id || String(s.id) === id || s._id === id;
+      });
+      
+      if (foundStudy) {
+        console.log('✅ StudyDetailPage: Study found in updated studies list:', foundStudy.title);
+        setStudy(foundStudy);
+        setCurrentStudy(foundStudy);
+        setLoading(false);
+      }
+    }
+  }, [studies, study, id, setCurrentStudy]);
 
   // Temporary tab components (will be replaced with proper components)
   const StudyOverviewTab = ({ study }: { study: IStudy }) => {
