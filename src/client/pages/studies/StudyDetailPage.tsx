@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   BarChart3,
@@ -25,7 +25,7 @@ import { IStudy } from '../../../shared/types';
 
 type TabType = 'overview' | 'analytics' | 'participants' | 'collaboration' | 'settings';
 
-const StudyDetailPage: React.FC = () => {
+const StudyDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { studies, fetchStudies, setCurrentStudy } = useAppStore();
@@ -49,7 +49,7 @@ const StudyDetailPage: React.FC = () => {
       setLoading(true);
       
       // First try to find the study in the current studies list - check both id formats
-      let existingStudy = studies?.find(s => {
+      const existingStudy = studies?.find(s => {
         const studyId = s._id || String(s.id);
         return studyId === id || String(s.id) === id || s._id === id;
       });
@@ -87,7 +87,7 @@ const StudyDetailPage: React.FC = () => {
     };
 
     loadStudy();
-  }, [id, fetchStudies, setCurrentStudy]);
+  }, [id, fetchStudies, setCurrentStudy, studies]);
 
   // Separate effect to watch for studies updates if needed
   useEffect(() => {
@@ -107,6 +107,7 @@ const StudyDetailPage: React.FC = () => {
   }, [studies, study, id, setCurrentStudy]);
 
   // Temporary tab components (will be replaced with proper components)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const StudyOverviewTab = ({ study }: { study: IStudy }) => {
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
