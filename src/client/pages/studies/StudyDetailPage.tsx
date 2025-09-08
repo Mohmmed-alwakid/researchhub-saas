@@ -1044,6 +1044,7 @@ const StudyDetailPage: React.FC = () => {
       )}
     </div>
   );
-};
+} // Close main StudyDetailPage function
+}
 
 export default StudyDetailPage;
