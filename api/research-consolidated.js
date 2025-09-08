@@ -7,6 +7,7 @@
 let studiesDatabase = [
   {
     id: 1,
+    _id: '1', // Add _id for frontend compatibility
     title: 'Sample Research Study',
     description: 'A demonstration study for the platform',
     status: 'active',
@@ -48,6 +49,7 @@ export default async function handler(req, res) {
         const studyData = req.body;
         const newStudy = {
           id: studyIdCounter++,
+          _id: String(studyIdCounter - 1), // Add _id for frontend compatibility
           title: studyData.title || 'Untitled Study',
           description: studyData.description || '',
           status: studyData.status || 'draft',
@@ -73,14 +75,21 @@ export default async function handler(req, res) {
       case 'get-studies':
         // Filter studies by user role if needed
         const userRole = req.headers['x-user-role'] || 'researcher';
-        let filteredStudies = studiesDatabase;
+        let filteredStudies = studiesDatabase.map(study => ({
+          ...study,
+          // Ensure all studies have both id and _id for compatibility
+          id: study.id,
+          _id: study._id || String(study.id)
+        }));
         
         if (userRole === 'participant') {
           // Only show active/published studies for participants
-          filteredStudies = studiesDatabase.filter(study => 
+          filteredStudies = filteredStudies.filter(study => 
             study.status === 'active' || study.status === 'published'
           );
         }
+        
+        console.log('📊 Research API: Returning studies:', filteredStudies.map(s => ({ id: s.id, _id: s._id, title: s.title })));
         
         return res.status(200).json({
           success: true,

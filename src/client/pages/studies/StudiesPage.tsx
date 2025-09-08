@@ -131,8 +131,28 @@ const StudiesPage: React.FC = () => {
 
   // New action handlers for simplified study card
   const handleCardClick = (study: IStudy) => {
-    // Navigate to study details/overview page - use id instead of _id for enhanced API compatibility
-    navigate(`/app/studies/${study.id || study._id}`);
+    console.log('🖱️ StudiesPage: Card clicked for study:', study);
+    
+    // Validate study object and ID
+    if (!study) {
+      console.error('❌ StudiesPage: Study object is null/undefined');
+      return;
+    }
+    
+    // Get the most reliable ID - prefer numeric id from enhanced API, fallback to _id
+    const studyId = study.id || study._id;
+    console.log('🔍 StudiesPage: Study ID for navigation:', studyId);
+    
+    if (!studyId || studyId === 'undefined' || studyId === 'null') {
+      console.error('❌ StudiesPage: Invalid study ID:', studyId, 'Study:', study);
+      alert('Unable to navigate to study - invalid study ID');
+      return;
+    }
+    
+    // Navigate to study details/overview page
+    const navigationPath = `/app/studies/${studyId}`;
+    console.log('🧭 StudiesPage: Navigating to:', navigationPath);
+    navigate(navigationPath);
   };
 
   const handleEdit = (study: IStudy) => {

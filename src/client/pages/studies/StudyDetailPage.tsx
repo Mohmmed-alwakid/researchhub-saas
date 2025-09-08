@@ -32,26 +32,46 @@ const StudyDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [study, setStudy] = useState<IStudy | null>(null);
 
-  // Load study data
+  // Load study data with comprehensive ID validation
   useEffect(() => {
     const loadStudy = async () => {
-      if (!id) return;
+      console.log('🔍 StudyDetailPage: Loading study with ID:', id);
+      
+      // Validate ID parameter first
+      if (!id || id === 'undefined' || id === 'null') {
+        console.error('❌ StudyDetailPage: Invalid ID parameter:', id);
+        setLoading(false);
+        return;
+      }
       
       setLoading(true);
       
       // First try to find the study in the current studies list - check both id formats
-      const existingStudy = studies?.find(s => s._id === id || String(s.id) === id);
+      const existingStudy = studies?.find(s => {
+        const studyId = s._id || String(s.id);
+        return studyId === id || String(s.id) === id || s._id === id;
+      });
+      
       if (existingStudy) {
+        console.log('✅ StudyDetailPage: Found existing study:', existingStudy.title);
         setStudy(existingStudy);
         setCurrentStudy(existingStudy);
         setLoading(false);
       } else {
+        console.log('🔄 StudyDetailPage: Study not in cache, fetching...');
         // If not found, fetch all studies
         await fetchStudies();
-        const foundStudy = studies?.find(s => s._id === id || String(s.id) === id);
+        const foundStudy = studies?.find(s => {
+          const studyId = s._id || String(s.id);
+          return studyId === id || String(s.id) === id || s._id === id;
+        });
+        
         if (foundStudy) {
+          console.log('✅ StudyDetailPage: Found study after fetch:', foundStudy.title);
           setStudy(foundStudy);
           setCurrentStudy(foundStudy);
+        } else {
+          console.error('❌ StudyDetailPage: Study not found with ID:', id);
         }
         setLoading(false);
       }
