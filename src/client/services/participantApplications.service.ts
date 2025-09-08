@@ -273,7 +273,12 @@ export const participantApplicationsService = {
     data: ParticipantApplication;
     message: string;
   }> {
-    return apiService.post(`applications?endpoint=studies/${studyId}/apply`, application);
+    // Send studyId in the request body as expected by the API
+    const applicationData = {
+      ...application,
+      studyId: studyId
+    };
+    return apiService.post(`applications?action=apply`, applicationData);
   },
 
   /**

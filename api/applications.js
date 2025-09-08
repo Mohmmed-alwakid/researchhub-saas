@@ -202,18 +202,27 @@ async function submitApplication(req, res) {
   }
 
   try {
-    const { studyId, responses } = req.body;
+    const { studyId, responses, screeningResponses } = req.body;
 
-    console.log('📋 Submit application request:', { studyId, responses, userId: auth.user.id });
+    // Handle both possible field names for responses
+    const finalResponses = responses || screeningResponses || {};
 
-    // For now, return success response
+    console.log('📋 Submit application request:', { studyId, finalResponses, userId: auth.user.id });
+
+    // Validate required studyId
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'studyId is required'
+      });
+    }
     // In the future, this would save to applications table
     const application = {
       id: Date.now().toString(),
       study_id: studyId,
       participant_id: auth.user.id,
       status: 'pending',
-      responses: responses || {},
+      responses: finalResponses,
       submitted_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
