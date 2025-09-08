@@ -350,12 +350,30 @@ const StudyDetailPage: React.FC = () => {
                   <Download className="w-4 h-4 mr-2" />
                   Export
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    // For now, show a preview modal or navigate to a preview page
+                    // This could open a modal showing the study as a participant would see it
+                    alert(`Preview for "${study.title}" - This will show the study as participants see it. Feature coming soon!`);
+                  }}
+                >
                   <Eye className="w-4 h-4 mr-2" />
                   Preview
                 </Button>
                 <Button 
-                  onClick={() => navigate(`/app/studies/${study._id}/edit`)}
+                  onClick={() => {
+                    // Check if study can be edited based on status
+                    if (study.status === 'active' || study.status === 'completed') {
+                      alert(`Cannot edit study "${study.title}" because it is currently ${study.status}. Please change the status to "draft" or "paused" first to enable editing.`);
+                      return;
+                    }
+                    
+                    // Navigate to study builder for editing
+                    console.log('🖊️ StudyDetailPage: Navigating to edit study:', study);
+                    navigate(`/app/studies/${study.id || study._id}/edit`);
+                  }}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   <Edit3 className="w-4 h-4 mr-2" />
