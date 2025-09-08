@@ -103,6 +103,8 @@ export const TemplateManager: React.FC = () => {
   // UI state
   const [showCreateTemplate, setShowCreateTemplate] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   // Convert Template to TemplateData for editing
   const convertTemplateToTemplateData = (template: Template): TemplateData => {
@@ -581,14 +583,25 @@ export const TemplateManager: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-1 ml-2">
                       <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setPreviewTemplate(template);
+                          setShowPreviewModal(true);
+                        }}
+                        title="Preview Template"
+                        className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                      >
+                        <Play className="w-4 h-4" />
+                      </Button>
+                      <Button
                         variant="primary"
                         size="sm"
                         onClick={() => handleCreateStudyFromTemplate(template)}
                         title="Create Study from Template"
                         className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
-                        <Play className="w-4 h-4 mr-1" />
-                        Create Study
+                        <Plus className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost"
@@ -685,6 +698,117 @@ export const TemplateManager: React.FC = () => {
             <Plus className="w-4 h-4 mr-2" />
             Create Template
           </Button>
+        </div>
+      )}
+      
+      {/* Template Preview Modal */}
+      {showPreviewModal && previewTemplate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Template Preview</h2>
+              <button 
+                onClick={() => {
+                  setShowPreviewModal(false);
+                  setPreviewTemplate(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Template Header */}
+              <div className="border-b pb-4">
+                <h3 className="text-xl font-semibold mb-2">{previewTemplate.name}</h3>
+                <p className="text-gray-600 mb-3">{previewTemplate.description}</p>
+                <div className="flex items-center space-x-4 text-sm">
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    {categories.find(c => c.id === previewTemplate.category)?.name || previewTemplate.category}
+                  </span>
+                  <span className="text-gray-500">
+                    Created by {previewTemplate.createdBy}
+                  </span>
+                  <span className="text-gray-500">
+                    Used {previewTemplate.usage.timesUsed} times
+                  </span>
+                  {previewTemplate.usage.avgRating > 0 && (
+                    <span className="text-yellow-600">
+                      ⭐ {previewTemplate.usage.avgRating.toFixed(1)} ({previewTemplate.usage.ratingCount})
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Template Blocks Preview */}
+              <div>
+                <h4 className="font-semibold mb-4 text-lg">Study Flow ({previewTemplate.blocks.length} blocks)</h4>
+                <div className="space-y-3">
+                  {previewTemplate.blocks.map((block, index) => (
+                    <div key={block.id} className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                            {index + 1}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <h5 className="font-medium">{block.title}</h5>
+                            <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                              {block.type}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{block.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Template Tags */}
+              {previewTemplate.tags.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Tags</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {previewTemplate.tags.map(tag => (
+                      <span key={tag} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowPreviewModal(false);
+                    setPreviewTemplate(null);
+                  }}
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleCreateStudyFromTemplate(previewTemplate);
+                    setShowPreviewModal(false);
+                    setPreviewTemplate(null);
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Use This Template
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
