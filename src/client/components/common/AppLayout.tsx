@@ -15,6 +15,8 @@ import {
   BookOpen,
   Building,
   Layout,
+  Loader2,
+  Zap,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
@@ -22,10 +24,24 @@ import { useAuthStore } from '../../stores/authStore';
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Handle navigation loading states
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [location.pathname]);
+
+  const handleNavigation = (href: string) => {
+    if (location.pathname !== href) {
+      setIsNavigating(true);
+      navigate(href);
+    }
+    setSidebarOpen(false);
+  };
 
   // Close profile menu when clicking outside
   useEffect(() => {
@@ -147,10 +163,11 @@ const AppLayout = () => {
             >
               {currentNavigation.map((item) => {
                 const Icon = item.icon;
+                const isActive = isCurrentPath(item.href);
                 return (
-                  <Link
+                  <button
                     key={item.name}
-                    to={item.href}
+                    onClick={() => handleNavigation(item.href)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -159,15 +176,32 @@ const AppLayout = () => {
                       fontWeight: '500',
                       borderRadius: '6px',
                       width: '100%',
-                      textDecoration: 'none',
-                      backgroundColor: isCurrentPath(item.href) ? '#dbeafe' : 'transparent',
-                      color: isCurrentPath(item.href) ? '#1e3a8a' : '#4b5563'
+                      textAlign: 'left',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: isActive ? '#dbeafe' : 'transparent',
+                      color: isActive ? '#1e3a8a' : '#4b5563',
+                      transition: 'all 0.2s ease-in-out',
                     }}
-                    onClick={() => setSidebarOpen(false)}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = '#f3f4f6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
                   >
-                    <Icon style={{ marginRight: '16px', width: '24px', height: '24px', flexShrink: 0 }} />
+                    {isNavigating && location.pathname !== item.href ? (
+                      <Loader2 style={{ marginRight: '16px', width: '20px', height: '20px', flexShrink: 0 }} className="animate-spin" />
+                    ) : (
+                      <Icon style={{ marginRight: '16px', width: '20px', height: '20px', flexShrink: 0 }} />
+                    )}
                     <span>{item.name}</span>
-                  </Link>
+                    {isActive && <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#3b82f6' }} />}
+                  </button>
                 );
               })}
             </nav>
@@ -198,10 +232,11 @@ const AppLayout = () => {
               >
                 {currentNavigation.map((item) => {
                   const Icon = item.icon;
+                  const isActive = isCurrentPath(item.href);
                   return (
-                    <Link
+                    <button
                       key={item.name}
-                      to={item.href}
+                      onClick={() => handleNavigation(item.href)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -210,15 +245,32 @@ const AppLayout = () => {
                         fontWeight: '500',
                         borderRadius: '6px',
                         width: '100%',
-                        textDecoration: 'none',
-                        backgroundColor: isCurrentPath(item.href) ? '#dbeafe' : 'transparent',
-                        color: isCurrentPath(item.href) ? '#1e3a8a' : '#4b5563',
-                        transition: 'all 0.2s'
+                        textAlign: 'left',
+                        border: 'none',
+                        cursor: 'pointer',
+                        backgroundColor: isActive ? '#dbeafe' : 'transparent',
+                        color: isActive ? '#1e3a8a' : '#4b5563',
+                        transition: 'all 0.2s ease-in-out',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = '#f9fafb';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
                       }}
                     >
-                      <Icon style={{ marginRight: '12px', width: '20px', height: '20px', flexShrink: 0 }} />
+                      {isNavigating && location.pathname !== item.href ? (
+                        <Loader2 style={{ marginRight: '12px', width: '18px', height: '18px', flexShrink: 0 }} className="animate-spin" />
+                      ) : (
+                        <Icon style={{ marginRight: '12px', width: '18px', height: '18px', flexShrink: 0 }} />
+                      )}
                       <span>{item.name}</span>
-                    </Link>
+                      {isActive && <div style={{ marginLeft: 'auto', width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#3b82f6' }} />}
+                    </button>
                   );
                 })}
               </nav>
@@ -309,6 +361,18 @@ const AppLayout = () => {
 
         {/* Page content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
+          {/* Loading overlay */}
+          {isNavigating && (
+            <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+              <div className="flex flex-col items-center space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                  <Zap className="h-5 w-5 text-blue-500" />
+                </div>
+                <div className="text-sm font-medium text-gray-600">Loading page...</div>
+              </div>
+            </div>
+          )}
           <Outlet />
         </main>
       </div>

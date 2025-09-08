@@ -6,7 +6,9 @@ import {
   Users, 
   Calendar,
   Clock,
-  DollarSign
+  DollarSign,
+  RefreshCw,
+  Filter
 } from 'lucide-react';
 // Enhanced UI components for professional appearance
 import { Button, Input } from '../../components/ui';
@@ -17,6 +19,8 @@ import { IStudy } from '../../../shared/types';
 import StudyCardActions from '../../components/studies/StudyCardActions';
 import RenameStudyModal from '../../components/studies/RenameStudyModal';
 import StudiesLoading from '../../components/studies/StudiesLoading';
+import Loading, { CardSkeleton } from '../../components/common/Loading';
+import Notification from '../../components/common/Notification';
 import '../../styles/study-card.css';
 
 const StudiesPage: React.FC = () => {
@@ -34,6 +38,7 @@ const StudiesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Rename modal state
   const [showRenameModal, setShowRenameModal] = useState(false);
@@ -65,9 +70,14 @@ const StudiesPage: React.FC = () => {
   }, [fetchStudies]);
 
   // Handle manual refresh
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     console.log('🔄 Manual refresh triggered');
-    fetchStudies();
+    setIsRefreshing(true);
+    try {
+      await fetchStudies();
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   // Handle study creation flow - go directly to study builder
@@ -272,14 +282,17 @@ const StudiesPage: React.FC = () => {
             onClick={handleRefresh}
             variant="secondary"
             size="md"
+            disabled={isRefreshing}
             title="Refresh studies list"
             leftIcon={
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              isRefreshing ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4" />
+              )
             }
           >
-            Refresh
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button
             onClick={handleCreateNewStudy}
@@ -349,31 +362,54 @@ const StudiesPage: React.FC = () => {
         <div>
           {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' ? (
             // Show basic empty state when filters are applied
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 text-gray-400">
-                📊
+            <div className="text-center py-16">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                <Search className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No studies found</h3>
-              <p className="text-gray-600 mb-4">
-                Try adjusting your filters to see more results
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">No studies found</h3>
+              <p className="text-gray-600 mb-6 max-w-sm mx-auto">
+                No studies match your current filters. Try adjusting your search criteria to see more results.
               </p>
+              <Button
+                onClick={() => {
+                  setSearchTerm('');
+                  setStatusFilter('all');
+                  setTypeFilter('all');
+                }}
+                variant="outline"
+                size="sm"
+              >
+                Clear Filters
+              </Button>
             </div>          ) : (
             // Show empty state when no studies exist
-            <div className="text-center py-12">
-              <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <Plus className="w-12 h-12 text-gray-400" />
+            <div className="text-center py-20">
+              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full flex items-center justify-center">
+                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <Plus className="w-12 h-12 text-blue-500" />
+                </div>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No studies yet</h3>
-              <p className="text-gray-600 mb-6">
-                Get started by creating your first research study
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Research Hub</h3>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
+                You haven't created any studies yet. Get started by creating your first research study and begin collecting valuable insights.
               </p>
-              <button
-                onClick={handleCreateNewStudy}
-                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Study
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  onClick={handleCreateNewStudy}
+                  variant="primary"
+                  size="lg"
+                  leftIcon={<Plus className="w-5 h-5" />}
+                >
+                  Create Your First Study
+                </Button>
+                <Button
+                  onClick={() => window.open('/docs/getting-started', '_blank')}
+                  variant="outline"
+                  size="lg"
+                >
+                  View Documentation
+                </Button>
+              </div>
             </div>
           )}
         </div>
