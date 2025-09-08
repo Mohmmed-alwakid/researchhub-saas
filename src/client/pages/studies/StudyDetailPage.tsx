@@ -31,6 +31,7 @@ const StudyDetailPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [loading, setLoading] = useState(true);
   const [study, setStudy] = useState<IStudy | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   // Load study data with comprehensive ID validation
   useEffect(() => {
@@ -354,9 +355,8 @@ const StudyDetailPage: React.FC = () => {
                   variant="outline" 
                   size="sm"
                   onClick={() => {
-                    // For now, show a preview modal or navigate to a preview page
-                    // This could open a modal showing the study as a participant would see it
-                    alert(`Preview for "${study.title}" - This will show the study as participants see it. Feature coming soon!`);
+                    console.log('🔍 StudyDetailPage: Opening preview for study:', study.title);
+                    setShowPreviewModal(true);
                   }}
                 >
                   <Eye className="w-4 h-4 mr-2" />
@@ -419,6 +419,79 @@ const StudyDetailPage: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Preview Modal */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Study Preview</h2>
+              <button 
+                onClick={() => setShowPreviewModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">How participants will see this study:</h3>
+                <div className="border rounded-lg p-6 bg-gray-50">
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Eye className="w-6 h-6 text-blue-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-gray-900 mb-2">{study.title}</h4>
+                      <p className="text-gray-600 mb-4">{study.description}</p>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-500">Status:</span>
+                          <span className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
+                            study.status === 'active' ? 'bg-green-100 text-green-800' :
+                            study.status === 'draft' ? 'bg-gray-100 text-gray-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {study.status}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Type:</span>
+                          <span className="ml-2 text-gray-900">{study.type}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowPreviewModal(false)}
+                >
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    // Navigate to actual participant view if available
+                    setShowPreviewModal(false);
+                    alert('Full participant preview functionality coming soon!');
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  View as Participant
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
