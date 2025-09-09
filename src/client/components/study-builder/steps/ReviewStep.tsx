@@ -134,7 +134,7 @@ export const ReviewStep: React.FC<StepProps> = ({
         setIsLaunched(true);
         setTimeout(() => {
           setShowLaunchModal(false);
-          navigate('/researcher/studies');
+          navigate('/app/studies');
         }, 3000);
       } else {
         console.error('Failed to create study:', result.error);
