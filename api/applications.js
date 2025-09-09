@@ -372,12 +372,24 @@ async function submitApplication(req, res) {
     }
 
     // Check if user has already applied to this study
+    console.log('🔍 About to check existing application...', {
+      userId: auth.user.id,
+      studyId: studyId,
+      supabaseAdminConfigured: !!supabaseAdmin
+    });
+    
     const { data: existingApplication, error: checkError } = await supabaseAdmin
       .from('study_applications')
       .select('id')
       .eq('participant_id', auth.user.id)
       .eq('study_id', studyId)
       .single();
+
+    console.log('🔍 Check existing application result:', {
+      hasExisting: !!existingApplication,
+      error: checkError?.message,
+      errorCode: checkError?.code
+    });
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
       console.error('Error checking existing application:', checkError);

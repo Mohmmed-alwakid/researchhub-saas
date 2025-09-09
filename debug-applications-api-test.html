@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .test-button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 10px 0; }
+        .test-button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .timestamp { font-size: 0.8em; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Applications API Test</h1>
+        <p>Test the applications API to check if the RLS fix has been deployed.</p>
+        
+        <button class="test-button" onclick="testApplicationsHealthCheck()">Test Applications Health Check</button>
+        <button class="test-button" onclick="testWithAuth()">Test Submit Application (with Auth)</button>
+        <button class="test-button" onclick="checkDeploymentVersion()">Check Deployment Version</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let resultCounter = 0;
+
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `
+                <div class="timestamp">[${new Date().toLocaleTimeString()}] Test ${++resultCounter}</div>
+                <pre>${message}</pre>
+            `;
+            resultsDiv.insertBefore(resultDiv, resultsDiv.firstChild);
+        }
+
+        async function testApplicationsHealthCheck() {
+            try {
+                addResult('Testing applications API health check...', 'info');
+                
+                const response = await fetch('/api/applications?action=health', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const responseText = await response.text();
+                
+                if (response.ok) {
+                    addResult(`✅ Applications API Health Check SUCCESS\nStatus: ${response.status}\nResponse: ${responseText}`, 'success');
+                } else {
+                    addResult(`❌ Applications API Health Check FAILED\nStatus: ${response.status}\nResponse: ${responseText}`, 'error');
+                }
+            } catch (error) {
+                addResult(`💥 Applications API Health Check ERROR\nError: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWithAuth() {
+            try {
+                addResult('Testing application submission with mock auth...', 'info');
+                
+                // Mock application data
+                const mockData = {
+                    studyId: 'study-001',
+                    eligibilityConfirmed: true,
+                    screeningResponses: {}
+                };
+                
+                const response = await fetch('/api/applications?action=submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer mock-token-for-test'
+                    },
+                    body: JSON.stringify(mockData)
+                });
+                
+                const responseText = await response.text();
+                
+                if (response.ok) {
+                    addResult(`✅ Application Submission SUCCESS\nStatus: ${response.status}\nResponse: ${responseText}`, 'success');
+                } else {
+                    addResult(`❌ Application Submission FAILED\nStatus: ${response.status}\nResponse: ${responseText}`, 'error');
+                }
+            } catch (error) {
+                addResult(`💥 Application Submission ERROR\nError: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkDeploymentVersion() {
+            try {
+                addResult('Checking deployment version and timestamp...', 'info');
+                
+                const response = await fetch('/api/applications?action=version', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const responseText = await response.text();
+                
+                if (response.ok) {
+                    addResult(`✅ Deployment Version Check SUCCESS\nStatus: ${response.status}\nResponse: ${responseText}`, 'success');
+                } else {
+                    addResult(`❌ Deployment Version Check FAILED\nStatus: ${response.status}\nResponse: ${responseText}`, 'error');
+                }
+            } catch (error) {
+                addResult(`💥 Deployment Version Check ERROR\nError: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run health check on page load
+        window.onload = function() {
+            setTimeout(testApplicationsHealthCheck, 1000);
+        };
+    </script>
+</body>
+</html>
