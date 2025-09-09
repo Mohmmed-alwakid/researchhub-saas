@@ -31,11 +31,16 @@ async function authenticateUser(req) {
 
     const token = authHeader.replace('Bearer ', '');
     
-    // Verify token with Supabase
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    // Verify token with Supabase Admin client (bypasses RLS)
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
 
     if (error || !user) {
       console.log('❌ Token verification failed:', error?.message);
+      console.log('❌ Token verification error details:', {
+        errorMessage: error?.message,
+        errorCode: error?.code,
+        token: token?.substring(0, 50) + '...'
+      });
       return { success: false, error: 'Invalid or expired token', status: 401 };
     }
 
