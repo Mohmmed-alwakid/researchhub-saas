@@ -29,6 +29,11 @@ class ApiService {
             const { state } = JSON.parse(authStorage);
             let token = state?.token;
             
+            // Add user role header if available
+            if (state?.user?.role) {
+              config.headers['x-user-role'] = state.user.role;
+            }
+            
             if (token) {
               // Check if token is valid before making request
               const isValid = this.isTokenValid(token);

@@ -175,13 +175,13 @@ async function getStudies(req, res) {
     
     console.log(`📚 Getting studies for role: ${userRole}`);
     
+    // Build the query properly
     let query = supabaseAdmin
       .from('studies')
       .select('*');
     
     // Filter based on user role
     if (userRole === 'participant') {
-      // Only show active studies for participants
       console.log('🔍 Filtering for active studies only');
       query = query.eq('status', 'active');
     }
@@ -190,22 +190,7 @@ async function getStudies(req, res) {
     query = query.order('created_at', { ascending: false });
     
     console.log('🗄️ Executing database query...');
-    const { data: studies, error } = await supabaseAdmin.from('studies').select('*').eq('status', userRole === 'participant' ? 'active' : undefined).order('created_at', { ascending: false });
-
-    // Remove undefined filter if not participant
-    if (userRole !== 'participant') {
-      const { data: allStudies, error: allError } = await supabaseAdmin.from('studies').select('*').order('created_at', { ascending: false });
-      if (allError) {
-        console.error('❌ Database error fetching all studies:', allError);
-        return res.status(500).json({
-          success: false,
-          error: 'Failed to fetch studies from database',
-          details: allError.message
-        });
-      }
-      studies = allStudies;
-      error = null;
-    }
+    const { data: studies, error } = await query;
 
     if (error) {
       console.error('❌ Database error fetching studies:', error);
