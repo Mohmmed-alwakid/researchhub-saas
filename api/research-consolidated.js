@@ -175,6 +175,17 @@ async function getStudies(req, res) {
     
     console.log(`📚 Getting studies for role: ${userRole} - Fixed query logic`);
     
+    // Authenticate user to get their ID
+    let currentUserId = null;
+    if (userRole === 'researcher') {
+      // For researchers, we need to filter by their own studies
+      const authResult = await authenticateUser(req);
+      if (authResult.success) {
+        currentUserId = authResult.user.id;
+        console.log(`🔐 Authenticated researcher: ${currentUserId}`);
+      }
+    }
+    
     // Build the query properly
     let query = supabaseAdmin
       .from('studies')
@@ -184,6 +195,9 @@ async function getStudies(req, res) {
     if (userRole === 'participant') {
       console.log('🔍 Filtering for active studies only');
       query = query.eq('status', 'active');
+    } else if (userRole === 'researcher' && currentUserId) {
+      console.log(`🔍 Filtering for researcher's own studies: ${currentUserId}`);
+      query = query.eq('researcher_id', currentUserId);
     }
     
     // Add ordering
