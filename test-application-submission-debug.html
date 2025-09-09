@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Submission Debug Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+        }
+        button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        .log {
+            background-color: #0f0f0f;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            border: 1px solid #444;
+        }
+        .success { border-left: 4px solid #4caf50; }
+        .error { border-left: 4px solid #f44336; }
+        .info { border-left: 4px solid #2196f3; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Application Submission Debug Test</h1>
+    <p>Testing application submission API with detailed debugging</p>
+
+    <div class="section">
+        <h3>🔐 Step 1: Login as Participant</h3>
+        <button onclick="loginParticipant()">Login Participant</button>
+        <div id="loginResult" class="log"></div>
+    </div>
+
+    <div class="section">
+        <h3>📋 Step 2: Submit Application (with debug logs)</h3>
+        <button onclick="submitApplication()">Submit Application</button>
+        <div id="submitResult" class="log"></div>
+    </div>
+
+    <div class="section">
+        <h3>📊 Step 3: Check API Logs</h3>
+        <p>Check the Vercel function logs for detailed debugging output</p>
+        <button onclick="checkMyApplications()">Check My Applications</button>
+        <div id="checkResult" class="log"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        const API_BASE = 'https://researchhub-saas.vercel.app';
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML += `[${timestamp}] ${message}\n`;
+            element.className = `log ${type}`;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        async function loginParticipant() {
+            log('loginResult', '🔐 Attempting participant login...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+participant@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.session) {
+                    authToken = data.session.accessToken || data.session.access_token;
+                    log('loginResult', `✅ Login successful! Token: ${authToken.substring(0, 20)}...`, 'success');
+                    log('loginResult', `User ID: ${data.user.id}`, 'success');
+                } else {
+                    log('loginResult', `❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log('loginResult', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function submitApplication() {
+            if (!authToken) {
+                log('submitResult', '❌ Please login first!', 'error');
+                return;
+            }
+
+            log('submitResult', '📋 Submitting application with debug logs...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/applications?action=apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        studyId: 'study-001', // Demo study ID
+                        responses: [],
+                        screeningResponses: []
+                    })
+                });
+
+                const data = await response.json();
+                
+                log('submitResult', `📊 Response Status: ${response.status}`, 'info');
+                log('submitResult', `📋 Response Data: ${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+                
+                if (data.debug) {
+                    log('submitResult', `🔍 Debug Info: ${JSON.stringify(data.debug, null, 2)}`, 'info');
+                }
+                
+            } catch (error) {
+                log('submitResult', `❌ Submit error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkMyApplications() {
+            if (!authToken) {
+                log('checkResult', '❌ Please login first!', 'error');
+                return;
+            }
+
+            log('checkResult', '📊 Checking my applications...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/applications?endpoint=applications/my-applications`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                log('checkResult', `📊 Response Status: ${response.status}`, 'info');
+                log('checkResult', `📋 My Applications: ${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                log('checkResult', `❌ Check error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
