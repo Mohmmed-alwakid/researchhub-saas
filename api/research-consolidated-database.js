@@ -173,63 +173,33 @@ async function getStudies(req, res) {
   try {
     const userRole = req.headers['x-user-role'] || 'researcher';
     
-    console.log(`📚 Getting studies for role: ${userRole}`);
-    
-    let query = supabaseAdmin
+    let query = supabase
       .from('studies')
       .select('*');
     
     // Filter based on user role
     if (userRole === 'participant') {
-      // Only show active studies for participants
-      console.log('🔍 Filtering for active studies only');
-      query = query.eq('status', 'active');
+      // Only show active/published studies for participants
+      query = query.in('status', ['active', 'published']);
     }
     
     // Add ordering
     query = query.order('created_at', { ascending: false });
     
-    console.log('🗄️ Executing database query...');
-    const { data: studies, error } = await supabaseAdmin.from('studies').select('*').eq('status', userRole === 'participant' ? 'active' : undefined).order('created_at', { ascending: false });
-
-    // Remove undefined filter if not participant
-    if (userRole !== 'participant') {
-      const { data: allStudies, error: allError } = await supabaseAdmin.from('studies').select('*').order('created_at', { ascending: false });
-      if (allError) {
-        console.error('❌ Database error fetching all studies:', allError);
-        return res.status(500).json({
-          success: false,
-          error: 'Failed to fetch studies from database',
-          details: allError.message
-        });
-      }
-      studies = allStudies;
-      error = null;
-    }
+    const { data: studies, error } = await query;
 
     if (error) {
-      console.error('❌ Database error fetching studies:', error);
+      console.error('Database error fetching studies:', error);
       return res.status(500).json({
         success: false,
-        error: 'Failed to fetch studies from database',
-        details: error.message
+        error: 'Failed to fetch studies from database'
       });
     }
 
-    console.log(`📊 Found ${studies.length} studies in database`);
-
     // Format studies for frontend
-    console.log('🔄 Formatting studies for frontend...');
-    const formattedStudies = studies.map(study => {
-      try {
-        return formatStudyForFrontend(study);
-      } catch (formatError) {
-        console.error('❌ Error formatting study:', study.id, formatError);
-        return study; // Return unformatted if there's an error
-      }
-    });
+    const formattedStudies = studies.map(study => formatStudyForFrontend(study));
     
-    console.log(`📚 Successfully formatted ${formattedStudies.length} studies for role: ${userRole}`);
+    console.log(`📚 Fetched ${studies.length} studies from database for role: ${userRole}`);
     
     return res.status(200).json({
       success: true,
@@ -238,11 +208,10 @@ async function getStudies(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Get studies error:', error);
+    console.error('Get studies error:', error);
     return res.status(500).json({
       success: false,
-      error: 'Internal server error',
-      details: error.message
+      error: 'Internal server error'
     });
   }
 }
