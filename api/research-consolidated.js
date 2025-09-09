@@ -159,9 +159,24 @@ async function createStudy(req, res) {
 
     if (error) {
       console.error('Database error creating study:', error);
+      console.error('Database error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      console.error('Failed study data:', dbStudyData);
+      
       return res.status(500).json({
         success: false,
-        error: 'Failed to create study in database'
+        error: 'Failed to create study in database',
+        debug: {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          studyData: dbStudyData
+        }
       });
     }
 
