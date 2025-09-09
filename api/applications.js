@@ -376,9 +376,25 @@ async function submitApplication(req, res) {
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
       console.error('Error checking existing application:', checkError);
+      console.error('Check error details:', {
+        message: checkError.message,
+        details: checkError.details,
+        hint: checkError.hint,
+        code: checkError.code,
+        userId: auth.user.id,
+        studyId: studyId
+      });
       return res.status(500).json({
         success: false,
-        error: 'Failed to check existing application'
+        error: 'Failed to check existing application',
+        debug: {
+          message: checkError.message,
+          details: checkError.details,
+          hint: checkError.hint,
+          code: checkError.code,
+          userId: auth.user.id,
+          studyId: studyId
+        }
       });
     }
 
