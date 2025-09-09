@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Study API Test - ResearchHub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover { background: #0056b3; }
+        button.danger { background: #dc3545; }
+        button.danger:hover { background: #c82333; }
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .step {
+            border-left: 4px solid #007bff;
+            padding-left: 15px;
+            margin: 10px 0;
+        }
+        .credential-form {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .credential-form input {
+            width: 300px;
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Create Study API Authentication Test</h1>
+    <p><strong>Purpose:</strong> Test the authentication fix for the create-study API endpoint that was returning 401 errors.</p>
+    
+    <div class="test-panel">
+        <h3>Step 1: Authentication</h3>
+        <div class="credential-form">
+            <div>
+                <label>Email: </label>
+                <input type="email" id="email" value="abwanwr77+Researcher@gmail.com">
+            </div>
+            <div>
+                <label>Password: </label>
+                <input type="password" id="password" value="Testtest123">
+            </div>
+            <button onclick="loginAndTest()">Login & Test Create Study</button>
+            <button onclick="useExistingAuth()">Use Existing Auth</button>
+            <button onclick="clearAuth()" class="danger">Clear All Auth</button>
+        </div>
+        <div id="authResult"></div>
+    </div>
+
+    <div class="test-panel">
+        <h3>Step 2: Create Study API Test</h3>
+        <div class="step">
+            <strong>Test Configuration:</strong>
+            <ul>
+                <li>Endpoint: <code>/api/research-consolidated?action=create-study</code></li>
+                <li>Method: POST</li>
+                <li>Authentication: Bearer token from login</li>
+                <li>Test Study: "Auth Fix Verification Study"</li>
+            </ul>
+        </div>
+        <button onclick="testCreateStudy()">Test Create Study API</button>
+        <button onclick="runFullTest()">Run Complete Authentication Flow Test</button>
+        <div id="testResult"></div>
+    </div>
+
+    <div class="test-panel">
+        <h3>Step 3: Detailed Results</h3>
+        <div id="detailedResults"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://researchhub-saas.vercel.app/api';
+        
+        function displayStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function displayJson(elementId, data, title = 'Response') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<strong>${title}:</strong><div class="json-display">${JSON.stringify(data, null, 2)}</div>`;
+        }
+
+        async function loginAndTest() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                displayStatus('authResult', 'Please enter email and password', 'error');
+                return;
+            }
+
+            try {
+                displayStatus('authResult', 'Step 1/3: Attempting login...', 'info');
+
+                const loginResponse = await fetch(`${API_BASE}/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const loginData = await loginResponse.json();
+
+                if (!loginResponse.ok || !loginData.success) {
+                    displayStatus('authResult', `❌ Login failed: ${loginData.message || 'Unknown error'}`, 'error');
+                    return;
+                }
+
+                const token = loginData.session?.access_token || loginData.tokens?.authToken;
+                if (!token) {
+                    displayStatus('authResult', '❌ Login successful but no token received', 'error');
+                    return;
+                }
+
+                // Store authentication data
+                const authState = {
+                    user: loginData.user,
+                    token: token,
+                    refreshToken: loginData.session?.refresh_token || loginData.tokens?.refreshToken,
+                    isAuthenticated: true
+                };
+
+                localStorage.setItem('auth-storage', JSON.stringify({ 
+                    state: authState, 
+                    version: 0 
+                }));
+
+                displayStatus('authResult', `✅ Login successful!
+• User: ${loginData.user?.email}
+• Role: ${loginData.user?.role}
+• Token: ${token.substring(0, 20)}...`, 'success');
+
+                displayStatus('testResult', 'Step 2/3: Ready to test create study API...', 'info');
+                
+                // Automatically test create study
+                setTimeout(testCreateStudy, 1000);
+
+            } catch (error) {
+                displayStatus('authResult', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function useExistingAuth() {
+            const authStorage = localStorage.getItem('auth-storage');
+            if (!authStorage) {
+                displayStatus('authResult', '❌ No existing authentication found. Please login first.', 'error');
+                return;
+            }
+
+            try {
+                const { state } = JSON.parse(authStorage);
+                if (!state?.token || !state?.user) {
+                    displayStatus('authResult', '❌ Invalid authentication data. Please login again.', 'error');
+                    return;
+                }
+
+                displayStatus('authResult', `✅ Using existing authentication:
+• User: ${state.user.email}
+• Role: ${state.user.role}
+• Token: ${state.token.substring(0, 20)}...`, 'success');
+
+                testCreateStudy();
+            } catch (error) {
+                displayStatus('authResult', `❌ Error parsing auth data: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateStudy() {
+            const authStorage = localStorage.getItem('auth-storage');
+            if (!authStorage) {
+                displayStatus('testResult', '❌ No authentication available. Please login first.', 'error');
+                return;
+            }
+
+            try {
+                const { state } = JSON.parse(authStorage);
+                const token = state?.token;
+
+                if (!token) {
+                    displayStatus('testResult', '❌ No token found. Please login first.', 'error');
+                    return;
+                }
+
+                displayStatus('testResult', 'Step 2/3: Testing create study API...', 'info');
+
+                const testStudyData = {
+                    title: `Auth Fix Verification Study - ${new Date().toLocaleTimeString()}`,
+                    description: 'This study was created to verify that the 401 authentication error has been fixed.',
+                    status: 'draft',
+                    type: 'usability',
+                    target_participants: 10,
+                    duration: 30,
+                    compensation: 25,
+                    blocks: [
+                        {
+                            id: 'welcome-1',
+                            type: 'welcome',
+                            order: 1,
+                            title: 'Welcome',
+                            description: 'Welcome to our verification study',
+                            settings: {}
+                        },
+                        {
+                            id: 'thank-you-2',
+                            type: 'thank_you',
+                            order: 2,
+                            title: 'Thank You',
+                            description: 'Thank you for participating',
+                            settings: {}
+                        }
+                    ],
+                    settings: {
+                        difficulty: 'beginner',
+                        category: 'product_testing'
+                    }
+                };
+
+                console.log('🧪 Sending create study request:', testStudyData);
+                console.log('🔑 Using token:', token.substring(0, 30) + '...');
+
+                const createResponse = await fetch(`${API_BASE}/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(testStudyData)
+                });
+
+                const responseText = await createResponse.text();
+                let responseData;
+                
+                try {
+                    responseData = JSON.parse(responseText);
+                } catch (parseError) {
+                    responseData = {
+                        rawResponse: responseText,
+                        parseError: parseError.message
+                    };
+                }
+
+                console.log('📥 Create study response:', responseData);
+
+                if (createResponse.ok && responseData.success) {
+                    displayStatus('testResult', `✅ SUCCESS! Create study API is working!
+• Status: ${createResponse.status}
+• Study ID: ${responseData.data?.id || 'Unknown'}
+• Study Title: ${responseData.data?.title || 'Unknown'}
+• Researcher ID: ${responseData.data?.researcher_id || 'Unknown'}`, 'success');
+
+                    displayJson('detailedResults', responseData, 'Successful Create Study Response');
+                } else {
+                    displayStatus('testResult', `❌ FAILED! Create study API still has issues:
+• Status: ${createResponse.status}
+• Error: ${responseData.error || 'Unknown error'}
+• Message: ${responseData.message || 'No message'}`, 'error');
+
+                    displayJson('detailedResults', {
+                        status: createResponse.status,
+                        headers: Object.fromEntries(createResponse.headers),
+                        response: responseData
+                    }, 'Failed Create Study Response');
+                }
+
+            } catch (error) {
+                displayStatus('testResult', `❌ Network/Request Error: ${error.message}`, 'error');
+                displayJson('detailedResults', {
+                    error: error.message,
+                    stack: error.stack
+                }, 'Network Error Details');
+            }
+        }
+
+        async function runFullTest() {
+            displayStatus('detailedResults', '🚀 Running complete authentication flow test...', 'info');
+            
+            // Step 1: Clear existing auth
+            clearAuth();
+            
+            // Step 2: Login
+            setTimeout(() => {
+                displayStatus('detailedResults', 'Step 1/3: Logging in...', 'info');
+                loginAndTest();
+            }, 500);
+        }
+
+        function clearAuth() {
+            localStorage.removeItem('auth-storage');
+            displayStatus('authResult', '🧹 Authentication data cleared', 'info');
+            displayStatus('testResult', '', 'info');
+            displayStatus('detailedResults', '', 'info');
+        }
+
+        // Check for existing auth on page load
+        window.onload = function() {
+            const authStorage = localStorage.getItem('auth-storage');
+            if (authStorage) {
+                try {
+                    const { state } = JSON.parse(authStorage);
+                    if (state?.user && state?.token) {
+                        displayStatus('authResult', `ℹ️ Found existing authentication:
+• User: ${state.user.email}
+• Role: ${state.user.role}
+• Ready to test API`, 'info');
+                    }
+                } catch (e) {
+                    console.log('Invalid existing auth data');
+                }
+            }
+        };
+    </script>
+</body>
+</html>

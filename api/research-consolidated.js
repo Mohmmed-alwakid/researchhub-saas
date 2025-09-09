@@ -123,7 +123,7 @@ function formatStudyForFrontend(dbStudy, includeNumericId = true) {
  */
 async function createStudy(req, res) {
   try {
-    // Authenticate user
+    // Authenticate user first
     const authResult = await authenticateUser(req);
     if (!authResult.success) {
       return res.status(authResult.status).json({ success: false, error: authResult.error });
@@ -131,6 +131,17 @@ async function createStudy(req, res) {
 
     const studyData = req.body;
     const timestamp = new Date().toISOString();
+    
+    // Get the authorization token for user context
+    const authHeader = req.headers.authorization;
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Create a Supabase client with the user's session context for RLS
+    const userSupabase = createClient(supabaseUrl, supabaseKey);
+    await userSupabase.auth.setSession({
+      access_token: token,
+      refresh_token: null // We don't have refresh token in this context
+    });
     
     // Prepare study data for database
     const dbStudyData = {
@@ -150,8 +161,14 @@ async function createStudy(req, res) {
       }
     };
 
-    // Insert into database
-    const { data: newStudy, error } = await supabase
+    console.log('📝 Attempting to insert study with user context:', {
+      userId: authResult.user.id,
+      title: dbStudyData.title,
+      hasToken: !!token
+    });
+
+    // Insert into database using user-contextualized client
+    const { data: newStudy, error } = await userSupabase
       .from('studies')
       .insert([dbStudyData])
       .select()

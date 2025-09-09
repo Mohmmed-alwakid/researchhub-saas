@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Fix Verification - ResearchHub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        .warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 10px 10px 0;
+            transition: background-color 0.2s;
+        }
+        button:hover { background: #0056b3; }
+        button.success { background: #28a745; }
+        button.success:hover { background: #218838; }
+        .test-step {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+        }
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔧 Authentication Fix Verification</h1>
+        <p><strong>Testing the 401 authentication error fix deployed on September 9, 2025</strong></p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="test-step">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <span class="step-number">1</span>
+                <strong>Authentication Test</strong>
+            </div>
+            <button onclick="runAuthTest()">Start Authentication Test</button>
+            <div id="authResult"></div>
+        </div>
+
+        <div class="test-step">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <span class="step-number">2</span>
+                <strong>Create Study API Test</strong>
+            </div>
+            <button onclick="runCreateStudyTest()" id="createStudyBtn" disabled>Test Create Study API</button>
+            <div id="createStudyResult"></div>
+        </div>
+
+        <div class="test-step">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <span class="step-number">3</span>
+                <strong>Overall Verification</strong>
+            </div>
+            <button onclick="runCompleteTest()" class="success">Run Complete Verification</button>
+            <div id="overallResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://researchhub-saas.vercel.app/api';
+        let authToken = null;
+        
+        function updateProgress(percentage) {
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+        
+        function showStatus(elementId, message, type = 'info') {
+            document.getElementById(elementId).innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function runAuthTest() {
+            showStatus('authResult', '🔄 Testing authentication with researcher credentials...', 'info');
+            updateProgress(10);
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const data = await response.json();
+                updateProgress(30);
+
+                if (response.ok && data.success) {
+                    authToken = data.session?.access_token || data.tokens?.authToken;
+                    
+                    if (authToken) {
+                        showStatus('authResult', `✅ Authentication successful!<br>
+                            • Status: ${response.status}<br>
+                            • User: ${data.user?.email}<br>
+                            • Role: ${data.user?.role}<br>
+                            • Token received: Yes`, 'success');
+                        
+                        document.getElementById('createStudyBtn').disabled = false;
+                        updateProgress(50);
+                        return true;
+                    } else {
+                        showStatus('authResult', '❌ Authentication successful but no token received', 'error');
+                        return false;
+                    }
+                } else {
+                    showStatus('authResult', `❌ Authentication failed: ${data.message || 'Unknown error'}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                showStatus('authResult', `❌ Authentication error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function runCreateStudyTest() {
+            if (!authToken) {
+                showStatus('createStudyResult', '❌ No authentication token. Please run authentication test first.', 'error');
+                return false;
+            }
+
+            showStatus('createStudyResult', '🔄 Testing create study API with authenticated token...', 'info');
+            updateProgress(60);
+
+            try {
+                const testStudy = {
+                    title: `Auth Fix Test - ${new Date().toLocaleTimeString()}`,
+                    description: 'Testing the 401 authentication fix deployment',
+                    status: 'draft',
+                    type: 'usability',
+                    target_participants: 5,
+                    blocks: [
+                        {
+                            id: 'welcome-1',
+                            type: 'welcome',
+                            order: 1,
+                            title: 'Welcome',
+                            description: 'Welcome to our test study',
+                            settings: {}
+                        }
+                    ]
+                };
+
+                const response = await fetch(`${API_BASE}/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testStudy)
+                });
+
+                const data = await response.json();
+                updateProgress(80);
+
+                if (response.ok && data.success) {
+                    showStatus('createStudyResult', `✅ Create study API working perfectly!<br>
+                        • Status: ${response.status}<br>
+                        • Study created: ${data.data?.title}<br>
+                        • Study ID: ${data.data?.id}<br>
+                        • No 401 errors!`, 'success');
+                    return true;
+                } else {
+                    const errorMsg = response.status === 401 ? 
+                        'AUTHENTICATION ERROR STILL EXISTS' : 
+                        `API Error: ${data.error || 'Unknown error'}`;
+                    
+                    showStatus('createStudyResult', `❌ ${errorMsg}<br>
+                        • Status: ${response.status}<br>
+                        • Error: ${data.error || 'No error message'}<br>
+                        • Response: ${JSON.stringify(data).substring(0, 200)}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                showStatus('createStudyResult', `❌ Network error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function runCompleteTest() {
+            showStatus('overallResult', '🚀 Running complete authentication fix verification...', 'info');
+            updateProgress(0);
+            
+            const authSuccess = await runAuthTest();
+            if (!authSuccess) {
+                showStatus('overallResult', '❌ Complete test failed at authentication step', 'error');
+                return;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const createStudySuccess = await runCreateStudyTest();
+            updateProgress(90);
+            
+            if (createStudySuccess) {
+                showStatus('overallResult', `🎉 AUTHENTICATION FIX VERIFICATION COMPLETE!<br><br>
+                    ✅ Authentication working<br>
+                    ✅ Create study API working<br>
+                    ✅ No more 401 errors<br>
+                    ✅ Fix successfully deployed<br><br>
+                    <strong>Status: All systems operational!</strong>`, 'success');
+                updateProgress(100);
+            } else {
+                showStatus('overallResult', '❌ Complete test failed - authentication fix may need additional work', 'error');
+                updateProgress(100);
+            }
+        }
+
+        // Auto-run on page load for quick verification
+        window.onload = function() {
+            setTimeout(() => {
+                showStatus('authResult', 'Ready to test authentication fix...', 'info');
+            }, 500);
+        };
+    </script>
+</body>
+</html>

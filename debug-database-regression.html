@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Regression Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Database Regression Debug</h1>
+        
+        <div class="space-y-6">
+            <!-- Step 1: Test Authentication -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">1. Test Authentication & User Object</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email:</label>
+                        <input type="email" id="debugEmail" value="abwanwr77+Researcher@gmail.com" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Password:</label>
+                        <input type="password" id="debugPassword" value="Testtest123" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+                    </div>
+                    <button onclick="testAuth()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Test Authentication & Get User Object
+                    </button>
+                </div>
+                <div id="authResult" class="mt-4 p-3 bg-gray-50 rounded text-sm"></div>
+            </div>
+
+            <!-- Step 2: Test Database Direct -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">2. Test Database Insert with Debug Info</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Study Title:</label>
+                        <input type="text" id="debugTitle" value="Debug Study Test" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+                    </div>
+                    <button onclick="testDatabaseInsert()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                        Test Database Insert with Full Debug
+                    </button>
+                </div>
+                <div id="databaseResult" class="mt-4 p-3 bg-gray-50 rounded text-sm"></div>
+            </div>
+
+            <!-- Step 3: Check Database Schema -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">3. Check Database Schema & Constraints</h2>
+                <button onclick="checkDatabaseSchema()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    Check Studies Table Schema
+                </button>
+                <div id="schemaResult" class="mt-4 p-3 bg-gray-50 rounded text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://researchhub-saas.vercel.app';
+        let currentToken = null;
+        let currentUser = null;
+
+        async function testAuth() {
+            const email = document.getElementById('debugEmail').value;
+            const password = document.getElementById('debugPassword').value;
+            const resultDiv = document.getElementById('authResult');
+            
+            try {
+                resultDiv.innerHTML = 'Testing authentication...';
+                
+                // First, login to get token
+                const loginResponse = await fetch(`${BASE_URL}/api/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const loginData = await loginResponse.json();
+                console.log('Login response:', loginData);
+                
+                if (!loginData.success) {
+                    resultDiv.innerHTML = `❌ Login failed: ${loginData.error}`;
+                    return;
+                }
+                
+                currentToken = loginData.session.access_token;
+                
+                // Now test the authentication function directly
+                const authTestResponse = await fetch(`${BASE_URL}/api/research-consolidated?action=debug-auth`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const authData = await authTestResponse.json();
+                console.log('Auth test response:', authData);
+                
+                if (authData.success) {
+                    currentUser = authData.user;
+                    resultDiv.innerHTML = `
+                        <div class="text-green-600">✅ Authentication successful</div>
+                        <div class="mt-2"><strong>Token:</strong> ${currentToken.substring(0, 50)}...</div>
+                        <div><strong>User ID:</strong> ${authData.user.id}</div>
+                        <div><strong>User Email:</strong> ${authData.user.email}</div>
+                        <div><strong>User ID Length:</strong> ${authData.user.id.length}</div>
+                        <div><strong>User ID Format:</strong> ${isValidUUID(authData.user.id) ? 'Valid UUID' : 'Invalid UUID'}</div>
+                        <div class="mt-2"><strong>Raw Response:</strong></div>
+                        <pre class="bg-gray-100 p-2 rounded text-xs overflow-x-auto">${JSON.stringify(authData, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `❌ Authentication failed: ${authData.error}`;
+                }
+                
+            } catch (error) {
+                console.error('Auth test error:', error);
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testDatabaseInsert() {
+            if (!currentToken || !currentUser) {
+                document.getElementById('databaseResult').innerHTML = '❌ Please test authentication first';
+                return;
+            }
+            
+            const title = document.getElementById('debugTitle').value;
+            const resultDiv = document.getElementById('databaseResult');
+            
+            try {
+                resultDiv.innerHTML = 'Testing database insert...';
+                
+                const studyData = {
+                    title: title,
+                    description: 'Debug test study to check database regression',
+                    type: 'usability',
+                    target_participants: 10,
+                    blocks: [],
+                    settings: {}
+                };
+                
+                const response = await fetch(`${BASE_URL}/api/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(studyData)
+                });
+                
+                const data = await response.json();
+                console.log('Database insert response:', data);
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="text-green-600">✅ Database insert successful</div>
+                        <div class="mt-2"><strong>Study ID:</strong> ${data.data.id}</div>
+                        <div><strong>Study Title:</strong> ${data.data.title}</div>
+                        <div><strong>Researcher ID:</strong> ${data.data.researcher_id}</div>
+                        <div class="mt-2"><strong>Full Response:</strong></div>
+                        <pre class="bg-gray-100 p-2 rounded text-xs overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="text-red-600">❌ Database insert failed: ${data.error}</div>
+                        <div class="mt-2"><strong>Status:</strong> ${response.status}</div>
+                        <div class="mt-2"><strong>Full Response:</strong></div>
+                        <pre class="bg-gray-100 p-2 rounded text-xs overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Database test error:', error);
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function checkDatabaseSchema() {
+            const resultDiv = document.getElementById('schemaResult');
+            
+            try {
+                resultDiv.innerHTML = 'Checking database schema...';
+                
+                const response = await fetch(`${BASE_URL}/api/research-consolidated?action=debug-schema`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                console.log('Schema check response:', data);
+                
+                resultDiv.innerHTML = `
+                    <div class="mt-2"><strong>Schema Information:</strong></div>
+                    <pre class="bg-gray-100 p-2 rounded text-xs overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('Schema check error:', error);
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        function isValidUUID(str) {
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            return uuidRegex.test(str);
+        }
+    </script>
+</body>
+</html>
