@@ -367,7 +367,7 @@ async function submitApplication(req, res) {
     }
 
     // Check if user has already applied to this study
-    const { data: existingApplication, error: checkError } = await supabase
+    const { data: existingApplication, error: checkError } = await supabaseAdmin
       .from('study_applications')
       .select('id')
       .eq('participant_id', auth.user.id)
@@ -403,8 +403,14 @@ async function submitApplication(req, res) {
       }
     };
 
-    // Insert into database
-    const { data: newApplication, error } = await supabase
+    console.log('📝 Attempting to insert application with user context:', {
+      userId: auth.user.id,
+      studyId: studyId,
+      email: auth.user.email
+    });
+
+    // Insert into database using admin client (bypasses RLS)
+    const { data: newApplication, error } = await supabaseAdmin
       .from('study_applications')
       .insert([dbApplicationData])
       .select()
@@ -412,9 +418,24 @@ async function submitApplication(req, res) {
 
     if (error) {
       console.error('Database error creating application:', error);
+      console.error('Database error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      console.error('Failed application data:', dbApplicationData);
+      
       return res.status(500).json({
         success: false,
-        error: 'Failed to submit application to database'
+        error: 'Failed to submit application to database',
+        debug: {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          applicationData: dbApplicationData
+        }
       });
     }
 
