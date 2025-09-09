@@ -167,8 +167,8 @@ async function createStudy(req, res) {
       hasToken: !!token
     });
 
-    // Insert into database using user-contextualized client
-    const { data: newStudy, error } = await userSupabase
+    // Insert into database using admin client (bypasses RLS)
+    const { data: newStudy, error } = await supabaseAdmin
       .from('studies')
       .insert([dbStudyData])
       .select()
