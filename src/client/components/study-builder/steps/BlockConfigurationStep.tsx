@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StepProps, StudyBuilderBlock, BlockType, BLOCK_LIBRARY, getBlockDisplayName, getDefaultBlockDescription, getDefaultBlockSettings } from '../types';
 import { StudyPreviewModal } from '../StudyPreviewModal';
 import { EnhancedBlockPreview } from '../enhanced/EnhancedBlockPreview';
+import { EnhancedBlockEditor } from '../enhanced/EnhancedBlockEditor';
 
 export const BlockConfigurationStep: React.FC<StepProps> = ({
   formData,
@@ -171,164 +172,13 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
     return block?.icon || '📋';
   };
 
+  // Use EnhancedBlockEditor instead of the basic BlockEditor
   const BlockEditor = ({ block }: { block: StudyBuilderBlock }) => {
-    const updateBlockField = (field: string, value: unknown) => {
-      updateBlock(block.id, {
-        ...block,
-        [field]: value
-      });
-    };
-
-    const updateBlockSetting = (setting: string, value: unknown) => {
-      updateBlock(block.id, {
-        settings: {
-          ...block.settings,
-          [setting]: value
-        }
-      });
-    };
-
     return (
-      <div className="space-y-4">
-        {/* Block Title */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Block Title
-          </label>
-          <input
-            type="text"
-            value={block.title}
-            onChange={(e) => updateBlockField('title', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        {/* Block Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <input
-            type="text"
-            value={block.description}
-            onChange={(e) => updateBlockField('description', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        {/* Block-specific settings */}
-        {(block.type === 'feedback_collection' || block.type === 'task_instruction') && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Question
-              </label>
-              <input
-                type="text"
-                value={(block.settings as { question?: string }).question || ''}
-                onChange={(e) => updateBlockSetting('question', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Placeholder Text
-              </label>
-              <input
-                type="text"
-                value={(block.settings as { placeholder?: string }).placeholder || ''}
-                onChange={(e) => updateBlockSetting('placeholder', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </>
-        )}
-
-        {block.type === 'rating_scale' && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Question
-              </label>
-              <input
-                type="text"
-                value={(block.settings as { question?: string }).question || ''}
-                onChange={(e) => updateBlockSetting('question', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Min Value
-                </label>
-                <input
-                  type="number"
-                  value={(block.settings as { minValue?: number }).minValue || 1}
-                  onChange={(e) => updateBlockSetting('minValue', parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max Value
-                </label>
-                <input
-                  type="number"
-                  value={(block.settings as { maxValue?: number }).maxValue || 10}
-                  onChange={(e) => updateBlockSetting('maxValue', parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-          </>
-        )}
-
-        {block.type === 'comparison_test' && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image URL
-              </label>
-              <input
-                type="url"
-                value={(block.settings as { imageUrl?: string }).imageUrl || ''}
-                onChange={(e) => updateBlockSetting('imageUrl', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Follow-up Question
-              </label>
-              <input
-                type="text"
-                value={(block.settings as { followUpQuestion?: string }).followUpQuestion || ''}
-                onChange={(e) => updateBlockSetting('followUpQuestion', e.target.value)}
-                placeholder="What do you remember seeing?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </>
-        )}
-
-        {/* Required checkbox for applicable blocks */}
-        {['open_question', 'simple_input', 'opinion_scale', 'multiple_choice', 'yes_no'].includes(block.type) && (
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id={`required-${block.id}`}
-              checked={(block.settings as { required?: boolean }).required || false}
-              onChange={(e) => updateBlockSetting('required', e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor={`required-${block.id}`} className="text-sm font-medium text-gray-700">
-              Required field
-            </label>
-          </div>
-        )}
-      </div>
+      <EnhancedBlockEditor 
+        block={block} 
+        onUpdate={updateBlock}
+      />
     );
   };
 

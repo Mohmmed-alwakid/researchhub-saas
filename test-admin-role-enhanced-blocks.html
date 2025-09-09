@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Role Testing - Enhanced Block System Validation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        }
+        .test-success { background-color: #dcfce7; border-color: #86efac; }
+        .test-warning { background-color: #fef3c7; border-color: #fbbf24; }
+        .test-error { background-color: #fecaca; border-color: #f87171; }
+        .test-step {
+            transition: all 0.3s ease;
+        }
+        .test-step:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-6">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="flex items-center space-x-4">
+                <div class="text-3xl">👨‍💼</div>
+                <div>
+                    <h1 class="text-2xl font-bold">Admin Role Testing</h1>
+                    <p class="text-purple-100">Enhanced Block System Validation - Phase B</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-6 py-8">
+        <!-- Quick Admin Access -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">🚀 Admin Dashboard Access</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <h3 class="font-medium text-purple-900 mb-2">👨‍💼 Admin Account</h3>
+                    <div class="text-sm text-purple-800 space-y-1">
+                        <div><strong>Email:</strong> abwanwr77+admin@gmail.com</div>
+                        <div><strong>Password:</strong> Testtest123</div>
+                        <div><strong>Role:</strong> Admin</div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <a href="http://localhost:5175/login" target="_blank" 
+                       class="block w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-center transition-colors">
+                        🔐 Login as Admin
+                    </a>
+                    <a href="http://localhost:5175/app/admin" target="_blank" 
+                       class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-center transition-colors">
+                        📊 Admin Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Testing Checklist -->
+        <div class="space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800">📋 Admin Testing Checklist</h2>
+
+            <!-- Test 1: Admin Dashboard Access -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-purple-600">1.</span> Admin Dashboard Access
+                        </h3>
+                        <p class="text-gray-600 mb-3">Verify admin can access the admin dashboard and see system overview</p>
+                        
+                        <div class="bg-purple-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-purple-900 mb-2">🎯 What to Test:</h4>
+                            <ul class="text-sm text-purple-800 space-y-1">
+                                <li>✓ Login with admin credentials works</li>
+                                <li>✓ Admin dashboard loads without errors</li>
+                                <li>✓ System overview displays correctly</li>
+                                <li>✓ Admin-only navigation items visible</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markTest(1)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 2: Study Monitoring -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-blue-600">2.</span> Study Monitoring & Oversight
+                        </h3>
+                        <p class="text-gray-600 mb-3">View created studies and verify administrative oversight capabilities</p>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-blue-900 mb-2">🔍 What to Verify:</h4>
+                            <ul class="text-sm text-blue-800 space-y-1">
+                                <li>✓ Enhanced Block System test study is visible</li>
+                                <li>✓ Study status and metadata displayed correctly</li>
+                                <li>✓ Enhanced block configurations are preserved</li>
+                                <li>✓ Admin can monitor study activity</li>
+                                <li>✓ Administrative controls are available</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                            <p class="text-sm text-amber-800">
+                                <strong>Target Study:</strong> Look for "Enhanced Block System Validation Study" 
+                                with multiple enhanced blocks (Rating Scale, Comparison Test, etc.)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markTest(2)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 3: User Management -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-green-600">3.</span> User Management & Permissions
+                        </h3>
+                        <p class="text-gray-600 mb-3">Test admin user management and role-based permissions</p>
+                        
+                        <div class="bg-green-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-green-900 mb-2">👥 User Management Tests:</h4>
+                            <ul class="text-sm text-green-800 space-y-1">
+                                <li>✓ View list of registered users (researchers, participants)</li>
+                                <li>✓ User roles are correctly displayed</li>
+                                <li>✓ Admin permissions work correctly</li>
+                                <li>✓ User activity monitoring (if available)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markTest(3)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 4: System Analytics -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-indigo-600">4.</span> System Analytics & Reports
+                        </h3>
+                        <p class="text-gray-600 mb-3">Verify admin analytics and system performance monitoring</p>
+                        
+                        <div class="bg-indigo-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-indigo-900 mb-2">📊 Analytics to Check:</h4>
+                            <ul class="text-sm text-indigo-800 space-y-1">
+                                <li>✓ Platform usage statistics</li>
+                                <li>✓ Study creation and completion metrics</li>
+                                <li>✓ Enhanced block usage analytics</li>
+                                <li>✓ System performance indicators</li>
+                                <li>✓ Export/reporting capabilities</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markTest(4)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 5: Enhanced Block Validation -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-red-600">5.</span> Enhanced Block System Validation
+                        </h3>
+                        <p class="text-gray-600 mb-3">Specifically verify enhanced blocks are properly stored and displayed</p>
+                        
+                        <div class="bg-red-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-red-900 mb-2">🔍 Enhanced Block Verification:</h4>
+                            <ul class="text-sm text-red-800 space-y-1">
+                                <li>✓ Rating Scale block settings preserved (numeric/star/SUS)</li>
+                                <li>✓ Comparison Test block images and questions stored</li>
+                                <li>✓ Website Navigation block URLs and tracking settings</li>
+                                <li>✓ Task Instructions block time limits and criteria</li>
+                                <li>✓ Feedback Collection block configurations intact</li>
+                                <li>✓ All enhanced block data readable by admin</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                            <p class="text-sm text-yellow-800">
+                                <strong>Key Focus:</strong> This validates that enhanced block configurations 
+                                are properly persisted and visible to administrators.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markTest(5)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testing Progress -->
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">📊 Admin Testing Progress</h3>
+            <div class="flex items-center space-x-4">
+                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                    <div id="progressBar" class="bg-purple-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <span id="progressText" class="text-sm font-medium text-gray-600">0/5 tests completed</span>
+            </div>
+            
+            <div class="mt-4 grid grid-cols-2 gap-4">
+                <div id="statusCard" class="p-4 rounded-lg border-2 border-gray-200">
+                    <div class="text-2xl mb-2">⏳</div>
+                    <div class="text-sm font-medium text-gray-600">Ready to Begin</div>
+                    <div class="text-xs text-gray-500">Login as admin to start testing</div>
+                </div>
+                <div class="space-y-2">
+                    <button onclick="resetTests()" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        🔄 Reset Tests
+                    </button>
+                    <button onclick="proceedToNext()" id="nextPhaseBtn" disabled 
+                            class="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        ➡️ Next: Participant Testing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-blue-900 mb-3">🔗 Quick Reference Links</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="http://localhost:5175/login" target="_blank" 
+                   class="block bg-white p-3 rounded border hover:bg-gray-50 transition-colors">
+                    <div class="font-medium text-gray-800">Login Portal</div>
+                    <div class="text-sm text-gray-600">Switch between user roles</div>
+                </a>
+                <a href="http://localhost:5175/app/admin" target="_blank" 
+                   class="block bg-white p-3 rounded border hover:bg-gray-50 transition-colors">
+                    <div class="font-medium text-gray-800">Admin Dashboard</div>
+                    <div class="text-sm text-gray-600">Main admin interface</div>
+                </a>
+                <a href="http://localhost:5175/app/studies" target="_blank" 
+                   class="block bg-white p-3 rounded border hover:bg-gray-50 transition-colors">
+                    <div class="font-medium text-gray-800">Studies Management</div>
+                    <div class="text-sm text-gray-600">View all studies</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let completedTests = 0;
+        const totalTests = 5;
+
+        function markTest(testNumber) {
+            const testElement = document.querySelector(`[onclick="markTest(${testNumber})"]`);
+            if (testElement.classList.contains('bg-green-500')) return; // Already completed
+            
+            testElement.classList.remove('bg-green-500', 'hover:bg-green-600');
+            testElement.classList.add('bg-green-600');
+            testElement.innerHTML = '✅ Done';
+            
+            completedTests++;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const statusCard = document.getElementById('statusCard');
+            const nextBtn = document.getElementById('nextPhaseBtn');
+            
+            const percentage = (completedTests / totalTests) * 100;
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = `${completedTests}/${totalTests} tests completed`;
+            
+            if (completedTests === 0) {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">⏳</div>
+                    <div class="text-sm font-medium text-gray-600">Ready to Begin</div>
+                    <div class="text-xs text-gray-500">Login as admin to start testing</div>
+                `;
+            } else if (completedTests < totalTests) {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">🔄</div>
+                    <div class="text-sm font-medium text-blue-600">Testing in Progress</div>
+                    <div class="text-xs text-blue-500">${completedTests} of ${totalTests} tests completed</div>
+                `;
+                statusCard.className = 'p-4 rounded-lg border-2 border-blue-200 bg-blue-50';
+            } else {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">✅</div>
+                    <div class="text-sm font-medium text-green-600">Admin Testing Complete!</div>
+                    <div class="text-xs text-green-500">Ready for participant testing</div>
+                `;
+                statusCard.className = 'p-4 rounded-lg border-2 border-green-200 bg-green-50';
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('disabled:bg-gray-300', 'disabled:cursor-not-allowed');
+            }
+        }
+
+        function resetTests() {
+            completedTests = 0;
+            const buttons = document.querySelectorAll('[onclick^="markTest"]');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-green-600');
+                btn.classList.add('bg-green-500', 'hover:bg-green-600');
+                btn.innerHTML = '✓ Complete';
+            });
+            updateProgress();
+            document.getElementById('nextPhaseBtn').disabled = true;
+            document.getElementById('nextPhaseBtn').classList.add('disabled:bg-gray-300', 'disabled:cursor-not-allowed');
+        }
+
+        function proceedToNext() {
+            if (completedTests === totalTests) {
+                alert('🎉 Admin testing completed! Proceeding to Participant Testing phase...');
+                // You could redirect to the participant testing page here
+                window.open('participant-testing.html', '_blank');
+            }
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Researcher Role Testing - Enhanced Block System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+        }
+        .test-step {
+            transition: all 0.3s ease;
+        }
+        .test-step:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .analytics-demo {
+            border: 2px dashed #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        .analytics-demo:hover {
+            border-color: #16a34a;
+            background-color: #f0fdf4;
+        }
+        .response-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-left: 4px solid #16a34a;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-6">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="flex items-center space-x-4">
+                <div class="text-3xl">🔬</div>
+                <div>
+                    <h1 class="text-2xl font-bold">Researcher Role Testing</h1>
+                    <p class="text-green-100">Enhanced Block System Analytics - Final Phase</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-6 py-8">
+        <!-- Quick Researcher Access -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">🔬 Researcher Account Access</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-medium text-green-900 mb-2">🔬 Researcher Account</h3>
+                    <div class="text-sm text-green-800 space-y-1">
+                        <div><strong>Email:</strong> abwanwr77+Researcher@gmail.com</div>
+                        <div><strong>Password:</strong> Testtest123</div>
+                        <div><strong>Role:</strong> Researcher</div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <a href="http://localhost:5175/login" target="_blank" 
+                       class="block w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-center transition-colors">
+                        🔐 Login as Researcher
+                    </a>
+                    <a href="http://localhost:5175/app/dashboard" target="_blank" 
+                       class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-center transition-colors">
+                        📊 Research Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Block Analytics Testing -->
+        <div class="space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800">📊 Enhanced Block Analytics Testing</h2>
+
+            <!-- Test 1: Study Results Overview -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-green-600">1.</span> Study Results Overview & Analytics
+                        </h3>
+                        <p class="text-gray-600 mb-3">Validate enhanced block system data collection and analytics</p>
+                        
+                        <div class="analytics-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">📊 Enhanced Analytics Dashboard:</h4>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="bg-green-50 p-3 rounded border border-green-200">
+                                    <div class="text-2xl text-green-600 mb-1">247</div>
+                                    <div class="text-xs text-green-700">Total Responses</div>
+                                </div>
+                                <div class="bg-blue-50 p-3 rounded border border-blue-200">
+                                    <div class="text-2xl text-blue-600 mb-1">89%</div>
+                                    <div class="text-xs text-blue-700">Completion Rate</div>
+                                </div>
+                            </div>
+                            <div class="bg-yellow-50 p-3 rounded border border-yellow-200">
+                                <div class="text-sm font-medium text-yellow-800">Enhanced Block Performance:</div>
+                                <div class="text-xs text-yellow-700 mt-1">
+                                    Navigation Block: 4.2min avg • Rating Scale: 98% completion • Comparison: 3.7/5 confidence
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-green-900 mb-2">📊 Analytics Testing:</h4>
+                            <ul class="text-sm text-green-800 space-y-1">
+                                <li>✓ Navigate to study results/analytics page</li>
+                                <li>✓ Verify enhanced block data is displayed</li>
+                                <li>✓ Check completion rates and response quality</li>
+                                <li>✓ Validate data visualization and insights</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markResearcherTest(1)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 2: Individual Response Analysis -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-blue-600">2.</span> Individual Response Deep Analysis
+                        </h3>
+                        <p class="text-gray-600 mb-3">Examine detailed participant responses from enhanced blocks</p>
+                        
+                        <div class="space-y-3 mb-4">
+                            <div class="response-card p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="font-medium text-gray-800">Participant #1247</div>
+                                    <div class="text-sm text-green-600">✅ Completed</div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 text-xs text-gray-600">
+                                    <div><strong>Navigation:</strong> 2m 34s</div>
+                                    <div><strong>Rating:</strong> 8/10 (SUS)</div>
+                                    <div><strong>Comparison:</strong> Design A</div>
+                                </div>
+                            </div>
+                            
+                            <div class="response-card p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="font-medium text-gray-800">Participant #1248</div>
+                                    <div class="text-sm text-yellow-600">⏳ In Progress</div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 text-xs text-gray-600">
+                                    <div><strong>Navigation:</strong> 4m 12s</div>
+                                    <div><strong>Rating:</strong> 6/10 (SUS)</div>
+                                    <div><strong>Comparison:</strong> Pending</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-blue-900 mb-2">👤 Individual Analysis Testing:</h4>
+                            <ul class="text-sm text-blue-800 space-y-1">
+                                <li>✓ Access detailed participant response views</li>
+                                <li>✓ Verify enhanced block data is captured</li>
+                                <li>✓ Check timing data for navigation blocks</li>
+                                <li>✓ Validate rating scale responses and SUS scores</li>
+                                <li>✓ Review comparison test selections and rationale</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markResearcherTest(2)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 3: Enhanced Block Insights -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-purple-600">3.</span> Enhanced Block Insights & Patterns
+                        </h3>
+                        <p class="text-gray-600 mb-3">Analyze advanced insights from enhanced block system</p>
+                        
+                        <div class="analytics-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">🧠 Block Performance Insights:</h4>
+                            <div class="space-y-2">
+                                <div class="bg-purple-50 p-3 rounded border border-purple-200">
+                                    <div class="flex justify-between items-center">
+                                        <div class="font-medium text-purple-800">Website Navigation Block</div>
+                                        <div class="text-sm text-purple-600">⭐ High Performance</div>
+                                    </div>
+                                    <div class="text-xs text-purple-700 mt-1">
+                                        Avg Time: 3m 45s | Success Rate: 94% | User Satisfaction: 4.2/5
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-indigo-50 p-3 rounded border border-indigo-200">
+                                    <div class="flex justify-between items-center">
+                                        <div class="font-medium text-indigo-800">Rating Scale (SUS) Block</div>
+                                        <div class="text-sm text-indigo-600">✅ Excellent</div>
+                                    </div>
+                                    <div class="text-xs text-indigo-700 mt-1">
+                                        Completion Rate: 98% | Average Score: 7.3/10 | Quality Score: A+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-purple-900 mb-2">🧠 Insights Testing:</h4>
+                            <ul class="text-sm text-purple-800 space-y-1">
+                                <li>✓ Access advanced insights dashboard</li>
+                                <li>✓ Review block performance comparisons</li>
+                                <li>✓ Validate pattern recognition in responses</li>
+                                <li>✓ Check automated insights generation</li>
+                                <li>✓ Verify data quality assessments</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markResearcherTest(3)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 4: Data Export & Integration -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-yellow-600">4.</span> Data Export & Integration Testing
+                        </h3>
+                        <p class="text-gray-600 mb-3">Test enhanced block data export and integration capabilities</p>
+                        
+                        <div class="analytics-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">📤 Export Options:</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-yellow-50 p-3 rounded border border-yellow-200">
+                                    <div class="font-medium text-yellow-800 mb-1">📊 CSV Export</div>
+                                    <div class="text-xs text-yellow-700">Enhanced block responses + metadata</div>
+                                    <button class="mt-2 bg-yellow-600 text-white px-2 py-1 rounded text-xs">Export CSV</button>
+                                </div>
+                                <div class="bg-orange-50 p-3 rounded border border-orange-200">
+                                    <div class="font-medium text-orange-800 mb-1">📋 Analytics Report</div>
+                                    <div class="text-xs text-orange-700">Comprehensive insights + visualizations</div>
+                                    <button class="mt-2 bg-orange-600 text-white px-2 py-1 rounded text-xs">Generate Report</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-yellow-900 mb-2">📤 Export Testing:</h4>
+                            <ul class="text-sm text-yellow-800 space-y-1">
+                                <li>✓ Test CSV export with enhanced block data</li>
+                                <li>✓ Verify data completeness and formatting</li>
+                                <li>✓ Check metadata inclusion (timing, quality scores)</li>
+                                <li>✓ Validate analytics report generation</li>
+                                <li>✓ Test integration with external tools</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markResearcherTest(4)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 5: Study Configuration Review -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-indigo-600">5.</span> Study Configuration Review & Optimization
+                        </h3>
+                        <p class="text-gray-600 mb-3">Review and optimize enhanced block configurations based on results</p>
+                        
+                        <div class="analytics-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">⚙️ Configuration Optimization:</h4>
+                            <div class="bg-indigo-50 p-3 rounded border border-indigo-200">
+                                <div class="text-sm font-medium text-indigo-800 mb-2">🔧 Recommendations:</div>
+                                <ul class="text-xs text-indigo-700 space-y-1">
+                                    <li>• Navigation Block: Consider reducing time limit from 5min to 3min</li>
+                                    <li>• Rating Scale: SUS performing well, maintain current configuration</li>
+                                    <li>• Comparison Test: Add follow-up question for 15% better insights</li>
+                                    <li>• Feedback Block: Optional → Required (92% completion when required)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-indigo-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-indigo-900 mb-2">⚙️ Configuration Testing:</h4>
+                            <ul class="text-sm text-indigo-800 space-y-1">
+                                <li>✓ Access study configuration/settings page</li>
+                                <li>✓ Review enhanced block performance metrics</li>
+                                <li>✓ Check optimization recommendations</li>
+                                <li>✓ Test configuration update capabilities</li>
+                                <li>✓ Validate A/B testing setup for improvements</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markResearcherTest(5)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Testing Summary -->
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">🎯 Researcher Testing Progress & Final Summary</h3>
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                    <div id="researcherProgressBar" class="bg-green-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <span id="researcherProgressText" class="text-sm font-medium text-gray-600">0/5 tests completed</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div id="researcherStatusCard" class="p-4 rounded-lg border-2 border-gray-200">
+                    <div class="text-2xl mb-2">⏳</div>
+                    <div class="text-sm font-medium text-gray-600">Ready to Begin</div>
+                    <div class="text-xs text-gray-500">Login as researcher to start</div>
+                </div>
+                <div class="space-y-2">
+                    <button onclick="resetResearcherTests()" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        🔄 Reset Tests
+                    </button>
+                    <button onclick="completeFullTesting()" id="completionBtn" disabled 
+                            class="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        🎉 Complete Enhanced Block Testing
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enhanced Block System Testing Summary -->
+            <div id="testingSummary" class="hidden">
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200">
+                    <h4 class="text-lg font-semibold text-green-800 mb-4">🎉 Enhanced Block System Testing Complete!</h4>
+                    
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl text-blue-600 mb-1">👔</div>
+                            <div class="text-sm font-medium text-blue-800">Admin Testing</div>
+                            <div class="text-xs text-blue-600">System oversight ✅</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl text-purple-600 mb-1">👥</div>
+                            <div class="text-sm font-medium text-purple-800">Participant Testing</div>
+                            <div class="text-xs text-purple-600">User experience ✅</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl text-green-600 mb-1">🔬</div>
+                            <div class="text-sm font-medium text-green-800">Researcher Testing</div>
+                            <div class="text-xs text-green-600">Analytics & insights ✅</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded border border-green-300 mb-4">
+                        <h5 class="font-medium text-green-800 mb-2">🏆 Key Achievements Validated:</h5>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li>✅ Enhanced Block System fully functional across all user roles</li>
+                            <li>✅ Professional UI/UX implementation with interactive previews</li>
+                            <li>✅ Comprehensive data collection and analytics capabilities</li>
+                            <li>✅ Database integration with proper persistence and retrieval</li>
+                            <li>✅ Role-based access control and permissions working correctly</li>
+                            <li>✅ Advanced insights and optimization recommendations</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="text-green-600 font-medium">🚀 Ready for Production Deployment</div>
+                        <div class="text-xs text-green-500 mt-1">Enhanced Block System successfully validated for live use</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let completedResearcherTests = 0;
+        const totalResearcherTests = 5;
+
+        function markResearcherTest(testNumber) {
+            const testElement = document.querySelector(`[onclick="markResearcherTest(${testNumber})"]`);
+            if (testElement.classList.contains('bg-green-600')) return; // Already completed
+            
+            testElement.classList.remove('bg-green-500', 'hover:bg-green-600');
+            testElement.classList.add('bg-green-600');
+            testElement.innerHTML = '✅ Done';
+            
+            completedResearcherTests++;
+            updateResearcherProgress();
+        }
+
+        function updateResearcherProgress() {
+            const progressBar = document.getElementById('researcherProgressBar');
+            const progressText = document.getElementById('researcherProgressText');
+            const statusCard = document.getElementById('researcherStatusCard');
+            const completionBtn = document.getElementById('completionBtn');
+            
+            const percentage = (completedResearcherTests / totalResearcherTests) * 100;
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = `${completedResearcherTests}/${totalResearcherTests} tests completed`;
+            
+            if (completedResearcherTests === 0) {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">⏳</div>
+                    <div class="text-sm font-medium text-gray-600">Ready to Begin</div>
+                    <div class="text-xs text-gray-500">Login as researcher to start</div>
+                `;
+            } else if (completedResearcherTests < totalResearcherTests) {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">🔄</div>
+                    <div class="text-sm font-medium text-green-600">Analytics Review in Progress</div>
+                    <div class="text-xs text-green-500">${completedResearcherTests} of ${totalResearcherTests} tests completed</div>
+                `;
+                statusCard.className = 'p-4 rounded-lg border-2 border-green-200 bg-green-50';
+            } else {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">🎉</div>
+                    <div class="text-sm font-medium text-emerald-600">Researcher Testing Complete!</div>
+                    <div class="text-xs text-emerald-500">Enhanced Block System fully validated</div>
+                `;
+                statusCard.className = 'p-4 rounded-lg border-2 border-emerald-200 bg-emerald-50';
+                completionBtn.disabled = false;
+                completionBtn.classList.remove('disabled:bg-gray-300', 'disabled:cursor-not-allowed');
+            }
+        }
+
+        function resetResearcherTests() {
+            completedResearcherTests = 0;
+            const buttons = document.querySelectorAll('[onclick^="markResearcherTest"]');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-green-600');
+                btn.classList.add('bg-green-500', 'hover:bg-green-600');
+                btn.innerHTML = '✓ Complete';
+            });
+            updateResearcherProgress();
+            document.getElementById('completionBtn').disabled = true;
+            document.getElementById('completionBtn').classList.add('disabled:bg-gray-300', 'disabled:cursor-not-allowed');
+            document.getElementById('testingSummary').classList.add('hidden');
+        }
+
+        function completeFullTesting() {
+            if (completedResearcherTests === totalResearcherTests) {
+                document.getElementById('testingSummary').classList.remove('hidden');
+                alert('🎉 Enhanced Block System Testing Complete!\n\nAll phases validated:\n✅ Admin oversight\n✅ Participant experience\n✅ Researcher analytics\n\nReady for production deployment!');
+            }
+        }
+
+        // Initialize
+        updateResearcherProgress();
+    </script>
+</body>
+</html>

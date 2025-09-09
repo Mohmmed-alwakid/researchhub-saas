@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participant Role Testing - Enhanced Block System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+        }
+        .test-step {
+            transition: all 0.3s ease;
+        }
+        .test-step:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .block-demo {
+            border: 2px dashed #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        .block-demo:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-6">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="flex items-center space-x-4">
+                <div class="text-3xl">👥</div>
+                <div>
+                    <h1 class="text-2xl font-bold">Participant Role Testing</h1>
+                    <p class="text-blue-100">Enhanced Block System Experience - Phase C</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-6 py-8">
+        <!-- Quick Participant Access -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">👥 Participant Account Access</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h3 class="font-medium text-blue-900 mb-2">👥 Participant Account</h3>
+                    <div class="text-sm text-blue-800 space-y-1">
+                        <div><strong>Email:</strong> abwanwr77+participant@gmail.com</div>
+                        <div><strong>Password:</strong> Testtest123</div>
+                        <div><strong>Role:</strong> Participant</div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <a href="http://localhost:5175/login" target="_blank" 
+                       class="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center transition-colors">
+                        🔐 Login as Participant
+                    </a>
+                    <a href="http://localhost:5175/app/participant-dashboard" target="_blank" 
+                       class="block w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-center transition-colors">
+                        📊 Participant Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Block Testing Sequence -->
+        <div class="space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800">🎯 Enhanced Block Experience Testing</h2>
+
+            <!-- Test 1: Study Discovery & Access -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-blue-600">1.</span> Study Discovery & Access
+                        </h3>
+                        <p class="text-gray-600 mb-3">Find and access the Enhanced Block System validation study</p>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-blue-900 mb-2">🔍 Discovery Process:</h4>
+                            <ul class="text-sm text-blue-800 space-y-1">
+                                <li>✓ Navigate to study discovery or participant dashboard</li>
+                                <li>✓ Locate "Enhanced Block System Validation Study"</li>
+                                <li>✓ Review study details and requirements</li>
+                                <li>✓ Successfully start/apply to participate</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markParticipantTest(1)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 2: Welcome & Task Instructions -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-green-600">2.</span> Welcome & Task Instructions Experience
+                        </h3>
+                        <p class="text-gray-600 mb-3">Test the enhanced welcome screen and task instruction blocks</p>
+                        
+                        <div class="bg-green-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-green-900 mb-2">👋 Enhanced Welcome Block:</h4>
+                            <ul class="text-sm text-green-800 space-y-1">
+                                <li>✓ Professional welcome screen displays correctly</li>
+                                <li>✓ Study introduction is clear and engaging</li>
+                                <li>✓ Navigation to first task is intuitive</li>
+                            </ul>
+                        </div>
+
+                        <div class="block-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">📝 Task Instructions Block Demo:</h4>
+                            <div class="bg-yellow-50 p-3 rounded border border-yellow-200">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <div class="text-lg">⏱️</div>
+                                    <div class="font-medium">Website Navigation Task</div>
+                                </div>
+                                <p class="text-sm text-gray-700 mb-2">Navigate to our homepage and find the pricing section</p>
+                                <div class="text-xs text-gray-500">Time Limit: 3 minutes | Success: Locate pricing information</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markParticipantTest(2)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 3: Website Navigation Block -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-purple-600">3.</span> Website Navigation Block Testing
+                        </h3>
+                        <p class="text-gray-600 mb-3">Experience the enhanced website navigation tracking</p>
+                        
+                        <div class="block-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">🌐 Navigation Block Demo:</h4>
+                            <div class="bg-purple-50 p-3 rounded border border-purple-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="font-medium">Task: Find Pricing Section</div>
+                                    <div class="text-sm text-purple-600">🔗 URL Tracking Active</div>
+                                </div>
+                                <div class="text-sm text-gray-600 mb-2">Target: https://researchhub-saas.vercel.app</div>
+                                <button class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm">
+                                    🚀 Start Navigation Task
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-purple-900 mb-2">🎯 Navigation Testing:</h4>
+                            <ul class="text-sm text-purple-800 space-y-1">
+                                <li>✓ Website opens correctly in new tab/frame</li>
+                                <li>✓ Navigation tracking is working</li>
+                                <li>✓ Task completion can be recorded</li>
+                                <li>✓ Time tracking is functional</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markParticipantTest(3)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 4: Comparison Test Block -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-indigo-600">4.</span> Comparison Test Block Experience
+                        </h3>
+                        <p class="text-gray-600 mb-3">Test the enhanced A/B comparison interface</p>
+                        
+                        <div class="block-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">🔄 Comparison Block Demo:</h4>
+                            <div class="bg-indigo-50 p-3 rounded border border-indigo-200">
+                                <div class="grid grid-cols-2 gap-4 mb-3">
+                                    <div class="bg-white p-3 rounded border text-center">
+                                        <div class="text-2xl mb-1">🖼️</div>
+                                        <div class="text-xs text-gray-600">Design A</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border text-center">
+                                        <div class="text-2xl mb-1">🖼️</div>
+                                        <div class="text-xs text-gray-600">Design B</div>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-700 mb-2">Which design feels more professional?</div>
+                                <div class="flex space-x-2">
+                                    <button class="bg-indigo-600 text-white px-2 py-1 rounded text-xs">Choose A</button>
+                                    <button class="bg-indigo-600 text-white px-2 py-1 rounded text-xs">Choose B</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-indigo-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-indigo-900 mb-2">🎯 Comparison Testing:</h4>
+                            <ul class="text-sm text-indigo-800 space-y-1">
+                                <li>✓ Images display correctly side-by-side</li>
+                                <li>✓ Selection mechanism works smoothly</li>
+                                <li>✓ Follow-up questions appear after selection</li>
+                                <li>✓ Response data is captured properly</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markParticipantTest(4)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 5: Rating Scale Block -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-yellow-600">5.</span> Rating Scale Block Testing
+                        </h3>
+                        <p class="text-gray-600 mb-3">Experience enhanced rating scale interfaces</p>
+                        
+                        <div class="block-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">⭐ Rating Scale Demo:</h4>
+                            <div class="bg-yellow-50 p-3 rounded border border-yellow-200 space-y-3">
+                                <div>
+                                    <div class="text-sm font-medium mb-2">Overall usability rating:</div>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="text-xs">1</span>
+                                        <div class="flex space-x-1">
+                                            <div class="w-6 h-6 border-2 border-yellow-400 rounded-full cursor-pointer hover:bg-yellow-400"></div>
+                                            <div class="w-6 h-6 border-2 border-yellow-400 rounded-full cursor-pointer hover:bg-yellow-400"></div>
+                                            <div class="w-6 h-6 border-2 border-yellow-400 rounded-full cursor-pointer hover:bg-yellow-400"></div>
+                                            <div class="w-6 h-6 border-2 border-yellow-400 rounded-full cursor-pointer hover:bg-yellow-400"></div>
+                                            <div class="w-6 h-6 border-2 border-yellow-400 rounded-full cursor-pointer hover:bg-yellow-400"></div>
+                                        </div>
+                                        <span class="text-xs">10</span>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-gray-600">SUS Scale: 1=Very Difficult, 10=Very Easy</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-yellow-900 mb-2">⭐ Rating Scale Testing:</h4>
+                            <ul class="text-sm text-yellow-800 space-y-1">
+                                <li>✓ Scale displays correctly (numeric/stars/SUS)</li>
+                                <li>✓ Interactive selection works smoothly</li>
+                                <li>✓ Visual feedback on selection</li>
+                                <li>✓ Required validation functions properly</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markParticipantTest(5)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test 6: Feedback Collection -->
+            <div class="test-step bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <span class="text-red-600">6.</span> Feedback Collection & Submission
+                        </h3>
+                        <p class="text-gray-600 mb-3">Test enhanced feedback collection and study completion</p>
+                        
+                        <div class="block-demo p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-gray-800 mb-2">💭 Feedback Block Demo:</h4>
+                            <div class="bg-red-50 p-3 rounded border border-red-200">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Please share any additional thoughts about your experience
+                                </label>
+                                <textarea 
+                                    className="w-full p-2 border border-gray-300 rounded text-sm resize-none"
+                                    placeholder="Your detailed feedback helps us improve..."
+                                    rows="3"
+                                    style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; resize: none;"
+                                ></textarea>
+                                <div class="text-xs text-red-600 mt-1">* Required field</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-medium text-red-900 mb-2">💭 Feedback Testing:</h4>
+                            <ul class="text-sm text-red-800 space-y-1">
+                                <li>✓ Feedback form displays correctly</li>
+                                <li>✓ Text input validation works</li>
+                                <li>✓ Required field enforcement</li>
+                                <li>✓ Character limits (if set) respected</li>
+                                <li>✓ Successful submission to database</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button onclick="markParticipantTest(6)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            ✓ Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testing Progress -->
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">📊 Participant Testing Progress</h3>
+            <div class="flex items-center space-x-4">
+                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                    <div id="participantProgressBar" class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <span id="participantProgressText" class="text-sm font-medium text-gray-600">0/6 tests completed</span>
+            </div>
+            
+            <div class="mt-4 grid grid-cols-2 gap-4">
+                <div id="participantStatusCard" class="p-4 rounded-lg border-2 border-gray-200">
+                    <div class="text-2xl mb-2">⏳</div>
+                    <div class="text-sm font-medium text-gray-600">Ready to Begin</div>
+                    <div class="text-xs text-gray-500">Login as participant to start</div>
+                </div>
+                <div class="space-y-2">
+                    <button onclick="resetParticipantTests()" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        🔄 Reset Tests
+                    </button>
+                    <button onclick="proceedToResearcher()" id="researcherPhaseBtn" disabled 
+                            class="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        ➡️ Next: Researcher Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let completedParticipantTests = 0;
+        const totalParticipantTests = 6;
+
+        function markParticipantTest(testNumber) {
+            const testElement = document.querySelector(`[onclick="markParticipantTest(${testNumber})"]`);
+            if (testElement.classList.contains('bg-green-600')) return; // Already completed
+            
+            testElement.classList.remove('bg-green-500', 'hover:bg-green-600');
+            testElement.classList.add('bg-green-600');
+            testElement.innerHTML = '✅ Done';
+            
+            completedParticipantTests++;
+            updateParticipantProgress();
+        }
+
+        function updateParticipantProgress() {
+            const progressBar = document.getElementById('participantProgressBar');
+            const progressText = document.getElementById('participantProgressText');
+            const statusCard = document.getElementById('participantStatusCard');
+            const nextBtn = document.getElementById('researcherPhaseBtn');
+            
+            const percentage = (completedParticipantTests / totalParticipantTests) * 100;
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = `${completedParticipantTests}/${totalParticipantTests} tests completed`;
+            
+            if (completedParticipantTests === 0) {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">⏳</div>
+                    <div class="text-sm font-medium text-gray-600">Ready to Begin</div>
+                    <div class="text-xs text-gray-500">Login as participant to start</div>
+                `;
+            } else if (completedParticipantTests < totalParticipantTests) {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">🔄</div>
+                    <div class="text-sm font-medium text-blue-600">Testing in Progress</div>
+                    <div class="text-xs text-blue-500">${completedParticipantTests} of ${totalParticipantTests} tests completed</div>
+                `;
+                statusCard.className = 'p-4 rounded-lg border-2 border-blue-200 bg-blue-50';
+            } else {
+                statusCard.innerHTML = `
+                    <div class="text-2xl mb-2">✅</div>
+                    <div class="text-sm font-medium text-green-600">Participant Testing Complete!</div>
+                    <div class="text-xs text-green-500">Ready for researcher analysis</div>
+                `;
+                statusCard.className = 'p-4 rounded-lg border-2 border-green-200 bg-green-50';
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('disabled:bg-gray-300', 'disabled:cursor-not-allowed');
+            }
+        }
+
+        function resetParticipantTests() {
+            completedParticipantTests = 0;
+            const buttons = document.querySelectorAll('[onclick^="markParticipantTest"]');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-green-600');
+                btn.classList.add('bg-green-500', 'hover:bg-green-600');
+                btn.innerHTML = '✓ Complete';
+            });
+            updateParticipantProgress();
+            document.getElementById('researcherPhaseBtn').disabled = true;
+            document.getElementById('researcherPhaseBtn').classList.add('disabled:bg-gray-300', 'disabled:cursor-not-allowed');
+        }
+
+        function proceedToResearcher() {
+            if (completedParticipantTests === totalParticipantTests) {
+                alert('🎉 Participant testing completed! Proceeding to Researcher Analysis phase...');
+            }
+        }
+
+        // Initialize
+        updateParticipantProgress();
+    </script>
+</body>
+</html>
