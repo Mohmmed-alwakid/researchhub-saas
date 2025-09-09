@@ -26,19 +26,38 @@ async function authenticateUser(req) {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('❌ Auth failed: Missing authorization header');
       return { success: false, error: 'Missing or invalid authorization header', status: 401 };
     }
 
     const token = authHeader.replace('Bearer ', '');
+    console.log('🔍 Attempting to verify token:', token.substring(0, 20) + '...');
     
-    // Verify token with Supabase
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      console.log('❌ Token verification failed:', error?.message);
-      return { success: false, error: 'Invalid or expired token', status: 401 };
+    // First try with admin client for server-side verification
+    const { data: { user }, error: adminError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (adminError || !user) {
+      console.log('❌ Admin token verification failed:', adminError?.message);
+      
+      // Fallback: Try with regular client
+      const { data: { user: fallbackUser }, error: fallbackError } = await supabase.auth.getUser(token);
+      
+      if (fallbackError || !fallbackUser) {
+        console.log('❌ Fallback token verification failed:', fallbackError?.message);
+        return { success: false, error: 'Invalid or expired token', status: 401 };
+      }
+      
+      console.log('✅ Token verified with fallback method for user:', fallbackUser.email);
+      return {
+        success: true,
+        user: {
+          id: fallbackUser.id,
+          email: fallbackUser.email
+        }
+      };
     }
 
+    console.log('✅ Token verified for user:', user.email);
     return {
       success: true,
       user: {
@@ -396,10 +415,25 @@ async function getDashboardAnalytics(req, res) {
  * Main API handler
  */
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // Enhanced CORS headers for better compatibility
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'https://researchhub-saas.vercel.app',
+    'https://researchhub-saas-ca57yz24b-mohmmed-alwakids-projects.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:5175',
+    'http://localhost:3000'
+  ];
+  
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -410,12 +444,18 @@ export default async function handler(req, res) {
     const { action } = req.query;
     
     console.log(`🔧 Research API (Database) - ${req.method} ${action}`);
+    console.log('🔍 Headers received:', {
+      authorization: req.headers.authorization ? 'Bearer ' + req.headers.authorization.substring(7, 27) + '...' : 'None',
+      contentType: req.headers['content-type'],
+      origin: req.headers.origin
+    });
 
     switch (action) {
       case 'create-study':
         if (req.method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
+        console.log('📝 Processing create-study request');
         return await createStudy(req, res);
 
       case 'get-studies':
