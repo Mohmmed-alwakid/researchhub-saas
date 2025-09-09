@@ -14,6 +14,10 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJ
 const supabase = createClient(supabaseUrl, supabaseKey);
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
+// In-memory storage for applications (replace with database in production)
+let applicationsDatabase = [];
+let applicationIdCounter = 1;
+
 console.log('📋 Applications API initialized');
 
 /**
@@ -105,18 +109,39 @@ async function getMyApplications(req, res) {
   }
 
   try {
-    // For now, return empty applications list
-    // In the future, this would fetch from applications table
-    const applications = [];
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const status = req.query.status;
+
+    console.log('📋 Get my applications request:', { userId: auth.user.id, page, limit, status });
+
+    // Filter applications by user ID
+    let userApplications = applicationsDatabase.filter(app => 
+      app.participant_id === auth.user.id
+    );
+
+    // Apply status filter if provided
+    if (status && status !== 'all') {
+      userApplications = userApplications.filter(app => app.status === status);
+    }
+
+    // Apply pagination
+    const total = userApplications.length;
+    const totalPages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedApplications = userApplications.slice(startIndex, startIndex + limit);
+
+    console.log(`📋 Found ${total} applications for user ${auth.user.email}`);
 
     return res.status(200).json({ 
       success: true, 
       data: {
-        applications: applications,
-        total: 0,
-        page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 10,
-        totalPages: 0
+        applications: paginatedApplications,
+        pagination: {
+          current: page,
+          pages: totalPages,
+          total: total
+        }
       }
     });
 
@@ -205,7 +230,7 @@ async function submitApplication(req, res) {
     const { studyId, responses, screeningResponses } = req.body;
 
     // Handle both possible field names for responses
-    const finalResponses = responses || screeningResponses || {};
+    const finalResponses = responses || screeningResponses || [];
 
     console.log('📋 Submit application request:', { studyId, finalResponses, userId: auth.user.id });
 
@@ -216,17 +241,46 @@ async function submitApplication(req, res) {
         error: 'studyId is required'
       });
     }
-    // In the future, this would save to applications table
+
+    // Check if user has already applied to this study
+    const existingApplication = applicationsDatabase.find(app => 
+      app.participant_id === auth.user.id && app.study_id === studyId
+    );
+
+    if (existingApplication) {
+      return res.status(409).json({
+        success: false,
+        code: 'DUPLICATE_APPLICATION',
+        error: 'You have already applied to this study'
+      });
+    }
+
+    // Create and store the application
     const application = {
-      id: Date.now().toString(),
+      id: applicationIdCounter++,
+      _id: String(applicationIdCounter - 1),
       study_id: studyId,
       participant_id: auth.user.id,
+      participant_email: auth.user.email,
       status: 'pending',
       responses: finalResponses,
       submitted_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      // Frontend compatibility fields
+      studyId: studyId,
+      participantId: auth.user.id,
+      appliedAt: new Date().toISOString(),
+      reviewedAt: null,
+      rejectionReason: null,
+      notes: null,
+      screeningResponses: finalResponses
     };
+
+    // Store in memory database
+    applicationsDatabase.push(application);
+    
+    console.log(`✅ Application created: Study ${studyId} by ${auth.user.email} (ID: ${application.id})`);
 
     return res.status(201).json({ 
       success: true, 
