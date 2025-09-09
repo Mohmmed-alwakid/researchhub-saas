@@ -414,6 +414,96 @@ async function getDashboardAnalytics(req, res) {
 /**
  * Main API handler
  */
+/**
+ * Debug endpoint to test authentication and return user object details
+ */
+async function debugAuth(req, res) {
+  console.log('🔍 Debug: Testing authentication function');
+  
+  const authResult = await authenticateUser(req);
+  
+  if (!authResult.success) {
+    return res.status(authResult.status || 500).json({
+      success: false,
+      error: authResult.error,
+      debug: 'Authentication failed in debug mode'
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    user: authResult.user,
+    debug: {
+      userId: authResult.user.id,
+      userIdLength: authResult.user.id.length,
+      userIdType: typeof authResult.user.id,
+      isValidUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(authResult.user.id),
+      timestamp: new Date().toISOString()
+    }
+  });
+}
+
+/**
+ * Debug endpoint to check database schema and constraints
+ */
+async function debugSchema(req, res) {
+  console.log('🔍 Debug: Checking database schema');
+  
+  try {
+    // Check studies table structure
+    const { data: studiesColumns, error: studiesError } = await supabaseAdmin
+      .from('information_schema.columns')
+      .select('column_name, data_type, is_nullable, column_default')
+      .eq('table_name', 'studies')
+      .eq('table_schema', 'public');
+    
+    if (studiesError) {
+      console.error('Schema query error:', studiesError);
+    }
+
+    // Check foreign key constraints
+    const { data: constraints, error: constraintsError } = await supabaseAdmin
+      .from('information_schema.table_constraints')
+      .select('constraint_name, constraint_type')
+      .eq('table_name', 'studies')
+      .eq('table_schema', 'public');
+    
+    if (constraintsError) {
+      console.error('Constraints query error:', constraintsError);
+    }
+
+    // Test a simple query to check RLS policies
+    const { data: testQuery, error: testError } = await supabase
+      .from('studies')
+      .select('id, title')
+      .limit(1);
+
+    return res.status(200).json({
+      success: true,
+      debug: {
+        studiesColumns: studiesColumns || [],
+        studiesColumnsError: studiesError?.message,
+        constraints: constraints || [],
+        constraintsError: constraintsError?.message,
+        testQuery: testQuery || [],
+        testQueryError: testError?.message,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    console.error('Debug schema error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to check database schema',
+      debug: error.message
+    });
+  }
+}
+
+/**
+ * Main API Handler
+ */
 export default async function handler(req, res) {
   // Enhanced CORS headers for better compatibility
   const origin = req.headers.origin;
@@ -475,6 +565,18 @@ export default async function handler(req, res) {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
         return await getDashboardAnalytics(req, res);
+
+      case 'debug-auth':
+        if (req.method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await debugAuth(req, res);
+
+      case 'debug-schema':
+        if (req.method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await debugSchema(req, res);
 
       default:
         return res.status(400).json({
