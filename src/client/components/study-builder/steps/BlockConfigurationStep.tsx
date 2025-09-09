@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StepProps, StudyBuilderBlock, BlockType, BLOCK_LIBRARY, getBlockDisplayName, getDefaultBlockDescription, getDefaultBlockSettings } from '../types';
 import { StudyPreviewModal } from '../StudyPreviewModal';
+import { EnhancedBlockPreview } from '../enhanced/EnhancedBlockPreview';
 
 export const BlockConfigurationStep: React.FC<StepProps> = ({
   formData,
@@ -643,145 +644,19 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
                   </div>
                 ) : selectedBlockId ? (
                   <div className="h-80 overflow-y-auto">
-                    {/* Selected Block Preview - Same as before */}
+                    {/* Enhanced Block Preview */}
                     {(() => {
                       const selectedBlock = blocks.find(b => b.id === selectedBlockId);
                       if (!selectedBlock) return null;
                       
                       return (
-                        <div className="p-4">
-                          {/* Block Header */}
-                          <div className="flex items-center space-x-2 mb-3 pb-3 border-b border-gray-200">
-                            <div className="text-lg">{getBlockIcon(selectedBlock.type)}</div>
-                            <div>
-                              <h4 className="font-semibold text-gray-900 text-sm">{selectedBlock.title}</h4>
-                              <p className="text-xs text-gray-500">{getBlockDisplayName(selectedBlock.type)}</p>
-                            </div>
-                          </div>
-                          
-                          {/* Live Block Content Preview */}
-                          <div className="space-y-3">
-                            {selectedBlock.description && (
-                              <p className="text-xs text-gray-600">{selectedBlock.description}</p>
-                            )}
-                            
-                            {/* Block Type Specific Preview */}
-                            {selectedBlock.type === 'feedback_collection' && (
-                              <div className="space-y-2">
-                                <label className="block text-xs font-medium text-gray-700">
-                                  {(selectedBlock.settings as { question?: string }).question || 'Your question here'}
-                                </label>
-                                <textarea 
-                                  className="w-full p-2 border border-gray-300 rounded text-xs resize-none"
-                                  placeholder={(selectedBlock.settings as { placeholder?: string }).placeholder || 'Type your answer here...'}
-                                  rows={2}
-                                  disabled
-                                />
-                              </div>
-                            )}
-                            
-                            {selectedBlock.type === 'rating_scale' && (
-                              <div className="space-y-2">
-                                <label className="block text-xs font-medium text-gray-700">
-                                  {(selectedBlock.settings as { question?: string }).question || 'Rate this item'}
-                                </label>
-                                <div className="flex items-center space-x-1">
-                                  <span className="text-xs text-gray-500">
-                                    {(selectedBlock.settings as { minValue?: number }).minValue || 1}
-                                  </span>
-                                  <div className="flex space-x-1">
-                                    {Array.from({ length: Math.min(((selectedBlock.settings as { maxValue?: number }).maxValue || 10) - ((selectedBlock.settings as { minValue?: number }).minValue || 1) + 1, 5) }, (_, i) => (
-                                      <div key={i} className="w-6 h-6 border-2 border-gray-300 rounded-full"></div>
-                                    ))}
-                                    {((selectedBlock.settings as { maxValue?: number }).maxValue || 10) > 5 && (
-                                      <span className="text-xs text-gray-400">...</span>
-                                    )}
-                                  </div>
-                                  <span className="text-xs text-gray-500">
-                                    {(selectedBlock.settings as { maxValue?: number }).maxValue || 10}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-                            
-                            {selectedBlock.type === 'task_instruction' && (
-                              <div className="space-y-2">
-                                <label className="block text-xs font-medium text-gray-700">
-                                  {(selectedBlock.settings as { question?: string }).question || 'Enter your response'}
-                                </label>
-                                <input 
-                                  type="text"
-                                  className="w-full p-2 border border-gray-300 rounded text-xs"
-                                  placeholder={(selectedBlock.settings as { placeholder?: string }).placeholder || 'Your answer...'}
-                                  disabled
-                                />
-                              </div>
-                            )}
-                            
-                            {selectedBlock.type === 'comparison_test' && (
-                              <div className="space-y-3">
-                                <div className="bg-gray-100 rounded p-3 text-center">
-                                  {(selectedBlock.settings as { imageUrl?: string }).imageUrl ? (
-                                    <img 
-                                      src={(selectedBlock.settings as { imageUrl?: string }).imageUrl} 
-                                      alt="Preview"
-                                      className="mx-auto max-w-full h-16 object-contain"
-                                    />
-                                  ) : (
-                                    <div className="text-gray-400">
-                                      <div className="text-lg mb-1">🖼️</div>
-                                      <p className="text-xs">Image will appear here</p>
-                                    </div>
-                                  )}
-                                </div>
-                                {(selectedBlock.settings as { followUpQuestion?: string }).followUpQuestion && (
-                                  <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                                      {(selectedBlock.settings as { followUpQuestion?: string }).followUpQuestion}
-                                    </label>
-                                    <textarea 
-                                      className="w-full p-2 border border-gray-300 rounded text-xs resize-none"
-                                      placeholder="Share your thoughts..."
-                                      rows={2}
-                                      disabled
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            {(selectedBlock.type === 'welcome_screen' || selectedBlock.type === 'thank_you_screen') && (
-                              <div className="text-center py-4">
-                                <div className="text-2xl mb-2">
-                                  {selectedBlock.type === 'welcome_screen' ? '👋' : '🙏'}
-                                </div>
-                                <h3 className="text-sm font-semibold text-gray-900 mb-1">
-                                  {selectedBlock.title}
-                                </h3>
-                                <p className="text-xs text-gray-600">
-                                  {selectedBlock.description}
-                                </p>
-                              </div>
-                            )}
-                            
-                            {!['feedback_collection', 'rating_scale', 'task_instruction', 'comparison_test', 'welcome_screen', 'thank_you_screen'].includes(selectedBlock.type) && (
-                              <div className="text-center py-6 text-gray-500">
-                                <div className="text-2xl mb-2">{getBlockIcon(selectedBlock.type)}</div>
-                                <p className="text-xs font-medium">{getBlockDisplayName(selectedBlock.type)}</p>
-                                <p className="text-xs text-gray-400 mt-1">
-                                  Preview for this block type coming soon
-                                </p>
-                              </div>
-                            )}
-                            
-                            {/* Required Field Indicator */}
-                            {(selectedBlock.settings as { required?: boolean }).required && (
-                              <div className="flex items-center space-x-1 text-xs text-red-600">
-                                <span>*</span>
-                                <span>This field is required</span>
-                              </div>
-                            )}
-                          </div>
+                        <div className="p-2">
+                          <EnhancedBlockPreview 
+                            block={selectedBlock}
+                            participantData={participantData}
+                            onParticipantDataChange={setParticipantData}
+                            isInteractive={true}
+                          />
                         </div>
                       );
                     })()}
