@@ -46,7 +46,7 @@ async function checkRemoteConnectivity(): Promise<boolean> {
     return isOnline;
     
   } catch (error) {
-    console.log('🔧 Network connectivity check failed, using fallback strategy');
+    console.log('🔧 Network connectivity check failed, using fallback strategy', error);
     isOnline = false;
     lastConnectivityCheck = now;
     return false;
@@ -61,8 +61,15 @@ class NetworkResilientApiService {
   private fallbackBaseUrl: string;
 
   constructor() {
+    // Fix axios configuration - ensure baseURL is always set correctly
+    const baseURL = (typeof window !== 'undefined' && window.location?.origin) 
+      ? '/api'  // In browser, use relative path
+      : (import.meta.env.VITE_API_URL || '/api');
+
+    console.log('🔧 API Service initializing with baseURL:', baseURL);
+
     this.api = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || '/api',
+      baseURL: baseURL,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
@@ -230,8 +237,15 @@ class NetworkResilientApiService {
 
   // Standard HTTP methods with automatic fallback support
   async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.api.get(url, config);
-    return response.data;
+    console.log('🔧 API Service GET request:', url, 'with config:', config?.headers);
+    try {
+      const response = await this.api.get(url, config);
+      console.log('✅ API Service GET success:', url, 'status:', response.status);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('❌ API Service GET error:', url, 'error:', error instanceof Error ? error.message : error);
+      throw error;
+    }
   }
 
   async post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
