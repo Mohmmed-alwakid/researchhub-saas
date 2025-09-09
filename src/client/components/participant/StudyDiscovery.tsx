@@ -216,15 +216,40 @@ class StudyDiscoveryAPI {
   }
 
   async applyForStudy(applicationData: ApplicationData): Promise<boolean> {
-    const response = await this.makeRequest(`/research-consolidated?action=apply`, {
+    const token = this.authClient.getToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${this.baseUrl}/applications`, {
       method: 'POST',
+      headers,
       body: JSON.stringify({
-        study_id: applicationData.studyId,
-        screening_answers: JSON.stringify(applicationData.responses),
-        eligibility_confirmed: applicationData.eligibilityConfirmed
+        action: 'submit',
+        studyId: applicationData.studyId,
+        screeningResponses: applicationData.responses,
+        eligibilityConfirmed: applicationData.eligibilityConfirmed
       })
     });
-    return response.success;
+
+    const data = await response.json();
+    
+    if (response.ok) {
+      return true; // Success
+    } else {
+      // Handle specific error cases
+      if (response.status === 409 && data.code === 'DUPLICATE_APPLICATION') {
+        // This is expected - user already applied, should be handled by the UI
+        throw new Error('You have already applied to this study');
+      } else {
+        // Generic error
+        throw new Error(data.error || 'Failed to submit application');
+      }
+    }
   }
 
   async getMyApplications(): Promise<PublicStudy[]> {
@@ -768,11 +793,31 @@ export const StudyDiscovery: React.FC<StudyDiscoveryProps> = ({ className = '' }
           setApplicationSuccess(false);
           setApplicationSuccessStudy(null);
         }, 5000);
-      } else {
-        setError('Failed to submit application. Please try again.');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit application');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to submit application';
+      
+      // Handle duplicate application specifically
+      if (errorMessage.includes('already applied')) {
+        // Update the study to show it's already applied
+        setStudies(prevStudies => 
+          prevStudies.map(study => 
+            study.id === studyId 
+              ? { ...study, isApplied: true, applicationStatus: 'pending' as const }
+              : study
+          )
+        );
+        
+        // Close the modal since user already applied
+        setShowApplicationModal(false);
+        setSelectedStudy(null);
+        
+        // Show a more specific message for duplicate applications
+        setError('You have already applied to this study. Check your applications dashboard for status updates.');
+      } else {
+        // Generic error handling
+        setError(errorMessage);
+      }
     }
   };
 
