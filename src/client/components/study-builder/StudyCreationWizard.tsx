@@ -4,7 +4,6 @@ import { StudyTypeStep } from './steps/StudyTypeStep';
 import { StudySetupStep } from './steps/StudySetupStep';
 import { BlockConfigurationStep } from './steps/BlockConfigurationStep';
 import { ReviewStep } from './steps/ReviewStep';
-import { LaunchStep } from './steps/LaunchStep';
 import { InterviewSessionConfigStep } from './steps/InterviewSessionConfig';
 import { UsabilityStudyConfigStep } from './steps/UsabilityStudyConfig';
 import { StudyFormData } from './types';
@@ -20,10 +19,10 @@ interface StudyCreationWizardProps {
 }
 
 // Steps specific to usability studies
-const USABILITY_STEPS = ['type', 'setup', 'usability_config', 'blocks', 'review', 'launch'] as const;
+const USABILITY_STEPS = ['type', 'setup', 'usability_config', 'blocks', 'review'] as const;
 
 // Steps specific to interview studies  
-const INTERVIEW_STEPS = ['type', 'setup', 'session_config', 'review', 'launch'] as const;
+const INTERVIEW_STEPS = ['type', 'setup', 'session_config', 'review'] as const;
 
 export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
   onComplete,
@@ -390,8 +389,6 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
         return <BlockConfigurationStep {...stepProps} />;
       case 'review':
         return <ReviewStep {...stepProps} />;
-      case 'launch':
-        return <LaunchStep {...stepProps} />;
       default:
         return null;
     }

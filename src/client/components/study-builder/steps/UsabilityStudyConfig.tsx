@@ -4,10 +4,7 @@ import { HelpCircle, Monitor, Clock, CheckCircle, Settings, Plus, X } from 'luci
 
 export const UsabilityStudyConfigStep: React.FC<StepProps> = ({
   formData,
-  onUpdateFormData,
-  onNext,
-  onPrevious,
-  isFirst
+  onUpdateFormData
 }) => {
   const [activeTab, setActiveTab] = useState<'screening' | 'recording' | 'completion'>('screening');
 
@@ -459,34 +456,6 @@ export const UsabilityStudyConfigStep: React.FC<StepProps> = ({
           </div>
         </div>
       )}
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center pt-8 border-t border-gray-200">
-        <div>
-          {!isFirst && (
-            <button
-              type="button"
-              onClick={onPrevious}
-              className="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Previous
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500">
-            Usability Configuration Complete
-          </div>
-          <button
-            type="button"
-            onClick={onNext}
-            className="px-8 py-3 rounded-lg font-medium transition-all duration-200 bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg"
-          >
-            Continue to Block Builder
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

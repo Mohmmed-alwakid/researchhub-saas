@@ -3,11 +3,7 @@ import { StepProps } from '../types';
 
 export const StudySetupStep: React.FC<StepProps> = ({
   formData,
-  onUpdateFormData,
-  onNext,
-  onPrevious,
-  isFirst,
-  isLast
+  onUpdateFormData
 }) => {
   const [objectives, setObjectives] = useState<string[]>(formData.research_objectives || ['']);
 
@@ -32,15 +28,7 @@ export const StudySetupStep: React.FC<StepProps> = ({
     onUpdateFormData({ research_objectives: newObjectives.filter(obj => obj.trim() !== '') });
   };
 
-  const handleNext = () => {
-    if (formData.title?.trim()) {
-      onNext();
-    }
-  };
-
-  const isFormValid = formData.title?.trim() && formData.target_participants > 0;
-
-  const showDurationField = formData.type === 'interview' || formData.type === 'usability_test';
+  const showDurationField = formData.type === 'interview';
   const showAudioField = formData.type === 'interview';
 
   return (
@@ -199,36 +187,6 @@ export const StudySetupStep: React.FC<StepProps> = ({
             rows={3}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
           />
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center mt-8">
-        <button
-          type="button"
-          onClick={onPrevious}
-          className="px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Previous
-        </button>
-
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500">
-            Step 2 of 6
-          </div>
-          <button
-            type="button"
-            onClick={handleNext}
-            disabled={!isFormValid}
-            className={`
-              px-8 py-3 rounded-lg font-medium transition-all duration-200
-              ${isFormValid
-                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }
-            `}
-          >
-            Continue
-          </button>
         </div>
       </div>
     </div>

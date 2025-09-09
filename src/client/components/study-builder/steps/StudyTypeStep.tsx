@@ -80,20 +80,12 @@ const STUDY_TYPE_OPTIONS: StudyTypeOption[] = [
 
 export const StudyTypeStep: React.FC<StepProps> = ({
   formData,
-  onUpdateFormData,
-  onNext,
-  isFirst
+  onUpdateFormData
 }) => {
   const handleTypeSelect = (type: 'usability' | 'interview') => {
     onUpdateFormData({ 
       type: type
     });
-  };
-
-  const handleNext = () => {
-    if (formData.type) {
-      onNext();
-    }
   };
 
   return (
@@ -186,40 +178,6 @@ export const StudyTypeStep: React.FC<StepProps> = ({
             )}
           </div>
         ))}
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div>
-          {!isFirst && (
-            <button
-              type="button"
-              className="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              disabled
-            >
-              Previous
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500">
-            Step 1 of {formData.type === 'usability' ? '6' : '5'}
-          </div>
-          <button
-            type="button"
-            onClick={handleNext}
-            disabled={!formData.type}
-            className={`
-              px-10 py-3 rounded-xl font-semibold transition-all duration-200 text-lg
-              ${formData.type
-                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }
-            `}
-          >
-            Continue to {formData.type === 'usability' ? 'Block Builder' : 'Session Setup'}
-          </button>
-        </div>
       </div>
     </div>
   );
