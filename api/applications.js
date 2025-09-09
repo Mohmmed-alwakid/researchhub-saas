@@ -478,7 +478,15 @@ export default async function handler(req, res) {
     console.log('📋 Applications API (Database) - Query params:', { endpoint, action, method: req.method });
 
     // Handle different endpoint patterns
-    if (endpoint === 'applications/my-applications' || action === 'my-applications') {
+    if (action === 'version' || action === 'health') {
+      return res.status(200).json({
+        success: true,
+        version: '1.1.0-rls-fix',
+        timestamp: new Date().toISOString(),
+        deployment: 'supabaseAdmin-fix-deployed',
+        message: 'Applications API with RLS fix using supabaseAdmin client'
+      });
+    } else if (endpoint === 'applications/my-applications' || action === 'my-applications') {
       return await getMyApplications(req, res);
     } else if (endpoint && endpoint.includes('/withdraw')) {
       return await withdrawApplication(req, res);
