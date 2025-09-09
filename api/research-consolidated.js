@@ -173,7 +173,7 @@ async function getStudies(req, res) {
   try {
     const userRole = req.headers['x-user-role'] || 'researcher';
     
-    console.log(`📚 Getting studies for role: ${userRole}`);
+    console.log(`📚 Getting studies for role: ${userRole} - Fixed query logic`);
     
     // Build the query properly
     let query = supabaseAdmin
