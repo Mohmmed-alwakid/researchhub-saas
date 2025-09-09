@@ -12,13 +12,17 @@ let studiesDatabase = [
     description: 'A demonstration study for the platform',
     status: 'active',
     created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
     created_by: 'system',
     type: 'user_research',
     target_participants: 50,
     blocks: [],
     compensation: 25,
     duration: 30,
-    difficulty: 'beginner'
+    difficulty: 'beginner',
+    // Add camelCase versions for frontend compatibility
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
@@ -47,20 +51,25 @@ export default async function handler(req, res) {
         }
         
         const studyData = req.body;
+        const timestamp = new Date().toISOString();
         const newStudy = {
           id: studyIdCounter++,
           _id: String(studyIdCounter - 1), // Add _id for frontend compatibility
           title: studyData.title || 'Untitled Study',
           description: studyData.description || '',
           status: studyData.status || 'draft',
-          created_at: new Date().toISOString(),
+          created_at: timestamp,
+          updated_at: timestamp,
           created_by: 'researcher', // TODO: Get from auth token
           type: studyData.type || 'usability',
           target_participants: studyData.target_participants || 10,
           blocks: studyData.blocks || [],
           compensation: studyData.compensation || 25,
           duration: studyData.duration || 30,
-          difficulty: studyData.difficulty || 'beginner'
+          difficulty: studyData.difficulty || 'beginner',
+          // Add camelCase versions for frontend compatibility
+          createdAt: timestamp,
+          updatedAt: timestamp
         };
         
         studiesDatabase.push(newStudy);
@@ -79,7 +88,10 @@ export default async function handler(req, res) {
           ...study,
           // Ensure all studies have both id and _id for compatibility
           id: study.id,
-          _id: study._id || String(study.id)
+          _id: study._id || String(study.id),
+          // Convert snake_case to camelCase for frontend compatibility
+          createdAt: study.created_at,
+          updatedAt: study.updated_at || study.created_at
         }));
         
         if (userRole === 'participant') {
