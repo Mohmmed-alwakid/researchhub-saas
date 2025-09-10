@@ -198,9 +198,17 @@ async function createStudy(req, res) {
     }
 
     console.log(`✅ Study created in database: ${newStudy.title} (UUID: ${newStudy.id})`);
+    console.log(`🔐 Study created by researcher: ${authResult.user.id}`);
     
     // Return formatted study for frontend
     const formattedStudy = formatStudyForFrontend(newStudy);
+    
+    console.log(`📊 Returning formatted study data:`, {
+      id: formattedStudy.id,
+      _id: formattedStudy._id,
+      title: formattedStudy.title,
+      researcher_id: formattedStudy.researcher_id
+    });
     
     return res.status(201).json({
       success: true,
@@ -234,6 +242,9 @@ async function getStudies(req, res) {
       if (authResult.success) {
         currentUserId = authResult.user.id;
         console.log(`🔐 Authenticated researcher: ${currentUserId}`);
+      } else {
+        console.error(`❌ Authentication failed for researcher: ${authResult.error}`);
+        return res.status(401).json({ success: false, error: 'Authentication required' });
       }
     }
     

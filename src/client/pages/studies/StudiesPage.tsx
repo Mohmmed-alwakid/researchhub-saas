@@ -7,8 +7,7 @@ import {
   Calendar,
   Clock,
   DollarSign,
-  RefreshCw,
-  Filter
+  RefreshCw
 } from 'lucide-react';
 // Enhanced UI components for professional appearance
 import { Button, Input } from '../../components/ui';
@@ -19,8 +18,6 @@ import { IStudy } from '../../../shared/types';
 import StudyCardActions from '../../components/studies/StudyCardActions';
 import RenameStudyModal from '../../components/studies/RenameStudyModal';
 import StudiesLoading from '../../components/studies/StudiesLoading';
-import Loading, { CardSkeleton } from '../../components/common/Loading';
-import Notification from '../../components/common/Notification';
 import '../../styles/study-card.css';
 
 const StudiesPage: React.FC = () => {
@@ -47,6 +44,20 @@ const StudiesPage: React.FC = () => {
 
   useEffect(() => {
     fetchStudies();
+    
+    // Check for newly created study data in localStorage
+    const newlyCreatedStudy = localStorage.getItem('newly-created-study');
+    if (newlyCreatedStudy) {
+      try {
+        const studyData = JSON.parse(newlyCreatedStudy);
+        console.log('🆕 Found newly created study in localStorage:', studyData.title);
+        // Clear the localStorage item since we've retrieved it
+        localStorage.removeItem('newly-created-study');
+      } catch (error) {
+        console.error('❌ Error parsing newly created study data:', error);
+        localStorage.removeItem('newly-created-study');
+      }
+    }
   }, [fetchStudies]);
 
   // Refresh studies when returning from study builder
@@ -54,9 +65,39 @@ const StudiesPage: React.FC = () => {
     // If user is coming from study builder, refresh the studies list
     if (location.state?.fromStudyBuilder) {
       console.log('👀 Detected return from Study Builder, refreshing studies...');
-      fetchStudies();
+      
+      // If there's newly created study data, add it temporarily to avoid waiting for API
+      if (location.state?.newlyCreated && location.state?.studyData) {
+        console.log('🆕 Adding newly created study to immediate display...');
+        // This will be updated when fetchStudies completes
+      }
+      
+      // Always fetch fresh data, with retries if needed
+      const fetchWithRetry = async (retries = 3) => {
+        for (let i = 0; i < retries; i++) {
+          try {
+            await fetchStudies();
+            // Check if the new study appears
+            const newlyCreatedId = location.state?.studyData?.id;
+            if (newlyCreatedId && studies.some(s => s.id === newlyCreatedId)) {
+              console.log('✅ Newly created study found in list!');
+              break;
+            } else if (i < retries - 1) {
+              console.log(`🔄 Study not yet visible, retrying... (${i + 1}/${retries})`);
+              await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+            }
+          } catch (error) {
+            console.error(`❌ Fetch attempt ${i + 1} failed:`, error);
+            if (i === retries - 1) throw error;
+          }
+        }
+      };
+      
+      fetchWithRetry().catch(error => {
+        console.error('❌ All fetch attempts failed:', error);
+      });
     }
-  }, [location.state, fetchStudies]);
+  }, [location.state, fetchStudies, studies]);
 
   // Also refresh when window regains focus (user returns from another tab/app)
   useEffect(() => {

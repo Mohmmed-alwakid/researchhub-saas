@@ -132,9 +132,21 @@ export const ReviewStep: React.FC<StepProps> = ({
 
       if (result.success && result.data) {
         setIsLaunched(true);
+        
+        // Store the created study data for immediate display
+        if (result.data) {
+          localStorage.setItem('newly-created-study', JSON.stringify(result.data));
+        }
+        
         setTimeout(() => {
           setShowLaunchModal(false);
-          navigate('/app/studies');
+          navigate('/app/studies', { 
+            state: { 
+              fromStudyBuilder: true, 
+              newlyCreated: true,
+              studyData: result.data 
+            } 
+          });
         }, 3000);
       } else {
         console.error('Failed to create study:', result.error);
