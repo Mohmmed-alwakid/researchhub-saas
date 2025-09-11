@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-09-11T11:12:24.528Z",
+  "testType": "quick",
+  "summary": {
+    "total": 3,
+    "passed": 0,
+    "failed": 3,
+    "warnings": 0,
+    "duration": 3412
+  },
+  "tests": [
+    {
+      "name": "Application Loads",
+      "status": "failed",
+      "timestamp": "2025-09-11T11:12:27.595Z",
+      "duration": 2646,
+      "details": "",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5175/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5175/\", waiting until \"networkidle\"\u001b[22m\n"
+    },
+    {
+      "name": "Authentication",
+      "status": "failed",
+      "timestamp": "2025-09-11T11:12:27.860Z",
+      "duration": 265,
+      "details": "",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5175/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5175/login\", waiting until \"load\"\u001b[22m\n"
+    },
+    {
+      "name": "API Health",
+      "status": "failed",
+      "timestamp": "2025-09-11T11:12:27.889Z",
+      "duration": 29,
+      "details": "",
+      "error": "fetch failed"
+    }
+  ],
+  "errors": []
+}

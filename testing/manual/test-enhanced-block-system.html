@@ -3,298 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Enhanced Block System Demo</title>
+    <title>Enhanced Block System Test</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            padding: 20px; 
+            background-color: #f9fafb;
         }
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        .test-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .header h1 {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 3rem;
-            margin: 0 0 10px 0;
-            font-weight: 800;
-        }
-        .header p {
-            color: #6b7280;
-            font-size: 1.25rem;
-            margin: 0;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-        .feature {
-            background: #f8fafc;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
-        .feature:hover {
-            border-color: #667eea;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(102,126,234,0.1);
-        }
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-        .feature h3 {
-            color: #1f2937;
-            margin: 0 0 15px 0;
-            font-size: 1.5rem;
-        }
-        .feature p {
-            color: #6b7280;
-            line-height: 1.6;
-            margin: 0;
-        }
-        .demo-section {
-            background: #f8fafc;
-            border-radius: 15px;
-            padding: 30px;
-            margin: 40px 0;
-            border: 2px solid #e2e8f0;
-        }
-        .demo-section h2 {
-            color: #1f2937;
-            margin: 0 0 20px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .demo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .demo-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            border: 2px solid #e2e8f0;
-            transition: all 0.2s ease;
-        }
-        .demo-card:hover {
-            border-color: #667eea;
-            box-shadow: 0 5px 15px rgba(102,126,234,0.1);
-        }
-        .demo-card h4 {
-            margin: 0 0 10px 0;
-            color: #1f2937;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .demo-card p {
-            color: #6b7280;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        .cta-section {
-            text-align: center;
-            margin-top: 40px;
-            padding: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            color: white;
-        }
-        .cta-section h2 {
-            margin: 0 0 15px 0;
-            font-size: 2rem;
-        }
-        .cta-section p {
-            margin: 0 0 30px 0;
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-        .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            background: white;
-            color: #667eea;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .status {
-            background: #10b981;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
+        .success { color: #059669; }
+        .error { color: #dc2626; }
+        .info { color: #0369a1; }
+        .warning { color: #d97706; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="status">✅ Authentication Fixed - Ready for Development</div>
-            <h1>🚀 Enhanced Block System</h1>
-            <p>Next iteration of the Study Builder with improved UX and functionality</p>
+    <div class="test-container">
+        <h1>🚀 Enhanced Block System - Development Test</h1>
+        
+        <div class="info">
+            <h2>✅ Components Created Successfully!</h2>
+            <p>The following enhanced components have been created and are ready for integration:</p>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <h3>📁 New Enhanced Components:</h3>
+            <ul>
+                <li><code>src/client/components/study-builder/enhanced/EnhancedBlockEditor.tsx</code></li>
+                <li><code>src/client/components/study-builder/enhanced/EnhancedBlockPreview.tsx</code></li>
+            </ul>
         </div>
 
-        <div class="features">
-            <div class="feature">
-                <span class="feature-icon">🎨</span>
-                <h3>Visual Block Preview</h3>
-                <p>Real-time preview showing exactly how participants will see each block. Toggle between edit, preview, and participant modes.</p>
-            </div>
-            
-            <div class="feature">
-                <span class="feature-icon">🎯</span>
-                <h3>Enhanced Block Selector</h3>
-                <p>Organized visual selector with categories, icons, and clear descriptions. Find the right block type instantly.</p>
-            </div>
-            
-            <div class="feature">
-                <span class="feature-icon">⚙️</span>
-                <h3>Smart Configuration</h3>
-                <p>Dynamic forms that adapt to block types. Intelligent defaults and validation with helpful error messages.</p>
-            </div>
+        <div style="margin: 20px 0;">
+            <h3>🎯 Key Features Added:</h3>
+            <ul>
+                <li><strong>Comprehensive Block Configuration:</strong> All 8 block types now have specialized configuration forms</li>
+                <li><strong>Enhanced Preview System:</strong> Interactive participant view for all block types</li>
+                <li><strong>Rating Scale Options:</strong> Numeric, Stars, Thumbs, SUS scale types</li>
+                <li><strong>A/B Comparison Testing:</strong> Full image and text comparison interface</li>
+                <li><strong>Task Instructions:</strong> Time limits, success criteria, detailed instructions</li>
+                <li><strong>Website Navigation:</strong> URL tracking, click monitoring, navigation guidance</li>
+                <li><strong>Completion Checking:</strong> Multiple choice with follow-up questions</li>
+                <li><strong>Interactive Preview Mode:</strong> Researchers can test participant experience</li>
+            </ul>
         </div>
 
-        <div class="demo-section">
-            <h2>🧩 Available Block Types</h2>
-            <p>Each block type has been enhanced with better previews and configuration options:</p>
-            
-            <div class="demo-grid">
-                <div class="demo-card">
-                    <h4>👋 Welcome Screen</h4>
-                    <p>Gradient background, centered layout, engaging introduction with clear call-to-action</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>💬 Open Questions</h4>
-                    <p>Character counter, smart text areas, real-time validation and response preview</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>☑️ Multiple Choice</h4>
-                    <p>Interactive selection, visual feedback, customizable options with hover states</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>⭐ Rating Scales</h4>
-                    <p>Numerical scales, star ratings, emoji ratings with smooth animations</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>🖼️ Media Upload</h4>
-                    <p>Drag & drop interfaces, file type validation, progress indicators</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>🔬 Usability Tests</h4>
-                    <p>5-second tests, card sorting, tree testing with interactive elements</p>
-                </div>
-            </div>
+        <div style="margin: 20px 0;">
+            <h3>🔧 Next Integration Steps:</h3>
+            <ol>
+                <li><strong>Test the Enhanced Components:</strong> Visit your Study Builder in the browser</li>
+                <li><strong>Verify Block Configuration:</strong> Check that block settings are properly saved</li>
+                <li><strong>Test Interactive Preview:</strong> Ensure participant experience is accurate</li>
+                <li><strong>Database Integration:</strong> Confirm block settings persist correctly</li>
+            </ol>
         </div>
 
-        <div class="demo-section">
-            <h2>🎮 Interactive Features</h2>
-            <div class="demo-grid">
-                <div class="demo-card">
-                    <h4>👁️ Live Preview</h4>
-                    <p>See exactly how participants will experience each block with simulated interactions</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>🔄 Mode Switching</h4>
-                    <p>Toggle between edit, preview, and participant modes with one click</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>📱 Responsive Design</h4>
-                    <p>All blocks automatically adapt to different screen sizes and devices</p>
-                </div>
-                
-                <div class="demo-card">
-                    <h4>⚡ Smart Defaults</h4>
-                    <p>Intelligent default settings based on block type and research best practices</p>
-                </div>
-            </div>
+        <div class="success">
+            <h3>🎉 Ready for Testing!</h3>
+            <p>Your enhanced block system is ready. Open your Study Builder and:</p>
+            <ol>
+                <li>Create a new study</li>
+                <li>Add different block types (Rating Scale, Comparison Test, etc.)</li>
+                <li>Configure each block with the new enhanced settings</li>
+                <li>Test the interactive preview functionality</li>
+                <li>Verify participant data is captured correctly</li>
+            </ol>
         </div>
 
-        <div class="cta-section">
-            <h2>🚀 Ready to Test?</h2>
-            <p>The enhanced block system is ready for integration into the Study Builder</p>
-            <a href="http://localhost:5175" class="btn">Open Study Builder →</a>
-        </div>
-
-        <div style="margin-top: 30px; text-align: center; color: #6b7280; font-size: 0.9rem;">
-            <p><strong>Next Steps:</strong> Integrate enhanced components → Add block templates → Implement conditional logic</p>
-            <p><strong>Status:</strong> Authentication ✅ | Block Preview ✅ | Visual Selector ✅ | Ready for Integration 🚀</p>
+        <div style="margin-top: 30px; padding: 15px; background-color: #f0f9ff; border-radius: 6px;">
+            <h3 class="info">🌟 What's New in This Iteration:</h3>
+            <ul>
+                <li>✅ <strong>Block Editor Enhancement:</strong> Specialized forms for each of 8 block types</li>
+                <li>✅ <strong>Preview System Upgrade:</strong> Interactive participant experience</li>
+                <li>🔄 <strong>Integration in Progress:</strong> Connecting to existing Study Builder</li>
+                <li>📋 <strong>Next Up:</strong> Study Analytics Dashboard with real-time data</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        // Add some interactivity
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate feature cards on scroll
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
+        console.log('🚀 Enhanced Block System Test Page Loaded');
+        console.log('📁 Enhanced components created in: src/client/components/study-builder/enhanced/');
+        console.log('🎯 Ready for testing in Study Builder interface');
+        
+        // Test API connection
+        fetch('/api/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ API Connection:', data);
+            })
+            .catch(error => {
+                console.log('❌ API Connection Error:', error);
             });
-
-            document.querySelectorAll('.feature, .demo-card').forEach((el) => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(20px)';
-                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(el);
-            });
-
-            // Add click handlers for demo cards
-            document.querySelectorAll('.demo-card').forEach((card) => {
-                card.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.98)';
-                    setTimeout(() => {
-                        this.style.transform = 'scale(1)';
-                    }, 150);
-                });
-            });
-
-            console.log('🚀 Enhanced Block System Demo Loaded!');
-            console.log('✅ Visual Block Selector: Ready');
-            console.log('✅ Enhanced Block Preview: Ready'); 
-            console.log('✅ Authentication: Fixed');
-            console.log('🎯 Next: Integration with Study Builder');
-        });
     </script>
 </body>
 </html>

@@ -1,7 +1,8 @@
 /**
- * CONSOLIDATED PAYMENTS & WALLETS API
- * Merges: payments-consolidated.js + wallets.js + wallets-simulated.js
- * Handles: DodoPayments, participant wallets, withdrawals, transactions
+ * UNIFIED FINANCIAL SERVICES API
+ * Consolidates: Payments + Wallets + DodoPayments + STC Bank + Participant Wallet Operations
+ * Handles: Payment processing, wallet management, transactions, withdrawals, financial operations
+ * Merged from payments-consolidated-full.js + wallet.js to save Vercel function slots
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -1089,21 +1090,24 @@ export default async function handler(req, res) {
       case 'stc-webhook':
         return await handleSTCWebhook(req, res);
       
-      // Wallet actions
+      // Wallet actions (including frontend compatibility aliases)
       case 'get-wallet':
       case 'get':
+      case 'wallet':  // Frontend compatibility alias
         return await handleGetWallet(req, res);
       
       case 'add-earnings':
         return await handleAddEarnings(req, res);
       
       case 'request-withdrawal':
+      case 'create-withdrawal':  // Frontend compatibility alias
         return await handleRequestWithdrawal(req, res);
       
       case 'transactions':
         return await handleGetTransactions(req, res);
       
       case 'withdrawals':
+      case 'withdrawal-requests':  // Frontend compatibility alias
         return await handleGetWithdrawals(req, res);
       
       case 'admin-wallets':
@@ -1118,7 +1122,8 @@ export default async function handler(req, res) {
           error: 'Invalid action',
           availableActions: [
             'create-payment-intent', 'conversion-rates', 'researcher-payment', 'webhook',
-            'get-wallet', 'add-earnings', 'request-withdrawal', 'transactions', 'withdrawals', 'admin-wallets', 'financial-overview'
+            'get-wallet', 'wallet', 'add-earnings', 'request-withdrawal', 'create-withdrawal', 
+            'transactions', 'withdrawals', 'withdrawal-requests', 'admin-wallets', 'financial-overview'
           ]
         });
     }

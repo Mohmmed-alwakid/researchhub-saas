@@ -1,7 +1,8 @@
 /**
- * CONSOLIDATED USER PROFILE API
- * Merges: profile.js + user-enhanced.js
- * Handles: User profile management, enhanced user operations, role management
+ * UNIFIED USER SERVICES API
+ * Consolidates: User Profile Management + Study Applications
+ * Handles: User profiles, demographics, role management, study applications, application management
+ * Merged from user-profile-consolidated.js + applications.js to save Vercel function slots
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -1030,6 +1031,23 @@ export default async function handler(req, res) {
       case 'admin-stats':
         return await handleAdminStats(req, res);
       
+      // APPLICATION ACTIONS
+      case 'version':
+      case 'health':
+        return await handleApplicationsHealth(req, res);
+      
+      case 'my-applications':
+        return await getMyApplications(req, res);
+      
+      case 'apply':
+        return await submitApplication(req, res);
+      
+      case 'withdraw':
+        return await withdrawApplication(req, res);
+      
+      case 'study-applications':
+        return await getStudyApplications(req, res);
+      
       default:
         // Default to get profile if no action specified
         if (req.method === 'GET') {
@@ -1045,7 +1063,8 @@ export default async function handler(req, res) {
           error: 'Invalid action',
           availableActions: [
             'get', 'profile', 'update', 'update-demographics', 'delete', 'stats', 'search', 'update-role',
-            'get-all-users', 'update-user-status', 'admin-stats'
+            'get-all-users', 'update-user-status', 'admin-stats',
+            'version', 'health', 'my-applications', 'apply', 'withdraw', 'study-applications'
           ]
         });
     }
@@ -1409,6 +1428,398 @@ async function handleAdminStats(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Internal server error'
+    });
+  }
+}
+
+// =====================================================================================
+// APPLICATIONS HANDLER FUNCTIONS  
+// =====================================================================================
+
+/**
+ * Helper function to format application for frontend compatibility
+ */
+function formatApplicationForFrontend(dbApplication, includeNumericId = true) {
+  try {
+    const applicationData = dbApplication.application_data || {};
+    
+    // Create a hash-based numeric ID for frontend compatibility
+    const numericId = includeNumericId ? 
+      Math.abs(dbApplication.id.split('-').join('').slice(0, 8).split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0)) :
+      null;
+
+    return {
+      // Database fields
+      id: includeNumericId ? numericId : dbApplication.id,
+      _id: dbApplication.id, // UUID as string for compatibility
+      uuid: dbApplication.id, // Keep original UUID
+      study_id: dbApplication.study_id,
+      participant_id: dbApplication.participant_id,
+      status: dbApplication.status || 'pending',
+      applied_at: dbApplication.applied_at,
+      reviewed_at: dbApplication.reviewed_at,
+      reviewed_by: dbApplication.reviewed_by,
+      created_at: dbApplication.created_at,
+      updated_at: dbApplication.updated_at,
+      notes: dbApplication.notes,
+      
+      // Application data fields (for backward compatibility)
+      responses: applicationData.responses || applicationData.screeningResponses || [],
+      screeningResponses: applicationData.responses || applicationData.screeningResponses || [],
+      participant_email: applicationData.participant_email || null,
+      
+      // Frontend compatibility (camelCase)
+      studyId: dbApplication.study_id,
+      participantId: dbApplication.participant_id,
+      appliedAt: dbApplication.applied_at,
+      reviewedAt: dbApplication.reviewed_at,
+      rejectionReason: applicationData.rejectionReason || null,
+      submitted_at: dbApplication.applied_at, // Alias for compatibility
+      
+      // Full application_data object
+      application_data: applicationData
+    };
+  } catch (error) {
+    console.error('Error formatting application:', error);
+    return dbApplication; // Return original if formatting fails
+  }
+}
+
+/**
+ * Applications health check
+ */
+async function handleApplicationsHealth(req, res) {
+  return res.status(200).json({
+    success: true,
+    version: '1.1.0-rls-fix',
+    timestamp: new Date().toISOString(),
+    deployment: 'unified-user-services',
+    message: 'Applications API consolidated into User Services API'
+  });
+}
+
+/**
+ * Get participant's applications from database
+ */
+async function getMyApplications(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const status = req.query.status;
+
+    console.log('📋 Get my applications request:', { userId: auth.user.id, page, limit, status });
+
+    let query = supabaseAdmin
+      .from('study_applications')
+      .select('*')
+      .eq('participant_id', auth.user.id)
+      .order('applied_at', { ascending: false });
+
+    // Apply status filter if provided
+    if (status && status !== 'all') {
+      query = query.eq('status', status);
+    }
+
+    // Get total count for pagination
+    const { count: totalCount, error: countError } = await supabaseAdmin
+      .from('study_applications')
+      .select('*', { count: 'exact', head: true })
+      .eq('participant_id', auth.user.id);
+
+    if (countError) {
+      console.error('Count error:', countError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to count applications'
+      });
+    }
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    query = query.range(startIndex, startIndex + limit - 1);
+
+    const { data: applications, error } = await query;
+
+    if (error) {
+      console.error('Database error fetching applications:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch applications from database'
+      });
+    }
+
+    // Format applications for frontend
+    const formattedApplications = applications.map(app => formatApplicationForFrontend(app));
+    
+    const totalPages = Math.ceil(totalCount / limit);
+
+    console.log(`📋 Found ${totalCount} total applications for user ${auth.user.email}, showing ${applications.length} on page ${page}`);
+
+    return res.status(200).json({ 
+      success: true, 
+      data: {
+        applications: formattedApplications,
+        pagination: {
+          current: page,
+          pages: totalPages,
+          total: totalCount
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Get my applications error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch applications' 
+    });
+  }
+}
+
+/**
+ * Submit new application to database
+ */
+async function submitApplication(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const { studyId, responses, participant_email } = req.body;
+
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    console.log('📋 Submit application request:', { 
+      studyId, 
+      userId: auth.user.id, 
+      responsesCount: responses?.length || 0,
+      participant_email 
+    });
+
+    // Check if user already applied to this study
+    const { data: existingApplication, error: checkError } = await supabaseAdmin
+      .from('study_applications')
+      .select('id, status')
+      .eq('study_id', studyId)
+      .eq('participant_id', auth.user.id)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing application:', checkError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to check existing application'
+      });
+    }
+
+    if (existingApplication) {
+      return res.status(400).json({
+        success: false,
+        error: `You have already applied to this study (Status: ${existingApplication.status})`
+      });
+    }
+
+    // Create new application record
+    const applicationData = {
+      study_id: studyId,
+      participant_id: auth.user.id,
+      status: 'pending',
+      applied_at: new Date().toISOString(),
+      application_data: {
+        responses: responses || [],
+        screeningResponses: responses || [], // For backward compatibility
+        participant_email: participant_email || auth.user.email,
+        submitted_at: new Date().toISOString()
+      }
+    };
+
+    const { data: newApplication, error: insertError } = await supabaseAdmin
+      .from('study_applications')
+      .insert(applicationData)
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Error creating application:', insertError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to submit application to database'
+      });
+    }
+
+    console.log('✅ Application submitted successfully:', newApplication.id);
+
+    const formattedApplication = formatApplicationForFrontend(newApplication);
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        application: formattedApplication,
+        message: 'Application submitted successfully'
+      }
+    });
+
+  } catch (error) {
+    console.error('Submit application error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to submit application'
+    });
+  }
+}
+
+/**
+ * Withdraw application from database
+ */
+async function withdrawApplication(req, res) {
+  const auth = await authenticateUser(req);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const { endpoint } = req.query;
+    const applicationId = endpoint?.split('/')[2]; // Extract from endpoint like "applications/123/withdraw"
+
+    if (!applicationId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Application ID is required'
+      });
+    }
+
+    console.log('📋 Withdraw application request:', { applicationId, userId: auth.user.id });
+
+    // Find the application
+    const { data: application, error: findError } = await supabaseAdmin
+      .from('study_applications')
+      .select('*')
+      .eq('id', applicationId)
+      .eq('participant_id', auth.user.id)
+      .single();
+
+    if (findError || !application) {
+      console.error('Application not found:', findError);
+      return res.status(404).json({
+        success: false,
+        error: 'Application not found or access denied'
+      });
+    }
+
+    if (application.status === 'withdrawn') {
+      return res.status(400).json({
+        success: false,
+        error: 'Application is already withdrawn'
+      });
+    }
+
+    // Update application status to withdrawn
+    const { data: updatedApplication, error: updateError } = await supabaseAdmin
+      .from('study_applications')
+      .update({ 
+        status: 'withdrawn',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', applicationId)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Error withdrawing application:', updateError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to withdraw application'
+      });
+    }
+
+    console.log('✅ Application withdrawn successfully:', applicationId);
+
+    const formattedApplication = formatApplicationForFrontend(updatedApplication);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        application: formattedApplication,
+        message: 'Application withdrawn successfully'
+      }
+    });
+
+  } catch (error) {
+    console.error('Withdraw application error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to withdraw application'
+    });
+  }
+}
+
+/**
+ * Get study applications for researchers
+ */
+async function getStudyApplications(req, res) {
+  const auth = await authenticateUser(req, ['researcher', 'admin']);
+  if (!auth.success) {
+    return res.status(auth.status).json(auth);
+  }
+
+  try {
+    const { endpoint } = req.query;
+    const studyId = endpoint?.split('/')[1]; // Extract from endpoint like "studies/123/applications"
+
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    console.log('📋 Get study applications request:', { studyId, userId: auth.user.id });
+
+    // Get applications for the study
+    const { data: applications, error } = await supabaseAdmin
+      .from('study_applications')
+      .select('*')
+      .eq('study_id', studyId)
+      .order('applied_at', { ascending: false });
+
+    if (error) {
+      console.error('Database error fetching study applications:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch study applications'
+      });
+    }
+
+    // Format applications for frontend
+    const formattedApplications = applications.map(app => formatApplicationForFrontend(app));
+
+    console.log(`📋 Found ${applications.length} applications for study ${studyId}`);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        applications: formattedApplications,
+        studyId: studyId,
+        total: applications.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get study applications error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch study applications'
     });
   }
 }
