@@ -5,6 +5,93 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
+// Browser API interfaces for type safety
+interface WindowWithAnalytics extends Window {
+  gtag?: (command: string, eventName: string, eventData: Record<string, unknown>) => void;
+  mixpanel?: {
+    track: (eventName: string, eventData: Record<string, unknown>) => void;
+  };
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+  };
+}
+
+// Form data interface for type safety
+export interface StudyCreationFormData {
+  // Basic study information
+  studyTitle?: string;
+  title?: string; // Alternative property name
+  studyDescription?: string;
+  description?: string; // Alternative property name
+  studyType?: string;
+  type?: string;
+  templateUsed?: string;
+  estimatedDuration?: number;
+  deviceRequirements?: string[];
+  
+  // Recruitment and participants
+  recruitmentSettings?: {
+    maxParticipants?: number;
+    demographics?: Record<string, unknown>;
+  };
+  targetAudience?: {
+    countries?: string[];
+    professions?: string[];
+    demographics?: Record<string, unknown>;
+  };
+  screeningQuestions?: Array<{
+    question: string;
+    type: string;
+    required?: boolean;
+  }>;
+  
+  // Scheduling for interviews
+  schedulingDetails?: {
+    availableDates?: string[];
+    availableTimes?: string[];
+    participantInstructions?: string;
+    maxParticipants?: number;
+    duration?: number;
+  };
+  
+  // Study structure
+  studyBlocks?: Array<{
+    id: string;
+    title?: string;
+    description?: string;
+    estimatedTime?: number;
+    type: string;
+    settings?: Record<string, unknown>;
+  }>;
+  
+  // Timeline and metadata
+  timeline?: {
+    startDate?: string;
+    endDate?: string;
+    duration?: number;
+  };
+  researchObjectives?: string[];
+  tags?: string[];
+  visibility?: 'public' | 'private' | 'shared';
+  collaborators?: string[];
+  
+  // Allow additional properties for flexibility
+  [key: string]: unknown;
+}
+
+// Study data interface for completed studies
+export interface StudyCompletionData extends StudyCreationFormData {
+  id?: string;
+  status?: string;
+  createdAt?: string;
+  lastModified?: string;
+}
+
 // Analytics event types for type safety
 export interface StudyCreationAnalyticsEvents {
   'study_creation_started': {
@@ -113,7 +200,7 @@ export const detectUserType = (): 'new' | 'returning' | 'enterprise' => {
 
 // Connection type detection
 export const detectConnectionType = (): string | undefined => {
-  const connection = (navigator as any).connection;
+  const connection = (navigator as NavigatorWithConnection).connection;
   return connection?.effectiveType;
 };
 
@@ -125,7 +212,7 @@ export class StudyCreationFlowTracker {
   private sessionId: string;
   private startTime: number;
   private stepTimes: Record<number, number> = {};
-  private formData: any = {};
+  private formData: StudyCreationFormData = {};
   private validationErrors: Record<number, string[]> = {};
   private autoSaveCount = 0;
   
@@ -159,7 +246,7 @@ export class StudyCreationFlowTracker {
   /**
    * Track step completion
    */
-  completeStep(stepNumber: number, stepName: string, formData: any) {
+  completeStep(stepNumber: number, stepName: string, formData: StudyCreationFormData) {
     const stepTime = Date.now();
     const timeSpent = this.stepTimes[stepNumber - 1] 
       ? stepTime - this.stepTimes[stepNumber - 1]
@@ -205,14 +292,14 @@ export class StudyCreationFlowTracker {
   /**
    * Track successful completion
    */
-  trackCompletion(studyData: any) {
+  trackCompletion(studyData: StudyCompletionData) {
     const totalTime = Date.now() - this.startTime;
     
     const event: StudyCreationAnalyticsEvents['study_creation_completed'] = {
       session_id: this.sessionId,
       total_time_seconds: Math.round(totalTime / 1000),
       template_used: studyData.templateUsed,
-      study_type: studyData.studyType || studyData.type,
+      study_type: studyData.studyType || studyData.type || 'unknown',
       participant_count: studyData.recruitmentSettings?.maxParticipants || 0,
       blocks_count: studyData.studyBlocks?.length || 0,
       quality_score: this.calculateFinalQualityScore(studyData),
@@ -313,7 +400,7 @@ export class StudyCreationFlowTracker {
   /**
    * Calculate form completion percentage for a specific step
    */
-  private calculateCompletionPercentage(formData: any, stepNumber: number): number {
+  private calculateCompletionPercentage(formData: StudyCreationFormData, stepNumber: number): number {
     const requiredFields = this.getRequiredFieldsForStep(stepNumber);
     const completedFields = this.getCompletedFields(formData, requiredFields);
     return Math.round((completedFields / requiredFields.length) * 100);
@@ -322,39 +409,39 @@ export class StudyCreationFlowTracker {
   /**
    * Calculate data quality score for a specific step
    */
-  private calculateQualityScore(formData: any, stepNumber: number): number {
+  private calculateQualityScore(formData: StudyCreationFormData, stepNumber: number): number {
     let score = 0;
     const maxScore = 10;
     
     switch (stepNumber) {
       case 1: // Overview
-        if (formData.title?.length >= 10) score += 3;
-        if (formData.title?.length >= 20) score += 2;
-        if (formData.description?.length >= 50) score += 2;
-        if (formData.estimatedDuration >= 5 && formData.estimatedDuration <= 60) score += 2;
-        if (formData.deviceRequirements?.length > 0) score += 1;
+        if (formData.title && formData.title.length >= 10) score += 3;
+        if (formData.title && formData.title.length >= 20) score += 2;
+        if (formData.description && formData.description.length >= 50) score += 2;
+        if (formData.estimatedDuration && formData.estimatedDuration >= 5 && formData.estimatedDuration <= 60) score += 2;
+        if (formData.deviceRequirements && formData.deviceRequirements.length > 0) score += 1;
         break;
         
       case 2: // Session (if applicable)
-        if (formData.schedulingDetails?.availableDates?.length > 0) score += 3;
-        if (formData.schedulingDetails?.availableTimes?.length > 0) score += 3;
-        if (formData.schedulingDetails?.participantInstructions?.length > 0) score += 2;
-        if (formData.schedulingDetails?.maxParticipants > 0) score += 2;
+        if (formData.schedulingDetails?.availableDates && formData.schedulingDetails.availableDates.length > 0) score += 3;
+        if (formData.schedulingDetails?.availableTimes && formData.schedulingDetails.availableTimes.length > 0) score += 3;
+        if (formData.schedulingDetails?.participantInstructions && formData.schedulingDetails.participantInstructions.length > 0) score += 2;
+        if (formData.schedulingDetails?.maxParticipants && formData.schedulingDetails.maxParticipants > 0) score += 2;
         break;
         
       case 3: // Participants
-        if (formData.targetAudience?.countries?.length > 0) score += 3;
-        if (formData.targetAudience?.professions?.length > 0) score += 2;
-        if (formData.recruitmentSettings?.maxParticipants > 0) score += 2;
-        if (formData.recruitmentSettings?.maxParticipants >= 5 && formData.recruitmentSettings?.maxParticipants <= 15) score += 2;
-        if (formData.screeningQuestions?.length > 0) score += 1;
+        if (formData.targetAudience?.countries && formData.targetAudience.countries.length > 0) score += 3;
+        if (formData.targetAudience?.professions && formData.targetAudience.professions.length > 0) score += 2;
+        if (formData.recruitmentSettings?.maxParticipants && formData.recruitmentSettings.maxParticipants > 0) score += 2;
+        if (formData.recruitmentSettings?.maxParticipants && formData.recruitmentSettings.maxParticipants >= 5 && formData.recruitmentSettings.maxParticipants <= 15) score += 2;
+        if (formData.screeningQuestions && formData.screeningQuestions.length > 0) score += 1;
         break;
         
       case 4: // Tasks
-        if (formData.studyBlocks?.length > 0) score += 4;
-        if (formData.studyBlocks?.length >= 3) score += 2;
-        if (formData.studyBlocks?.some((block: any) => block.estimatedTime > 0)) score += 2;
-        if (formData.studyBlocks?.every((block: any) => block.title && block.description)) score += 2;
+        if (formData.studyBlocks && formData.studyBlocks.length > 0) score += 4;
+        if (formData.studyBlocks && formData.studyBlocks.length >= 3) score += 2;
+        if (formData.studyBlocks?.some((block) => block.estimatedTime && block.estimatedTime > 0)) score += 2;
+        if (formData.studyBlocks?.every((block) => block.title && block.description)) score += 2;
         break;
     }
     
@@ -373,30 +460,30 @@ export class StudyCreationFlowTracker {
   /**
    * Calculate final quality score for completed study
    */
-  private calculateFinalQualityScore(studyData: any): number {
+  private calculateFinalQualityScore(studyData: StudyCompletionData): number {
     let score = 0;
     
     // Title and description quality
-    if (studyData.title?.length >= 20) score += 1;
-    if (studyData.description?.length >= 100) score += 1;
+    if (studyData.title && studyData.title.length >= 20) score += 1;
+    if (studyData.description && studyData.description.length >= 100) score += 1;
     
     // Study configuration quality
-    if (studyData.estimatedDuration >= 15 && studyData.estimatedDuration <= 45) score += 1;
-    if (studyData.targetAudience?.countries?.length > 0) score += 1;
-    if (studyData.recruitmentSettings?.maxParticipants >= 5) score += 1;
+    if (studyData.estimatedDuration && studyData.estimatedDuration >= 15 && studyData.estimatedDuration <= 45) score += 1;
+    if (studyData.targetAudience?.countries && studyData.targetAudience.countries.length > 0) score += 1;
+    if (studyData.recruitmentSettings?.maxParticipants && studyData.recruitmentSettings.maxParticipants >= 5) score += 1;
     
     // Study blocks quality
-    if (studyData.studyBlocks?.length >= 3) score += 1;
-    if (studyData.studyBlocks?.length <= 8) score += 1; // Not too many blocks
+    if (studyData.studyBlocks && studyData.studyBlocks.length >= 3) score += 1;
+    if (studyData.studyBlocks && studyData.studyBlocks.length <= 8) score += 1; // Not too many blocks
     
     // Template usage (indicates thoughtful planning)
     if (studyData.templateUsed) score += 1;
     
     // Screening questions (indicates quality control)
-    if (studyData.screeningQuestions?.length > 0) score += 1;
+    if (studyData.screeningQuestions && studyData.screeningQuestions.length > 0) score += 1;
     
     // Realistic participant expectations
-    if (studyData.recruitmentSettings?.maxParticipants <= 20) score += 1;
+    if (studyData.recruitmentSettings?.maxParticipants && studyData.recruitmentSettings.maxParticipants <= 20) score += 1;
     
     return Math.min(score, 10);
   }
@@ -418,7 +505,7 @@ export class StudyCreationFlowTracker {
   /**
    * Count completed fields in form data
    */
-  private getCompletedFields(formData: any, requiredFields: string[]): number {
+  private getCompletedFields(formData: StudyCreationFormData, requiredFields: string[]): number {
     return requiredFields.filter(field => {
       const value = this.getNestedValue(formData, field);
       return value !== undefined && value !== null && value !== '' && 
@@ -429,8 +516,12 @@ export class StudyCreationFlowTracker {
   /**
    * Get nested object value by dot notation
    */
-  private getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+  private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
+    return path.split('.').reduce((current: unknown, key: string) => {
+      return current && typeof current === 'object' && current !== null && key in current
+        ? (current as Record<string, unknown>)[key]
+        : undefined;
+    }, obj);
   }
   
   /**
@@ -476,13 +567,13 @@ export class StudyCreationFlowTracker {
     
     // Example integrations:
     // Google Analytics 4
-    if ((window as any).gtag) {
-      (window as any).gtag('event', eventName, eventData);
+    if ((window as WindowWithAnalytics).gtag) {
+      (window as WindowWithAnalytics).gtag!('event', eventName, eventData);
     }
     
     // Mixpanel
-    if ((window as any).mixpanel) {
-      (window as any).mixpanel.track(eventName, eventData);
+    if ((window as WindowWithAnalytics).mixpanel) {
+      (window as WindowWithAnalytics).mixpanel!.track(eventName, eventData);
     }
     
     // Custom analytics endpoint
@@ -492,7 +583,7 @@ export class StudyCreationFlowTracker {
   /**
    * Send to custom analytics API
    */
-  private async sendToAnalyticsAPI(eventName: string, eventData: any) {
+  private async sendToAnalyticsAPI(eventName: string, eventData: Record<string, unknown>) {
     try {
       await fetch('/api/analytics', {
         method: 'POST',
@@ -603,7 +694,7 @@ export class StudyCreationPerformanceMonitor {
       timestamp: Date.now(),
       userAgent: navigator.userAgent,
       screenSize: `${window.innerWidth}x${window.innerHeight}`,
-      connection: (navigator as any).connection?.effectiveType
+      connection: (navigator as NavigatorWithConnection).connection?.effectiveType
     };
   }
 }
