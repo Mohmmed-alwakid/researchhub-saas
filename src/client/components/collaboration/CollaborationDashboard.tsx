@@ -18,6 +18,11 @@ import { approvalService } from '../../services/approvalService';
 import ActivityFeed from '../collaboration/ActivityFeed';
 import ApprovalQueue from '../approval/ApprovalQueue';
 import type { WorkspaceRole } from '../../../shared/types';
+import type { 
+  UserJoinedData, 
+  UserLeftData, 
+  ActivityUpdateData 
+} from './types';
 
 interface CollaborationDashboardProps {
   currentUser: {
@@ -147,18 +152,21 @@ export const CollaborationDashboard: React.FC<CollaborationDashboardProps> = ({
   }, [workspaceId]);
 
   // Real-time event handlers
-  const handleUserJoined = (data: any) => {
-    console.log('User joined:', data);
+  const handleUserJoined = (data?: unknown) => {
+    const userData = data as UserJoinedData;
+    console.log('User joined:', userData);
     // Update online collaborators list
   };
 
-  const handleUserLeft = (data: any) => {
-    console.log('User left:', data);
+  const handleUserLeft = (data?: unknown) => {
+    const userData = data as UserLeftData;
+    console.log('User left:', userData);
     // Update online collaborators list
   };
 
-  const handleActivityUpdate = (data: any) => {
-    console.log('Activity update:', data);
+  const handleActivityUpdate = (data?: unknown) => {
+    const activityData = data as ActivityUpdateData;
+    console.log('Activity update:', activityData);
     // Update activity feed and stats
     setStats(prev => ({
       ...prev,

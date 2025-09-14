@@ -85,3 +85,15 @@ export interface EditingStatusData {
   isEditing: boolean;
   timestamp: string;
 }
+
+export interface ActivityUpdateData {
+  activityId: string;
+  userId: string;
+  type: ActivityType;
+  timestamp: string;
+  metadata?: {
+    studyId?: string;
+    changes?: string[];
+    description?: string;
+  };
+}
