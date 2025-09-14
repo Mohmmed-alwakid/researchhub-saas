@@ -60,16 +60,47 @@ export interface LiveIntervention {
   autoHide?: number; // seconds
 }
 
+// WebSocket Manager Interface
+interface WebSocketManager {
+  emitSessionEvent: (event: SessionEvent) => void;
+  emitCollaborationEvent: (event: CollaborationEvent) => void;
+  emitObservationEvent: (event: ObservationEvent) => void;
+}
+
+interface SessionEvent {
+  type: string;
+  senderId: string;
+  sessionId: string;
+  data: unknown;
+}
+
+interface CollaborationEvent {
+  type: string;
+  senderId: string;
+  sessionId: string;
+  data: unknown;
+}
+
+interface ObservationEvent {
+  type: string;
+  senderId: string;
+  sessionId: string;
+  data: unknown;
+}
+
+// Event listener function type
+type EventListener = (data: unknown) => void;
+
 // Live Session Manager
 export class LiveSessionManager {
   private session: LiveSession | null = null;
   private metrics: LiveMetrics | null = null;
   private observations: LiveObservation[] = [];
-  private websocketManager: any; // WebSocket connection
-  private eventListeners: Map<string, Function[]> = new Map();
+  private websocketManager: WebSocketManager;
+  private eventListeners: Map<string, EventListener[]> = new Map();
   private metricsUpdateInterval: NodeJS.Timeout | null = null;
   
-  constructor(websocketManager: any) {
+  constructor(websocketManager: WebSocketManager) {
     this.websocketManager = websocketManager;
   }
   
@@ -257,14 +288,14 @@ export class LiveSessionManager {
   }
   
   // Event Management
-  on(event: string, listener: Function): void {
+  on(event: string, listener: EventListener): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
     this.eventListeners.get(event)!.push(listener);
   }
-  
-  off(event: string, listener: Function): void {
+
+  off(event: string, listener: EventListener): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       const index = listeners.indexOf(listener);
@@ -273,15 +304,13 @@ export class LiveSessionManager {
       }
     }
   }
-  
-  private emit(event: string, data: any): void {
+
+  private emit(event: string, data: unknown): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.forEach(listener => listener(data));
     }
-  }
-  
-  // Getters
+  }  // Getters
   getCurrentSession(): LiveSession | null {
     return this.session;
   }
@@ -314,24 +343,26 @@ export const LiveSessionParticipant: React.FC<{
     const initializeSession = async () => {
       try {
         // Mock WebSocket manager
-        const mockWebSocketManager = {
-          emitSessionEvent: (event: any) => console.log('Session event:', event),
-          emitCollaborationEvent: (event: any) => console.log('Collaboration event:', event),
-          emitObservationEvent: (event: any) => console.log('Observation event:', event)
+        const mockWebSocketManager: WebSocketManager = {
+          emitSessionEvent: (event: SessionEvent) => console.log('Session event:', event),
+          emitCollaborationEvent: (event: CollaborationEvent) => console.log('Collaboration event:', event),
+          emitObservationEvent: (event: ObservationEvent) => console.log('Observation event:', event)
         };
         
         sessionManagerRef.current = new LiveSessionManager(mockWebSocketManager);
         
-        // Set up event listeners
-        sessionManagerRef.current.on('session_started', setSession);
-        sessionManagerRef.current.on('session_paused', setSession);
-        sessionManagerRef.current.on('session_resumed', setSession);
-        sessionManagerRef.current.on('session_completed', (completedSession: LiveSession) => {
+        // Set up event listeners with proper type casting
+        sessionManagerRef.current.on('session_started', (data: unknown) => setSession(data as LiveSession));
+        sessionManagerRef.current.on('session_paused', (data: unknown) => setSession(data as LiveSession));
+        sessionManagerRef.current.on('session_resumed', (data: unknown) => setSession(data as LiveSession));
+        sessionManagerRef.current.on('session_completed', (data: unknown) => {
+          const completedSession = data as LiveSession;
           setSession(completedSession);
           onSessionEnd();
         });
-        sessionManagerRef.current.on('metrics_updated', setMetrics);
-        sessionManagerRef.current.on('intervention_triggered', (intervention: LiveIntervention) => {
+        sessionManagerRef.current.on('metrics_updated', (data: unknown) => setMetrics(data as LiveMetrics));
+        sessionManagerRef.current.on('intervention_triggered', (data: unknown) => {
+          const intervention = data as LiveIntervention;
           setInterventions(prev => [...prev, intervention]);
         });
         
