@@ -5,6 +5,15 @@ import React from 'react';
  * Allows users to report performance issues and monitors application health
  */
 
+// Extended Performance interface for Chrome's memory API
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize?: number;
+    totalJSHeapSize?: number;
+    jsHeapSizeLimit?: number;
+  };
+}
+
 export interface PerformanceIssue {
   id: string;
   type: 'performance' | 'error' | 'ui_issue' | 'bug' | 'feature_request';
@@ -105,7 +114,7 @@ class PerformanceMonitor {
     const fcp = paint.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0;
     
     // Get memory info if available (Chrome only)
-    const memoryInfo = (performance as any).memory as { usedJSHeapSize?: number } | undefined;
+    const memoryInfo = (performance as PerformanceWithMemory).memory;
     
     const metrics: PerformanceMetrics = {
       pageLoadTime: navigation ? navigation.loadEventEnd - navigation.loadEventStart : 0,
