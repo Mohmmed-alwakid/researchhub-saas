@@ -19,6 +19,13 @@ import { useEnhancedAuth } from '../../hooks/useEnhancedAuth';
 import toast from 'react-hot-toast';
 
 // Types
+type TabId = 'overview' | 'applications' | 'sessions' | 'achievements';
+
+interface AuthClient {
+  getUser(): Promise<unknown>;
+  request(options: unknown): Promise<unknown>;
+}
+
 interface ParticipantStats {
   totalStudiesCompleted: number;
   totalEarnings: number;
@@ -64,10 +71,10 @@ interface Achievement {
 
 // API Service
 class ParticipantDashboardAPI {
-  private authClient: any;
+  private authClient: AuthClient;
   private baseUrl: string;
 
-  constructor(authClient: any, baseUrl = 'http://localhost:3003/api') {
+  constructor(authClient: AuthClient, baseUrl = 'http://localhost:3003/api') {
     this.authClient = authClient;
     this.baseUrl = baseUrl;
   }
@@ -474,7 +481,7 @@ export const ParticipantDashboard: React.FC<{ className?: string }> = ({ classNa
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as TabId)}
                   className={`${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
