@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { Play, Pause, Square, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { ISession, ITaskCompletion } from '../../../shared/types';
+import { ISession, ITaskCompletion, IStudy, IParticipant } from '../../../shared/types';
 import { useRecording } from '../../hooks/useRecording.ts';
 import { NavigationTask } from './task-types/NavigationTask.tsx';
 import { SurveyTask } from './task-types/SurveyTask.tsx';
@@ -12,19 +12,19 @@ import { WelcomeBlockTask } from './task-types/WelcomeBlockTask.tsx';
 import { ContextScreenTask } from './task-types/ContextScreenTask.tsx';
 
 interface TaskRunnerProps {
-  study: any;
+  study: IStudy;
   session: ISession;
-  participant: any;
+  participant: IParticipant;
   onComplete: () => void;
   onExit: () => void;
 }
 
 interface TaskResponse {
   taskId: string;
-  responses: Record<string, any>;
+  responses: Record<string, unknown>;
   duration: number;
   success: boolean;
-  interactions: any[];
+  interactions: unknown[];
   startedAt: Date;
   completedAt: Date;
 }
@@ -136,7 +136,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
   }, [isRecording, stopRecording, sessionStartTime, session._id, taskResponses, taskCompletions, onComplete]);
 
   // Track task completion
-  const completeCurrentTask = useCallback(async (responses: Record<string, any>) => {
+  const completeCurrentTask = useCallback(async (responses: Record<string, unknown>) => {
     if (!currentTask || !taskStartTime) return;
 
     const completedAt = new Date();
