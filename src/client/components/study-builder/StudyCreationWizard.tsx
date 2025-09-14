@@ -1,11 +1,15 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
 import { StudyBuilderHeader } from './shared/StudyBuilderHeader';
 import { StudyTypeStep } from './steps/StudyTypeStep';
 import { StudySetupStep } from './steps/StudySetupStep';
-import { BlockConfigurationStep } from './steps/BlockConfigurationStep';
-import { ReviewStep } from './steps/ReviewStep';
-import { InterviewSessionConfigStep } from './steps/InterviewSessionConfig';
-import { UsabilityStudyConfigStep } from './steps/UsabilityStudyConfig';
+
+// PHASE 4D: LAZY LOAD HEAVY STUDY BUILDER COMPONENTS - September 14, 2025
+// Convert heavy step components to lazy loading for better performance
+const LazyBlockConfigurationStep = lazy(() => import('./steps/BlockConfigurationStep').then(module => ({ default: module.BlockConfigurationStep })));
+const LazyReviewStep = lazy(() => import('./steps/ReviewStep').then(module => ({ default: module.ReviewStep })));
+const LazyInterviewSessionConfigStep = lazy(() => import('./steps/InterviewSessionConfig').then(module => ({ default: module.InterviewSessionConfigStep })));
+const LazyUsabilityStudyConfigStep = lazy(() => import('./steps/UsabilityStudyConfig').then(module => ({ default: module.UsabilityStudyConfigStep })));
+
 import { StudyFormData } from './types';
 
 interface StudyCreationWizardProps {
@@ -382,13 +386,41 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
       case 'setup':
         return <StudySetupStep {...stepProps} />;
       case 'usability_config':
-        return <UsabilityStudyConfigStep {...stepProps} />;
+        return (
+          <Suspense fallback={<div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading study configuration...</span>
+          </div>}>
+            <LazyUsabilityStudyConfigStep {...stepProps} />
+          </Suspense>
+        );
       case 'session_config':
-        return <InterviewSessionConfigStep {...stepProps} />;
+        return (
+          <Suspense fallback={<div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading session configuration...</span>
+          </div>}>
+            <LazyInterviewSessionConfigStep {...stepProps} />
+          </Suspense>
+        );
       case 'blocks':
-        return <BlockConfigurationStep {...stepProps} />;
+        return (
+          <Suspense fallback={<div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading block configuration...</span>
+          </div>}>
+            <LazyBlockConfigurationStep {...stepProps} />
+          </Suspense>
+        );
       case 'review':
-        return <ReviewStep {...stepProps} />;
+        return (
+          <Suspense fallback={<div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading review...</span>
+          </div>}>
+            <LazyReviewStep {...stepProps} />
+          </Suspense>
+        );
       default:
         return null;
     }
