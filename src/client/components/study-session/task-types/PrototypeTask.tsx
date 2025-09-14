@@ -58,7 +58,7 @@ export const ClickTrackingTask: React.FC<ClickTrackingTaskProps> = ({
   task,
   onComplete,
   isRecording,
-  taskVariant
+  taskVariant: _taskVariant
 }) => {
   const [startTime] = useState(new Date());
   const [timeSpent, setTimeSpent] = useState(0);

@@ -14,7 +14,7 @@ export const NavigationTask: React.FC<NavigationTaskProps> = ({
   task,
   onComplete,
   isRecording,
-  taskVariant
+  taskVariant: _taskVariant
 }) => {
   const [startTime] = useState(new Date());
   const [currentUrl, setCurrentUrl] = useState('');
