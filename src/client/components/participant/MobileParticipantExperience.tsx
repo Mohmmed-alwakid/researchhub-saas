@@ -117,7 +117,7 @@ class TouchGestureHandler {
     }, 500);
   };
   
-  handleTouchMove = (_event: TouchEvent) => {
+  handleTouchMove = () => {
     if (this.longPressTimer) {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
@@ -566,28 +566,11 @@ export const MobileStudyBlock: React.FC<{
 export const MobileParticipantExperience: React.FC<{
   studyId: string;
   participantId: string;
-}> = ({ studyId, participantId: _participantId }) => {
+}> = ({ studyId }) => {
   const [session, setSession] = useState<MobileStudySession | null>(null);
   const [currentBlock, setCurrentBlock] = useState(0);
   const [blocks, setBlocks] = useState<any[]>([]);
-  const [responses, setResponses] = useState<Record<number, any>>({});
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [viewport, setViewport] = useState<MobileViewport>({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
-    isFullscreen: false,
-    devicePixelRatio: window.devicePixelRatio
-  });
-  
-  const gestureHandler = useRef(new TouchGestureHandler((gesture) => {
-    if (session) {
-      setSession(prev => prev ? {
-        ...prev,
-        touchGestures: [...prev.touchGestures, gesture]
-      } : null);
-    }
-  }));
   
   // Initialize mobile session
   useEffect(() => {
@@ -665,32 +648,9 @@ export const MobileParticipantExperience: React.FC<{
     ]);
   }, [studyId]);
   
-  // Handle viewport changes
-  useEffect(() => {
-    const handleResize = () => {
-      setViewport({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
-        isFullscreen: document.fullscreenElement !== null,
-        devicePixelRatio: window.devicePixelRatio
-      });
-    };
-    
-    window.addEventListener('resize', handleResize);
-    document.addEventListener('fullscreenchange', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      document.removeEventListener('fullscreenchange', handleResize);
-    };
-  }, []);
-  
   const handleResponse = (response: any) => {
-    setResponses(prev => ({
-      ...prev,
-      [currentBlock]: response
-    }));
+    // Store response logic would go here
+    console.log('Response:', response);
   };
   
   const handleNext = () => {

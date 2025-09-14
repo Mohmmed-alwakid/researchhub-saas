@@ -289,7 +289,7 @@ class GamificationAPI {
     };
   }
   
-  async getLeaderboard(_timeframe: 'week' | 'month' | 'all' = 'month'): Promise<LeaderboardEntry[]> {
+  async getLeaderboard(): Promise<LeaderboardEntry[]> {
     // Mock implementation
     return [
       {
