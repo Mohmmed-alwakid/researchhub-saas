@@ -652,7 +652,7 @@ export const StudyExecution: React.FC<{ className?: string }> = ({ className = '
   const { studyId } = useParams<{ studyId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const hasRole = useCallback((_role: string) => true, []); // Simplified for now
+  const hasRole = useCallback(() => true, []); // Simplified for now
   const authClient = null; // Simplified for now
   
   const [study, setStudy] = useState<Study | null>(null);
@@ -700,7 +700,7 @@ export const StudyExecution: React.FC<{ className?: string }> = ({ className = '
       }
     };
 
-    if (isAuthenticated && hasRole('participant')) {
+    if (isAuthenticated && hasRole()) {
       initializeStudy();
     }
   }, [studyId, isAuthenticated, hasRole, navigate, api]);
@@ -774,7 +774,7 @@ export const StudyExecution: React.FC<{ className?: string }> = ({ className = '
     );
   }
 
-  if (!hasRole('participant')) {
+  if (!hasRole()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

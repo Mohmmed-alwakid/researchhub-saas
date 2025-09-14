@@ -497,7 +497,7 @@ export const RealTimeAnalyticsDashboard: React.FC<{
   sessionId: string;
   participantId: string;
   isLive?: boolean;
-}> = ({ sessionId, participantId, isLive = false }) => {
+}> = ({ sessionId, participantId, isLive: _isLive = false }) => {
   const [analytics, setAnalytics] = useState<RealTimeAnalytics | null>(null);
   const [data, setData] = useState<ParticipantBehavior | null>(null);
   const [isTracking, setIsTracking] = useState(false);
