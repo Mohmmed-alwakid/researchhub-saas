@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { ExternalLink, CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import type { IStudy, IParticipant } from '../../../../shared/types/index';
+
+interface NavigationTaskData {
+  configuration?: {
+    url?: string;
+    instructions?: string;
+    questions?: QuestionData[];
+  };
+  timeLimit?: number;
+}
+
+interface QuestionData {
+  id: string;
+  question: string;
+  required?: boolean;
+  type?: string;
+  options?: string[];
+}
 
 interface NavigationTaskProps {
-  task: any;
-  study: any;
-  session: any;
-  onComplete: (responses: Record<string, any>) => void;
+  task: NavigationTaskData;
+  study: IStudy;
+  session: IParticipant;
+  onComplete: (responses: Record<string, unknown>) => void;
   isRecording: boolean;
   taskVariant?: 'tree_test';
 }
@@ -19,7 +37,7 @@ export const NavigationTask: React.FC<NavigationTaskProps> = ({
   const [currentUrl, setCurrentUrl] = useState('');
   const [taskCompleted, setTaskCompleted] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
-  const [responses, setResponses] = useState<Record<string, any>>({});
+  const [responses, setResponses] = useState<Record<string, unknown>>({});
 
   const targetUrl = task.configuration?.url || '';
   const instructions = task.configuration?.instructions || '';
@@ -60,7 +78,7 @@ export const NavigationTask: React.FC<NavigationTaskProps> = ({
     setTaskCompleted(true);
   };
 
-  const handleQuestionResponse = (questionId: string, value: any) => {
+  const handleQuestionResponse = (questionId: string, value: unknown) => {
     setResponses(prev => ({
       ...prev,
       [questionId]: value
@@ -80,8 +98,8 @@ export const NavigationTask: React.FC<NavigationTaskProps> = ({
     onComplete(taskResponses);
   };
 
-  const isTimeUp = timeLimit && timeSpent >= timeLimit;
-  const canComplete = taskCompleted && questions.every((q: any) => 
+  const isTimeUp = Boolean(timeLimit && timeSpent >= timeLimit);
+  const canComplete = taskCompleted && questions.every((q: QuestionData) => 
     !q.required || responses[q.id]
   );
 
@@ -166,7 +184,7 @@ export const NavigationTask: React.FC<NavigationTaskProps> = ({
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Post-Task Questions</h3>
           <div className="space-y-6">
-            {questions.map((question: any, index: number) => (
+            {questions.map((question: QuestionData, index: number) => (
               <div key={question.id || index} className="bg-gray-50 rounded-lg p-4">
                 <label className="block text-sm font-medium text-gray-900 mb-2">
                   {question.question}
@@ -178,7 +196,7 @@ export const NavigationTask: React.FC<NavigationTaskProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     rows={3}
                     placeholder="Enter your response..."
-                    value={responses[question.id] || ''}
+                    value={String(responses[question.id] || '')}
                     onChange={(e) => handleQuestionResponse(question.id, e.target.value)}
                   />
                 )}
