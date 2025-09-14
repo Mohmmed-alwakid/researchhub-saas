@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   BarChart3, 
   Users, 
@@ -8,18 +8,27 @@ import {
   Activity,
   Eye,
   Settings,
-  Filter,
-  Search,
   Clock
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 
 // Import existing components that will become tabs
 import DashboardOverview from './DashboardOverview';
 import CollaborationTab from '../collaboration/CollaborationTab';
 import StudyAnalyticsTab from '../analytics/StudyAnalyticsTab';
 import TemplateAccessTab from '../templates/TemplateAccessTab';
+
+// Study interface for type safety
+interface Study {
+  id: string;
+  title: string;
+  description: string;
+  status: 'active' | 'completed' | 'draft' | 'paused';
+  participantCount?: number;
+  participant_count?: number; // Alternative naming
+  createdAt: string;
+  estimated_duration?: number;
+}
 
 interface TabConfig {
   id: string;
@@ -67,11 +76,10 @@ export const UnifiedWorkspace: React.FC<UnifiedWorkspaceProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { studyId } = useParams();
   
   const [activeTab, setActiveTab] = useState(defaultTab);
-  const [selectedStudy, setSelectedStudy] = useState<any>(null);
-  const [studies, setStudies] = useState<any[]>([]);
+  const [selectedStudy, setSelectedStudy] = useState<Study | null>(null);
+  const [studies, setStudies] = useState<Study[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Load studies on mount
@@ -138,8 +146,8 @@ export const UnifiedWorkspace: React.FC<UnifiedWorkspaceProps> = ({
     navigate('/app/studies/create');
   };
 
-  const handleStudySelect = (study: any) => {
-    setSelectedStudy(study);
+  const handleStudySelect = (study: Study | undefined) => {
+    setSelectedStudy(study || null);
   };
 
   const getStatusColor = (status: string) => {
