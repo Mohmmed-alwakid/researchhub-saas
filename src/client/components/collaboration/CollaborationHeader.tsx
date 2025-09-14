@@ -26,6 +26,29 @@ interface ActiveCollaborator {
   lastSeen: Date;
 }
 
+interface UserJoinedData {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+}
+
+interface UserLeftData {
+  user: {
+    id: string;
+  };
+}
+
+interface PresenceUpdateData {
+  user: {
+    id: string;
+  };
+  status: 'active' | 'away' | 'idle';
+  currentElement?: string;
+}
+
 export const CollaborationHeader: React.FC<CollaborationHeaderProps> = ({
   entityType,
   entityId,
@@ -87,14 +110,15 @@ export const CollaborationHeader: React.FC<CollaborationHeaderProps> = ({
       }
     };
 
-    const handleUserJoined = (data: any) => {
-      if (data.user?.id !== user?.id) {
+    const handleUserJoined = (data: unknown) => {
+      const userJoinedData = data as UserJoinedData;
+      if (userJoinedData.user?.id !== user?.id) {
         setActiveCollaborators(prev => [
-          ...prev.filter(c => c.id !== data.user.id),
+          ...prev.filter(c => c.id !== userJoinedData.user.id),
           {
-            id: data.user.id,
-            name: data.user.name || 'Unknown User',
-            email: data.user.email || '',
+            id: userJoinedData.user.id,
+            name: userJoinedData.user.name || 'Unknown User',
+            email: userJoinedData.user.email || '',
             status: 'active',
             lastSeen: new Date()
           }
@@ -102,14 +126,16 @@ export const CollaborationHeader: React.FC<CollaborationHeaderProps> = ({
       }
     };
 
-    const handleUserLeft = (data: any) => {
-      setActiveCollaborators(prev => prev.filter(c => c.id !== data.user?.id));
+    const handleUserLeft = (data: unknown) => {
+      const userLeftData = data as UserLeftData;
+      setActiveCollaborators(prev => prev.filter(c => c.id !== userLeftData.user?.id));
     };
 
-    const handlePresenceUpdate = (data: any) => {
+    const handlePresenceUpdate = (data: unknown) => {
+      const presenceData = data as PresenceUpdateData;
       setActiveCollaborators(prev => prev.map(c => 
-        c.id === data.user?.id 
-          ? { ...c, status: data.status, currentElement: data.currentElement, lastSeen: new Date() }
+        c.id === presenceData.user?.id 
+          ? { ...c, status: presenceData.status, currentElement: presenceData.currentElement, lastSeen: new Date() }
           : c
       ));
     };
