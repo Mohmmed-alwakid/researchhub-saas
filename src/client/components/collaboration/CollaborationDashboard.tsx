@@ -73,6 +73,49 @@ export const CollaborationDashboard: React.FC<CollaborationDashboardProps> = ({
 
   // Initialize collaboration service and load data
   useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        // Load dashboard statistics
+        const [approvals, activity] = await Promise.all([
+          approvalService.getApprovalQueue(workspaceId),
+          collaborationService.getActivityFeed(workspaceId)
+        ]);
+
+        // Mock data for demonstration - in real app this would come from APIs
+        setStats({
+          activeCollaborators: 5,
+          pendingApprovals: approvals.count || 0,
+          unreadComments: 3,
+          myStudies: 8,
+          sharedStudies: 12,
+          recentActivity: activity.length || 0
+        });
+
+        // Set online collaborators
+        setOnlineCollaborators([
+          {
+            id: 'user-2',
+            name: 'Sarah Johnson',
+            email: 'sarah.johnson@company.com',
+            avatar: '/avatars/sarah.jpg',
+            status: 'active',
+            currentStudy: { id: 'study-1', title: 'Mobile App Usability' },
+            lastSeen: new Date()
+          },
+          {
+            id: 'user-3',
+            name: 'Mike Chen',
+            email: 'mike.chen@company.com',
+            status: 'away',
+            currentStudy: { id: 'study-2', title: 'Website Navigation' },
+            lastSeen: new Date(Date.now() - 300000) // 5 minutes ago
+          }
+        ]);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      }
+    };
+
     const initializeDashboard = async () => {
       try {
         const token = localStorage.getItem('auth-token');
@@ -102,50 +145,6 @@ export const CollaborationDashboard: React.FC<CollaborationDashboardProps> = ({
       collaborationService.off('activity_update', handleActivityUpdate);
     };
   }, [workspaceId]);
-
-  const loadDashboardData = async () => {
-    try {
-      // Load dashboard statistics
-      const [approvals, activity] = await Promise.all([
-        approvalService.getApprovalQueue(workspaceId),
-        collaborationService.getActivityFeed(workspaceId)
-      ]);
-
-      // Mock data for demonstration - in real app this would come from APIs
-      setStats({
-        activeCollaborators: 5,
-        pendingApprovals: approvals.count || 0,
-        unreadComments: 3,
-        myStudies: 8,
-        sharedStudies: 12,
-        recentActivity: activity.length || 0
-      });
-
-      // Mock online collaborators
-      setOnlineCollaborators([
-        {
-          id: 'user-2',
-          name: 'Sarah Johnson',
-          email: 'sarah.johnson@company.com',
-          avatar: '/avatars/sarah.jpg',
-          status: 'active',
-          currentStudy: { id: 'study-1', title: 'Mobile App Usability' },
-          lastSeen: new Date()
-        },
-        {
-          id: 'user-3',
-          name: 'Mike Chen',
-          email: 'mike.chen@company.com',
-          status: 'away',
-          currentStudy: { id: 'study-2', title: 'Website Navigation' },
-          lastSeen: new Date(Date.now() - 300000) // 5 minutes ago
-        }
-      ]);
-
-    } catch (error) {
-      console.error('Failed to load dashboard data:', error);
-    }
-  };
 
   // Real-time event handlers
   const handleUserJoined = (data: any) => {
