@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore, TaskInput } from '../stores/appStore';
 import { StudyFormData } from '../components/studies/StudyMetadataForm';
 import { StudyBuilderBlock } from '../components/studies/StudyBlocksManager';
-import { ITask } from '../../shared/types';
+import { ITask, Study } from '../../shared/types';
 
 interface ValidationError {
   field: string;
@@ -142,7 +142,7 @@ export const useStudyBuilder = (studyId?: string) => {
         }
       };
 
-      let result: any;
+      let result: Study | void;
       try {
         if (isEditing && studyId) {
           result = await updateStudy(studyId, studyData);
@@ -159,11 +159,14 @@ export const useStudyBuilder = (studyId?: string) => {
           navigate('/app/studies');
         }, 2000);
         
-      } catch (apiError: any) {
+      } catch (apiError: unknown) {
         console.error('API Error:', apiError);
+        const errorMessage = apiError && typeof apiError === 'object' && 'message' in apiError 
+          ? (apiError as { message: string }).message 
+          : 'Failed to save study';
         setValidation([{ 
           field: 'submit', 
-          message: apiError?.message || 'Failed to save study' 
+          message: errorMessage 
         }]);
       }
     } catch (error) {
