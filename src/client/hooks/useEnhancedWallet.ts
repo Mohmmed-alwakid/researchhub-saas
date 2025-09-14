@@ -24,7 +24,7 @@ interface CacheEntry<T> {
 }
 
 class WalletCache {
-  private cache = new Map<string, CacheEntry<any>>();
+  private cache = new Map<string, CacheEntry<unknown>>();
   
   set<T>(key: string, data: T, ttl: number = 5 * 60 * 1000): void { // 5 minutes default
     this.cache.set(key, {
@@ -43,7 +43,7 @@ class WalletCache {
       return null;
     }
     
-    return entry.data;
+    return entry.data as T;
   }
   
   invalidate(key?: string): void {
@@ -103,7 +103,7 @@ export const useEnhancedWallet = (): UseEnhancedWalletReturn => {
           setTransactions(cachedTransactions);
           setWithdrawals(cachedWithdrawals);
           setCacheStatus(walletCache.getStatus('wallet'));
-          setLastUpdated(new Date(walletCache.get<any>('wallet')?.timestamp || Date.now()));
+          setLastUpdated(new Date(walletCache.get<CacheEntry<unknown>>('wallet')?.timestamp || Date.now()));
           setLoading(false);
           setRefreshing(false);
           
