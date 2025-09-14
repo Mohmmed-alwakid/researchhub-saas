@@ -1,6 +1,14 @@
 // PayPal Payment Service for ResearchHub SaaS
 // Handles frontend PayPal integration and subscription management
 
+// Generic API response interface
+interface ApiResponse<T = unknown> {
+  success?: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
 export interface PayPalPlan {
   id: string;
   name: string;
@@ -72,7 +80,7 @@ class PayPalService {
       : 'http://localhost:3003/api/paypal-consolidated';
   }
 
-  private async makeRequest(action: string, method: string = 'GET', body?: unknown): Promise<any> {
+  private async makeRequest<T = unknown>(action: string, method: string = 'GET', body?: unknown): Promise<ApiResponse<T>> {
     const token = localStorage.getItem('access_token');
     
     const config: RequestInit = {
@@ -98,8 +106,8 @@ class PayPalService {
   // Get all available subscription plans
   async getAvailablePlans(): Promise<PayPalPlan[]> {
     try {
-      const response = await this.makeRequest('get-available-plans');
-      return response.data;
+      const response = await this.makeRequest<PayPalPlan[]>('get-available-plans');
+      return response.data || [];
     } catch (error) {
       console.error('Failed to fetch available plans:', error);
       throw error;
@@ -109,8 +117,8 @@ class PayPalService {
   // Get current user's subscription status
   async getSubscriptionStatus(userId: string): Promise<SubscriptionStatus> {
     try {
-      const response = await this.makeRequest(`get-subscription-status&userId=${userId}`);
-      return response.data;
+      const response = await this.makeRequest<SubscriptionStatus>(`get-subscription-status&userId=${userId}`);
+      return response.data!;
     } catch (error) {
       console.error('Failed to fetch subscription status:', error);
       throw error;
@@ -120,8 +128,8 @@ class PayPalService {
   // Create a new subscription
   async createSubscription(request: CreateSubscriptionRequest): Promise<CreateSubscriptionResponse> {
     try {
-      const response = await this.makeRequest('create-subscription', 'POST', request);
-      return response.data;
+      const response = await this.makeRequest<CreateSubscriptionResponse>('create-subscription', 'POST', request);
+      return response.data!;
     } catch (error) {
       console.error('Failed to create subscription:', error);
       throw error;
@@ -153,7 +161,7 @@ class PayPalService {
       
       const available = plans.filter(p => p.id !== currentPlan);
       
-      const recommendations = this.generateUpgradeRecommendations(current, available);
+      const recommendations = this.generateUpgradeRecommendations(current);
       
       return {
         current,
@@ -167,7 +175,7 @@ class PayPalService {
   }
 
   // Generate upgrade recommendations based on current plan
-  private generateUpgradeRecommendations(current: PayPalPlan, _available: PayPalPlan[]): string[] {
+  private generateUpgradeRecommendations(current: PayPalPlan): string[] {
     const recommendations: string[] = [];
     
     if (current.id === 'free') {
