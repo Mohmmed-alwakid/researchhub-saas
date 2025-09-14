@@ -33,6 +33,35 @@ interface UnifiedWorkspaceProps {
   defaultTab?: string;
 }
 
+// Tab configuration (static data)
+const TABS: TabConfig[] = [
+  {
+    id: 'overview',
+    name: 'Overview',
+    icon: BarChart3,
+    component: DashboardOverview
+  },
+  {
+    id: 'collaboration', 
+    name: 'Team',
+    icon: Users,
+    component: CollaborationTab,
+    badge: 3 // Example: 3 pending team activities
+  },
+  {
+    id: 'analytics',
+    name: 'Analytics', 
+    icon: Activity,
+    component: StudyAnalyticsTab
+  },
+  {
+    id: 'templates',
+    name: 'Templates',
+    icon: FileText, 
+    component: TemplateAccessTab
+  }
+];
+
 export const UnifiedWorkspace: React.FC<UnifiedWorkspaceProps> = ({ 
   defaultTab = 'overview' 
 }) => {
@@ -45,37 +74,46 @@ export const UnifiedWorkspace: React.FC<UnifiedWorkspaceProps> = ({
   const [studies, setStudies] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Tab configuration
-  const tabs: TabConfig[] = [
-    {
-      id: 'overview',
-      name: 'Overview',
-      icon: BarChart3,
-      component: DashboardOverview
-    },
-    {
-      id: 'collaboration', 
-      name: 'Team',
-      icon: Users,
-      component: CollaborationTab,
-      badge: 3 // Example: 3 pending team activities
-    },
-    {
-      id: 'analytics',
-      name: 'Analytics', 
-      icon: Activity,
-      component: StudyAnalyticsTab
-    },
-    {
-      id: 'templates',
-      name: 'Templates',
-      icon: FileText, 
-      component: TemplateAccessTab
-    }
-  ];
-
   // Load studies on mount
   useEffect(() => {
+    const loadStudies = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/studies');
+        const result = await response.json();
+        
+        if (result.success) {
+          setStudies(result.data || []);
+        } else {
+          console.error('Failed to load studies:', result.error);
+          // Set mock data for development
+          setStudies([
+            {
+              id: '1',
+              title: 'Website Usability Study',
+              description: 'Testing user experience flows on our main website',
+              status: 'active',
+              participantCount: 25,
+              createdAt: '2024-01-15'
+            },
+            {
+              id: '2', 
+              title: 'Mobile App Testing',
+              description: 'Evaluating mobile app navigation and usability',
+              status: 'completed',
+              participantCount: 18,
+              createdAt: '2024-01-10'
+            }
+          ]);
+        }
+      } catch (error) {
+        console.error('Error loading studies:', error);
+        setStudies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadStudies();
   }, []);
 
@@ -83,30 +121,10 @@ export const UnifiedWorkspace: React.FC<UnifiedWorkspaceProps> = ({
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get('tab');
-    if (tabParam && tabs.find(tab => tab.id === tabParam)) {
+    if (tabParam && TABS.find(tab => tab.id === tabParam)) {
       setActiveTab(tabParam);
     }
   }, [location.search]);
-
-  const loadStudies = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/studies');
-      const result = await response.json();
-      
-      if (result.success) {
-        setStudies(result.data || []);
-        // Set first study as selected if none selected and studies exist
-        if (!selectedStudy && result.data && result.data.length > 0) {
-          setSelectedStudy(result.data[0]);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load studies:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -231,7 +249,7 @@ export const UnifiedWorkspace: React.FC<UnifiedWorkspaceProps> = ({
       <div className="bg-white border-b border-gray-200">
         <div className="px-6">
           <nav className="flex space-x-8">
-            {tabs.map((tab) => {
+            {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               
@@ -261,7 +279,7 @@ export const UnifiedWorkspace: React.FC<UnifiedWorkspaceProps> = ({
 
       {/* Tab Content Area */}
       <div className="flex-1 overflow-hidden">
-        {tabs.map((tab) => {
+        {TABS.map((tab) => {
           const TabComponent = tab.component;
           return (
             <div 
