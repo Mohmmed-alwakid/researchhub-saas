@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '../../stores/authStore';
 import { 
   Users, 
   MessageSquare, 
@@ -50,7 +49,6 @@ interface PendingApproval {
 }
 
 const CollaborationTab: React.FC<CollaborationTabProps> = ({ studyId, workspaceId }) => {
-  const { user } = useAuthStore();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
