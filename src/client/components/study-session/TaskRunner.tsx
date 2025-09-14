@@ -63,7 +63,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
         startRecording();
       }
     }
-  }, []);
+  }, [startRecording, study.settings?.recordScreen, tasks.length]);
 
   // Track task completion
   const completeCurrentTask = useCallback(async (responses: Record<string, any>) => {
@@ -110,7 +110,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
     toast.success('Task completed! Moving to next task...');
   };
 
-  const saveTaskProgress = async (taskResponse: TaskResponse, taskCompletion: ITaskCompletion) => {
+  const saveTaskProgress = useCallback(async (taskResponse: TaskResponse, taskCompletion: ITaskCompletion) => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/sessions/progress', {
@@ -136,9 +136,9 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session._id, currentTaskIndex]);
 
-  const completeSession = async () => {
+  const completeSession = useCallback(async () => {
     try {
       setIsLoading(true);
       
@@ -176,7 +176,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isRecording, stopRecording, sessionStartTime, session._id, taskResponses, taskCompletions, onComplete]);
 
   const handleExit = async () => {
     if (window.confirm('Are you sure you want to exit? Your progress will be saved.')) {
