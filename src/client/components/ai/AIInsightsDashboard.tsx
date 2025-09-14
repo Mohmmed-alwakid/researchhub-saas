@@ -24,8 +24,7 @@ interface AIInsightsDashboardProps {
 }
 
 export const AIInsightsDashboard: React.FC<AIInsightsDashboardProps> = ({ 
-  studyId,
-  studyData: _studyData
+  studyId
 }) => {
   const { id } = useParams<{ id: string }>();
   const currentStudyId = studyId || id;

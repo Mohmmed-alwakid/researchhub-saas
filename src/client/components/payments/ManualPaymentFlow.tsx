@@ -82,11 +82,6 @@ const ManualPaymentFlow: React.FC = () => {
     }
   };
 
-  const handlePlanSelect = (plan: Plan) => {
-    setSelectedPlan(plan);
-    setCurrentStep('payment');
-  };
-
   const createPaymentRequest = async () => {
     if (!selectedPlan) return;
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Users, Search, Filter, Download, RefreshCw, 
+  Users, Search, Download, RefreshCw, 
   Eye, Settings, UserCheck, UserX, Crown, Shield,
-  Mail, Calendar, DollarSign, BarChart3,
+  Mail, BarChart3,
   AlertTriangle, CheckCircle, XCircle
 } from 'lucide-react';
 

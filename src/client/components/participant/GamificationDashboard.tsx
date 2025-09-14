@@ -277,7 +277,7 @@ class GamificationAPI {
     this.baseUrl = baseUrl;
   }
   
-  async getParticipantPoints(participantId: string): Promise<ParticipantPoints> {
+  async getParticipantPoints(_participantId: string): Promise<ParticipantPoints> {
     // Mock implementation
     return {
       total: 1250,
@@ -289,7 +289,7 @@ class GamificationAPI {
     };
   }
   
-  async getLeaderboard(timeframe: 'week' | 'month' | 'all' = 'month'): Promise<LeaderboardEntry[]> {
+  async getLeaderboard(_timeframe: 'week' | 'month' | 'all' = 'month'): Promise<LeaderboardEntry[]> {
     // Mock implementation
     return [
       {
@@ -331,7 +331,7 @@ class GamificationAPI {
     ];
   }
   
-  async getEngagementStreak(participantId: string): Promise<EngagementStreak> {
+  async getEngagementStreak(_participantId: string): Promise<EngagementStreak> {
     return {
       current: 7,
       longest: 15,
