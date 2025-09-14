@@ -23,8 +23,16 @@ interface User {
   login_attempts: number;
 }
 
+interface ApiClient {
+  getUsersWithAnalytics(): Promise<{ success: boolean; data?: { users: User[]; total?: number }; error?: string }>;
+  getAllUsers(): Promise<{ success: boolean; data?: { users: User[]; total?: number }; error?: string }>;
+  suspendUser(id: string, reason: string): Promise<{ success: boolean; error?: string }>;
+  updateUserStatus(id: string, status: string, reason: string): Promise<{ success: boolean; error?: string }>;
+  // Add other methods as needed
+}
+
 interface UserManagementPanelProps {
-  apiClient: any;
+  apiClient: ApiClient;
 }
 
 export const UserManagementPanel: React.FC<UserManagementPanelProps> = ({ apiClient }) => {
@@ -338,7 +346,7 @@ export const UserManagementPanel: React.FC<UserManagementPanelProps> = ({ apiCli
                           {user.participants_recruited} participants
                         </div>
                         <div className="text-xs text-gray-500">
-                          Active: {formatDate(user.last_active)}
+                          Active: {user.last_active ? formatDate(user.last_active) : 'Never'}
                         </div>
                       </div>
                     </td>

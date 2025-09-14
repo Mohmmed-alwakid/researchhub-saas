@@ -141,7 +141,19 @@ class AdminAPIClient {
   // System metrics using comprehensive admin API
   async getSystemMetrics(): Promise<SystemMetrics> {
     try {
-      const response = await this.makeRequest<any>('/admin-comprehensive?action=dashboard-analytics&period=30d');
+      const response = await this.makeRequest<{
+        overview?: {
+          totalUsers?: number;
+          activeUsers?: number;
+          totalStudies?: number;
+          activeStudies?: number;
+          totalRevenue?: number;
+          monthlyRevenue?: number;
+          [key: string]: unknown;
+        };
+        generatedAt?: string;
+        [key: string]: unknown;
+      }>('/admin-comprehensive?action=dashboard-analytics&period=30d');
       if (response.success && response.data) {
         const data = response.data;
         return {
