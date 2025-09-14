@@ -2,15 +2,33 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Video, Mic, MicOff, VideoOff, Clock, Users, ExternalLink, AlertCircle, CheckCircle, PhoneOff } from 'lucide-react';
 
 // Conditional Zoom SDK import to prevent React version conflicts
-let ZoomMtgEmbedded: any = null;
+interface ZoomClient {
+  init(config: unknown): Promise<unknown>;
+  join(joinConfig: unknown): Promise<unknown>;
+  on(event: string, callback: (payload: unknown) => void): void;
+  leave(): Promise<unknown>;
+}
+
+interface ZoomSDK {
+  createClient(): ZoomClient;
+  // Add other Zoom SDK methods as needed
+}
+
+let ZoomMtgEmbedded: ZoomSDK | null = null;
 try {
   // Dynamic import to prevent bundling issues in production
   if (typeof window !== 'undefined') {
-    import('@zoom/meetingsdk/embedded').then(module => {
-      ZoomMtgEmbedded = module.default;
-    }).catch(err => {
-      console.warn('Zoom SDK not available:', err);
-    });
+    // Using dynamic import with proper error handling
+    const loadZoomSDK = async () => {
+      try {
+        // @ts-expect-error - Optional dependency, may not be available
+        const module = await import('@zoom/meetingsdk/embedded');
+        ZoomMtgEmbedded = module.default as ZoomSDK;
+      } catch (err) {
+        console.warn('Zoom SDK not available:', err);
+      }
+    };
+    loadZoomSDK();
   }
 } catch (error) {
   console.warn('Zoom SDK import failed:', error);
@@ -124,6 +142,10 @@ export const InterviewTask: React.FC<InterviewTaskProps> = ({
         try {
           if (!zoomConfig) {
             throw new Error('Zoom configuration is required');
+          }
+
+          if (!ZoomMtgEmbedded) {
+            throw new Error('Zoom SDK not available');
           }
 
           // Use embedded client for better integration

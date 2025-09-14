@@ -8,12 +8,19 @@ import {
   AlertTriangle, Bell, Shield, LogOut 
 } from 'lucide-react';
 
+// Type for auth store
+interface AuthStoreType {
+  token: string | null;
+  user: unknown;
+  // Add other properties as needed
+}
+
 // Enhanced Admin API Client with comprehensive backend integration
 class ComprehensiveAdminAPIClient {
   private baseUrl: string;
-  private authStore: any;
+  private authStore: AuthStoreType;
 
-  constructor(authStore: any, baseUrl = '/api') {
+  constructor(authStore: AuthStoreType, baseUrl = '/api') {
     this.baseUrl = baseUrl;
     this.authStore = authStore;
   }
@@ -244,7 +251,7 @@ export const ComprehensiveAdminPanel: React.FC = () => {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'dashboard' | 'users' | 'analytics' | 'settings')}
                 className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
