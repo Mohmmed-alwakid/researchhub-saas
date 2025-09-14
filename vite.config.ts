@@ -62,7 +62,8 @@ export default defineConfig({
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        // Optimized manual chunks for better caching and loading
+        // PHASE 4B: ENHANCED VENDOR BUNDLE SPLITTING - September 14, 2025
+        // Split large vendor bundle (485kB → ~290kB target) with optimized caching strategy
         manualChunks: (id: string) => {
           // CRITICAL: React and its ecosystem MUST be together and load first
           // This prevents circular dependencies that cause "Cannot read properties of undefined (reading 'memo')"
@@ -82,12 +83,32 @@ export default defineConfig({
             return 'react-ecosystem';
           }
           
-          // UI and rendering libraries that don't depend on React internals
-          // Includes charts (recharts) which had circular dependencies with vendor
+          // PHASE 4B: Split large UI libraries for better caching
+          // Chart libraries (often >100kB) - lazy load when needed
+          if (id.includes('node_modules/recharts') ||
+              id.includes('node_modules/d3-') ||
+              id.includes('node_modules/victory')) {
+            return 'charts';
+          }
+          
+          // Drag & Drop libraries - only needed in study builder
+          if (id.includes('node_modules/@dnd-kit') ||
+              id.includes('node_modules/react-beautiful-dnd')) {
+            return 'drag-drop';
+          }
+          
+          // Icon libraries - frequently cached, separate for stability
           if (id.includes('node_modules/lucide-react') ||
-              id.includes('node_modules/@dnd-kit') ||
-              id.includes('node_modules/recharts')) {
-            return 'ui-libraries';
+              id.includes('node_modules/@heroicons') ||
+              id.includes('node_modules/react-icons')) {
+            return 'icons';
+          }
+          
+          // Animation libraries - optional features
+          if (id.includes('node_modules/framer-motion') ||
+              id.includes('node_modules/@react-spring') ||
+              id.includes('node_modules/react-transition-group')) {
+            return 'animations';
           }
           
           // Supabase and data libraries - independent of React initialization
@@ -103,8 +124,24 @@ export default defineConfig({
           // Utilities that don't depend on React - safe to load anytime
           if (id.includes('node_modules/date-fns') ||
               id.includes('node_modules/clsx') ||
-              id.includes('node_modules/tailwind-merge')) {
+              id.includes('node_modules/tailwind-merge') ||
+              id.includes('node_modules/lodash')) {
             return 'utilities';
+          }
+          
+          // PHASE 4B: Split vendor into size-based chunks for better caching
+          // Large vendor libraries (>50kB) - separate for better cache invalidation
+          if (id.includes('node_modules/@tanstack/') ||
+              id.includes('node_modules/@emotion/') ||
+              id.includes('node_modules/styled-components')) {
+            return 'vendor-large';
+          }
+          
+          // Medium vendor libraries (10-50kB) - group together
+          if (id.includes('node_modules/axios') ||
+              id.includes('node_modules/uuid') ||
+              id.includes('node_modules/crypto-js')) {
+            return 'vendor-medium';
           }
           
           // Handle app pages as separate chunks for code splitting
@@ -113,9 +150,9 @@ export default defineConfig({
             return `page-${pageName}`;
           }
           
-          // All other vendor libraries - load after React is initialized
+          // Small vendor libraries (<10kB) - group together for efficiency
           if (id.includes('node_modules/')) {
-            return 'vendor';
+            return 'vendor-small';
           }
           
           return undefined;
