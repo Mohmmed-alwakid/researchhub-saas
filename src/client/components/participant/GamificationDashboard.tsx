@@ -277,7 +277,7 @@ class GamificationAPI {
     this.baseUrl = baseUrl;
   }
   
-  async getParticipantPoints(_participantId: string): Promise<ParticipantPoints> {
+  async getParticipantPoints(): Promise<ParticipantPoints> {
     // Mock implementation
     return {
       total: 1250,
@@ -331,7 +331,7 @@ class GamificationAPI {
     ];
   }
   
-  async getEngagementStreak(_participantId: string): Promise<EngagementStreak> {
+  async getEngagementStreak(): Promise<EngagementStreak> {
     return {
       current: 7,
       longest: 15,
@@ -404,9 +404,9 @@ export const GamificationDashboard: React.FC<{
     const loadData = async () => {
       try {
         const [pointsData, leaderboardData, streakData, challengesData] = await Promise.all([
-          api.getParticipantPoints(participantId),
+          api.getParticipantPoints(),
           api.getLeaderboard(),
-          api.getEngagementStreak(participantId),
+          api.getEngagementStreak(),
           api.getChallenges()
         ]);
         
