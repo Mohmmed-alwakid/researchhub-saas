@@ -78,12 +78,50 @@ interface PlatformRevenue {
 interface PlatformSettings {
   STUDY_BASE_COST: number;
   COST_PER_BLOCK: number;
+  PLATFORM_FEE_PERCENTAGE: number;
+  WITHDRAWAL_FEE_PERCENTAGE: number;
+  MINIMUM_WITHDRAWAL: number;
+  POINT_EXPIRY_DAYS: number;
+  MAX_STUDIES_PER_PARTICIPANT: number;
   COST_PER_PARTICIPANT: number;
   PARTICIPANT_BASE_REWARD: number;
   PARTICIPANT_BONUS_PER_BLOCK: number;
   PLATFORM_FEE_PERCENT: number;
   WITHDRAWAL_FEE_PERCENT: number;
   FRAUD_DETECTION_THRESHOLD: number;
+}
+
+interface ParticipantAuditSession {
+  sessionId: string;
+  participant: {
+    name?: string;
+    email: string;
+  };
+  study: {
+    title: string;
+  };
+  session: {
+    completedAt: string;
+  };
+  earnings: {
+    actual: number;
+    discrepancy: number;
+  };
+  flags: string[];
+  riskScore: number;
+}
+
+interface FraudAlert {
+  transactionId: string;
+  user: {
+    name?: string;
+    email: string;
+  };
+  type: string;
+  timestamp: string;
+  riskLevel: 'high' | 'medium' | 'low';
+  amount: number;
+  flags: string[];
 }
 
 const AdminAnalyticsDashboard: React.FC = () => {
@@ -94,8 +132,8 @@ const AdminAnalyticsDashboard: React.FC = () => {
   // Data states
   const [studyAnalysis, setStudyAnalysis] = useState<StudyAnalysis[]>([]);
   const [platformRevenue, setPlatformRevenue] = useState<PlatformRevenue | null>(null);
-  const [participantAudit, setParticipantAudit] = useState<any[]>([]);
-  const [fraudAlerts, setFraudAlerts] = useState<any[]>([]);
+  const [participantAudit, setParticipantAudit] = useState<ParticipantAuditSession[]>([]);
+  const [fraudAlerts, setFraudAlerts] = useState<FraudAlert[]>([]);
   const [platformSettings, setPlatformSettings] = useState<PlatformSettings | null>(null);
   
   // Filter states
@@ -582,7 +620,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                           <Input
                             type="number"
                             value={editedSettings?.STUDY_BASE_COST || 0}
-                            onChange={(e) => setEditedSettings(prev => prev ? 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedSettings(prev => prev ? 
                               { ...prev, STUDY_BASE_COST: parseInt(e.target.value) } : null
                             )}
                           />
@@ -596,7 +634,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                           <Input
                             type="number"
                             value={editedSettings?.COST_PER_BLOCK || 0}
-                            onChange={(e) => setEditedSettings(prev => prev ? 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedSettings(prev => prev ? 
                               { ...prev, COST_PER_BLOCK: parseInt(e.target.value) } : null
                             )}
                           />
@@ -616,7 +654,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                           <Input
                             type="number"
                             value={editedSettings?.PARTICIPANT_BASE_REWARD || 0}
-                            onChange={(e) => setEditedSettings(prev => prev ? 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedSettings(prev => prev ? 
                               { ...prev, PARTICIPANT_BASE_REWARD: parseInt(e.target.value) } : null
                             )}
                           />
@@ -630,7 +668,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                           <Input
                             type="number"
                             value={editedSettings?.PARTICIPANT_BONUS_PER_BLOCK || 0}
-                            onChange={(e) => setEditedSettings(prev => prev ? 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedSettings(prev => prev ? 
                               { ...prev, PARTICIPANT_BONUS_PER_BLOCK: parseInt(e.target.value) } : null
                             )}
                           />
@@ -651,7 +689,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                             type="number"
                             step="0.1"
                             value={editedSettings?.PLATFORM_FEE_PERCENT || 0}
-                            onChange={(e) => setEditedSettings(prev => prev ? 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedSettings(prev => prev ? 
                               { ...prev, PLATFORM_FEE_PERCENT: parseFloat(e.target.value) } : null
                             )}
                           />
@@ -666,7 +704,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                             type="number"
                             step="0.1"
                             value={editedSettings?.WITHDRAWAL_FEE_PERCENT || 0}
-                            onChange={(e) => setEditedSettings(prev => prev ? 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedSettings(prev => prev ? 
                               { ...prev, WITHDRAWAL_FEE_PERCENT: parseFloat(e.target.value) } : null
                             )}
                           />
@@ -686,7 +724,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                           <Input
                             type="number"
                             value={editedSettings?.FRAUD_DETECTION_THRESHOLD || 0}
-                            onChange={(e) => setEditedSettings(prev => prev ? 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditedSettings(prev => prev ? 
                               { ...prev, FRAUD_DETECTION_THRESHOLD: parseInt(e.target.value) } : null
                             )}
                           />
