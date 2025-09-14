@@ -90,46 +90,22 @@ export const ScreenRecordingBlock: React.FC<{
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Request screen recording permission
-  const requestPermission = useCallback(async () => {
-    try {
-      const constraints = {
-        video: {
-          mediaSource: 'screen',
-          width: { ideal: config?.quality === 'high' ? 1920 : config?.quality === 'medium' ? 1280 : 720 },
-          height: { ideal: config?.quality === 'high' ? 1080 : config?.quality === 'medium' ? 720 : 480 },
-          frameRate: { ideal: config?.quality === 'high' ? 30 : 24 }
-        },
-        audio: config?.includeAudio ? {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 44100
-        } : false
-      };
-
-      const stream = await navigator.mediaDevices.getDisplayMedia(constraints);
-      setMediaStream(stream);
-      setHasPermission(true);
-      setError(null);
-
-      // Auto-start if configured
-      if (config?.autoStart) {
-        startRecording(stream);
+  // Stop recording
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
 
-      // Handle stream end (user stops sharing)
-      stream.getVideoTracks()[0].addEventListener('ended', () => {
-        if (isRecording) {
-          stopRecording();
-        }
-      });
-
-    } catch (err) {
-      console.error('Screen recording permission denied:', err);
-      setError('Screen recording permission is required to continue.');
-      setHasPermission(false);
+      // Stop all tracks
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
     }
-  }, [config, isRecording]);
+  }, [isRecording, mediaStream]);
 
   // Start recording
   const startRecording = useCallback((stream?: MediaStream) => {
@@ -191,24 +167,48 @@ export const ScreenRecordingBlock: React.FC<{
       console.error('Failed to start recording:', err);
       setError('Failed to start screen recording.');
     }
-  }, [mediaStream, config, recordingTime, onRecordingComplete]);
+  }, [mediaStream, config, recordingTime, onRecordingComplete, stopRecording]);
 
-  // Stop recording
-  const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
+  // Request screen recording permission
+  const requestPermission = useCallback(async () => {
+    try {
+      const constraints = {
+        video: {
+          mediaSource: 'screen',
+          width: { ideal: config?.quality === 'high' ? 1920 : config?.quality === 'medium' ? 1280 : 720 },
+          height: { ideal: config?.quality === 'high' ? 1080 : config?.quality === 'medium' ? 720 : 480 },
+          frameRate: { ideal: config?.quality === 'high' ? 30 : 24 }
+        },
+        audio: config?.includeAudio ? {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        } : false
+      };
+
+      const stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+      setMediaStream(stream);
+      setHasPermission(true);
+      setError(null);
+
+      // Auto-start if configured
+      if (config?.autoStart) {
+        startRecording(stream);
       }
 
-      // Stop all tracks
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-      }
+      // Handle stream end (user stops sharing)
+      stream.getVideoTracks()[0].addEventListener('ended', () => {
+        if (isRecording) {
+          stopRecording();
+        }
+      });
+
+    } catch (err) {
+      console.error('Screen recording permission denied:', err);
+      setError('Screen recording permission is required to continue.');
+      setHasPermission(false);
     }
-  }, [isRecording, mediaStream, setIsRecording]);
+  }, [config, isRecording, startRecording, stopRecording]);
 
   // Format time display
   const formatTime = (seconds: number) => {
@@ -450,47 +450,6 @@ export const AudioRecordingBlock: React.FC<{
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const animationRef = useRef<number | null>(null);
 
-  // Request microphone permission
-  const requestPermission = useCallback(async () => {
-    try {
-      const constraints = {
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: config?.noiseReduction !== false,
-          sampleRate: config?.quality === 'high' ? 48000 : 44100,
-          channelCount: 2
-        }
-      };
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      // Set up audio analysis for level monitoring
-      const audioContext = new AudioContext();
-      const analyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaStreamSource(stream);
-      
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      
-      audioContextRef.current = audioContext;
-      analyserRef.current = analyser;
-      
-      setHasPermission(true);
-      setError(null);
-      
-      // Start level monitoring
-      startLevelMonitoring();
-      
-      // Set up recorder
-      setupRecorder(stream);
-
-    } catch (err) {
-      console.error('Microphone permission denied:', err);
-      setError('Microphone access is required for this task.');
-      setHasPermission(false);
-    }
-  }, [config]);
-
   // Setup media recorder
   const setupRecorder = useCallback((stream: MediaStream) => {
     try {
@@ -548,6 +507,59 @@ export const AudioRecordingBlock: React.FC<{
     updateLevel();
   }, []);
 
+  // Request microphone permission
+  const requestPermission = useCallback(async () => {
+    try {
+      const constraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: config?.noiseReduction !== false,
+          sampleRate: config?.quality === 'high' ? 48000 : 44100,
+          channelCount: 2
+        }
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      // Set up audio analysis for level monitoring
+      const audioContext = new AudioContext();
+      const analyser = audioContext.createAnalyser();
+      const source = audioContext.createMediaStreamSource(stream);
+      
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+      
+      setHasPermission(true);
+      setError(null);
+      
+      // Start level monitoring
+      startLevelMonitoring();
+      
+      // Set up recorder
+      setupRecorder(stream);
+
+    } catch (err) {
+      console.error('Microphone permission denied:', err);
+      setError('Microphone access is required for this task.');
+      setHasPermission(false);
+    }
+  }, [config, setupRecorder, startLevelMonitoring]);
+
+  // Stop recording
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    }
+  }, [isRecording]);
+
   // Start recording
   const startRecording = useCallback(() => {
     if (!mediaRecorderRef.current) return;
@@ -576,19 +588,7 @@ export const AudioRecordingBlock: React.FC<{
       console.error('Failed to start recording:', err);
       setError('Failed to start audio recording.');
     }
-  }, [config]);
-
-  // Stop recording
-  const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    }
-  }, [isRecording]);
+  }, [config, stopRecording]);
 
   // Format time display
   const formatTime = (seconds: number) => {
