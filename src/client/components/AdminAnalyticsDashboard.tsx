@@ -105,59 +105,58 @@ const AdminAnalyticsDashboard: React.FC = () => {
   const [settingsMode, setSettingsMode] = useState<'view' | 'edit'>('view');
   const [editedSettings, setEditedSettings] = useState<PlatformSettings | null>(null);
 
-  // Fetch all analytics data
-  const fetchAnalyticsData = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('authToken');
-      
-      // Fetch study analysis
-      const studyResponse = await fetch('/api/admin-analytics?action=study-analysis', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const studyData = await studyResponse.json();
-      
-      // Fetch platform revenue
-      const revenueResponse = await fetch(`/api/admin-analytics?action=platform-revenue&period=${dateRange}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const revenueData = await revenueResponse.json();
-      
-      // Fetch participant audit
-      const auditResponse = await fetch('/api/admin-analytics?action=participant-audit', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const auditData = await auditResponse.json();
-      
-      // Fetch fraud alerts
-      const fraudResponse = await fetch('/api/admin-analytics?action=fraud-detection', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const fraudData = await fraudResponse.json();
-      
-      // Fetch platform settings
-      const settingsResponse = await fetch('/api/admin-analytics?action=settings', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const settingsData = await settingsResponse.json();
-      
-      if (studyData.success) setStudyAnalysis(studyData.data.studies);
-      if (revenueData.success) setPlatformRevenue(revenueData.data.revenue);
-      if (auditData.success) setParticipantAudit(auditData.data.sessions);
-      if (fraudData.success) setFraudAlerts(fraudData.data.alerts);
-      if (settingsData.success) setPlatformSettings(settingsData.data.settings);
-      
-    } catch (err) {
-      setError('Failed to fetch analytics data');
-      console.error('Analytics fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('authToken');
+        
+        // Fetch study analysis
+        const studyResponse = await fetch('/api/admin-analytics?action=study-analysis', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const studyData = await studyResponse.json();
+        
+        // Fetch platform revenue
+        const revenueResponse = await fetch(`/api/admin-analytics?action=platform-revenue&period=${dateRange}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const revenueData = await revenueResponse.json();
+        
+        // Fetch participant audit
+        const auditResponse = await fetch('/api/admin-analytics?action=participant-audit', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const auditData = await auditResponse.json();
+        
+        // Fetch fraud alerts
+        const fraudResponse = await fetch('/api/admin-analytics?action=fraud-detection', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const fraudData = await fraudResponse.json();
+        
+        // Fetch platform settings
+        const settingsResponse = await fetch('/api/admin-analytics?action=settings', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const settingsData = await settingsResponse.json();
+        
+        if (studyData.success) setStudyAnalysis(studyData.data.studies);
+        if (revenueData.success) setPlatformRevenue(revenueData.data.revenue);
+        if (auditData.success) setParticipantAudit(auditData.data.sessions);
+        if (fraudData.success) setFraudAlerts(fraudData.data.alerts);
+        if (settingsData.success) setPlatformSettings(settingsData.data.settings);
+        
+      } catch (err) {
+        setError('Failed to fetch analytics data');
+        console.error('Analytics fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAnalyticsData();
-  }, [dateRange, fetchAnalyticsData]);
+  }, [dateRange]);
 
   // Update platform settings
   const updateSettings = async () => {
