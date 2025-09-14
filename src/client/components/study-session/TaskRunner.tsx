@@ -65,51 +65,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
     }
   }, [startRecording, study.settings?.recordScreen, tasks.length]);
 
-  // Track task completion
-  const completeCurrentTask = useCallback(async (responses: Record<string, any>) => {
-    if (!currentTask || !taskStartTime) return;
-
-    const completedAt = new Date();
-    const duration = (completedAt.getTime() - taskStartTime.getTime()) / 1000;
-
-    const taskResponse: TaskResponse = {
-      taskId: currentTask._id,
-      responses,
-      duration,
-      success: true,
-      interactions: [], // Removed unused interaction tracking
-      startedAt: taskStartTime,
-      completedAt
-    };
-
-    const taskCompletion: ITaskCompletion = {
-      taskId: currentTask._id,
-      status: 'completed',
-      startedAt: taskStartTime,
-      completedAt,
-      duration,
-      success: true
-    };
-
-    setTaskResponses(prev => [...prev, taskResponse]);
-    setTaskCompletions(prev => [...prev, taskCompletion]);
-
-    // Save progress to backend
-    await saveTaskProgress(taskResponse, taskCompletion);
-
-    if (isLastTask) {
-      await completeSession();
-    } else {
-      moveToNextTask();
-    }
-  }, [currentTask, taskStartTime, isLastTask]);
-
-  const moveToNextTask = () => {
-    setCurrentTaskIndex(prev => prev + 1);
-    setTaskStartTime(new Date());
-    toast.success('Task completed! Moving to next task...');
-  };
-
+  // Save task progress to backend
   const saveTaskProgress = useCallback(async (taskResponse: TaskResponse, taskCompletion: ITaskCompletion) => {
     try {
       setIsLoading(true);
@@ -138,6 +94,7 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
     }
   }, [session._id, currentTaskIndex]);
 
+  // Complete the entire session
   const completeSession = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -177,6 +134,51 @@ export const TaskRunner: React.FC<TaskRunnerProps> = ({
       setIsLoading(false);
     }
   }, [isRecording, stopRecording, sessionStartTime, session._id, taskResponses, taskCompletions, onComplete]);
+
+  // Track task completion
+  const completeCurrentTask = useCallback(async (responses: Record<string, any>) => {
+    if (!currentTask || !taskStartTime) return;
+
+    const completedAt = new Date();
+    const duration = (completedAt.getTime() - taskStartTime.getTime()) / 1000;
+
+    const taskResponse: TaskResponse = {
+      taskId: currentTask._id,
+      responses,
+      duration,
+      success: true,
+      interactions: [], // Removed unused interaction tracking
+      startedAt: taskStartTime,
+      completedAt
+    };
+
+    const taskCompletion: ITaskCompletion = {
+      taskId: currentTask._id,
+      status: 'completed',
+      startedAt: taskStartTime,
+      completedAt,
+      duration,
+      success: true
+    };
+
+    setTaskResponses(prev => [...prev, taskResponse]);
+    setTaskCompletions(prev => [...prev, taskCompletion]);
+
+    // Save progress to backend
+    await saveTaskProgress(taskResponse, taskCompletion);
+
+    if (isLastTask) {
+      await completeSession();
+    } else {
+      moveToNextTask();
+    }
+  }, [currentTask, taskStartTime, isLastTask, completeSession, saveTaskProgress]);
+
+  const moveToNextTask = () => {
+    setCurrentTaskIndex(prev => prev + 1);
+    setTaskStartTime(new Date());
+    toast.success('Task completed! Moving to next task...');
+  };
 
   const handleExit = async () => {
     if (window.confirm('Are you sure you want to exit? Your progress will be saved.')) {
