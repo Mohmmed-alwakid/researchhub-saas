@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   BarChart3, 
@@ -31,9 +31,13 @@ import {
   Cell
 } from 'recharts';
 import { Card, CardContent } from '../../components/ui/Card';
-import HeatmapAnalytics from '../../components/analytics/HeatmapAnalytics';
-import SessionReplay from '../../components/analytics/SessionReplay';
-import AdvancedAnalyticsDashboard from '../../components/analytics/AdvancedAnalyticsDashboard';
+
+// PHASE 4C: LAZY LOAD ANALYTICS COMPONENTS - September 14, 2025
+// Convert heavy analytics components to lazy loading for better performance
+const LazyHeatmapAnalytics = lazy(() => import('../../components/analytics/HeatmapAnalytics'));
+const LazySessionReplay = lazy(() => import('../../components/analytics/SessionReplay'));
+const LazyAdvancedAnalyticsDashboard = lazy(() => import('../../components/analytics/AdvancedAnalyticsDashboard'));
+
 import { useAppStore } from '../../stores/appStore';
 import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import type { 
@@ -615,22 +619,32 @@ const AnalyticsPage: React.FC = () => {
         {/* Advanced Analytics Tab */}
         {activeTab === 'advanced' && (
           <div>
-            <AdvancedAnalyticsDashboard
-              studyId={studyId}
-              dateRange={dateRange}
-              refreshInterval={30000}
-            />
+            <Suspense fallback={<div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Loading advanced analytics...</span>
+            </div>}>
+              <LazyAdvancedAnalyticsDashboard
+                studyId={studyId}
+                dateRange={dateRange}
+                refreshInterval={30000}
+              />
+            </Suspense>
           </div>
         )}
 
         {/* Heatmaps Tab */}
         {activeTab === 'heatmaps' && (
           <div>
-            <HeatmapAnalytics
-              studyId={studyId}
-              data={displayData.heatmapData}
-              showControls={true}
-            />
+            <Suspense fallback={<div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Loading heatmap analytics...</span>
+            </div>}>
+              <LazyHeatmapAnalytics
+                studyId={studyId}
+                data={displayData.heatmapData}
+                showControls={true}
+              />
+            </Suspense>
           </div>
         )}
 
@@ -648,16 +662,21 @@ const AnalyticsPage: React.FC = () => {
                   </button>
                 </div>
                 {displayData.sessions[0] && (
-                  <SessionReplay
-                    sessionId={selectedSession}
-                    recordingUrl={displayData.sessions[0].recordingUrl}
-                    events={displayData.sessions[0].events.map(event => ({
-                      ...event,
-                      type: event.type === 'move' ? 'hover' : event.type
-                    }))}
-                    duration={displayData.sessions[0].duration}
-                    showEvents={true}
-                  />
+                  <Suspense fallback={<div className="flex justify-center items-center h-48">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-gray-600">Loading session replay...</span>
+                  </div>}>
+                    <LazySessionReplay
+                      sessionId={selectedSession}
+                      recordingUrl={displayData.sessions[0].recordingUrl}
+                      events={displayData.sessions[0].events.map(event => ({
+                        ...event,
+                        type: event.type === 'move' ? 'hover' : event.type
+                      }))}
+                      duration={displayData.sessions[0].duration}
+                      showEvents={true}
+                    />
+                  </Suspense>
                 )}
               </div>
             ) : (
