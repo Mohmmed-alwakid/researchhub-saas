@@ -12,6 +12,28 @@ import {
 } from 'lucide-react';
 
 // Real-time Analytics Types
+// Event metadata interface
+interface EventMetadata extends Record<string, unknown> {
+  // Mouse/Click metadata
+  viewport?: { width: number; height: number };
+  scroll?: { x: number; y: number };
+  button?: number;
+  ctrlKey?: boolean;
+  shiftKey?: boolean;
+  altKey?: boolean;
+  // Scroll metadata
+  scrollTop?: number;
+  scrollLeft?: number;
+  documentHeight?: number;
+  viewportHeight?: number;
+  // Keyboard metadata
+  key?: string;
+  code?: string;
+  // Form metadata
+  inputType?: string;
+  value?: string;
+}
+
 export interface InteractionEvent {
   id: string;
   type: 'click' | 'scroll' | 'hover' | 'focus' | 'key_press' | 'mouse_move';
@@ -20,7 +42,7 @@ export interface InteractionEvent {
   coordinates?: { x: number; y: number };
   value?: string;
   duration?: number;
-  metadata: Record<string, any>;
+  metadata: EventMetadata;
 }
 
 export interface HeatmapData {
@@ -198,7 +220,7 @@ export class RealTimeAnalytics {
       type: 'focus',
       element: this.getElementPath(event.target as Element),
       metadata: {
-        inputType: (event.target as HTMLInputElement)?.type || null
+        inputType: (event.target as HTMLInputElement)?.type || undefined
       }
     });
   };
@@ -218,7 +240,7 @@ export class RealTimeAnalytics {
         duration,
         metadata: {
           focusDuration: duration,
-          value: (event.target as HTMLInputElement)?.value || null
+          value: (event.target as HTMLInputElement)?.value || undefined
         }
       });
     }
@@ -659,7 +681,7 @@ export const RealTimeAnalyticsDashboard: React.FC<{
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setSelectedView(tab.id as any)}
+                  onClick={() => setSelectedView(tab.id as 'overview' | 'heatmap' | 'timeline' | 'patterns')}
                   className={`${
                     selectedView === tab.id
                       ? 'border-blue-500 text-blue-600'

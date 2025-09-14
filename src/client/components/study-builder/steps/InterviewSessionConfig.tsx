@@ -298,7 +298,7 @@ export const InterviewSessionConfigStep: React.FC<StepProps> = ({
                   </label>
                   <select
                     value={question.type}
-                    onChange={(e) => updateQuestion(question.id, { type: e.target.value as any })}
+                    onChange={(e) => updateQuestion(question.id, { type: e.target.value as 'open_ended' | 'behavioral' | 'scenario' | 'follow_up' })}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                   >
                     <option value="open_ended">Open-ended</option>
@@ -496,7 +496,7 @@ export const InterviewSessionConfigStep: React.FC<StepProps> = ({
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'basic' | 'guide' | 'scheduling')}
                 className={`
                   flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm
                   ${activeTab === tab.id
