@@ -12,6 +12,42 @@ import { useAuthStore } from '../../stores/authStore';
 import toast from 'react-hot-toast';
 
 // Types for study execution
+interface StudyResponse {
+  [questionId: string]: string | string[] | number | boolean;
+}
+
+interface StudyQuestion {
+  id: string;
+  question: string;
+  type: 'radio' | 'checkbox' | 'text' | 'textarea' | 'rating' | 'scale';
+  options?: string[];
+  required?: boolean;
+  placeholder?: string;
+  labels?: string[]; // Changed to string array for flexibility
+  min?: number;
+  max?: number;
+}
+
+interface StudyBlockConfig {
+  questions?: StudyQuestion[];
+  timeLimit?: number;
+  duration?: number;
+  showProgress?: boolean;
+  url?: string;
+  trackClicks?: boolean;
+  recordScreen?: boolean;
+  media?: {
+    type: 'image' | 'video' | 'audio';
+    url: string;
+  };
+  instructions?: string[];
+}
+
+interface AuthClient {
+  token?: string;
+  [key: string]: unknown;
+}
+
 interface StudySession {
   id: string;
   studyId: string;
@@ -20,7 +56,7 @@ interface StudySession {
   currentBlockIndex: number;
   startedAt?: string;
   completedAt?: string;
-  responses: Record<string, any>;
+  responses: Record<string, StudyResponse>;
   metadata: {
     userAgent: string;
     screenResolution: string;
@@ -33,7 +69,7 @@ interface StudyBlock {
   type: 'instruction' | 'question' | 'task' | 'media' | 'survey' | 'break';
   title: string;
   content: string;
-  config: Record<string, any>;
+  config: StudyBlockConfig;
   required: boolean;
   timeLimit?: number;
   order: number;
@@ -55,10 +91,10 @@ interface Study {
 
 // API service for study execution
 class StudyExecutionAPI {
-  private authClient: any;
+  private authClient: AuthClient | null;
   private baseUrl: string;
 
-  constructor(authClient: any, baseUrl = 'http://localhost:3003/api') {
+  constructor(authClient: AuthClient | null, baseUrl = 'http://localhost:3003/api') {
     this.authClient = authClient;
     this.baseUrl = baseUrl;
   }
@@ -276,7 +312,7 @@ class StudyExecutionAPI {
     return session;
   }
 
-  async saveResponse(sessionId: string, blockId: string, response: any): Promise<void> {
+  async saveResponse(sessionId: string, blockId: string, response: StudyResponse): Promise<void> {
     // Mock implementation - in real app, this would save to backend
     console.log('Saving response:', { sessionId, blockId, response });
   }
@@ -346,14 +382,14 @@ const InstructionBlock: React.FC<{
 
 const QuestionBlock: React.FC<{ 
   block: StudyBlock; 
-  responses: Record<string, any>;
-  onResponse: (responses: Record<string, any>) => void;
+  responses: Record<string, StudyResponse>;
+  onResponse: (responses: Record<string, StudyResponse>) => void;
   onNext: () => void; 
 }> = ({ block, responses, onResponse, onNext }) => {
-  const [blockResponses, setBlockResponses] = useState<Record<string, any>>(responses[block.id] || {});
+  const [blockResponses, setBlockResponses] = useState<StudyResponse>(responses[block.id] || {});
   const questions = block.config.questions || [];
 
-  const handleResponseChange = (questionId: string, value: any) => {
+  const handleResponseChange = (questionId: string, value: string | string[] | number | boolean) => {
     const updated = { ...blockResponses, [questionId]: value };
     setBlockResponses(updated);
     onResponse({ ...responses, [block.id]: updated });
@@ -379,7 +415,7 @@ const QuestionBlock: React.FC<{
               
               {question.type === 'radio' && (
                 <div className="space-y-3">
-                  {question.options.map((option: string) => (
+                  {question.options?.map((option: string) => (
                     <label key={option} className="flex items-center">
                       <input
                         type="radio"
@@ -397,13 +433,13 @@ const QuestionBlock: React.FC<{
               
               {question.type === 'checkbox' && (
                 <div className="space-y-3">
-                  {question.options.map((option: string) => (
+                  {question.options?.map((option: string) => (
                     <label key={option} className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={(blockResponses[question.id] || []).includes(option)}
+                        checked={Array.isArray(blockResponses[question.id]) && (blockResponses[question.id] as string[]).includes(option)}
                         onChange={(e) => {
-                          const current = blockResponses[question.id] || [];
+                          const current = Array.isArray(blockResponses[question.id]) ? blockResponses[question.id] as string[] : [];
                           const updated = e.target.checked 
                             ? [...current, option]
                             : current.filter((item: string) => item !== option);
@@ -417,7 +453,7 @@ const QuestionBlock: React.FC<{
                 </div>
               )}
               
-              {question.type === 'scale' && (
+              {question.type === 'scale' && question.labels && question.min !== undefined && question.max !== undefined && (
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm text-gray-500">
                     <span>{question.labels[0]}</span>
@@ -443,7 +479,7 @@ const QuestionBlock: React.FC<{
               
               {question.type === 'textarea' && (
                 <textarea
-                  value={blockResponses[question.id] || ''}
+                  value={typeof blockResponses[question.id] === 'string' ? blockResponses[question.id] as string : ''}
                   onChange={(e) => handleResponseChange(question.id, e.target.value)}
                   placeholder={question.placeholder}
                   rows={4}
@@ -659,7 +695,7 @@ export const StudyExecution: React.FC<{ className?: string }> = ({ className = '
   const [session, setSession] = useState<StudySession | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentBlock, setCurrentBlock] = useState<StudyBlock | null>(null);
-  const [responses, setResponses] = useState<Record<string, any>>({});
+  const [responses, setResponses] = useState<Record<string, StudyResponse>>({});
 
   const api = useMemo(() => new StudyExecutionAPI(authClient), [authClient]);
 
@@ -739,7 +775,7 @@ export const StudyExecution: React.FC<{ className?: string }> = ({ className = '
     
   }, [study, session, currentBlock, responses, api, navigate]);
 
-  const handleResponseUpdate = useCallback((newResponses: Record<string, any>) => {
+  const handleResponseUpdate = useCallback((newResponses: Record<string, StudyResponse>) => {
     setResponses(newResponses);
   }, []);
 
