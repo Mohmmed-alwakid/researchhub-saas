@@ -40,7 +40,6 @@ import userProfileHandler from '../../api/user-profile-consolidated.js';
 import systemHandler from '../../api/system-consolidated.js';
 import researchHandler from '../../api/research-consolidated.js';
 import adminHandler from '../../api/admin-consolidated.js';
-import studySessionsHandler from '../../api/study-sessions.js';
 
 console.log('🔍 Testing Supabase connectivity...');
 
@@ -73,9 +72,9 @@ app.all('/api/blocks*', async (req, res) => {
   await researchHandler(req, res);
 });
 
-// Study Sessions endpoints (NEW - Participant completion workflow)
+// Study Sessions endpoints (Redirected to research handler)
 app.all('/api/study-sessions*', async (req, res) => {
-  await studySessionsHandler(req, res);
+  await researchHandler(req, res);
 });
 
 // Payments & Wallets endpoints

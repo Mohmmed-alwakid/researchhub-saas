@@ -5,7 +5,7 @@
  * Created: June 25, 2025
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types for advanced blocks
@@ -92,9 +92,9 @@ export const ConditionalBranchBlock = ({ block, onNext, analyticsTracker }: Bloc
 
   useEffect(() => {
     evaluateConditions();
-  }, []);
+  }, [evaluateConditions]);
 
-  const evaluateConditions = async () => {
+  const evaluateConditions = useCallback(async () => {
     try {
       analyticsTracker?.track('branch_evaluation_start', { blockId: block.id });
       
@@ -135,7 +135,7 @@ export const ConditionalBranchBlock = ({ block, onNext, analyticsTracker }: Bloc
     } finally {
       setLoading(false);
     }
-  };
+  }, [block.id, block.settings, analyticsTracker, onNext]);
 
   const evaluateCondition = async (condition: BlockCondition, responses: Record<string, any>) => {
     const { logic } = condition;
@@ -153,15 +153,17 @@ export const ConditionalBranchBlock = ({ block, onNext, analyticsTracker }: Bloc
       case 'rating_less_than':
         return Number(responses[logic.blockId]?.response) < logic.value;
       
-      case 'multiple_choice_includes':
+      case 'multiple_choice_includes': {
         const mcResponse = responses[logic.blockId]?.response;
         return Array.isArray(mcResponse) ? 
           mcResponse.includes(logic.value) : 
           mcResponse === logic.value;
+      }
 
-      case 'time_spent_greater':
+      case 'time_spent_greater': {
         const timeSpent = responses[logic.blockId]?.metadata?.timeSpent || 0;
         return timeSpent > logic.value;
+      }
 
       default:
         return false;

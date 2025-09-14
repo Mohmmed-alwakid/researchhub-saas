@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AdminDashboard } from './AdminDashboard';
 import { UserManagementPanel } from './UserManagementPanel';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
@@ -148,9 +148,9 @@ export const ComprehensiveAdminPanel: React.FC = () => {
 
     // Load initial notifications count
     loadNotifications();
-  }, [authStore.user]);
+  }, [authStore.user, loadNotifications]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     try {
       const response = await apiClient.getSystemAlerts('open', 10);
       if (response.success && response.data) {
@@ -159,7 +159,7 @@ export const ComprehensiveAdminPanel: React.FC = () => {
     } catch (error) {
       console.error('Failed to load notifications:', error);
     }
-  };
+  }, [apiClient]);
 
   const handleLogout = () => {
     authStore.logout();

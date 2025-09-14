@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Activity, 
   Users, 
@@ -39,7 +39,7 @@ const SystemAnalytics: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSystemPerformanceData = async () => {
+  const fetchSystemPerformanceData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -79,11 +79,11 @@ const SystemAnalytics: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedTimeRange]);
 
   useEffect(() => {
     fetchSystemPerformanceData();
-  }, [selectedTimeRange]);
+  }, [selectedTimeRange, fetchSystemPerformanceData]);
 
   const getIconForMetric = (metricId: string): React.ElementType => {
     switch (metricId) {

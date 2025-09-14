@@ -33,7 +33,7 @@ const STC_BANK_CONFIG = {
 };
 
 // Import STC Bank integration
-import { STCBankAPI } from './stc-bank-integration.js';
+// import { STCBankAPI } from './stc-bank-integration.js'; // ARCHIVED: File moved to archive during Phase 1 cleanup
 
 // Simulated data for testing mode
 const simulatedData = {
@@ -155,19 +155,20 @@ async function handleCreateSTCPaymentIntent(req, res) {
       });
     }
 
-    const stcBank = new STCBankAPI();
-    const paymentIntent = await stcBank.createPaymentIntent(
-      amount, 
-      currency, 
-      description || 'ResearchHub Payment',
-      metadata
-    );
+    // const stcBank = new STCBankAPI(); // ARCHIVED: STC Bank integration temporarily disabled
+    // const paymentIntent = await stcBank.createPaymentIntent(
+    //   amount, 
+    //   currency, 
+    //   description || 'ResearchHub Payment',
+    //   metadata
+    // );
 
-    return res.status(200).json({
-      success: true,
-      paymentIntent,
+    // Temporary fallback response while STC Bank integration is archived
+    return res.status(503).json({
+      success: false,
+      error: 'STC Bank integration temporarily unavailable',
       provider: 'stcbank',
-      message: 'STC Bank payment intent created successfully'
+      message: 'STC Bank payment processing is currently disabled'
     });
 
   } catch (error) {
@@ -198,12 +199,13 @@ async function handleVerifySTCPayment(req, res) {
       });
     }
 
-    const stcBank = new STCBankAPI();
-    const paymentDetails = await stcBank.verifyPayment(payment_id);
+    // const stcBank = new STCBankAPI(); // ARCHIVED: STC Bank integration temporarily disabled
+    // const paymentDetails = await stcBank.verifyPayment(payment_id);
 
-    return res.status(200).json({
-      success: true,
-      payment: paymentDetails,
+    // Temporary fallback response while STC Bank integration is archived
+    return res.status(503).json({
+      success: false,
+      error: 'STC Bank integration temporarily unavailable',
       provider: 'stcbank'
     });
 
@@ -235,14 +237,15 @@ async function handleSTCRefund(req, res) {
       });
     }
 
-    const stcBank = new STCBankAPI();
-    const refund = await stcBank.processRefund(payment_id, amount, reason);
+    // const stcBank = new STCBankAPI(); // ARCHIVED: STC Bank integration temporarily disabled
+    // const refund = await stcBank.processRefund(payment_id, amount, reason);
 
-    return res.status(200).json({
-      success: true,
-      refund,
+    // Temporary fallback response while STC Bank integration is archived
+    return res.status(503).json({
+      success: false,
+      error: 'STC Bank integration temporarily unavailable',
       provider: 'stcbank',
-      message: 'Refund processed successfully'
+      message: 'Refund processing is currently disabled'
     });
 
   } catch (error) {
@@ -268,13 +271,19 @@ async function handleSTCWebhook(req, res) {
     const payload = JSON.stringify(req.body);
 
     // Verify webhook signature
-    const stcBank = new STCBankAPI();
-    if (signature && !stcBank.verifyWebhookSignature(payload, signature)) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid webhook signature'
-      });
-    }
+    // const stcBank = new STCBankAPI(); // ARCHIVED: STC Bank integration temporarily disabled
+    // if (signature && !stcBank.verifyWebhookSignature(payload, signature)) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     error: 'Invalid webhook signature'
+    //   });
+    // }
+
+    // Temporary fallback - reject all STC Bank webhooks while integration is archived
+    return res.status(503).json({
+      success: false,
+      error: 'STC Bank webhook processing temporarily unavailable'
+    });
 
     const { event_type, data } = req.body;
 

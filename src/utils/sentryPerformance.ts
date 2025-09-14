@@ -187,7 +187,7 @@ export class PerformanceMonitor {
    * Track participant engagement metrics
    */
   trackParticipantEngagement() {
-    let sessionStart = performance.now();
+    const sessionStart = performance.now();
     let lastActivity = sessionStart;
 
     // Track activity

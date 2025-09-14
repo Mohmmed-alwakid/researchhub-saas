@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
 export interface AIInterviewMessage {
@@ -86,15 +86,15 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
       initializeSession();
       setSessionStarted(true);
     }
-  }, [sessionStarted, interviewConfig.language, isAudioEnabled]);
+  }, [sessionStarted, interviewConfig.language, isAudioEnabled, getWelcomeMessage]);
 
-  const getWelcomeMessage = (): string => {
+  const getWelcomeMessage = useCallback((): string => {
     const messages = {
       arabic: `مرحباً! أنا المحاور الذكي للدراسة. سأقوم بطرح بعض الأسئلة عليك لفهم تجربتك بشكل أفضل. هل أنت مستعد للبدء؟`,
       english: `Hello! I'm your AI interview moderator. I'll be asking you some questions to better understand your experience. Are you ready to begin?`
     };
     return messages[interviewConfig.language];
-  };
+  }, [interviewConfig.language]);
 
   const synthesizeSpeech = async (text: string, language: 'arabic' | 'english') => {
     try {

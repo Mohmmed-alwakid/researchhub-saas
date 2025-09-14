@@ -230,7 +230,8 @@ export const AccessibleInput = React.forwardRef<HTMLInputElement, AccessibleInpu
     'aria-invalid': ariaInvalid,
     ...props 
   }, ref) => {
-    const inputId = id || React.useId();
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
     const errorId = error ? `${inputId}-error` : undefined;
     const hintId = hint ? `${inputId}-hint` : undefined;
     
@@ -331,8 +332,10 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
 }) => {
   const modalRef = React.useRef<HTMLDivElement>(null);
   const { trapFocus } = useFocusManagement();
-  const titleId = React.useId();
-  const descriptionId = ariaDescribedBy || React.useId();
+  const generatedTitleId = React.useId();
+  const generatedDescriptionId = React.useId();
+  const titleId = generatedTitleId;
+  const descriptionId = ariaDescribedBy || generatedDescriptionId;
 
   React.useEffect(() => {
     if (!isOpen) return;

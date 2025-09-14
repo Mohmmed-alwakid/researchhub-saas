@@ -164,7 +164,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchAnalyticsData();
-  }, [dateRange]);
+  }, [dateRange, fetchAnalyticsData]);
 
   // Update platform settings
   const updateSettings = async () => {
