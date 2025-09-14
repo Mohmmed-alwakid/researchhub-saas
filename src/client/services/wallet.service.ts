@@ -4,12 +4,6 @@ import { apiService } from './api-network-resilient.service';
 // Supported currencies: USD and SAR only
 export type SupportedCurrency = 'USD' | 'SAR';
 
-// Network-resilient configuration
-const NETWORK_CONFIG = {
-  AUTO_FALLBACK: true, // Automatic fallback to local database
-  CONNECTIVITY_CHECK: true // Check network before API calls
-};
-
 export interface WalletData {
   id: string;
   participant_id: string;
@@ -173,7 +167,7 @@ class WalletService {
         try {
           const { state } = JSON.parse(authStorage);
           isFallback = isFallbackToken(state?.token || '');
-        } catch (e) {
+        } catch {
           // Continue with normal flow
         }
       }
@@ -209,7 +203,7 @@ class WalletService {
         try {
           const { state } = JSON.parse(authStorage);
           isFallback = isFallbackToken(state?.token || '');
-        } catch (e) {
+        } catch {
           // Continue with normal flow
         }
       }
@@ -245,7 +239,7 @@ class WalletService {
         try {
           const { state } = JSON.parse(authStorage);
           isFallback = isFallbackToken(state?.token || '');
-        } catch (e) {
+        } catch {
           // Continue with normal flow
         }
       }
@@ -281,7 +275,7 @@ class WalletService {
         try {
           const { state } = JSON.parse(authStorage);
           isFallback = isFallbackToken(state?.token || '');
-        } catch (e) {
+        } catch {
           // Continue with normal flow
         }
       }
@@ -337,7 +331,7 @@ class WalletService {
         try {
           const { state } = JSON.parse(authStorage);
           isFallback = isFallbackToken(state?.token || '');
-        } catch (e) {
+        } catch {
           // Continue with normal flow
         }
       }

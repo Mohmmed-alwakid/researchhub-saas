@@ -311,64 +311,6 @@ class CommentsService {
   }
 
   /**
-   * Get comment thread (parent + all replies)
-   */
-  async getCommentThread(commentId: string): Promise<CommentWithReactions> {
-    // This would need to be implemented in the backend API
-    // For now, we'll use the regular getComments and filter
-    throw new Error('getCommentThread not yet implemented');
-  }
-
-  /**
-   * Search comments
-   */
-  async searchComments(
-    query: string,
-    entityType?: string,
-    entityId?: string,
-    workspaceId?: string,
-    limit = 20,
-    offset = 0
-  ): Promise<{
-    comments: CommentWithReactions[];
-    count: number;
-  }> {
-    // This would need to be implemented in the backend API
-    // For now, we'll return empty results
-    return {
-      comments: [],
-      count: 0
-    };
-  }
-
-  /**
-   * Get comment analytics/stats
-   */
-  async getCommentStats(
-    entityType: string,
-    entityId: string,
-    workspaceId?: string
-  ): Promise<{
-    totalComments: number;
-    resolvedComments: number;
-    activeThreads: number;
-    topContributors: Array<{
-      userId: string;
-      userName: string;
-      commentCount: number;
-    }>;
-  }> {
-    // This would need to be implemented in the backend API
-    // For now, we'll return mock data
-    return {
-      totalComments: 0,
-      resolvedComments: 0,
-      activeThreads: 0,
-      topContributors: []
-    };
-  }
-
-  /**
    * Toggle reaction on a comment
    */
   async toggleReaction(
@@ -383,7 +325,7 @@ class CommentsService {
       try {
         await this.removeReaction(commentId, reactionType);
         return { added: false };
-      } catch (removeError) {
+      } catch {
         throw error; // Re-throw the original error
       }
     }

@@ -1,12 +1,6 @@
 import { apiService } from './api-network-resilient.service';
 import type { ParticipantApplication, IParticipantApplication } from '../../shared/types';
 
-// Network-resilient configuration
-const NETWORK_CONFIG = {
-  AUTO_FALLBACK: true, // Automatic fallback to local database
-  CONNECTIVITY_CHECK: true // Check network before API calls
-};
-
 // Helper function to detect if we're in fallback mode
 const isFallbackMode = (): boolean => {
   try {
@@ -77,40 +71,6 @@ const getMockApplications = (): IParticipantApplication[] => {
           answer: '17'
         }
       ]
-    }
-  ];
-};
-
-const getMockPublicStudies = (): PublicStudy[] => {
-  const baseTime = Date.now();
-  return [
-    {
-      id: 'mock-public-001',
-      title: 'Website Usability Testing',
-      description: 'Help us improve our e-commerce website user experience',
-      type: 'usability',
-      researcher: { name: 'UX Research Co.' },
-      configuration: {
-        duration: 30,
-        compensation: 25,
-        maxParticipants: 50
-      },
-      participants: { enrolled: 23 },
-      createdAt: new Date(baseTime - 86400000 * 3).toISOString()
-    },
-    {
-      id: 'mock-public-002',
-      title: 'Mobile App First Impressions',
-      description: 'Share your thoughts on a new mobile app design',
-      type: 'feedback',
-      researcher: { name: 'App Design Studio' },
-      configuration: {
-        duration: 20,
-        compensation: 15,
-        maxParticipants: 30
-      },
-      participants: { enrolled: 12 },
-      createdAt: new Date(baseTime - 86400000 * 1).toISOString()
     }
   ];
 };
