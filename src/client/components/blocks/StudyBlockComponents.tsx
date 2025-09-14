@@ -4,6 +4,29 @@ import { Button } from '../ui/Button';
 import { CheckCircle, Star } from 'lucide-react';
 import { ConditionalBranchBlock, AIFollowUpBlock, CardSortBlock } from './AdvancedStudyBlocks';
 
+// Tree Test interfaces for type safety
+interface TreeTestNode {
+  id: string;
+  label: string;
+  children?: TreeTestNode[];
+  isDestination?: boolean;
+}
+
+interface TreeTestTask {
+  id: string;
+  instruction: string;
+  targetPath: string[];
+}
+
+interface TreeTestResult {
+  taskId: string;
+  completed: boolean;
+  success: boolean;
+  path: string[];
+  timeSpent: number;
+  attempts: number;
+}
+
 export interface StudyBlock {
   id: string;
   type: string;
@@ -797,11 +820,11 @@ export const FiveSecondTestBlock: React.FC<BlockProps> = ({ block, onComplete, o
 export const TreeTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext, isLastBlock }) => {
   const [currentTask, setCurrentTask] = useState(0);
   const [navigationPath, setNavigationPath] = useState<string[]>([]);
-  const [currentLevel, setCurrentLevel] = useState<any[]>([]);
+  const [currentLevel, setCurrentLevel] = useState<TreeTestNode[]>([]);
   const [taskStartTime, setTaskStartTime] = useState(Date.now());
-  const [taskResults, setTaskResults] = useState<any[]>([]);
+  const [taskResults, setTaskResults] = useState<TreeTestResult[]>([]);
 
-  const tree = useMemo(() => (block.settings.tree as any[]) || [
+  const tree = useMemo(() => (block.settings.tree as unknown as TreeTestNode[]) || [
     {
       id: 'home',
       label: 'Home',
@@ -826,7 +849,7 @@ export const TreeTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext,
     }
   ], [block.settings.tree]);
 
-  const tasks = (block.settings.tasks as any[]) || [
+  const tasks = (block.settings.tasks as unknown as TreeTestTask[]) || [
     { id: '1', instruction: 'Find information about laptops', targetPath: ['home', 'products', 'laptops'] }
   ];
 
@@ -839,7 +862,7 @@ export const TreeTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext,
     setNavigationPath(newPath);
 
     // Find the node in the current level
-    const selectedNode = currentLevel.find((node: any) => node.id === nodeId);
+    const selectedNode = currentLevel.find((node: TreeTestNode) => node.id === nodeId);
     
     if (selectedNode) {
       if (selectedNode.children) {
@@ -892,7 +915,7 @@ export const TreeTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext,
       // Navigate back to parent level
       let currentNodes = tree;
       for (const nodeId of newPath) {
-        const node = currentNodes.find((n: any) => n.id === nodeId);
+        const node = currentNodes.find((n: TreeTestNode) => n.id === nodeId);
         if (node && node.children) {
           currentNodes = node.children;
         }
@@ -934,7 +957,7 @@ export const TreeTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext,
 
         {/* Navigation Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {currentLevel.map((node: any) => (
+          {currentLevel.map((node: TreeTestNode) => (
             <button
               key={node.id}
               onClick={() => navigateToNode(node.id)}
