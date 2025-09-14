@@ -222,31 +222,6 @@ const STEP_CONFIG: Record<number, {
   }
 };
 
-// Smart template recommendations based on user inputs
-const getTemplateRecommendations = (formData: Partial<StudyCreationFormData>) => {
-  const recommendations = [];
-  
-  if (formData.studyType === 'usability') {
-    recommendations.push({
-      title: 'E-commerce Usability Test',
-      description: 'Perfect for testing shopping workflows',
-      confidence: 0.9,
-      reason: 'Based on your usability study selection'
-    });
-  }
-  
-  if (formData.targetAudience?.professions?.includes('Tech Professional')) {
-    recommendations.push({
-      title: 'SaaS Product Testing',
-      description: 'Optimized for technical audiences',
-      confidence: 0.8,
-      reason: 'Based on your target audience'
-    });
-  }
-  
-  return recommendations;
-};
-
 export const MobileOptimizedStudyBuilder: React.FC<MobileOptimizedStudyBuilderProps> = ({
   onComplete,
   onCancel,
@@ -276,13 +251,12 @@ export const MobileOptimizedStudyBuilder: React.FC<MobileOptimizedStudyBuilderPr
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-  const { 
+  const {
     register, 
     handleSubmit, 
     watch, 
     trigger,
     formState: { errors, isValid },
-    setValue,
     getValues
   } = useForm<StudyCreationFormData>({
     mode: 'onChange',
@@ -323,7 +297,6 @@ export const MobileOptimizedStudyBuilder: React.FC<MobileOptimizedStudyBuilderPr
   });
 
   const sessionType = watch('sessionType');
-  const studyType = watch('studyType');
   const formData = watch();
 
   // Dynamic steps based on session type

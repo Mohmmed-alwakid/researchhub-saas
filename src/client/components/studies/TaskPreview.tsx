@@ -7,22 +7,6 @@ interface TaskPreviewProps {
   task: StudyTask;
 }
 
-// Helper function to safely check and render configuration properties
-const hasConfigProperty = (config: unknown, property: string): boolean => {
-  return config !== null && 
-         typeof config === 'object' && 
-         property in config && 
-         Boolean((config as Record<string, unknown>)[property]);
-};
-
-const getConfigValue = (config: unknown, property: string): string => {
-  if (hasConfigProperty(config, property)) {
-    const value = (config as Record<string, unknown>)[property];
-    return String(value);
-  }
-  return '';
-};
-
 export const TaskPreview: React.FC<TaskPreviewProps> = ({ task }) => {
   const renderTaskTypeSpecificPreview = () => {
     switch (task.type) {

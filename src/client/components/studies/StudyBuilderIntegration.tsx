@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Plus, Edit, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical } from 'lucide-react';
 
 // Local interfaces to avoid import issues
 interface StudyBuilderTask {
@@ -48,8 +48,6 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
   const [studyTypes, setStudyTypes] = useState<StudyType[]>([]);
   const [taskTemplates, setTaskTemplates] = useState<TaskTemplate[]>([]);
   const [currentTasks, setCurrentTasks] = useState<StudyBuilderTask[]>(initialTasks);
-  const [editingTask, setEditingTask] = useState<StudyBuilderTask | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showTaskLibrary, setShowTaskLibrary] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -132,20 +130,6 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
     );
   };
 
-  const moveTask = (fromIndex: number, toIndex: number) => {
-    const newTasks = [...currentTasks];
-    const [movedTask] = newTasks.splice(fromIndex, 1);
-    newTasks.splice(toIndex, 0, movedTask);
-    
-    // Update order indices
-    const reorderedTasks = newTasks.map((task, index) => ({
-      ...task,
-      order_index: index
-    }));
-    
-    setCurrentTasks(reorderedTasks);
-  };
-
   const currentStudyType = studyTypes.find(type => type.id === studyType);
 
   if (error) {
@@ -224,16 +208,6 @@ export const StudyBuilderIntegration: React.FC<StudyBuilderIntegrationProps> = (
                   </div>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setEditingTask(task);
-                      setShowEditModal(true);
-                    }}
-                  >
-                    <Edit className="h-3 w-3" />
-                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
