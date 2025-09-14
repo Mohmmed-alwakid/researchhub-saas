@@ -40,11 +40,20 @@ interface Activity {
   studyTitle?: string;
 }
 
+interface PendingApproval {
+  id: string;
+  type: 'study_changes' | 'participant_access' | 'data_export';
+  submittedBy: string;
+  submittedAt: string;
+  description: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 const CollaborationTab: React.FC<CollaborationTabProps> = ({ studyId, workspaceId }) => {
   const { user } = useAuthStore();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
-  const [pendingApprovals, setPendingApprovals] = useState<any[]>([]);
+  const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');

@@ -244,12 +244,17 @@ export class AchievementSystem {
     return this.achievements;
   }
   
-  static checkAchievements(participantData: any): Achievement[] {
+  static checkAchievements(participantData: {
+    studiesCompleted?: number;
+    totalParticipation?: number;
+    responseQuality?: number;
+    [key: string]: unknown;
+  }): Achievement[] {
     // Mock implementation - would check against real participant data
     const unlockedAchievements: Achievement[] = [];
     
     // Simulate some unlocked achievements
-    if (participantData.studiesCompleted >= 1) {
+    if ((participantData.studiesCompleted ?? 0) >= 1) {
       unlockedAchievements.push({
         ...this.achievements.find(a => a.id === 'first_study')!,
         unlockedAt: new Date().toISOString(),
@@ -257,7 +262,7 @@ export class AchievementSystem {
       });
     }
     
-    if (participantData.studiesCompleted >= 10) {
+    if ((participantData.studiesCompleted ?? 0) >= 10) {
       unlockedAchievements.push({
         ...this.achievements.find(a => a.id === 'study_marathon')!,
         unlockedAt: new Date().toISOString(),
@@ -524,7 +529,7 @@ export const GamificationDashboard: React.FC<{
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setSelectedTab(tab.id as any)}
+                  onClick={() => setSelectedTab(tab.id as 'overview' | 'achievements' | 'leaderboard' | 'challenges')}
                   className={`${
                     selectedTab === tab.id
                       ? 'border-blue-500 text-blue-600'

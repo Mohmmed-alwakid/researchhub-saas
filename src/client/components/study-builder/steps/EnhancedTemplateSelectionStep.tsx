@@ -77,9 +77,14 @@ const getBlockTypeFromName = (blockName: string): string => {
   return mapping[blockName] || 'context_screen';
 };
 
+// Block settings interface
+interface BlockSettings {
+  [key: string]: unknown;
+}
+
 // Get default settings for block types
-const getDefaultSettingsForBlock = (blockType: string): Record<string, any> => {
-  const defaults: Record<string, Record<string, any>> = {
+const getDefaultSettingsForBlock = (blockType: string): BlockSettings => {
+  const defaults: Record<string, BlockSettings> = {
     welcome_screen: {
       title: 'Welcome',
       message: 'Welcome to our study',

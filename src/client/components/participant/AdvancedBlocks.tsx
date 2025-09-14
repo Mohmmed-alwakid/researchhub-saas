@@ -53,7 +53,7 @@ export interface BlockCondition {
   type: 'response_based' | 'time_based' | 'performance_based';
   field: string;
   operator: 'equals' | 'contains' | 'greater' | 'less' | 'between';
-  value: any;
+  value: string | number | boolean | string[] | number[];
   action: 'show' | 'hide' | 'redirect' | 'modify';
   targetBlockId?: string;
 }
