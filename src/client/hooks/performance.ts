@@ -4,8 +4,27 @@ import { useState, useRef, useEffect } from 'react';
  * Performance utilities and hooks for optimization
  */
 
+// Performance API type definitions
+interface LayoutShiftEntry extends PerformanceEntry {
+  value: number;
+  hadRecentInput: boolean;
+}
+
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface ExtendedPerformance extends Performance {
+  memory?: PerformanceMemory;
+}
+
+// Generic function type for performance utilities
+type AnyFunction = (...args: unknown[]) => unknown;
+
 // Debounce function for performance
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends AnyFunction>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
@@ -18,7 +37,7 @@ export const debounce = <T extends (...args: any[]) => any>(
 };
 
 // Throttle function for performance
-export const throttle = <T extends (...args: any[]) => any>(
+export const throttle = <T extends AnyFunction>(
   func: T,
   limit: number
 ): ((...args: Parameters<T>) => void) => {
@@ -81,7 +100,7 @@ export const usePerformanceMonitor = () => {
     
     try {
       observer.observe({ entryTypes: ['largest-contentful-paint'] });
-    } catch (e) {
+    } catch {
       // LCP not supported
     }
     
@@ -89,8 +108,9 @@ export const usePerformanceMonitor = () => {
     let clsValue = 0;
     const clsObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        if (!(entry as any).hadRecentInput) {
-          clsValue += (entry as any).value;
+        const layoutShiftEntry = entry as LayoutShiftEntry;
+        if (!layoutShiftEntry.hadRecentInput) {
+          clsValue += layoutShiftEntry.value;
         }
       }
       
@@ -102,7 +122,7 @@ export const usePerformanceMonitor = () => {
     
     try {
       clsObserver.observe({ entryTypes: ['layout-shift'] });
-    } catch (e) {
+    } catch {
       // CLS not supported
     }
     
@@ -140,12 +160,15 @@ export const useMemoryMonitor = () => {
   useEffect(() => {
     const updateMemoryInfo = () => {
       if ('memory' in performance) {
-        const memory = (performance as any).memory;
-        setMemoryInfo({
-          usedJSHeapSize: memory.usedJSHeapSize,
-          totalJSHeapSize: memory.totalJSHeapSize,
-          jsHeapSizeLimit: memory.jsHeapSizeLimit
-        });
+        const extendedPerformance = performance as ExtendedPerformance;
+        const memory = extendedPerformance.memory;
+        if (memory) {
+          setMemoryInfo({
+            usedJSHeapSize: memory.usedJSHeapSize,
+            totalJSHeapSize: memory.totalJSHeapSize,
+            jsHeapSizeLimit: memory.jsHeapSizeLimit
+          });
+        }
       }
     };
     
