@@ -92,87 +92,6 @@ class MobileDetection {
   }
 }
 
-// Touch Gesture Handler
-class TouchGestureHandler {
-  private gestures: TouchGesture[] = [];
-  private currentTouch: Touch | null = null;
-  private touchStartTime: number = 0;
-  private longPressTimer: NodeJS.Timeout | null = null;
-  
-  constructor(private onGesture: (gesture: TouchGesture) => void) {}
-  
-  handleTouchStart = (event: TouchEvent) => {
-    this.currentTouch = event.touches[0];
-    this.touchStartTime = Date.now();
-    
-    // Set up long press detection
-    this.longPressTimer = setTimeout(() => {
-      if (this.currentTouch) {
-        this.onGesture({
-          type: 'long-press',
-          startPosition: { x: this.currentTouch.clientX, y: this.currentTouch.clientY },
-          duration: Date.now() - this.touchStartTime
-        });
-      }
-    }, 500);
-  };
-  
-  handleTouchMove = () => {
-    if (this.longPressTimer) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-  };
-  
-  handleTouchEnd = (event: TouchEvent) => {
-    if (this.longPressTimer) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-    
-    if (!this.currentTouch) return;
-    
-    const touch = event.changedTouches[0];
-    const duration = Date.now() - this.touchStartTime;
-    const deltaX = touch.clientX - this.currentTouch.clientX;
-    const deltaY = touch.clientY - this.currentTouch.clientY;
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
-    // Determine gesture type
-    if (duration < 300 && distance < 10) {
-      this.onGesture({
-        type: 'tap',
-        startPosition: { x: this.currentTouch.clientX, y: this.currentTouch.clientY },
-        endPosition: { x: touch.clientX, y: touch.clientY },
-        duration
-      });
-    } else if (distance > 50) {
-      // Determine swipe direction
-      const direction = Math.abs(deltaX) > Math.abs(deltaY) 
-        ? (deltaX > 0 ? 'right' : 'left')
-        : (deltaY > 0 ? 'down' : 'up');
-      
-      this.onGesture({
-        type: 'swipe',
-        startPosition: { x: this.currentTouch.clientX, y: this.currentTouch.clientY },
-        endPosition: { x: touch.clientX, y: touch.clientY },
-        duration,
-        direction
-      });
-    }
-    
-    this.currentTouch = null;
-  };
-  
-  getGestures(): TouchGesture[] {
-    return [...this.gestures];
-  }
-  
-  clearGestures() {
-    this.gestures = [];
-  }
-}
-
 // Mobile Navigation Component
 export const MobileNavigation: React.FC<{
   isOpen: boolean;
@@ -307,32 +226,6 @@ export const MobileStudyBlock: React.FC<{
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large' | 'extra-large'>('medium');
   
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Handle swipe gestures for navigation
-  const gestureHandler = new TouchGestureHandler((gesture) => {
-    if (gesture.type === 'swipe') {
-      if (gesture.direction === 'left' && canGoNext) {
-        onNext();
-      } else if (gesture.direction === 'right' && canGoPrevious) {
-        onPrevious();
-      }
-    }
-  });
-  
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    
-    container.addEventListener('touchstart', gestureHandler.handleTouchStart);
-    container.addEventListener('touchmove', gestureHandler.handleTouchMove);
-    container.addEventListener('touchend', gestureHandler.handleTouchEnd);
-    
-    return () => {
-      container.removeEventListener('touchstart', gestureHandler.handleTouchStart);
-      container.removeEventListener('touchmove', gestureHandler.handleTouchMove);
-      container.removeEventListener('touchend', gestureHandler.handleTouchEnd);
-    };
-  }, []);
   
   const handleFullscreenToggle = () => {
     if (!isFullscreen) {
