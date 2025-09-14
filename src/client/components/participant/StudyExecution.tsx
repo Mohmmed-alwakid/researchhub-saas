@@ -2,19 +2,11 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Play, 
-  Pause, 
-  SkipForward, 
-  CheckCircle, 
   Clock, 
-  User,
   AlertCircle,
   Save,
-  Send,
   ArrowLeft,
-  ArrowRight,
-  Volume2,
-  VolumeX,
-  Settings
+  ArrowRight
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import toast from 'react-hot-toast';
@@ -659,7 +651,7 @@ const BreakBlock: React.FC<{
 export const StudyExecution: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { studyId } = useParams<{ studyId: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const hasRole = useCallback((_role: string) => true, []); // Simplified for now
   const authClient = null; // Simplified for now
   

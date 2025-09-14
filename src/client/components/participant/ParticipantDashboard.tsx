@@ -13,7 +13,6 @@ import {
   CheckCircle,
   Pause,
   ArrowRight,
-  Filter,
   Search
 } from 'lucide-react';
 import { useEnhancedAuth } from '../../hooks/useEnhancedAuth';

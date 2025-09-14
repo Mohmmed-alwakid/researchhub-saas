@@ -14,12 +14,7 @@ import {
   Settings,
   Download,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Eye,
-  Calendar,
   BarChart3,
-  PieChart,
   Activity
 } from 'lucide-react';
 
@@ -105,8 +100,6 @@ const AdminAnalyticsDashboard: React.FC = () => {
   
   // Filter states
   const [dateRange, setDateRange] = useState('30d');
-  const [selectedStudy, setSelectedStudy] = useState('');
-  const [selectedParticipant, setSelectedParticipant] = useState('');
   
   // Settings management
   const [settingsMode, setSettingsMode] = useState<'view' | 'edit'>('view');

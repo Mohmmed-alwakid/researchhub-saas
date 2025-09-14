@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Coins, 
-  Check, 
-  Download,
   AlertCircle,
-  Crown,
-  Zap,
-  Sparkles,
   Plus,
   Minus,
   History,

@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Clock, User, MessageCircle, Edit, Eye, CheckCircle, XCircle, AlertTriangle, Users, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Clock, User, MessageCircle, Edit, CheckCircle, XCircle, AlertTriangle, Users, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';

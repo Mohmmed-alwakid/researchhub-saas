@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Zap, Clock } from 'lucide-react';
+import { Loader2, Zap } from 'lucide-react';
 
 interface LoadingProps {
   variant?: 'default' | 'page' | 'inline' | 'overlay';
