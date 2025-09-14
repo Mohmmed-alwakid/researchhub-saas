@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { 
   Users, 
@@ -51,11 +51,7 @@ const CollaborationTab: React.FC<CollaborationTabProps> = ({ studyId, workspaceI
   const [inviteRole, setInviteRole] = useState('researcher');
   const [inviting, setInviting] = useState(false);
 
-  useEffect(() => {
-    fetchCollaborationData();
-  }, [studyId, workspaceId]);
-
-  const fetchCollaborationData = async () => {
+  const fetchCollaborationData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -130,7 +126,11 @@ const CollaborationTab: React.FC<CollaborationTabProps> = ({ studyId, workspaceI
     } finally {
       setLoading(false);
     }
-  };
+  }, [studyId, workspaceId]);
+
+  useEffect(() => {
+    fetchCollaborationData();
+  }, [fetchCollaborationData]);
 
   const handleInviteMember = async () => {
     if (!inviteEmail || !inviteEmail.includes('@')) {
