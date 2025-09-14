@@ -34,6 +34,13 @@ interface WithdrawalRequest {
   processedAt?: string;
 }
 
+interface EarningsTransaction {
+  id: string;
+  type: string;
+  amount: number;
+  timestamp: string;
+}
+
 const ParticipantEarningsDashboard: React.FC = () => {
   const [earnings, setEarnings] = useState<ParticipantEarnings | null>(null);
   const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
@@ -67,8 +74,8 @@ const ParticipantEarningsDashboard: React.FC = () => {
           setEarnings(data.data.earnings);
           // Get withdrawal requests from recent transactions
           const withdrawals = data.data.recentTransactions
-            .filter((tx: any) => tx.type === 'withdrawal')
-            .map((tx: any) => ({
+            .filter((tx: EarningsTransaction) => tx.type === 'withdrawal')
+            .map((tx: EarningsTransaction) => ({
               id: tx.id,
               amount: tx.amount,
               fee: 0, // Would be calculated
