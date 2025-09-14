@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { CheckCircle, Star } from 'lucide-react';
@@ -801,7 +801,7 @@ export const TreeTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext,
   const [taskStartTime, setTaskStartTime] = useState(Date.now());
   const [taskResults, setTaskResults] = useState<any[]>([]);
 
-  const tree = (block.settings.tree as any[]) || [
+  const tree = useMemo(() => (block.settings.tree as any[]) || [
     {
       id: 'home',
       label: 'Home',
@@ -824,7 +824,7 @@ export const TreeTestBlock: React.FC<BlockProps> = ({ block, onComplete, onNext,
         }
       ]
     }
-  ];
+  ], [block.settings.tree]);
 
   const tasks = (block.settings.tasks as any[]) || [
     { id: '1', instruction: 'Find information about laptops', targetPath: ['home', 'products', 'laptops'] }
