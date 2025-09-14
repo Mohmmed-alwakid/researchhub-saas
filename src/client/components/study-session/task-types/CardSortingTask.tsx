@@ -1,10 +1,11 @@
 import React from 'react';
+import type { IStudy, IParticipant } from '../../../../shared/types/index';
 
 interface TaskProps {
-  task: any;
-  study: any;
-  session: any;
-  onComplete: (responses: Record<string, any>) => void;
+  task: unknown;
+  study: IStudy;
+  session: IParticipant;
+  onComplete: (responses: Record<string, unknown>) => void;
   isRecording: boolean;
 }
 
