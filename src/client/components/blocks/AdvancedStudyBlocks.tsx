@@ -9,13 +9,25 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types for advanced blocks
+type ConditionValue = string | number | boolean;
+
+interface BlockResponse {
+  response?: ConditionValue;
+  timestamp?: number | string;
+  branchTarget?: string;
+  aiResponses?: unknown[];
+  cardSort?: Record<string, CardItem[]>;
+  treeTest?: unknown;
+  [key: string]: unknown;
+}
+
 interface BlockCondition {
   id: string;
   type: string;
   logic: {
     type: string;
     blockId: string;
-    value: any;
+    value: ConditionValue;
   };
   targetBlockId: string;
 }
@@ -31,22 +43,34 @@ interface Category {
   name: string;
 }
 
+interface BlockSettings {
+  conditions?: BlockCondition[];
+  defaultTarget?: string;
+  baseBlockId?: string;
+  baseQuestion?: string;
+  followUpCount?: number;
+  instructions?: string;
+  items?: CardItem[];
+  categories?: Category[];
+  content?: string;
+  question?: string;
+  image?: string;
+  autoAdvance?: boolean;
+  advanceDelay?: number;
+  duration?: number;
+  imageUrl?: string;
+  questions?: QuestionData[];
+  tree?: TreeNode[];
+  tasks?: TaskData[];
+  [key: string]: unknown;
+}
+
 interface AdvancedBlock {
   id: string;
   type: string;
   title: string;
   description?: string;
-  settings: {
-    [key: string]: any;
-    conditions?: BlockCondition[];
-    defaultTarget?: string;
-    baseBlockId?: string;
-    baseQuestion?: string;
-    followUpCount?: number;
-    instructions?: string;
-    items?: CardItem[];
-    categories?: Category[];
-  };
+  settings: BlockSettings;
 }
 
 interface AnalyticsTracker {
@@ -55,7 +79,7 @@ interface AnalyticsTracker {
 
 interface BlockProps {
   block: AdvancedBlock;
-  onNext: (response: any) => void;
+  onNext: (response: BlockResponse) => void;
   analyticsTracker?: AnalyticsTracker;
 }
 
@@ -63,6 +87,36 @@ interface QuestionData {
   id: string;
   question: string;
   type: string;
+}
+
+interface TreeNode {
+  id: string;
+  name: string;
+  children?: TreeNode[];
+  parent?: string;
+}
+
+interface TaskData {
+  id: string;
+  title: string;
+  description: string;
+  target: string;
+  instruction?: string;
+  targetPath?: string[];
+}
+
+interface TreeTestResult {
+  taskId: string;
+  navigationPath: string[];
+  timeSpent: number;
+  success: boolean;
+  target: string;
+}
+
+interface TreeTestNode extends TreeNode {
+  label?: string;
+  isDestination?: boolean;
+  children?: TreeTestNode[];
 }
 
 // Enhanced animation variants for block transitions
@@ -137,7 +191,7 @@ export const ConditionalBranchBlock = ({ block, onNext, analyticsTracker }: Bloc
     }
   }, [block.id, block.settings, analyticsTracker, onNext]);
 
-  const evaluateCondition = async (condition: BlockCondition, responses: Record<string, any>) => {
+  const evaluateCondition = async (condition: BlockCondition, responses: Record<string, BlockResponse>) => {
     const { logic } = condition;
     
     switch (logic.type) {
@@ -170,7 +224,7 @@ export const ConditionalBranchBlock = ({ block, onNext, analyticsTracker }: Bloc
     }
   };
 
-  const getPreviousResponses = async (): Promise<Record<string, any>> => {
+  const getPreviousResponses = async (): Promise<Record<string, BlockResponse>> => {
     // Get responses from session storage or API
     const sessionData = JSON.parse(sessionStorage.getItem('blockResponses') || '{}');
     return sessionData;
@@ -462,11 +516,11 @@ const AIQuestionForm = ({ question, onSubmit, analyticsTracker }: AIQuestionForm
 export const CardSortBlock = ({ block, onNext, analyticsTracker }: BlockProps) => {
   const [items] = useState(block.settings.items || []);
   const [categories] = useState(block.settings.categories || []);
-  const [sortedItems, setSortedItems] = useState<Record<string, any[]>>({});
-  const [draggedItem, setDraggedItem] = useState<any>(null);
+  const [sortedItems, setSortedItems] = useState<Record<string, CardItem[]>>({});
+  const [draggedItem, setDraggedItem] = useState<CardItem | null>(null);
   const [startTime] = useState(Date.now());
 
-  const handleDragStart = (_e: React.DragEvent, item: any) => {
+  const handleDragStart = (_e: React.DragEvent, item: CardItem) => {
     setDraggedItem(item);
     analyticsTracker?.track('card_drag_start', { 
       blockId: block.id, 
@@ -523,7 +577,7 @@ export const CardSortBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
   };
 
   const unsortedItems = items.filter(item => 
-    !Object.values(sortedItems).flat().some((sorted: any) => sorted.id === item.id)
+    !Object.values(sortedItems).flat().some((sorted: CardItem) => sorted.id === item.id)
   );
 
   const allItemsSorted = unsortedItems.length === 0;
@@ -549,7 +603,7 @@ export const CardSortBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
         <div className="lg:col-span-1">
           <h3 className="font-semibold text-gray-900 mb-4">Items to Sort</h3>
           <div className="space-y-2 min-h-[200px] p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-            {unsortedItems.map((item: any) => (
+            {unsortedItems.map((item: CardItem) => (
               <motion.div
                 key={item.id}
                 draggable
@@ -574,7 +628,7 @@ export const CardSortBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
 
         {/* Categories */}
         <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {categories.map((category: any) => (
+          {categories.map((category: Category) => (
             <div
               key={category.id}
               onDragOver={handleDragOver}
@@ -583,7 +637,7 @@ export const CardSortBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
             >
               <h3 className="font-semibold text-gray-900 mb-4">{category.name}</h3>
               <div className="space-y-2">
-                {(sortedItems[category.id] || []).map((item: any) => (
+                {(sortedItems[category.id] || []).map((item: CardItem) => (
                   <motion.div
                     key={item.id}
                     className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm"
@@ -1038,9 +1092,9 @@ export const FiveSecondTestBlock = ({ block, onNext, analyticsTracker }: BlockPr
 export const TreeTestBlock = ({ block, onNext, analyticsTracker }: BlockProps) => {
   const [currentTask, setCurrentTask] = useState(0);
   const [navigationPath, setNavigationPath] = useState<string[]>([]);
-  const [currentLevel, setCurrentLevel] = useState<any[]>([]);
+  const [currentLevel, setCurrentLevel] = useState<TreeTestNode[]>([]);
   const [taskStartTime, setTaskStartTime] = useState(Date.now());
-  const [taskResults, setTaskResults] = useState<any[]>([]);
+  const [taskResults, setTaskResults] = useState<TreeTestResult[]>([]);
 
   const tree = useMemo(() => block.settings.tree || [
     {
@@ -1144,7 +1198,7 @@ export const TreeTestBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
       // Navigate back to parent level
       let currentNodes = tree;
       for (const nodeId of newPath) {
-        const node = currentNodes.find((n: any) => n.id === nodeId);
+        const node = currentNodes.find((n) => n.id === nodeId);
         if (node && node.children) {
           currentNodes = node.children;
         }
