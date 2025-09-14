@@ -34,6 +34,42 @@ export interface TouchGesture {
   direction?: 'up' | 'down' | 'left' | 'right';
 }
 
+// Study block and response interfaces
+export interface MobileStudyBlockOption {
+  value: string | number;
+  label: string;
+}
+
+export interface MobileStudyBlock {
+  id: string;
+  type: 'open_question' | 'multiple_choice' | 'rating' | 'image_upload' | 'instruction' | 'welcome' | 'opinion_scale' | 'thank_you';
+  title: string;
+  description: string;
+  question?: string;
+  image?: string;
+  order?: number;
+  options?: MobileStudyBlockOption[];
+  settings?: {
+    leftLabel?: string;
+    rightLabel?: string;
+    min?: number;
+    max?: number;
+  };
+  required: boolean;
+  validation?: {
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+  };
+}
+
+export interface MobileStudyResponse {
+  blockId: string;
+  response: string | number | string[] | File;
+  timestamp: string;
+  responseTime: number;
+}
+
 export interface MobileStudySession {
   studyId: string;
   currentBlockIndex: number;
@@ -203,8 +239,8 @@ export const MobileStatusBar: React.FC<{
 
 // Mobile Study Block Renderer
 export const MobileStudyBlock: React.FC<{
-  block: any;
-  onResponse: (response: any) => void;
+  block: MobileStudyBlock;
+  onResponse: (response: MobileStudyResponse) => void;
   onNext: () => void;
   onPrevious: () => void;
   canGoNext: boolean;
@@ -221,7 +257,7 @@ export const MobileStudyBlock: React.FC<{
   currentIndex,
   totalBlocks
 }) => {
-  const [response, setResponse] = useState<any>(null);
+  const [response, setResponse] = useState<string | number | string[] | File | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large' | 'extra-large'>('medium');
   
@@ -246,9 +282,17 @@ export const MobileStudyBlock: React.FC<{
     return sizeMap[fontSize];
   };
   
-  const handleResponseChange = (newResponse: any) => {
+  const handleResponseChange = (newResponse: string | number | string[] | File) => {
     setResponse(newResponse);
-    onResponse(newResponse);
+    
+    const responseObject: MobileStudyResponse = {
+      blockId: block.id,
+      response: newResponse,
+      timestamp: new Date().toISOString(),
+      responseTime: Date.now() // This would be calculated properly in real implementation
+    };
+    
+    onResponse(responseObject);
   };
   
   return (
@@ -277,7 +321,7 @@ export const MobileStudyBlock: React.FC<{
             {/* Font Size Controls */}
             <select
               value={fontSize}
-              onChange={(e) => setFontSize(e.target.value as any)}
+              onChange={(e) => setFontSize(e.target.value as 'small' | 'medium' | 'large' | 'extra-large')}
               className="text-xs border rounded px-2 py-1"
             >
               <option value="small">Small</option>
@@ -332,7 +376,7 @@ export const MobileStudyBlock: React.FC<{
             <h2 className="text-xl font-semibold text-gray-900">{block.title}</h2>
             <p className="text-gray-600">{block.description}</p>
             <textarea
-              value={response || ''}
+              value={typeof response === 'string' ? response : ''}
               onChange={(e) => handleResponseChange(e.target.value)}
               placeholder="Type your answer here..."
               className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -346,7 +390,7 @@ export const MobileStudyBlock: React.FC<{
             <h2 className="text-xl font-semibold text-gray-900">{block.title}</h2>
             <p className="text-gray-600">{block.description}</p>
             <div className="space-y-3">
-              {block.options?.map((option: any, index: number) => (
+              {block.options?.map((option: MobileStudyBlockOption, index: number) => (
                 <button
                   key={index}
                   onClick={() => handleResponseChange(option.value)}
@@ -462,7 +506,7 @@ export const MobileParticipantExperience: React.FC<{
 }> = ({ studyId }) => {
   const [session, setSession] = useState<MobileStudySession | null>(null);
   const [currentBlock, setCurrentBlock] = useState(0);
-  const [blocks, setBlocks] = useState<any[]>([]);
+  const [blocks, setBlocks] = useState<MobileStudyBlock[]>([]);
   const [isNavOpen, setIsNavOpen] = useState(false);
   
   // Initialize mobile session
@@ -479,7 +523,7 @@ export const MobileParticipantExperience: React.FC<{
         userAgent: deviceInfo.userAgent,
         screenSize: deviceInfo.screenSize,
         orientation: deviceInfo.orientation,
-        connectionType: (navigator as any).connection?.effectiveType || 'unknown'
+        connectionType: (navigator as Navigator & { connection?: { effectiveType?: string } }).connection?.effectiveType || 'unknown'
       },
       accessibility: {
         fontSize: 'medium',
@@ -498,14 +542,16 @@ export const MobileParticipantExperience: React.FC<{
         type: 'welcome',
         title: 'Welcome to Our Study',
         description: 'Thank you for participating. This study will take about 10 minutes.',
-        order: 0
+        order: 0,
+        required: false
       },
       {
         id: 'question1',
         type: 'open_question',
         title: 'Tell us about yourself',
         description: 'What brings you to our platform today?',
-        order: 1
+        order: 1,
+        required: true
       },
       {
         id: 'choice1',
@@ -518,7 +564,8 @@ export const MobileParticipantExperience: React.FC<{
           { label: 'Monthly', value: 'monthly' },
           { label: 'Rarely', value: 'rarely' }
         ],
-        order: 2
+        order: 2,
+        required: true
       },
       {
         id: 'rating1',
@@ -529,19 +576,21 @@ export const MobileParticipantExperience: React.FC<{
           leftLabel: 'Very Dissatisfied',
           rightLabel: 'Very Satisfied'
         },
-        order: 3
+        order: 3,
+        required: true
       },
       {
         id: 'thankyou',
         type: 'thank_you',
         title: 'Thank You!',
         description: 'Your responses have been recorded. We appreciate your participation.',
-        order: 4
+        order: 4,
+        required: false
       }
     ]);
   }, [studyId]);
   
-  const handleResponse = (response: any) => {
+  const handleResponse = (response: MobileStudyResponse) => {
     // Store response logic would go here
     console.log('Response:', response);
   };
