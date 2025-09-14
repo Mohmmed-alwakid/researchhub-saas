@@ -9,7 +9,6 @@ interface TaskProps {
 }
 
 export const CardSortingTask: React.FC<TaskProps> = ({ 
-  task: _task, 
   onComplete 
 }) => {
   return (

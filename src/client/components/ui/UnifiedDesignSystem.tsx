@@ -224,7 +224,6 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input: React.FC<InputProps> = ({
-  variant: _variant = 'default',
   size = 'md',
   leftIcon,
   rightIcon,
