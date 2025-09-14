@@ -46,21 +46,6 @@ export const WelcomeBlockTask: React.FC<WelcomeBlockTaskProps> = ({
     return () => clearInterval(timer);
   }, [startTime]);
 
-  // Auto-advance logic
-  useEffect(() => {
-    if (autoAdvance && hasStarted) {
-      const timer = setTimeout(() => {
-        handleContinue();
-      }, autoAdvanceDelay * 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [autoAdvance, autoAdvanceDelay, hasStarted]);
-
-  // Mark as started when component mounts
-  useEffect(() => {
-    setHasStarted(true);
-  }, []);
   const handleContinue = useCallback(() => {
     const completionData = {
       timeSpent,
@@ -76,6 +61,22 @@ export const WelcomeBlockTask: React.FC<WelcomeBlockTaskProps> = ({
 
     onComplete(completionData);
   }, [timeSpent, startTime, onComplete]);
+
+  // Auto-advance logic
+  useEffect(() => {
+    if (autoAdvance && hasStarted) {
+      const timer = setTimeout(() => {
+        handleContinue();
+      }, autoAdvanceDelay * 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoAdvance, autoAdvanceDelay, hasStarted, handleContinue]);
+
+  // Mark as started when component mounts
+  useEffect(() => {
+    setHasStarted(true);
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
