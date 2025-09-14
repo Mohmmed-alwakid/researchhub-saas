@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, Search, Download, RefreshCw, 
   Eye, Settings, UserCheck, UserX, Crown, Shield,
@@ -39,7 +39,7 @@ export const UserManagementPanel: React.FC<UserManagementPanelProps> = ({ apiCli
   const usersPerPage = 20;
 
   // Load users data
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
       const response = await apiClient.getAllUsers();
@@ -52,11 +52,11 @@ export const UserManagementPanel: React.FC<UserManagementPanelProps> = ({ apiCli
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient]);
 
   useEffect(() => {
     loadUsers();
-  }, [currentPage, filterRole, filterStatus]);
+  }, [currentPage, filterRole, filterStatus, loadUsers]);
 
   // Filter users based on search and filters
   const filteredUsers = users.filter(user => {
