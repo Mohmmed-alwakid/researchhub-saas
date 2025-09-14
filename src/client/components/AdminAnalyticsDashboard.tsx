@@ -183,7 +183,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
       } else {
         alert('Failed to update settings: ' + data.error);
       }
-    } catch (err) {
+    } catch {
       alert('Failed to update settings');
     }
   };
@@ -201,7 +201,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
       a.href = url;
       a.download = `afkar-analytics-${type}-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
-    } catch (err) {
+    } catch {
       alert('Failed to export data');
     }
   };
