@@ -8,7 +8,6 @@ import { StudyBuilderBlock } from './types';
 interface RealTimeBlockPreviewProps {
   blocks: StudyBuilderBlock[];
   currentEditingBlock?: StudyBuilderBlock;
-  onBlockUpdate?: (blockId: string, changes: Partial<StudyBuilderBlock>) => void;
   className?: string;
 }
 
@@ -22,7 +21,6 @@ interface PreviewState {
 export const RealTimeBlockPreview: React.FC<RealTimeBlockPreviewProps> = ({
   blocks,
   currentEditingBlock,
-  onBlockUpdate,
   className = ''
 }) => {
   const [previewState, setPreviewState] = useState<PreviewState>({
