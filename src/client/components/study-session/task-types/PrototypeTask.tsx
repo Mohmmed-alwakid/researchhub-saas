@@ -57,8 +57,7 @@ interface UsabilityMetadata {
 export const ClickTrackingTask: React.FC<ClickTrackingTaskProps> = ({
   task,
   onComplete,
-  isRecording,
-  taskVariant: _taskVariant
+  isRecording
 }) => {
   const [startTime] = useState(new Date());
   const [timeSpent, setTimeSpent] = useState(0);
