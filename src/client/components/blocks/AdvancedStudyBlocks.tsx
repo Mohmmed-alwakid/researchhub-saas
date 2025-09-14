@@ -5,7 +5,7 @@
  * Created: June 25, 2025
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types for advanced blocks
@@ -241,44 +241,44 @@ export const AIFollowUpBlock = ({ block, onNext, analyticsTracker }: BlockProps)
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    generateFollowUpQuestions();
-  }, []);
+    const generateFollowUpQuestions = async () => {
+      try {
+        analyticsTracker?.track('ai_generation_start', { blockId: block.id });
+        
+        const sessionData = JSON.parse(sessionStorage.getItem('blockResponses') || '{}');
+        const baseResponse = sessionData[block.settings.baseBlockId || '']?.response;
 
-  const generateFollowUpQuestions = async () => {
-    try {
-      analyticsTracker?.track('ai_generation_start', { blockId: block.id });
-      
-      const previousResponses = await getPreviousResponses();
-      const baseResponse = previousResponses[block.settings.baseBlockId || '']?.response;
+        if (!baseResponse) {
+          throw new Error('Base response not found for AI follow-up');
+        }
 
-      if (!baseResponse) {
-        throw new Error('Base response not found for AI follow-up');
+        // Simulate AI question generation (in production, call actual AI API)
+        const generatedQuestions = await generateAIQuestions(
+          block.settings.baseQuestion || '',
+          baseResponse,
+          block.settings.followUpCount || 3
+        );
+
+        setQuestions(generatedQuestions);
+        analyticsTracker?.track('ai_generation_complete', { 
+          blockId: block.id, 
+          questionCount: generatedQuestions.length 
+        });
+
+      } catch (err) {
+        console.error('Error generating AI questions:', err);
+        setError('Failed to generate follow-up questions');
+        analyticsTracker?.track('ai_generation_error', { 
+          blockId: block.id, 
+          error: err instanceof Error ? err.message : 'Unknown error'
+        });
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // Simulate AI question generation (in production, call actual AI API)
-      const generatedQuestions = await generateAIQuestions(
-        block.settings.baseQuestion || '',
-        baseResponse,
-        block.settings.followUpCount || 3
-      );
-
-      setQuestions(generatedQuestions);
-      analyticsTracker?.track('ai_generation_complete', { 
-        blockId: block.id, 
-        questionCount: generatedQuestions.length 
-      });
-
-    } catch (err) {
-      console.error('Error generating AI questions:', err);
-      setError('Failed to generate follow-up questions');
-      analyticsTracker?.track('ai_generation_error', { 
-        blockId: block.id, 
-        error: err instanceof Error ? err.message : 'Unknown error'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    generateFollowUpQuestions();
+  }, [analyticsTracker, block.id, block.settings.baseBlockId, block.settings.baseQuestion, block.settings.followUpCount]);
 
   const generateAIQuestions = async (_baseQuestion: string, _baseResponse: string, count: number): Promise<QuestionData[]> => {
     // Mock AI generation - in production, replace with actual AI API call
@@ -313,11 +313,6 @@ export const AIFollowUpBlock = ({ block, onNext, analyticsTracker }: BlockProps)
       // All questions answered
       onNext({ aiResponses: newResponses });
     }
-  };
-
-  const getPreviousResponses = async (): Promise<Record<string, any>> => {
-    const sessionData = JSON.parse(sessionStorage.getItem('blockResponses') || '{}');
-    return sessionData;
   };
 
   if (loading) {
@@ -771,7 +766,7 @@ export const ContextScreenBlock = ({ block, onNext, analyticsTracker }: BlockPro
     return () => clearInterval(interval);
   }, [startTime]);
 
-  const handleContinue = () => {
+  const handleContinue = useCallback(() => {
     analyticsTracker?.track('context_screen_completed', { 
       blockId: block.id, 
       timeSpent 
@@ -782,7 +777,7 @@ export const ContextScreenBlock = ({ block, onNext, analyticsTracker }: BlockPro
       timeSpent,
       timestamp: new Date().toISOString()
     });
-  };
+  }, [analyticsTracker, block.id, timeSpent, onNext]);
 
   const content = block.settings.content || block.settings.message || '';
   const showTimer = block.settings.showTimer || false;
@@ -797,7 +792,7 @@ export const ContextScreenBlock = ({ block, onNext, analyticsTracker }: BlockPro
 
       return () => clearTimeout(timer);
     }
-  }, [autoAdvance, advanceDelay]);
+  }, [autoAdvance, advanceDelay, handleContinue]);
 
   return (
     <motion.div
@@ -1047,7 +1042,7 @@ export const TreeTestBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
   const [taskStartTime, setTaskStartTime] = useState(Date.now());
   const [taskResults, setTaskResults] = useState<any[]>([]);
 
-  const tree = block.settings.tree || [
+  const tree = useMemo(() => block.settings.tree || [
     {
       id: 'home',
       label: 'Home',
@@ -1070,7 +1065,7 @@ export const TreeTestBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
         }
       ]
     }
-  ];
+  ], [block.settings.tree]);
 
   const tasks = block.settings.tasks || [
     { id: '1', instruction: 'Find information about laptops', targetPath: ['home', 'products', 'laptops'] }
@@ -1078,7 +1073,7 @@ export const TreeTestBlock = ({ block, onNext, analyticsTracker }: BlockProps) =
 
   React.useEffect(() => {
     setCurrentLevel(tree);
-  }, []);
+  }, [tree]);
 
   const navigateToNode = (nodeId: string) => {
     const newPath = [...navigationPath, nodeId];
