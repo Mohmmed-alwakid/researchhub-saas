@@ -117,7 +117,7 @@ class TouchGestureHandler {
     }, 500);
   };
   
-  handleTouchMove = (event: TouchEvent) => {
+  handleTouchMove = (_event: TouchEvent) => {
     if (this.longPressTimer) {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
@@ -566,7 +566,7 @@ export const MobileStudyBlock: React.FC<{
 export const MobileParticipantExperience: React.FC<{
   studyId: string;
   participantId: string;
-}> = ({ studyId, participantId }) => {
+}> = ({ studyId, participantId: _participantId }) => {
   const [session, setSession] = useState<MobileStudySession | null>(null);
   const [currentBlock, setCurrentBlock] = useState(0);
   const [blocks, setBlocks] = useState<any[]>([]);

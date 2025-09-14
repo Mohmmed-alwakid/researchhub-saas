@@ -164,7 +164,7 @@ const ResearcherPointsDashboard: React.FC = () => {
       } else {
         setError(data.error);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to allocate monthly points');
     }
   };

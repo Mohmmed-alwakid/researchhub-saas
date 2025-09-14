@@ -117,7 +117,7 @@ const ParticipantEarningsDashboard: React.FC = () => {
       } else {
         setError(data.error);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to submit withdrawal request');
     }
   };

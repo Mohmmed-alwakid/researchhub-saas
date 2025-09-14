@@ -67,7 +67,7 @@ const STCBankPaymentFlow: React.FC<STCBankPaymentFlowProps> = ({
         setError(response.error || 'Failed to create payment intent');
         onError?.(response.error || 'Payment creation failed');
       }
-    } catch (error) {
+    } catch {
       const errorMessage = 'Failed to create payment intent';
       setError(errorMessage);
       onError?.(errorMessage);
