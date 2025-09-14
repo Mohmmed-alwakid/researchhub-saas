@@ -125,7 +125,7 @@ export interface WithdrawalRequest {
   amount: number;
   status: 'pending' | 'approved' | 'rejected';
   payment_method: string;
-  payment_details: any;
+  payment_details: Record<string, string | number>;
   admin_notes?: string;
   requested_at: string;
   processed_at?: string;
@@ -393,7 +393,7 @@ export const walletService = {
   async requestWithdrawal(data: {
     amount: number;
     payment_method: string;
-    payment_details: any;
+    payment_details: Record<string, string | number>;
   }): Promise<{
     success: boolean;
     data?: WithdrawalRequest;

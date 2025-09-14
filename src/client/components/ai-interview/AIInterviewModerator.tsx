@@ -115,37 +115,7 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
     }
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream);
-      audioChunks.current = [];
-
-      mediaRecorder.current.ondataavailable = (event) => {
-        audioChunks.current.push(event.data);
-      };
-
-      mediaRecorder.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
-        await processAudioInput(audioBlob);
-      };
-
-      mediaRecorder.current.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Microphone access error:', error);
-      onError?.('Failed to access microphone');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder.current && isRecording) {
-      mediaRecorder.current.stop();
-      setIsRecording(false);
-    }
-  };
-
-  const processAudioInput = async (audioBlob: Blob) => {
+  const processAudioInput = useCallback(async (audioBlob: Blob) => {
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -169,7 +139,37 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [interviewConfig.language, handleParticipantResponse, onError]);
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder.current = new MediaRecorder(stream);
+      audioChunks.current = [];
+
+      mediaRecorder.current.ondataavailable = (event) => {
+        audioChunks.current.push(event.data);
+      };
+
+      mediaRecorder.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
+        await processAudioInput(audioBlob);
+      };
+
+      mediaRecorder.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Microphone access error:', error);
+      onError?.('Failed to access microphone');
+    }
+  }, [processAudioInput, onError]);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorder.current && isRecording) {
+      mediaRecorder.current.stop();
+      setIsRecording(false);
+    }
+  }, [isRecording]);
 
   const handleTextSubmit = () => {
     if (currentInput.trim()) {
@@ -178,7 +178,54 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
     }
   };
 
-  const handleParticipantResponse = async (response: string) => {
+  const generateAIResponse = useCallback(async (participantResponse: string) => {
+    const response = await fetch('/api/research-consolidated?action=ai-interview-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        participantResponse,
+        currentQuestionIndex,
+        conversationHistory: messages,
+        interviewConfig,
+        studyContext: { studyId, participantId }
+      })
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+
+    return result.data;
+  }, [sessionId, currentQuestionIndex, messages, interviewConfig, studyId, participantId]);
+
+  const endSession = useCallback(async () => {
+    try {
+      const sessionData = {
+        sessionId,
+        studyId,
+        participantId,
+        messages,
+        startTime: messages[0]?.timestamp,
+        endTime: new Date(),
+        completed: true
+      };
+
+      await fetch('/api/research-consolidated?action=save-interview-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessionData)
+      });
+
+      onSessionComplete?.(sessionData);
+    } catch (error) {
+      console.error('Session save error:', error);
+      onError?.('Failed to save session data');
+    }
+  }, [sessionId, studyId, participantId, messages, onSessionComplete, onError]);
+
+  const handleParticipantResponse = useCallback(async (response: string) => {
     // Add participant message
     const participantMessage: AIInterviewMessage = {
       id: `participant-${Date.now()}`,
@@ -223,54 +270,7 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const generateAIResponse = async (participantResponse: string) => {
-    const response = await fetch('/api/research-consolidated?action=ai-interview-response', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId,
-        participantResponse,
-        currentQuestionIndex,
-        conversationHistory: messages,
-        interviewConfig,
-        studyContext: { studyId, participantId }
-      })
-    });
-
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error);
-    }
-
-    return result.data;
-  };
-
-  const endSession = async () => {
-    try {
-      const sessionData = {
-        sessionId,
-        studyId,
-        participantId,
-        messages,
-        startTime: messages[0]?.timestamp,
-        endTime: new Date(),
-        completed: true
-      };
-
-      await fetch('/api/research-consolidated?action=save-interview-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sessionData)
-      });
-
-      onSessionComplete?.(sessionData);
-    } catch (error) {
-      console.error('Session save error:', error);
-      onError?.('Failed to save session data');
-    }
-  };
+  }, [interviewConfig.language, isAudioEnabled, generateAIResponse, endSession, onError]);
 
   const formatMessage = (message: AIInterviewMessage) => {
     const isAI = message.role === 'ai';
