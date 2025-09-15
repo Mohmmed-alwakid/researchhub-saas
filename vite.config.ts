@@ -73,18 +73,12 @@ export default defineConfig({
             return 'react-bundle';
           }
           
-          // Charts as separate bundle
-          if (id.includes('node_modules/recharts') ||
-              id.includes('node_modules/d3-')) {
-            return 'charts';
-          }
-          
-          // Icons as separate bundle
+          // Icons as separate bundle (small and isolated)
           if (id.includes('node_modules/lucide-react')) {
             return 'icons';
           }
           
-          // All other vendor code
+          // All other vendor code including charts
           if (id.includes('node_modules/')) {
             return 'vendor';
           }
