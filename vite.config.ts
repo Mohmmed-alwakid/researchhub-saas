@@ -62,97 +62,31 @@ export default defineConfig({
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        // PHASE 4B: ENHANCED VENDOR BUNDLE SPLITTING - September 14, 2025
-        // Split large vendor bundle (485kB → ~290kB target) with optimized caching strategy
+        // TEMPORARY FIX: Simplified vendor splitting to resolve memo error
+        // "Cannot read properties of undefined (reading 'memo')" fix
         manualChunks: (id: string) => {
-          // CRITICAL: React and its ecosystem MUST be together and load first
-          // This prevents circular dependencies that cause "Cannot read properties of undefined (reading 'memo')"
-          // Fixed August 27, 2025 - DO NOT CHANGE without thorough testing
-          if (id.includes('node_modules/react/') || 
-              id.includes('node_modules/react-dom/') ||
-              id.includes('node_modules/react-jsx-runtime') ||
-              id.includes('node_modules/scheduler')) {
-            return 'react-core';
-          }
-          
-          // React ecosystem that depends on react-core - load after React core is available
-          if (id.includes('node_modules/@tanstack/react-query') ||
+          // Keep React ecosystem together to prevent initialization issues
+          if (id.includes('node_modules/react') || 
+              id.includes('node_modules/@tanstack/react-query') ||
               id.includes('node_modules/react-router') ||
-              id.includes('node_modules/react-hook-form') || 
-              id.includes('node_modules/@hookform')) {
-            return 'react-ecosystem';
+              id.includes('node_modules/react-hook-form')) {
+            return 'react-bundle';
           }
           
-          // PHASE 4B: Split large UI libraries for better caching
-          // Chart libraries (often >100kB) - lazy load when needed
+          // Charts as separate bundle
           if (id.includes('node_modules/recharts') ||
-              id.includes('node_modules/d3-') ||
-              id.includes('node_modules/victory')) {
+              id.includes('node_modules/d3-')) {
             return 'charts';
           }
           
-          // Drag & Drop libraries - only needed in study builder
-          if (id.includes('node_modules/@dnd-kit') ||
-              id.includes('node_modules/react-beautiful-dnd')) {
-            return 'drag-drop';
-          }
-          
-          // Icon libraries - frequently cached, separate for stability
-          if (id.includes('node_modules/lucide-react') ||
-              id.includes('node_modules/@heroicons') ||
-              id.includes('node_modules/react-icons')) {
+          // Icons as separate bundle
+          if (id.includes('node_modules/lucide-react')) {
             return 'icons';
           }
           
-          // Animation libraries - optional features
-          if (id.includes('node_modules/framer-motion') ||
-              id.includes('node_modules/@react-spring') ||
-              id.includes('node_modules/react-transition-group')) {
-            return 'animations';
-          }
-          
-          // Supabase and data libraries - independent of React initialization
-          if (id.includes('node_modules/@supabase')) {
-            return 'data-services';
-          }
-          
-          // Form validation - can load independently
-          if (id.includes('node_modules/zod')) {
-            return 'validation';
-          }
-          
-          // Utilities that don't depend on React - safe to load anytime
-          if (id.includes('node_modules/date-fns') ||
-              id.includes('node_modules/clsx') ||
-              id.includes('node_modules/tailwind-merge') ||
-              id.includes('node_modules/lodash')) {
-            return 'utilities';
-          }
-          
-          // PHASE 4B: Split vendor into size-based chunks for better caching
-          // Large vendor libraries (>50kB) - separate for better cache invalidation
-          if (id.includes('node_modules/@tanstack/') ||
-              id.includes('node_modules/@emotion/') ||
-              id.includes('node_modules/styled-components')) {
-            return 'vendor-large';
-          }
-          
-          // Medium vendor libraries (10-50kB) - group together
-          if (id.includes('node_modules/axios') ||
-              id.includes('node_modules/uuid') ||
-              id.includes('node_modules/crypto-js')) {
-            return 'vendor-medium';
-          }
-          
-          // Handle app pages as separate chunks for code splitting
-          if (id.includes('/pages/')) {
-            const pageName = id.split('/pages/')[1].split('/')[0];
-            return `page-${pageName}`;
-          }
-          
-          // Small vendor libraries (<10kB) - group together for efficiency
+          // All other vendor code
           if (id.includes('node_modules/')) {
-            return 'vendor-small';
+            return 'vendor';
           }
           
           return undefined;
