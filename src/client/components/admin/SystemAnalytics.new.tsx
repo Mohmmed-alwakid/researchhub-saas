@@ -322,7 +322,7 @@ const SystemAnalytics: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900">Advanced Platform Analytics</h3>
           <p className="text-sm text-gray-600">Detailed performance and user behavior insights</p>
         </div>
-        <AdvancedAnalyticsDashboard />
+        <AdvancedAnalyticsDashboard studies={[]} />
       </div>
 
       {/* System Alerts */}

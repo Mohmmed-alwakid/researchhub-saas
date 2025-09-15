@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
+import { Input } from './ui/Input';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -260,17 +258,16 @@ const AdminAnalyticsDashboard: React.FC = () => {
           <p className="text-gray-600">Platform insights and revenue management</p>
         </div>
         <div className="flex space-x-4">
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Period" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-              <SelectItem value="90d">Last 90 days</SelectItem>
-              <SelectItem value="1y">Last year</SelectItem>
-            </SelectContent>
-          </Select>
+          <select 
+            value={dateRange} 
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white w-32"
+          >
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+            <option value="1y">Last year</option>
+          </select>
           <Button onClick={() => exportData('complete')} variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export Data
@@ -280,10 +277,12 @@ const AdminAnalyticsDashboard: React.FC = () => {
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center">
+            <AlertTriangle className="h-4 w-4 text-red-500 mr-2" />
+            <span className="text-red-700">{error}</span>
+          </div>
+        </div>
       )}
 
       {/* Key Metrics Overview */}
@@ -444,13 +443,13 @@ const AdminAnalyticsDashboard: React.FC = () => {
                       </div>
                       <div className="flex space-x-2">
                         {study.flags.costDiscrepancy && (
-                          <Badge variant="destructive">Cost Discrepancy</Badge>
+                          <Badge variant="error">Cost Discrepancy</Badge>
                         )}
                         {study.flags.lowCompletionRate && (
-                          <Badge variant="destructive">Low Completion</Badge>
+                          <Badge variant="error">Low Completion</Badge>
                         )}
                         {study.flags.suspiciousActivity && (
-                          <Badge variant="destructive">Suspicious Activity</Badge>
+                          <Badge variant="error">Suspicious Activity</Badge>
                         )}
                       </div>
                     </div>
@@ -563,7 +562,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                         </p>
                       </div>
                       <div className="text-right">
-                        <Badge variant={alert.riskLevel === 'high' ? 'destructive' : 'secondary'}>
+                        <Badge variant={alert.riskLevel === 'high' ? 'error' : 'secondary'}>
                           {alert.riskLevel} risk
                         </Badge>
                         <p className="font-medium text-lg mt-1">${(alert.amount * 0.1).toFixed(2)}</p>
@@ -573,7 +572,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                       <p className="text-sm font-medium text-gray-700">Flags:</p>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {alert.flags.map((flag: string, idx: number) => (
-                          <Badge key={idx} variant="outline">{flag}</Badge>
+                          <Badge key={idx} variant="default">{flag}</Badge>
                         ))}
                       </div>
                     </div>
@@ -602,7 +601,7 @@ const AdminAnalyticsDashboard: React.FC = () => {
                       updateSettings();
                     }
                   }}
-                  variant={settingsMode === 'edit' ? 'default' : 'outline'}
+                  variant={settingsMode === 'edit' ? 'primary' : 'outline'}
                 >
                   {settingsMode === 'edit' ? 'Save Changes' : 'Edit Settings'}
                 </Button>

@@ -58,6 +58,101 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
+  // Declare functions before they are used in useEffect dependencies
+  const getWelcomeMessage = useCallback((): string => {
+    const messages = {
+      arabic: `مرحباً! أنا المحاور الذكي للدراسة. سأقوم بطرح بعض الأسئلة عليك لفهم تجربتك بشكل أفضل. هل أنت مستعد للبدء؟`,
+      english: `Hello! I'm your AI interview moderator. I'll be asking you some questions to better understand your experience. Are you ready to begin?`
+    };
+    return messages[interviewConfig.language];
+  }, [interviewConfig.language]);
+
+  const generateAIResponse = useCallback(async (participantResponse: string) => {
+    const response = await fetch('/api/research-consolidated?action=ai-interview-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        participantResponse,
+        currentQuestionIndex,
+        conversationHistory: messages,
+        interviewConfig,
+        studyContext: { studyId, participantId }
+      })
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+
+    return result.data;
+  }, [sessionId, currentQuestionIndex, messages, interviewConfig, studyId, participantId]);
+
+  const synthesizeSpeech = useCallback(async (text: string, language: 'arabic' | 'english') => {
+    try {
+      const response = await fetch('/api/research-consolidated?action=text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, language })
+      });
+
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        await audio.play();
+        URL.revokeObjectURL(audioUrl);
+      }
+    } catch (error) {
+      console.error('Text-to-speech error:', error);
+    }
+  }, []);
+
+  const handleParticipantResponse = useCallback(async (response: string) => {
+    // Add participant message
+    const participantMessage: AIInterviewMessage = {
+      id: `participant-${Date.now()}`,
+      role: 'participant',
+      content: response,
+      timestamp: new Date(),
+      language: interviewConfig.language
+    };
+
+    setMessages(prev => [...prev, participantMessage]);
+    setIsLoading(true);
+
+    try {
+      // Generate AI response
+      const aiResponseData = await generateAIResponse(response);
+      
+      const aiMessage: AIInterviewMessage = {
+        id: `ai-${Date.now()}`,
+        role: 'ai',
+        content: aiResponseData.response,
+        timestamp: new Date(),
+        language: interviewConfig.language
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+      
+      // Update question index if moving to next question
+      if (aiResponseData.nextQuestionIndex !== undefined) {
+        setCurrentQuestionIndex(aiResponseData.nextQuestionIndex);
+      }
+
+      // Synthesize speech if audio is enabled
+      if (isAudioEnabled) {
+        await synthesizeSpeech(aiResponseData.response, interviewConfig.language);
+      }
+    } catch (error) {
+      console.error('AI response generation error:', error);
+      onError?.('Failed to generate AI response');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [interviewConfig.language, generateAIResponse, isAudioEnabled, synthesizeSpeech, onError]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -86,34 +181,7 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
       initializeSession();
       setSessionStarted(true);
     }
-  }, [sessionStarted, interviewConfig.language, isAudioEnabled, getWelcomeMessage]);
-
-  const getWelcomeMessage = useCallback((): string => {
-    const messages = {
-      arabic: `مرحباً! أنا المحاور الذكي للدراسة. سأقوم بطرح بعض الأسئلة عليك لفهم تجربتك بشكل أفضل. هل أنت مستعد للبدء؟`,
-      english: `Hello! I'm your AI interview moderator. I'll be asking you some questions to better understand your experience. Are you ready to begin?`
-    };
-    return messages[interviewConfig.language];
-  }, [interviewConfig.language]);
-
-  const synthesizeSpeech = async (text: string, language: 'arabic' | 'english') => {
-    try {
-      const response = await fetch('/api/research-consolidated?action=synthesize-speech', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, language })
-      });
-
-      if (response.ok) {
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        audio.play();
-      }
-    } catch (error) {
-      console.error('Speech synthesis error:', error);
-    }
-  };
+  }, [sessionStarted, interviewConfig.language, isAudioEnabled, getWelcomeMessage, synthesizeSpeech]);
 
   const processAudioInput = useCallback(async (audioBlob: Blob) => {
     setIsLoading(true);
@@ -178,28 +246,6 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
     }
   };
 
-  const generateAIResponse = useCallback(async (participantResponse: string) => {
-    const response = await fetch('/api/research-consolidated?action=ai-interview-response', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId,
-        participantResponse,
-        currentQuestionIndex,
-        conversationHistory: messages,
-        interviewConfig,
-        studyContext: { studyId, participantId }
-      })
-    });
-
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error);
-    }
-
-    return result.data;
-  }, [sessionId, currentQuestionIndex, messages, interviewConfig, studyId, participantId]);
-
   const endSession = useCallback(async () => {
     try {
       const sessionData = {
@@ -224,53 +270,6 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
       onError?.('Failed to save session data');
     }
   }, [sessionId, studyId, participantId, messages, onSessionComplete, onError]);
-
-  const handleParticipantResponse = useCallback(async (response: string) => {
-    // Add participant message
-    const participantMessage: AIInterviewMessage = {
-      id: `participant-${Date.now()}`,
-      role: 'participant',
-      content: response,
-      timestamp: new Date(),
-      language: interviewConfig.language
-    };
-
-    setMessages(prev => [...prev, participantMessage]);
-    setIsLoading(true);
-
-    try {
-      // Generate AI response
-      const aiResponse = await generateAIResponse(response);
-      
-      const aiMessage: AIInterviewMessage = {
-        id: `ai-${Date.now()}`,
-        role: 'ai',
-        content: aiResponse.content,
-        timestamp: new Date(),
-        language: interviewConfig.language
-      };
-
-      setMessages(prev => [...prev, aiMessage]);
-
-      // Synthesize AI response if audio enabled
-      if (isAudioEnabled) {
-        await synthesizeSpeech(aiResponse.content, interviewConfig.language);
-      }
-
-      // Check if interview should continue or end
-      if (aiResponse.shouldEnd) {
-        await endSession();
-      } else if (aiResponse.nextQuestionIndex !== undefined) {
-        setCurrentQuestionIndex(aiResponse.nextQuestionIndex);
-      }
-
-    } catch (error) {
-      console.error('AI response generation error:', error);
-      onError?.('Failed to generate AI response');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [interviewConfig.language, isAudioEnabled, generateAIResponse, endSession, onError]);
 
   const formatMessage = (message: AIInterviewMessage) => {
     const isAI = message.role === 'ai';
@@ -342,6 +341,24 @@ export const AIInterviewModerator: React.FC<AIInterviewProps> = ({
       {/* Input Area */}
       <div className="bg-white border-t border-gray-200 p-4">
         <div className="flex items-center gap-2">
+          {/* Audio Toggle */}
+          <button
+            onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+            className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+            title="Toggle audio"
+          >
+            {isAudioEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          </button>
+
+          {/* End Session */}
+          <button
+            onClick={endSession}
+            className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm"
+            title="End interview session"
+          >
+            End
+          </button>
+
           {/* Voice Input */}
           {isAudioEnabled && (
             <button

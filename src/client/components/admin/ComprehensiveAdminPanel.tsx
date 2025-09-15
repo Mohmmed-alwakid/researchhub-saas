@@ -8,6 +8,24 @@ import {
   AlertTriangle, Bell, Shield, LogOut 
 } from 'lucide-react';
 
+// User type for API compatibility
+interface User {
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  created_at: string;
+  last_active?: string;
+  subscription_plan: string;
+  subscription_status: string;
+  total_revenue: number;
+  studies_created: number;
+  participants_recruited: number;
+  last_login?: string;
+  profile_completed: boolean;
+  login_attempts: number;
+}
+
 // Type for auth store
 interface AuthStoreType {
   token: string | null;
@@ -70,8 +88,13 @@ class ComprehensiveAdminAPIClient {
   }
 
   // User Management
-  async getAllUsers(limit = 100) {
-    return await this.makeRequest(`/admin-comprehensive?action=get-all-users&limit=${limit}`);
+  async getAllUsers(limit = 100): Promise<{ success: boolean; data?: { users: User[]; total?: number }; error?: string }> {
+    const response = await this.makeRequest(`/admin-comprehensive?action=get-all-users&limit=${limit}`);
+    return {
+      success: response.success,
+      data: response.data as { users: User[]; total?: number },
+      error: response.error
+    };
   }
 
   async getUserDetails(userId: string) {
@@ -90,6 +113,16 @@ class ComprehensiveAdminAPIClient {
       method: 'POST',
       body: JSON.stringify({ userId, reason })
     });
+  }
+
+  // Required by UserManagementPanel interface
+  async getUsersWithAnalytics(): Promise<{ success: boolean; data?: { users: User[]; total?: number }; error?: string }> {
+    const response = await this.makeRequest(`/admin-comprehensive?action=get-users-with-analytics`);
+    return {
+      success: response.success,
+      data: response.data as { users: User[]; total?: number },
+      error: response.error
+    };
   }
 
   // Revenue Analytics
@@ -146,6 +179,19 @@ export const ComprehensiveAdminPanel: React.FC = () => {
   const [apiClient] = useState(() => new ComprehensiveAdminAPIClient(authStore));
 
   // Check admin permissions
+  const loadNotifications = useCallback(async () => {
+    try {
+      const response = await apiClient.getSystemAlerts('open', 10);
+      if (response.success && response.data) {
+        // Handle the response data structure properly
+        const alertsData = response.data as { alerts?: unknown[] };
+        setNotifications(alertsData.alerts?.length || 0);
+      }
+    } catch (error) {
+      console.error('Failed to load notifications:', error);
+    }
+  }, [apiClient]);
+
   useEffect(() => {
     if (!authStore.user || authStore.user.role !== 'admin') {
       // Redirect non-admin users
@@ -156,17 +202,6 @@ export const ComprehensiveAdminPanel: React.FC = () => {
     // Load initial notifications count
     loadNotifications();
   }, [authStore.user, loadNotifications]);
-
-  const loadNotifications = useCallback(async () => {
-    try {
-      const response = await apiClient.getSystemAlerts('open', 10);
-      if (response.success && response.data) {
-        setNotifications(response.data.alerts?.length || 0);
-      }
-    } catch (error) {
-      console.error('Failed to load notifications:', error);
-    }
-  }, [apiClient]);
 
   const handleLogout = () => {
     authStore.logout();
@@ -277,7 +312,7 @@ export const ComprehensiveAdminPanel: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && <AdminDashboard />}
         {activeTab === 'users' && <UserManagementPanel apiClient={apiClient} />}
-        {activeTab === 'analytics' && <AnalyticsDashboard apiClient={apiClient} />}
+        {activeTab === 'analytics' && <AnalyticsDashboard />}
         {activeTab === 'settings' && (
           <div className="text-center py-12">
             <Settings className="mx-auto h-12 w-12 text-gray-400" />

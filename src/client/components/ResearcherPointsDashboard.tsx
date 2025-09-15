@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 import { 
   Coins, 
   CreditCard, 
@@ -205,10 +203,12 @@ const ResearcherPointsDashboard: React.FC = () => {
 
       {/* Error Alert */}
       {error && (
-        <Alert className="border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-700">{error}</AlertDescription>
-        </Alert>
+        <div className="border border-red-200 bg-red-50 p-4 rounded-lg mb-6">
+          <div className="flex items-center">
+            <AlertCircle className="h-4 w-4 text-red-600 mr-2" />
+            <span className="text-red-700">{error}</span>
+          </div>
+        </div>
       )}
 
       <Tabs defaultValue="overview" className="space-y-6">
@@ -292,10 +292,12 @@ const ResearcherPointsDashboard: React.FC = () => {
                   </span>
                 </div>
                 
-                <Progress 
-                  value={(planInfo.monthlyAllocation.allocated / planInfo.monthlyAllocation.total) * 100}
-                  className="w-full"
-                />
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full" 
+                    style={{ width: `${(planInfo.monthlyAllocation.allocated / planInfo.monthlyAllocation.total) * 100}%` }}
+                  ></div>
+                </div>
                 
                 {planInfo.monthlyAllocation.remaining > 0 && (
                   <div className="flex justify-between items-center">
@@ -435,12 +437,14 @@ const ResearcherPointsDashboard: React.FC = () => {
                   </div>
                   
                   {balance && balance.currentBalance < costCalc.cost.totalCost && (
-                    <Alert className="border-orange-200 bg-orange-50">
-                      <AlertCircle className="h-4 w-4 text-orange-600" />
-                      <AlertDescription className="text-orange-700">
-                        Insufficient balance. You need {costCalc.cost.totalCost - balance.currentBalance} more points.
-                      </AlertDescription>
-                    </Alert>
+                    <div className="border border-orange-200 bg-orange-50 p-4 rounded-lg">
+                      <div className="flex items-center">
+                        <AlertCircle className="h-4 w-4 text-orange-600 mr-2" />
+                        <span className="text-orange-700">
+                          Insufficient balance. You need {costCalc.cost.totalCost - balance.currentBalance} more points.
+                        </span>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
