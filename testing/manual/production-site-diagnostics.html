@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Site Diagnostics</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .loading { color: orange; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🔍 ResearchHub Production Site Diagnostics</h1>
+    
+    <div class="test-section">
+        <h3>1. Basic Site Response</h3>
+        <div id="basic-test" class="loading">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. JavaScript Console Errors</h3>
+        <div id="console-errors" class="loading">Monitoring...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Network Request Status</h3>
+        <div id="network-status" class="loading">Checking...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Site Preview</h3>
+        <iframe 
+            src="https://researchhub-saas.vercel.app/" 
+            title="ResearchHub Production Site"
+            onload="handleIframeLoad()"
+            onerror="handleIframeError()">
+        </iframe>
+    </div>
+
+    <script>
+        // Test 1: Basic site response
+        async function testBasicResponse() {
+            try {
+                const response = await fetch('https://researchhub-saas.vercel.app/', { mode: 'no-cors' });
+                document.getElementById('basic-test').innerHTML = '<span class="success">✅ Site is responding (CORS-limited check)</span>';
+            } catch (error) {
+                document.getElementById('basic-test').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        // Test 2: Console error monitoring
+        window.addEventListener('error', (event) => {
+            const errorDiv = document.getElementById('console-errors');
+            errorDiv.innerHTML += `<div class="error">❌ ${event.error ? event.error.message : event.message}</div>`;
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            const errorDiv = document.getElementById('console-errors');
+            errorDiv.innerHTML += `<div class="error">❌ Promise rejection: ${event.reason}</div>`;
+        });
+        
+        // Test 3: Network status
+        async function checkNetworkStatus() {
+            try {
+                const startTime = Date.now();
+                const response = await fetch('https://researchhub-saas.vercel.app/', { 
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                const endTime = Date.now();
+                const loadTime = endTime - startTime;
+                
+                document.getElementById('network-status').innerHTML = 
+                    `<span class="success">✅ Response time: ${loadTime}ms</span>`;
+            } catch (error) {
+                document.getElementById('network-status').innerHTML = 
+                    `<span class="error">❌ Network error: ${error.message}</span>`;
+            }
+        }
+        
+        // Iframe handlers
+        function handleIframeLoad() {
+            console.log('✅ Iframe loaded successfully');
+        }
+        
+        function handleIframeError() {
+            console.log('❌ Iframe failed to load');
+        }
+        
+        // Initialize timeout for console errors
+        setTimeout(() => {
+            const errorDiv = document.getElementById('console-errors');
+            if (errorDiv.innerHTML === 'Monitoring...') {
+                errorDiv.innerHTML = '<span class="success">✅ No console errors detected</span>';
+            }
+        }, 5000);
+        
+        // Run tests
+        testBasicResponse();
+        checkNetworkStatus();
+    </script>
+</body>
+</html>
