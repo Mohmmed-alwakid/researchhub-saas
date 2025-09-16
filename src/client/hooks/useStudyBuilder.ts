@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore, TaskInput } from '../stores/appStore';
+import type { StudyInput } from '../stores/appStore';
 import { StudyFormData } from '../components/studies/StudyMetadataForm';
 import { StudyBuilderBlock } from '../components/studies/StudyBlocksManager';
 import { ITask, Study } from '../../shared/types';
@@ -122,31 +123,45 @@ export const useStudyBuilder = (studyId?: string) => {
       // Convert blocks to tasks
       const tasks = convertBlocksToTaskInput(blocks);
 
-      const studyData = {
+      const studyData: StudyInput = {
         title: formData.title,
         description: formData.description || '',
         type: formData.type as 'usability' | 'survey' | 'interview',
-        targetParticipants: formData.settings.maxParticipants,
-        duration: formData.settings.duration,
-        compensation: formData.settings.compensation,
-        requirements: [], // Could be added to form later
         status: 'draft' as const,
         tasks,
         settings: {
+          maxParticipants: formData.settings.maxParticipants,
+          duration: formData.settings.duration,
+          compensation: formData.settings.compensation,
           recordScreen: formData.settings.recordScreen,
           recordAudio: formData.settings.recordAudio,
-          recordWebcam: formData.settings.recordWebcam,
-          trackClicks: formData.settings.trackClicks,
-          trackHovers: false, // Could be added to form
-          trackScrolls: formData.settings.trackScrolls
+          collectHeatmaps: formData.settings.trackClicks || formData.settings.trackScrolls // Derive from tracking settings
         }
       };
 
       let result: Study | void;
       try {
         if (isEditing && studyId) {
-          result = await updateStudy(studyId, studyData);
+          // For updates, we need to convert to Partial<Study> format
+          const updateData: Partial<Study> = {
+            title: formData.title,
+            description: formData.description || '',
+            type: formData.type as 'usability' | 'survey' | 'interview',
+            status: 'draft' as const,
+            settings: {
+              maxParticipants: formData.settings.maxParticipants,
+              duration: formData.settings.duration,
+              compensation: formData.settings.compensation,
+              recordScreen: formData.settings.recordScreen,
+              recordAudio: formData.settings.recordAudio,
+              recordWebcam: formData.settings.recordWebcam,
+              trackClicks: formData.settings.trackClicks,
+              trackScrolls: formData.settings.trackScrolls
+            }
+          };
+          result = await updateStudy(studyId, updateData);
         } else {
+          // For creation, use StudyInput format
           result = await createStudy(studyData);
         }
 

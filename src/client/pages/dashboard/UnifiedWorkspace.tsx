@@ -15,8 +15,20 @@ import { Button } from '../../components/ui/Button';
 // Import existing components that will become tabs
 import DashboardOverview from './DashboardOverview';
 import CollaborationTab from '../collaboration/CollaborationTab';
-import StudyAnalyticsTab from '../analytics/StudyAnalyticsTab';
-import TemplateAccessTab from '../templates/TemplateAccessTab';
+import TemplateManager from '../../components/templates/TemplateManager';
+import AdvancedAnalyticsDashboard from '../../components/analytics/AdvancedAnalyticsDashboard';
+
+// Create wrapper components to match expected prop interface
+const StudyAnalyticsTab: React.FC<{ studyId?: string; workspaceId?: string }> = ({ studyId }) => (
+  <AdvancedAnalyticsDashboard 
+    studyId={studyId} 
+    studies={[]} // Will be populated by the component itself
+  />
+);
+
+const TemplateAccessTab: React.FC<{ studyId?: string; workspaceId?: string }> = () => (
+  <TemplateManager />
+);
 
 // Study interface for type safety
 interface Study {

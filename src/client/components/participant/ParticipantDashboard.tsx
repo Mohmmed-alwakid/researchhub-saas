@@ -15,15 +15,14 @@ import {
   ArrowRight,
   Search
 } from 'lucide-react';
-import { useEnhancedAuth } from '../../hooks/useEnhancedAuth';
+import { useAuthStore } from '../../stores/authStore';
 import toast from 'react-hot-toast';
 
 // Types
 type TabId = 'overview' | 'applications' | 'sessions' | 'achievements';
 
 interface AuthClient {
-  getUser(): Promise<unknown>;
-  request(options: unknown): Promise<unknown>;
+  getToken(): string | null;
 }
 
 interface ParticipantStats {
@@ -41,7 +40,7 @@ interface StudyApplication {
   studyTitle: string;
   researcherName: string;
   appliedAt: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'waitlisted';
+  status: 'pending' | 'accepted' | 'rejected' | 'waitlisted' | 'completed';
   compensation: number;
   duration: number;
   type: string;
@@ -362,7 +361,7 @@ const AchievementBadge: React.FC<{ achievement: Achievement }> = ({ achievement 
 
 // Main Participant Dashboard Component
 export const ParticipantDashboard: React.FC<{ className?: string }> = ({ className = '' }) => {
-  const { isAuthenticated, hasRole, authClient } = useEnhancedAuth();
+  const { isAuthenticated, user, token } = useAuthStore();
   const navigate = useNavigate();
   
   const [stats, setStats] = useState<ParticipantStats | null>(null);
@@ -373,7 +372,12 @@ export const ParticipantDashboard: React.FC<{ className?: string }> = ({ classNa
   
   const [activeTab, setActiveTab] = useState<'overview' | 'applications' | 'sessions' | 'achievements'>('overview');
 
-  const api = useMemo(() => new ParticipantDashboardAPI(authClient), [authClient]);
+  const api = useMemo(() => {
+    const authClient: AuthClient = {
+      getToken: () => token
+    };
+    return new ParticipantDashboardAPI(authClient);
+  }, [token]);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -400,10 +404,10 @@ export const ParticipantDashboard: React.FC<{ className?: string }> = ({ classNa
       }
     };
 
-    if (isAuthenticated && hasRole('participant')) {
+    if (isAuthenticated && user?.role === 'participant') {
       loadDashboardData();
     }
-  }, [isAuthenticated, hasRole, api]);
+  }, [isAuthenticated, user?.role, api]);
 
   // Authentication check
   if (!isAuthenticated) {
@@ -422,7 +426,7 @@ export const ParticipantDashboard: React.FC<{ className?: string }> = ({ classNa
     );
   }
 
-  if (!hasRole('participant')) {
+  if (user?.role !== 'participant') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

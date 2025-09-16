@@ -28,7 +28,7 @@ export interface TaskInput {
   settings?: Record<string, unknown>;
 }
 
-interface StudyInput {
+export interface StudyInput {
   title: string;
   description: string;
   type: 'usability' | 'interview' | 'survey' | 'prototype';

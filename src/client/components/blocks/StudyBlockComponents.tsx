@@ -39,7 +39,7 @@ export interface StudyBlock {
 
 export interface BlockProps {
   block: StudyBlock;
-  onComplete: (response: Record<string, string | number | boolean | string[]>) => void;
+  onComplete: (response: Record<string, unknown>) => void;
   onNext: () => void;
   isLastBlock: boolean;
 }
@@ -676,10 +676,19 @@ export const FiveSecondTestBlock: React.FC<BlockProps> = ({ block, onComplete, o
 
   const duration = (block.settings.duration as number) || 5;
   const imageUrl = (block.settings.image as string) || (block.settings.imageUrl as string) || '';
-  const questions = (block.settings.followUpQuestions as Array<{ id: string; question: string; type: string }>) || [
+  
+  // Safely cast followUpQuestions with proper type checking
+  let questions: Array<{ id: string; question: string; type: string }> = [
     { id: '1', question: 'What was the main focus of the image?', type: 'open_text' },
     { id: '2', question: 'What do you remember most clearly?', type: 'open_text' }
   ];
+  
+  if (block.settings.followUpQuestions && Array.isArray(block.settings.followUpQuestions)) {
+    const rawQuestions = block.settings.followUpQuestions as unknown;
+    if (Array.isArray(rawQuestions)) {
+      questions = rawQuestions as Array<{ id: string; question: string; type: string }>;
+    }
+  }
 
   const startTest = () => {
     setPhase('viewing');
@@ -1022,13 +1031,25 @@ export const BlockRenderer: React.FC<BlockProps> = ({ block, onComplete, onNext,
     case 'thank_you':
       return <ThankYouBlock block={block} onComplete={onComplete} onNext={onNext} isLastBlock={isLastBlock} />;
     
-    // Advanced block types
+    // Advanced block types - Bridge the type differences
     case 'conditional_branch':
-      return <ConditionalBranchBlock block={block} onNext={onComplete} analyticsTracker={analyticsTracker} />;
+      return <ConditionalBranchBlock 
+        block={block as unknown as typeof block} 
+        onNext={(response: unknown) => onComplete(response as Record<string, unknown>)} 
+        analyticsTracker={analyticsTracker} 
+      />;
     case 'ai_follow_up':
-      return <AIFollowUpBlock block={block} onNext={onComplete} analyticsTracker={analyticsTracker} />;
+      return <AIFollowUpBlock 
+        block={block as unknown as typeof block} 
+        onNext={(response: unknown) => onComplete(response as Record<string, unknown>)} 
+        analyticsTracker={analyticsTracker} 
+      />;
     case 'card_sort':
-      return <CardSortBlock block={block} onNext={onComplete} analyticsTracker={analyticsTracker} />;
+      return <CardSortBlock 
+        block={block as unknown as typeof block} 
+        onNext={(response: unknown) => onComplete(response as Record<string, unknown>)} 
+        analyticsTracker={analyticsTracker} 
+      />;
     case 'yes_no':
       return <YesNoBlock block={block} onComplete={onComplete} onNext={onNext} isLastBlock={isLastBlock} />;
     case 'simple_input':

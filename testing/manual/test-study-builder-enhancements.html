@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Builder Enhancements Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .test-section {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+        .test-checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .test-checklist li {
+            padding: 12px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .test-checklist li:hover {
+            background: #f0f9ff;
+            transform: translateX(4px);
+        }
+        .test-checklist input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        .priority-high { border-left-color: #dc2626; }
+        .priority-medium { border-left-color: #f59e0b; }
+        .priority-low { border-left-color: #10b981; }
+        .status-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 250px;
+        }
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 8px;
+            height: 8px;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981, #059669);
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .quick-link {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .quick-link:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+        .feature-demo {
+            background: #f0f9ff;
+            border: 2px dashed #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        .demo-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.2s;
+        }
+        .demo-button:hover {
+            background: #2563eb;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .success { color: #22c55e; font-weight: 600; }
+        .warning { color: #f59e0b; font-weight: 600; }
+        .error { color: #ef4444; font-weight: 600; }
+        .info { color: #3b82f6; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🎯 Study Builder Enhancements Test Suite</h1>
+        <p>Comprehensive testing for insertion points, quick actions, and enhanced block library</p>
+        <div class="quick-links">
+            <a href="http://localhost:5175" class="quick-link" target="_blank">
+                🏠 Local Development
+            </a>
+            <a href="http://localhost:5175/studies/create" class="quick-link" target="_blank">
+                ➕ Create Study
+            </a>
+            <a href="http://localhost:5175/studies" class="quick-link" target="_blank">
+                📚 Studies Dashboard
+            </a>
+            <a href="http://localhost:3003/api/health" class="quick-link" target="_blank">
+                ❤️ Health Check
+            </a>
+        </div>
+    </div>
+
+    <div class="status-panel">
+        <h3>Test Progress</h3>
+        <div id="progress-text">0 of 0 tests completed</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div id="completion-status" style="margin-top: 12px; font-size: 14px; color: #6b7280;"></div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-section">
+            <h2>🎯 Feature 1: Block Insertion Points Testing</h2>
+            <p>Test the new insertion points that allow precise block placement between existing blocks.</p>
+            
+            <div class="feature-demo">
+                <h4>How to Test Insertion Points:</h4>
+                <p>1. Navigate to Study Builder → Block Configuration</p>
+                <p>2. Hover between existing blocks</p>
+                <p>3. Look for hover-activated "+" buttons</p>
+                <p>4. Click to insert blocks at specific positions</p>
+                <button class="demo-button" onclick="openTestUrl('/studies/create')">Test Insertion Points</button>
+            </div>
+
+            <ul class="test-checklist">
+                <li class="priority-high">
+                    <input type="checkbox" id="insertion-1">
+                    <label for="insertion-1">Insertion points appear on hover between blocks</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="insertion-2">
+                    <label for="insertion-2">"+" buttons are visible and clickable</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="insertion-3">
+                    <label for="insertion-3">Clicking "+" opens block library modal</label>
+                </li>
+                <li class="priority-medium">
+                    <input type="checkbox" id="insertion-4">
+                    <label for="insertion-4">New blocks are inserted at correct position</label>
+                </li>
+                <li class="priority-medium">
+                    <input type="checkbox" id="insertion-5">
+                    <label for="insertion-5">Block order updates correctly after insertion</label>
+                </li>
+                <li class="priority-low">
+                    <input type="checkbox" id="insertion-6">
+                    <label for="insertion-6">Visual feedback during hover is smooth</label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>⚡ Feature 2: Block Quick Actions Testing</h2>
+            <p>Test the quick action buttons (duplicate, move up/down, delete) that appear on block hover.</p>
+            
+            <div class="feature-demo">
+                <h4>How to Test Quick Actions:</h4>
+                <p>1. Go to Study Builder with existing blocks</p>
+                <p>2. Hover over any block in the flow</p>
+                <p>3. Test duplicate, move up, move down, delete buttons</p>
+                <p>4. Verify actions work correctly</p>
+                <button class="demo-button" onclick="openTestUrl('/studies/create')">Test Quick Actions</button>
+            </div>
+
+            <ul class="test-checklist">
+                <li class="priority-high">
+                    <input type="checkbox" id="quick-1">
+                    <label for="quick-1">Quick action buttons appear on block hover</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="quick-2">
+                    <label for="quick-2">Duplicate button creates exact copy of block</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="quick-3">
+                    <label for="quick-3">Move up/down buttons reorder blocks correctly</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="quick-4">
+                    <label for="quick-4">Delete button removes block with confirmation</label>
+                </li>
+                <li class="priority-medium">
+                    <input type="checkbox" id="quick-5">
+                    <label for="quick-5">Quick actions work for all block types</label>
+                </li>
+                <li class="priority-low">
+                    <input type="checkbox" id="quick-6">
+                    <label for="quick-6">Hover states provide clear visual feedback</label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Feature 3: Enhanced Block Library Testing</h2>
+            <p>Test the improved block library with category filtering and enhanced search.</p>
+            
+            <div class="feature-demo">
+                <h4>How to Test Block Library:</h4>
+                <p>1. Open Study Builder block library</p>
+                <p>2. Test category filter pills (All, Survey, Usability, Research)</p>
+                <p>3. Use search to find specific blocks</p>
+                <p>4. Verify filtering and search accuracy</p>
+                <button class="demo-button" onclick="openTestUrl('/studies/create')">Test Block Library</button>
+            </div>
+
+            <ul class="test-checklist">
+                <li class="priority-high">
+                    <input type="checkbox" id="library-1">
+                    <label for="library-1">Category filter pills (All, Survey, Usability, Research) are visible</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="library-2">
+                    <label for="library-2">Clicking category filters shows relevant blocks only</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="library-3">
+                    <label for="library-3">Search functionality filters blocks in real-time</label>
+                </li>
+                <li class="priority-medium">
+                    <input type="checkbox" id="library-4">
+                    <label for="library-4">Block categorization is accurate and logical</label>
+                </li>
+                <li class="priority-medium">
+                    <input type="checkbox" id="library-5">
+                    <label for="library-5">Search handles partial matches and keywords</label>
+                </li>
+                <li class="priority-low">
+                    <input type="checkbox" id="library-6">
+                    <label for="library-6">Block library layout is clean and organized</label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔄 Feature 4: Integration & Workflow Testing</h2>
+            <p>Test how all enhanced features work together in real study creation workflows.</p>
+            
+            <div class="feature-demo">
+                <h4>Complete Workflow Test:</h4>
+                <p>1. Create a new study from scratch</p>
+                <p>2. Add blocks using insertion points</p>
+                <p>3. Modify blocks using quick actions</p>
+                <p>4. Use library filtering to find blocks</p>
+                <button class="demo-button" onclick="openTestUrl('/studies/create')">Test Complete Workflow</button>
+            </div>
+
+            <ul class="test-checklist">
+                <li class="priority-high">
+                    <input type="checkbox" id="workflow-1">
+                    <label for="workflow-1">All features work together without conflicts</label>
+                </li>
+                <li class="priority-high">
+                    <input type="checkbox" id="workflow-2">
+                    <label for="workflow-2">Block ordering remains consistent across operations</label>
+                </li>
+                <li class="priority-medium">
+                    <input type="checkbox" id="workflow-3">
+                    <label for="workflow-3">No performance issues with enhanced features</label>
+                </li>
+                <li class="priority-medium">
+                    <input type="checkbox" id="workflow-4">
+                    <label for="workflow-4">Study creation flow feels intuitive and smooth</label>
+                </li>
+                <li class="priority-low">
+                    <input type="checkbox" id="workflow-5">
+                    <label for="workflow-5">Enhanced features improve overall user experience</label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="test-results" id="test-results" style="display: none;">
+            <h3>🧪 Test Results Summary</h3>
+            <div id="results-content"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📋 Testing Instructions</h2>
+        <div class="test-section">
+            <h3>Step-by-Step Testing Process:</h3>
+            <ol style="padding-left: 20px; line-height: 1.8;">
+                <li><strong>Environment Setup:</strong> Ensure local development server is running at <code>http://localhost:5175</code></li>
+                <li><strong>Login:</strong> Use test account: <code>abwanwr77+Researcher@gmail.com</code> / <code>Testtest123</code></li>
+                <li><strong>Navigate:</strong> Go to Studies → Create New Study → Study Builder</li>
+                <li><strong>Test Systematically:</strong> Work through each feature section above</li>
+                <li><strong>Document Issues:</strong> Note any bugs or UX issues in the results section</li>
+                <li><strong>Complete Workflow:</strong> Test end-to-end study creation with enhanced features</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Key Testing Focus Areas:</h3>
+            <ul style="padding-left: 20px; line-height: 1.8;">
+                <li><strong>Visual Feedback:</strong> Hover states, animations, transitions</li>
+                <li><strong>Functionality:</strong> All buttons and interactions work as expected</li>
+                <li><strong>Block Management:</strong> Insertion, duplication, reordering, deletion</li>
+                <li><strong>Search & Filtering:</strong> Accurate results and smooth performance</li>
+                <li><strong>Integration:</strong> Features work together without conflicts</li>
+                <li><strong>User Experience:</strong> Intuitive and efficient workflow</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Expected Outcomes:</h3>
+            <ul style="padding-left: 20px; line-height: 1.8;">
+                <li>All 23 test items should pass ✅</li>
+                <li>No console errors during testing</li>
+                <li>Smooth performance with no lag</li>
+                <li>Intuitive user experience</li>
+                <li>Block operations maintain data integrity</li>
+                <li>Enhanced features feel natural and helpful</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Progress tracking functionality
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const completionStatus = document.getElementById('completion-status');
+        const resultsSection = document.getElementById('test-results');
+        const resultsContent = document.getElementById('results-content');
+
+        function updateProgress() {
+            const total = checkboxes.length;
+            const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+            
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = `${completed} of ${total} tests completed`;
+            
+            if (percentage === 100) {
+                completionStatus.textContent = '🎉 All tests completed!';
+                completionStatus.className = 'success';
+                generateTestResults();
+            } else if (percentage >= 75) {
+                completionStatus.textContent = '🚀 Almost done!';
+                completionStatus.className = 'info';
+            } else if (percentage >= 50) {
+                completionStatus.textContent = '⚡ Good progress!';
+                completionStatus.className = 'warning';
+            } else {
+                completionStatus.textContent = '🔄 Testing in progress...';
+                completionStatus.className = 'info';
+            }
+        }
+
+        function generateTestResults() {
+            const features = {
+                'insertion': 'Block Insertion Points',
+                'quick': 'Block Quick Actions', 
+                'library': 'Enhanced Block Library',
+                'workflow': 'Integration & Workflow'
+            };
+
+            let resultsHTML = '';
+            for (const [prefix, featureName] of Object.entries(features)) {
+                const featureCheckboxes = Array.from(checkboxes).filter(cb => cb.id.startsWith(prefix));
+                const completed = featureCheckboxes.filter(cb => cb.checked).length;
+                const total = featureCheckboxes.length;
+                const percentage = (completed / total) * 100;
+                
+                const statusClass = percentage === 100 ? 'success' : percentage >= 75 ? 'warning' : 'error';
+                
+                resultsHTML += `
+                    <div class="result-item">
+                        <span class="${statusClass}">${featureName}:</span> 
+                        ${completed}/${total} tests passed (${percentage.toFixed(0)}%)
+                    </div>
+                `;
+            }
+
+            resultsContent.innerHTML = resultsHTML;
+            resultsSection.style.display = 'block';
+        }
+
+        // Add event listeners
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateProgress);
+        });
+
+        // Helper function to open test URLs
+        function openTestUrl(path) {
+            window.open('http://localhost:5175' + path, '_blank');
+        }
+
+        // Initialize progress
+        updateProgress();
+
+        // Auto-save test progress to localStorage
+        function saveProgress() {
+            const progress = {};
+            checkboxes.forEach(cb => {
+                progress[cb.id] = cb.checked;
+            });
+            localStorage.setItem('studyBuilderTestProgress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('studyBuilderTestProgress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                checkboxes.forEach(cb => {
+                    if (progress[cb.id]) {
+                        cb.checked = true;
+                    }
+                });
+                updateProgress();
+            }
+        }
+
+        // Load saved progress on page load
+        loadProgress();
+
+        // Save progress on changes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', saveProgress);
+        });
+
+        console.log('🎯 Study Builder Enhancements Test Suite Loaded');
+        console.log('📊 Total test items:', checkboxes.length);
+        console.log('🔗 Local development server:', 'http://localhost:5175');
+    </script>
+</body>
+</html>

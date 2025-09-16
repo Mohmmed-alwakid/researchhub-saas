@@ -13,14 +13,17 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [previewBlockIndex, setPreviewBlockIndex] = useState(0);
   const [participantData, setParticipantData] = useState<Record<string, string | number | boolean>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Filter blocks based on search only
+  // Filter blocks based on search and category
   const filteredBlocks = BLOCK_LIBRARY
     .filter(block => block.type !== 'thank_you_screen' && block.type !== 'welcome_screen')
     .filter(block => {
       const matchesSearch = block.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            block.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesSearch;
+      const matchesCategory = selectedCategory === 'all' || 
+                             block.category?.toLowerCase() === selectedCategory.toLowerCase();
+      return matchesSearch && matchesCategory;
     });
 
   // Ensure there's always a welcome block at the beginning and a thank you block at the end
@@ -85,13 +88,20 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
     }));
   };
 
-  const addBlock = (type: BlockType) => {
-    console.log('🧩 Adding block:', type);
+  const addBlock = (type: BlockType, insertAfterIndex?: number) => {
+    console.log('🧩 Adding block:', type, 'at position:', insertAfterIndex);
     console.log('📊 Current blocks before:', blocks.length);
     
-    // Find the thank you block to insert before it
-    const thankYouIndex = blocks.findIndex(block => block.type === 'thank_you_screen');
-    const insertOrder = thankYouIndex >= 0 ? thankYouIndex : blocks.length;
+    let insertOrder: number;
+    
+    if (insertAfterIndex !== undefined) {
+      // Insert after specific block
+      insertOrder = insertAfterIndex + 1;
+    } else {
+      // Default: Find the thank you block to insert before it
+      const thankYouIndex = blocks.findIndex(block => block.type === 'thank_you_screen');
+      insertOrder = thankYouIndex >= 0 ? thankYouIndex : blocks.length;
+    }
 
     const newBlock: StudyBuilderBlock = {
       id: `block_${Date.now()}`,
@@ -117,6 +127,30 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
     
     onUpdateFormData({ blocks: finalBlocks });
     console.log('✅ Block added successfully');
+  };
+
+  const duplicateBlock = (blockId: string) => {
+    const blockToDuplicate = blocks.find(b => b.id === blockId);
+    if (!blockToDuplicate || blockToDuplicate.type === 'welcome_screen' || blockToDuplicate.type === 'thank_you_screen') {
+      return;
+    }
+
+    const duplicatedBlock: StudyBuilderBlock = {
+      ...blockToDuplicate,
+      id: `block_${Date.now()}`,
+      title: `${blockToDuplicate.title} (Copy)`,
+      order: blockToDuplicate.order + 1
+    };
+
+    // Update orders for blocks after the duplicated block
+    const updatedBlocks = blocks.map(block => 
+      block.order > blockToDuplicate.order 
+        ? { ...block, order: block.order + 1 }
+        : block
+    );
+
+    const finalBlocks = [...updatedBlocks, duplicatedBlock].sort((a, b) => a.order - b.order);
+    onUpdateFormData({ blocks: finalBlocks });
   };
 
   const removeBlock = (blockId: string) => {
@@ -200,7 +234,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
               </div>
 
               {/* Enhanced Search Bar */}
-              <div className="mb-4">
+              <div className="mb-4 space-y-3">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -224,6 +258,23 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
                       </svg>
                     </button>
                   )}
+                </div>
+
+                {/* Category Filter */}
+                <div className="flex space-x-1">
+                  {['all', 'survey', 'usability', 'research'].map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+                        selectedCategory === category
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -320,6 +371,27 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
                 >
                   {blocks.map((block, index) => (
                     <div key={block.id} className="space-y-2">
+                      {/* Insertion Point Above Block (except for welcome screen) */}
+                      {index > 0 && block.type !== 'welcome_screen' && (
+                        <div className="group relative py-2">
+                          <div className="flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-all duration-200">
+                              <button
+                                onClick={() => addBlock('feedback_collection', index - 1)}
+                                className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-full hover:bg-blue-100 transition-colors shadow-sm"
+                                title="Add block here"
+                              >
+                                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                                </svg>
+                                Add Block Here
+                              </button>
+                            </div>
+                          </div>
+                          <div className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent group-hover:via-blue-400 transition-colors"></div>
+                        </div>
+                      )}
+
                       {/* Block Card */}
                       <div
                         className={`group relative p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
@@ -400,6 +472,20 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    duplicateBlock(block.id);
+                  }}
+                  className="p-1 text-gray-400 hover:text-green-600 rounded hover:bg-green-50 transition-colors"
+                  title="Duplicate block"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" />
+                    <path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h8a2 2 0 00-2-2H5z" />
+                  </svg>
+                </button>
+                <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
                     removeBlock(block.id);
                   }}
                   className="p-1 text-gray-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors"
@@ -460,7 +546,7 @@ export const BlockConfigurationStep: React.FC<StepProps> = ({
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                       </svg>
-                      <span className="text-xs font-medium">Drop new block here</span>
+                      <span className="text-xs font-medium">Drag blocks from library or click + buttons above</span>
                     </div>
                   </div>
                 </div>

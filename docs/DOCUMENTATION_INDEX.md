@@ -78,6 +78,8 @@
 
 - **[STUDY_BLOCKS_IMPLEMENTATION_PROGRESS.md](STUDY_BLOCKS_IMPLEMENTATION_PROGRESS.md)** - 🚧 Current implementation status and roadmap
 
+- **[STUDY_BUILDER_ENHANCED_FEATURES_GUIDE.md](STUDY_BUILDER_ENHANCED_FEATURES_GUIDE.md)** - 🎯 **NEW - SEPTEMBER 16, 2025** - Comprehensive guide for enhanced Study Builder features including insertion points, quick actions, and enhanced block library
+
 - **[STUDY_TASKS.md](STUDY_TASKS.md)** - 📝 Legacy task documentation (superseded by Study Blocks System)
 
 ### 🚀 Launch Button & CORS System ⭐ **NEW - JULY 17, 2025**

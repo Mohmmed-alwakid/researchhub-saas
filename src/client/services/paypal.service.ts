@@ -87,9 +87,9 @@ class PayPalService {
       method,
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` })
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       },
-      ...(body && { body: JSON.stringify(body) })
+      ...(body ? { body: JSON.stringify(body) } : {})
     };
 
     const url = `${this.apiUrl}?action=${action}`;

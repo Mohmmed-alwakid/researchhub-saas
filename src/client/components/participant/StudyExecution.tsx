@@ -91,12 +91,10 @@ interface Study {
 
 // API service for study execution
 class StudyExecutionAPI {
-  private authClient: AuthClient | null;
-  private baseUrl: string;
-
-  constructor(authClient: AuthClient | null, baseUrl = 'http://localhost:3003/api') {
-    this.authClient = authClient;
-    this.baseUrl = baseUrl;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(_authClient: AuthClient | null) {
+    // Constructor parameter accepted for future implementation
+    // Currently using mock data for development
   }
 
   async getStudy(studyId: string): Promise<Study> {
@@ -460,7 +458,7 @@ const QuestionBlock: React.FC<{
                     <span>{question.labels[1]}</span>
                   </div>
                   <div className="flex justify-between">
-                    {Array.from({ length: question.max - question.min + 1 }, (_, i) => i + question.min).map((value) => (
+                    {Array.from({ length: (question.max || 10) - (question.min || 1) + 1 }, (_, i) => i + (question.min || 1)).map((value) => (
                       <label key={value} className="flex flex-col items-center">
                         <input
                           type="radio"

@@ -76,14 +76,9 @@ export const PointsManager: React.FC<PointsManagerProps> = () => {
         <CardContent>
           <div className="text-center py-6">
             <div className="text-3xl font-bold text-gray-900">
-              {balance?.available || 0}
+              {balance?.currentBalance || 0}
             </div>
             <p className="text-sm text-gray-600 mt-1">Available Points</p>
-            {balance && balance.pending > 0 && (
-              <p className="text-sm text-yellow-600 mt-1">
-                {balance.pending} points pending
-              </p>
-            )}
           </div>
           
           {/* Usage Stats */}
@@ -97,7 +92,7 @@ export const PointsManager: React.FC<PointsManagerProps> = () => {
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold text-gray-900">
-                  {usageStats.totalSpent}
+                  {usageStats.pointsSpent}
                 </div>
                 <p className="text-sm text-gray-600">Points Spent</p>
               </div>
@@ -135,23 +130,23 @@ export const PointsManager: React.FC<PointsManagerProps> = () => {
                 >
                   <div className="flex items-center space-x-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      transaction.type === 'credit' 
+                      (transaction.type === 'earned' || transaction.type === 'admin_assigned')
                         ? 'bg-green-100 text-green-600' 
                         : 'bg-red-100 text-red-600'
                     }`}>
-                      {transaction.type === 'credit' ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+                      {(transaction.type === 'earned' || transaction.type === 'admin_assigned') ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{transaction.description}</p>
                       <p className="text-sm text-gray-500">
-                        {new Date(transaction.createdAt).toLocaleDateString()}
+                        {new Date(transaction.timestamp).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <div className={`font-semibold ${
-                    transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
+                    (transaction.type === 'earned' || transaction.type === 'admin_assigned') ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {transaction.type === 'credit' ? '+' : '-'}{transaction.amount}
+                    {(transaction.type === 'earned' || transaction.type === 'admin_assigned') ? '+' : '-'}{transaction.amount}
                   </div>
                 </div>
               ))}

@@ -211,7 +211,7 @@ export const Button: React.FC<ButtonProps> = ({
 // ================================
 // Input Component (Enhanced)
 // ================================
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   variant?: 'default' | 'error' | 'success';
   size?: 'sm' | 'md' | 'lg';
   leftIcon?: React.ReactNode;
@@ -640,17 +640,6 @@ export const Progress: React.FC<ProgressProps> = ({
 // Export everything
 // ================================
 export default {
-  DesignTokens,
-  Button,
-  Input,
-  Card,
-  Modal,
-  Alert,
-  Progress
-};
-
-// Named exports for convenience
-export {
   DesignTokens,
   Button,
   Input,

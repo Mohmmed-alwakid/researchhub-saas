@@ -40,6 +40,7 @@ import userProfileHandler from '../../api/user-profile-consolidated.js';
 import systemHandler from '../../api/system-consolidated.js';
 import researchHandler from '../../api/research-consolidated.js';
 import adminHandler from '../../api/admin-consolidated.js';
+import applicationsHandler from '../../api/applications.js';
 
 console.log('🔍 Testing Supabase connectivity...');
 
@@ -65,7 +66,7 @@ app.all('/api/studies*', async (req, res) => {
 });
 
 app.all('/api/applications*', async (req, res) => {
-  await researchHandler(req, res);
+  await applicationsHandler(req, res);
 });
 
 app.all('/api/blocks*', async (req, res) => {

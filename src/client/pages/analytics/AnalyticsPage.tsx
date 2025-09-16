@@ -100,7 +100,7 @@ const PerformanceMonitor: React.FC<{ metrics: PerformanceMetrics | null }> = ({ 
 const AnalyticsPage: React.FC = () => {
   const { ENABLE_ADVANCED_ANALYTICS } = useFeatureFlags();
   const { studyId } = useParams();
-  const { currentStudy, fetchStudies } = useAppStore();
+  const { currentStudy, studies, fetchStudies } = useAppStore();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState('7d');
@@ -625,8 +625,27 @@ const AnalyticsPage: React.FC = () => {
             </div>}>
               <LazyAdvancedAnalyticsDashboard
                 studyId={studyId}
-                dateRange={dateRange}
-                refreshInterval={30000}
+                studies={studies.map(study => ({
+                  studyId: study._id || '',
+                  studyTitle: study.title || '',
+                  totalParticipants: study.participants?.enrolled || 0,
+                  completedSessions: study.participants?.completed || 0,
+                  averageCompletionTime: study.analytics?.avgCompletionTime || 0,
+                  completionRate: study.analytics?.successRate || 0,
+                  dropoffRate: study.analytics?.dropoffRate || 0,
+                  participantRating: 0,
+                  createdDate: study.createdAt?.toISOString() || '',
+                  lastActivity: study.updatedAt?.toISOString() || '',
+                  blockAnalytics: [],
+                  participantJourney: [],
+                  timeSeriesData: [],
+                  demographicData: {
+                    ageGroups: [],
+                    genderDistribution: [],
+                    deviceTypes: [],
+                    locations: []
+                  }
+                }))}
               />
             </Suspense>
           </div>

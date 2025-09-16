@@ -272,7 +272,7 @@ export const useEnhancedWallet = (): UseEnhancedWalletReturn => {
 
   const retryFailedRequests = useCallback(async () => {
     if (retryQueue.current.length > 0) {
-      toast.info('Retrying failed requests...');
+      toast('Retrying failed requests...');
       const retries = [...retryQueue.current];
       retryQueue.current = [];
       

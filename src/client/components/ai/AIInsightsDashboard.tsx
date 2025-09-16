@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { aiInsightsEngine, AIInsight, QualityScore, TrendInsight, Recommendation } from '../../../shared/services/aiInsightsEngine';
+import { aiInsightsEngine, AIInsight, QualityScore, TrendInsight, Recommendation } from '../../../services/ai/aiInsightsEngine';
 
 interface AIInsightsDashboardProps {
   studyId?: string;
@@ -99,7 +99,7 @@ export const AIInsightsDashboard: React.FC<AIInsightsDashboardProps> = ({
         aiInsightsEngine.analyzeResponses(mockResponses),
         aiInsightsEngine.generateRecommendations(mockMetrics),
         aiInsightsEngine.detectTrends(mockStudyData),
-        aiInsightsEngine.scoreResponseQuality(mockResponses[0])
+        aiInsightsEngine.scoreResponseQuality(mockResponses)
       ]);
 
       setInsights(aiInsights);
@@ -262,13 +262,13 @@ export const AIInsightsDashboard: React.FC<AIInsightsDashboardProps> = ({
                 className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
               >
                 <div className="flex-shrink-0 p-2 bg-white rounded-lg">
-                  {getInsightIcon(insight.type)}
+                  {getInsightIcon(insight.category)}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
                     <h4 className="font-semibold">{insight.title}</h4>
-                    <Badge className={getImpactColor(insight.impact)}>
-                      {insight.impact} impact
+                    <Badge className={getImpactColor('medium')}>
+                      medium impact
                     </Badge>
                     {insight.actionable && (
                       <Badge variant="secondary">
@@ -343,7 +343,7 @@ export const AIInsightsDashboard: React.FC<AIInsightsDashboardProps> = ({
                   <h4 className="font-semibold">{rec.title}</h4>
                   <div className="flex items-center space-x-2">
                     <Badge variant="secondary" className="text-xs">
-                      {rec.effort} effort
+                      medium effort
                     </Badge>
                     <Badge className={getPriorityColor(rec.priority)}>
                       {rec.priority} priority
