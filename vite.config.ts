@@ -62,12 +62,16 @@ export default defineConfig({
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        // CRITICAL FIX: Ensure React is in vendor bundle to prevent createContext errors
+        // CRITICAL FIX: Ensure React loads before other libraries that use React APIs
         manualChunks: (id: string) => {
-          // Critical: Keep ALL React-related modules in vendor bundle together
-          if (id.includes('node_modules/react') || 
-              id.includes('node_modules/react-dom') ||
-              id.includes('node_modules/@tanstack/react-query') ||
+          // PRIORITY 1: React and React DOM must be in main vendor bundle first
+          if (id.includes('node_modules/react/') || 
+              id.includes('node_modules/react-dom/')) {
+            return 'vendor';
+          }
+          
+          // PRIORITY 2: React ecosystem that depends on React being available
+          if (id.includes('node_modules/@tanstack/react-query') ||
               id.includes('node_modules/react-router') ||
               id.includes('node_modules/react-hook-form') ||
               id.includes('node_modules/react-hot-toast') ||
@@ -75,19 +79,24 @@ export default defineConfig({
             return 'vendor';
           }
           
-          // Icons as separate bundle (small and isolated)
+          // PRIORITY 3: Charts that use React Context - separate bundle to load after vendor
+          if (id.includes('node_modules/recharts') ||
+              id.includes('node_modules/d3-') ||
+              id.includes('node_modules/react-smooth')) {
+            return 'charts';
+          }
+          
+          // PRIORITY 4: Heavy animations and motion
+          if (id.includes('node_modules/framer-motion')) {
+            return 'animations';
+          }
+          
+          // PRIORITY 5: Icons as separate bundle (small and isolated)
           if (id.includes('node_modules/lucide-react')) {
             return 'icons';
           }
           
-          // Charts and other heavy libraries
-          if (id.includes('node_modules/recharts') ||
-              id.includes('node_modules/framer-motion') ||
-              id.includes('node_modules/d3-')) {
-            return 'charts';
-          }
-          
-          // All other vendor code
+          // PRIORITY 6: All other vendor code
           if (id.includes('node_modules/')) {
             return 'vendor';
           }
