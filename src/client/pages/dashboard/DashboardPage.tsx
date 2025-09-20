@@ -80,6 +80,16 @@ const DashboardPage = () => {
               completionRate: 85, // Default completion rate
               lastUpdate: study.updated_at || study.updatedAt
             }));
+          
+          // Set dashboard data with recent studies included
+          setDashboardData({
+            totalStudies: data.totalStudies || allStudies.length,
+            activeParticipants: data.activeParticipants || 0,
+            completionRate: data.completionRate || 0,
+            avgSessionTime: data.avgSessionTime || 0,
+            activeStudies: data.activeStudies || 0,
+            recentStudies: recentStudiesData || []
+          });
           setRecentStudies(recentStudiesData);
         }
       } catch (err) {
@@ -427,7 +437,7 @@ const DashboardPage = () => {
             subtitle="Latest updates and notifications from your studies"
           />
           <CardContent>
-            {dashboardData?.recentStudies && dashboardData.recentStudies.length > 0 ? (
+            {dashboardData?.recentStudies && Array.isArray(dashboardData.recentStudies) && dashboardData.recentStudies.length > 0 ? (
               <div className="space-y-6">
                 {dashboardData.recentStudies.slice(0, 3).map((study, index) => (
                   <div key={study.id} className="flex items-start space-x-4">
