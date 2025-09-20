@@ -294,8 +294,14 @@ async function getStudies(req, res) {
     
     return res.status(200).json({
       success: true,
-      data: formattedStudies,
-      count: studies.length
+      studies: formattedStudies,
+      pagination: {
+        currentPage: 1,
+        totalPages: 1,
+        totalStudies: studies.length,
+        hasNext: false,
+        hasPrev: false
+      }
     });
 
   } catch (error) {
