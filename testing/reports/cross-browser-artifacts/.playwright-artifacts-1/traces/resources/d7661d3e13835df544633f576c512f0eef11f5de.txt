@@ -1,0 +1,3 @@
+{"sent_at":"2025-09-20T18:40:03.037Z","sdk":{"name":"sentry.javascript.react","version":"9.46.0"}}
+{"type":"session"}
+{"sid":"d79b3a910aa64c65ba8e0d0d1c1ab871","init":true,"started":"2025-09-20T18:40:03.037Z","timestamp":"2025-09-20T18:40:03.037Z","status":"ok","errors":0,"attrs":{"release":"researchhub-saas@1.0.0","environment":"development","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.7258.5 Safari/537.36"}}

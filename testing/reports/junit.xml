@@ -1,0 +1,30 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="12.188496">
+<testsuite name="ui-inspector.spec.js" timestamp="2025-09-20T15:32:01.160Z" hostname="chromium" tests="1" failures="0" skipped="0" time="8.735" errors="0">
+<testcase name="UI Inspector: Find Study Creation Elements" classname="ui-inspector.spec.js" time="8.735">
+<system-out>
+<![CDATA[🔍 Inspecting ResearchHub UI for study creation elements...
+🔐 Logging in as Researcher...
+✅ Researcher login successful
+📍 Current URL: https://researchhub-saas.vercel.app/researcher/studies
+📋 Page title: Afkar - User Testing Research Platform
+🔘 Found 1 buttons on the page
+🔘 Button 1: "Go Back" | aria-label: null | data-testid: null
+   Classes: w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200
+🔗 Found 4 links on the page
+🔗 Link 1: "Go Home" | href: /
+🔗 Link 2: "Features" | href: /features
+🔗 Link 3: "Pricing" | href: /pricing
+🔗 Link 4: "About Us" | href: /about
+📝 Elements containing "create": 0
+📝 Elements containing "new": 0
+📝 Elements containing "add": 0
+📝 Elements containing "start": 0
+📝 Elements containing "begin": 0
+📝 Elements containing "study": 0
+🎨 Tailwind detected: 12 elements
+✅ UI inspection completed - check console output and screenshot
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

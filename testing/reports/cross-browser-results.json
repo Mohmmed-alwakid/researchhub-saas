@@ -1,0 +1,147 @@
+{
+  "config": {
+    "configFile": "D:\\MAMP\\AfakarM\\playwright.config.cross-browser.js",
+    "rootDir": "D:/MAMP/AfakarM/testing/comprehensive-suite/phase2",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "testing/reports/cross-browser-html",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "testing/reports/cross-browser-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "D:/MAMP/AfakarM/testing/reports/cross-browser-artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {},
+        "id": "Desktop-Chrome",
+        "name": "Desktop-Chrome",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite/phase2",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/testing/reports/cross-browser-artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {},
+        "id": "Desktop-Firefox",
+        "name": "Desktop-Firefox",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite/phase2",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/testing/reports/cross-browser-artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {},
+        "id": "Desktop-Safari",
+        "name": "Desktop-Safari",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite/phase2",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/testing/reports/cross-browser-artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {},
+        "id": "Mobile-Chrome",
+        "name": "Mobile-Chrome",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite/phase2",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/testing/reports/cross-browser-artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {},
+        "id": "Mobile-Safari",
+        "name": "Mobile-Safari",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite/phase2",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/testing/reports/cross-browser-artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {},
+        "id": "Tablet-Chrome",
+        "name": "Tablet-Chrome",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite/phase2",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.54.2",
+    "workers": 3,
+    "webServer": null
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
+      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+    }
+  ],
+  "stats": {
+    "startTime": "2025-09-20T18:22:40.293Z",
+    "duration": 16.983999999999924,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

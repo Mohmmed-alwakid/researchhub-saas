@@ -1,0 +1,253 @@
+{
+  "config": {
+    "configFile": "D:\\MAMP\\AfakarM\\playwright.config.comprehensive.js",
+    "rootDir": "D:/MAMP/AfakarM/testing/comprehensive-suite",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "testing/reports/playwright-html"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "testing/reports/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "testing/reports/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "D:/MAMP/AfakarM/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/MAMP/AfakarM/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-safari",
+        "name": "mobile-safari",
+        "testDir": "D:/MAMP/AfakarM/testing/comprehensive-suite",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.54.2",
+    "workers": 8,
+    "webServer": {
+      "command": "npm run dev:fullstack",
+      "port": 5175,
+      "reuseExistingServer": true,
+      "timeout": 60000
+    }
+  },
+  "suites": [
+    {
+      "title": "ui-inspector.spec.js",
+      "file": "ui-inspector.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "UI Inspector: Find Study Creation Elements",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8735,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🔍 Inspecting ResearchHub UI for study creation elements...\n"
+                    },
+                    {
+                      "text": "🔐 Logging in as Researcher...\n"
+                    },
+                    {
+                      "text": "✅ Researcher login successful\n"
+                    },
+                    {
+                      "text": "📍 Current URL: https://researchhub-saas.vercel.app/researcher/studies\n"
+                    },
+                    {
+                      "text": "📋 Page title: Afkar - User Testing Research Platform\n"
+                    },
+                    {
+                      "text": "🔘 Found 1 buttons on the page\n"
+                    },
+                    {
+                      "text": "🔘 Button 1: \"Go Back\" | aria-label: null | data-testid: null\n"
+                    },
+                    {
+                      "text": "   Classes: w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200\n"
+                    },
+                    {
+                      "text": "🔗 Found 4 links on the page\n"
+                    },
+                    {
+                      "text": "🔗 Link 1: \"Go Home\" | href: /\n"
+                    },
+                    {
+                      "text": "🔗 Link 2: \"Features\" | href: /features\n"
+                    },
+                    {
+                      "text": "🔗 Link 3: \"Pricing\" | href: /pricing\n"
+                    },
+                    {
+                      "text": "🔗 Link 4: \"About Us\" | href: /about\n"
+                    },
+                    {
+                      "text": "📝 Elements containing \"create\": 0\n"
+                    },
+                    {
+                      "text": "📝 Elements containing \"new\": 0\n"
+                    },
+                    {
+                      "text": "📝 Elements containing \"add\": 0\n"
+                    },
+                    {
+                      "text": "📝 Elements containing \"start\": 0\n"
+                    },
+                    {
+                      "text": "📝 Elements containing \"begin\": 0\n"
+                    },
+                    {
+                      "text": "📝 Elements containing \"study\": 0\n"
+                    },
+                    {
+                      "text": "🎨 Tailwind detected: 12 elements\n"
+                    },
+                    {
+                      "text": "✅ UI inspection completed - check console output and screenshot\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-09-20T15:32:01.948Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "07d2fa93a715e0a38854-63322fad51934330bd80",
+          "file": "ui-inspector.spec.js",
+          "line": 4,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-09-20T15:31:59.225Z",
+    "duration": 12188.496000000001,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

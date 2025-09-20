@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "frequency": "weekly",
+  "alertThreshold": 80,
+  "reportPath": "testing/health-monitoring/",
+  "lastRun": null,
+  "consecutiveFailures": 0,
+  "maxConsecutiveFailures": 3
+}

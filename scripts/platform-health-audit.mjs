@@ -35,7 +35,6 @@ class PlatformHealthAuditor {
         };
         this.authTokens = {};
         this.auditResults = {
-            timestamp: new Date().toISOString(),
             overall: { status: 'PENDING', score: 0, totalTests: 0, passedTests: 0 },
             dashboardConsistency: { status: 'PENDING', issues: [] },
             studyCreation: { status: 'PENDING', issues: [] },
@@ -43,6 +42,7 @@ class PlatformHealthAuditor {
             resultsAnalytics: { status: 'PENDING', issues: [] },
             apiContracts: { status: 'PENDING', issues: [] }
         };
+        this.auditTimestamp = new Date().toISOString();
     }
 
     /**
@@ -404,7 +404,14 @@ class PlatformHealthAuditor {
         const fileName = `platform-health-${timestamp}.json`;
         const filePath = path.join(reportPath, fileName);
         
-        fs.writeFileSync(filePath, JSON.stringify(this.auditResults, null, 2));
+        // Add timestamp to the report data
+        const reportData = {
+            timestamp: this.auditTimestamp,
+            generatedAt: new Date().toISOString(),
+            ...this.auditResults
+        };
+        
+        fs.writeFileSync(filePath, JSON.stringify(reportData, null, 2));
         console.log(`\n📄 Detailed report saved: ${filePath}`);
     }
 

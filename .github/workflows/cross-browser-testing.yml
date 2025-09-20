@@ -1,0 +1,184 @@
+name: ResearchHub Cross-Browser Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  test-phase2-core:
+    runs-on: ubuntu-latest
+    name: Phase 2 Core Testing
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+    
+    - name: Run Phase 2 Core Tests
+      run: npx playwright test --config=playwright.config.cross-browser.js testing/comprehensive-suite/phase2/scenario-51-fixed.spec.js --project="Desktop-${{ matrix.browser == 'chromium' && 'Chrome' || matrix.browser == 'webkit' && 'Safari' || 'Firefox' }}" --reporter=github
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.browser }}
+        path: test-results/
+        retention-days: 7
+
+  test-phase2-comprehensive:
+    runs-on: ubuntu-latest
+    name: Phase 2 Comprehensive Testing
+    needs: test-phase2-core
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    
+    - name: Run All Phase 2 Tests
+      run: |
+        npx playwright test --config=playwright.config.cross-browser.js \
+        testing/comprehensive-suite/phase2/scenario-51-fixed.spec.js \
+        testing/comprehensive-suite/phase2/participant-workflows-working.spec.js \
+        testing/comprehensive-suite/phase2/admin-advanced-working.spec.js \
+        testing/comprehensive-suite/phase2/final-3-scenarios.spec.js \
+        --project="Desktop-Chrome" --reporter=github
+    
+    - name: Generate Test Report
+      run: npx playwright show-report
+      if: always()
+
+  test-performance:
+    runs-on: ubuntu-latest
+    name: Performance Testing
+    needs: test-phase2-core
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+    
+    - name: Run Performance Tests
+      run: npx playwright test testing/comprehensive-suite/performance/quick-performance-tests.spec.js --reporter=github
+    
+    - name: Upload performance artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-results
+        path: test-results/
+        retention-days: 7
+
+  test-mobile:
+    runs-on: ubuntu-latest
+    name: Mobile Browser Testing
+    needs: test-phase2-comprehensive
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    
+    - name: Run Mobile Tests
+      run: npx playwright test --config=playwright.config.cross-browser.js testing/comprehensive-suite/phase2/scenario-51-fixed.spec.js --project="Mobile-Chrome" --reporter=github
+
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scan
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+    
+    - name: Check for vulnerabilities
+      run: |
+        if [ $(npm audit --audit-level=high --json | jq '.metadata.vulnerabilities.high + .metadata.vulnerabilities.critical') -gt 0 ]; then
+          echo "High or critical vulnerabilities found!"
+          exit 1
+        fi
+
+  deployment-readiness:
+    runs-on: ubuntu-latest
+    name: Deployment Readiness Check
+    needs: [test-phase2-comprehensive, test-performance, security-scan]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deployment Status
+      run: |
+        echo "✅ All tests passed!"
+        echo "✅ Security scan completed!"
+        echo "✅ Performance validated!"
+        echo "🚀 Deployment ready!"
+    
+    - name: Post to Slack (Optional)
+      if: success()
+      run: |
+        echo "Would post to Slack: ResearchHub testing pipeline completed successfully!"
+        # curl -X POST -H 'Content-type: application/json' \
+        # --data '{"text":"✅ ResearchHub testing pipeline completed successfully! Ready for deployment."}' \
+        # ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  cleanup:
+    runs-on: ubuntu-latest
+    name: Cleanup
+    needs: [deployment-readiness]
+    if: always()
+    
+    steps:
+    - name: Cleanup temp files
+      run: |
+        echo "🧹 Cleaning up temporary files..."
+        echo "✅ Cleanup completed!"

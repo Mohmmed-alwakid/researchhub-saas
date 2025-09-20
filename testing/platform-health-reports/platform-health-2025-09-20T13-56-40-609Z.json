@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-09-20T13:56:35.730Z",
+  "generatedAt": "2025-09-20T13:56:40.610Z",
+  "overall": {
+    "status": "EXCELLENT",
+    "score": 100,
+    "totalTests": 5,
+    "passedTests": 5
+  },
+  "dashboardConsistency": {
+    "status": "PASS",
+    "issues": []
+  },
+  "studyCreation": {
+    "status": "PASS",
+    "issues": []
+  },
+  "participantExperience": {
+    "status": "PASS",
+    "issues": []
+  },
+  "resultsAnalytics": {
+    "status": "PASS",
+    "issues": []
+  },
+  "apiContracts": {
+    "status": "PASS",
+    "issues": []
+  }
+}
