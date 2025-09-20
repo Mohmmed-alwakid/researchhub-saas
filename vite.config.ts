@@ -62,41 +62,36 @@ export default defineConfig({
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        // CRITICAL FIX: Ensure React loads before other libraries that use React APIs
+        // EMERGENCY FIX: Keep ALL React-dependent libraries in vendor bundle
         manualChunks: (id: string) => {
-          // PRIORITY 1: React and React DOM must be in main vendor bundle first
-          if (id.includes('node_modules/react/') || 
-              id.includes('node_modules/react-dom/')) {
-            return 'vendor';
-          }
-          
-          // PRIORITY 2: React ecosystem that depends on React being available
-          if (id.includes('node_modules/@tanstack/react-query') ||
+          // Keep ALL React ecosystem and React-dependent libraries together
+          if (id.includes('node_modules/react') || 
+              id.includes('node_modules/@tanstack/react-query') ||
               id.includes('node_modules/react-router') ||
               id.includes('node_modules/react-hook-form') ||
               id.includes('node_modules/react-hot-toast') ||
-              id.includes('node_modules/@sentry/react')) {
+              id.includes('node_modules/@sentry/react') ||
+              id.includes('node_modules/recharts') ||
+              id.includes('node_modules/react-smooth')) {
             return 'vendor';
           }
           
-          // PRIORITY 3: Charts that use React Context - separate bundle to load after vendor
-          if (id.includes('node_modules/recharts') ||
-              id.includes('node_modules/d3-') ||
-              id.includes('node_modules/react-smooth')) {
+          // D3 libraries (used by charts but not React-dependent)
+          if (id.includes('node_modules/d3-')) {
             return 'charts';
           }
           
-          // PRIORITY 4: Heavy animations and motion
+          // Heavy animations
           if (id.includes('node_modules/framer-motion')) {
             return 'animations';
           }
           
-          // PRIORITY 5: Icons as separate bundle (small and isolated)
+          // Icons as separate bundle
           if (id.includes('node_modules/lucide-react')) {
             return 'icons';
           }
           
-          // PRIORITY 6: All other vendor code
+          // All other vendor code
           if (id.includes('node_modules/')) {
             return 'vendor';
           }
