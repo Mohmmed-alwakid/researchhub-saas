@@ -1037,33 +1037,72 @@ const getDefaultBlockSettings = (type: BlockType): Record<string, any> => { /* .
 
 ## ⚠️ Important Development Rules
 
-### 🏗️ MANDATORY Development Process (ALL REQUESTS)
-**CRITICAL: Follow this process for EVERY request before any implementation**
+### 🏗️ ENHANCED DEVELOPMENT WORKFLOW (MANDATORY)
+**CRITICAL: Follow this systematic approach for EVERY request**
 
-#### 1. 📋 REQUIREMENTS VALIDATION PHASE
-- **STOP**: Check if detailed requirements exist for this request
-- **READ**: Review existing requirements document (create if missing)
-- **VALIDATE**: Ensure requirements are complete and approved
-- **DOCUMENT**: Create requirements.md file following template in `DEVELOPMENT_STANDARDS_FRAMEWORK.md`
+#### 🎯 **Phase 1: Request Analysis (MANDATORY)**
 
-#### 2. 🔍 EXISTING CODE ANALYSIS PHASE  
-- **SEARCH**: Find all existing implementations related to the request
-- **ANALYZE**: Understand current patterns, architecture, and conventions
-- **DECISION**: Extend existing code vs. create new (PREFER EXTEND)
-- **RULE**: Never create new components when existing ones can be enhanced
-- **EXAMPLE**: StudyCreationWizard exists - enhance it, don't replace it
+##### 1.1 **Immediate Requirements Check**
+```
+✅ STOP: Is this request clearly defined?
+✅ SCOPE: What specific files/features need modification?
+✅ IMPACT: How does this affect existing functionality?
+✅ PRIORITY: P0 (Critical), P1 (Important), P2 (Enhancement)?
+```
 
-#### 3. 📝 IMPLEMENTATION PLAN PHASE
-- **DESIGN**: Technical approach that builds on existing systems
-- **COMPATIBILITY**: Ensure backward compatibility and integration
-- **APPROVAL**: Present plan to user before proceeding
-- **ENHANCEMENT**: Always prefer enhancement over replacement
+##### 1.2 **Existing Code Analysis**
+```
+✅ SEARCH: Find all related existing implementations
+✅ UNDERSTAND: Current patterns and architecture
+✅ DECISION: Extend existing vs. create new (PREFER EXTEND)
+✅ COMPATIBILITY: Ensure no breaking changes
+```
 
-#### 4. ✅ QUALITY ASSURANCE PHASE
-- **BUILD**: Follow approved plan exactly
-- **TEST**: Comprehensive testing including existing functionality
-- **DOCUMENT**: Update all relevant documentation
-- **VALIDATE**: Ensure no regression in existing features
+##### 1.3 **Rule Compliance Check**
+```
+✅ FILE STRUCTURE: Will this violate our organization rules?
+✅ DOCUMENTATION: Where should documentation go?
+✅ TESTING: What testing is required?
+✅ FUNCTION LIMIT: Are we within 12 Vercel function limit?
+```
+
+#### � **Phase 2: Implementation Strategy**
+
+##### 2.1 **Pre-Implementation Planning**
+```javascript
+// Template for every development task
+const implementationPlan = {
+    task: "Clear description of what to implement",
+    approach: "Extend existing | Create new | Refactor",
+    files: ["list", "of", "files", "to", "modify"],
+    testing: "How to test the changes",
+    rollback: "How to undo if needed",
+    compliance: "How this follows our rules"
+};
+```
+
+##### 2.2 **Implementation Rules**
+1. **ALWAYS start with smallest viable change**
+2. **Test locally first** (`npm run dev:fullstack`)
+3. **Follow file naming conventions** (no "Advanced", "Enhanced", etc.)
+4. **Update existing files** instead of creating new ones
+5. **Document changes** in appropriate existing files
+
+#### 🧪 **Phase 3: Testing & Validation**
+
+##### 3.1 **Automated Testing Sequence**
+```bash
+npm run test:quick           # Basic functionality
+npm run dev:fullstack        # Local environment test
+# Production test with designated accounts only
+```
+
+##### 3.2 **Quality Gates**
+- ✅ No TypeScript errors
+- ✅ No ESLint warnings  
+- ✅ All existing functionality preserved
+- ✅ New feature works as specified
+- ✅ Project structure compliance
 
 ### 🚫 CRITICAL ANTI-PATTERNS (NEVER DO)
 1. **Creating duplicate directories/files**: Never create folders with similar names (e.g., `tests/` when `testing/` exists, `ProductManager/` when `product-manager/` exists)
