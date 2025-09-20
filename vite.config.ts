@@ -62,15 +62,17 @@ export default defineConfig({
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        // TEMPORARY FIX: Simplified vendor splitting to resolve memo error
-        // "Cannot read properties of undefined (reading 'memo')" fix
+        // CRITICAL FIX: Ensure React is in vendor bundle to prevent createContext errors
         manualChunks: (id: string) => {
-          // Keep React ecosystem together to prevent initialization issues
+          // Critical: Keep ALL React-related modules in vendor bundle together
           if (id.includes('node_modules/react') || 
+              id.includes('node_modules/react-dom') ||
               id.includes('node_modules/@tanstack/react-query') ||
               id.includes('node_modules/react-router') ||
-              id.includes('node_modules/react-hook-form')) {
-            return 'react-bundle';
+              id.includes('node_modules/react-hook-form') ||
+              id.includes('node_modules/react-hot-toast') ||
+              id.includes('node_modules/@sentry/react')) {
+            return 'vendor';
           }
           
           // Icons as separate bundle (small and isolated)
@@ -78,7 +80,14 @@ export default defineConfig({
             return 'icons';
           }
           
-          // All other vendor code including charts
+          // Charts and other heavy libraries
+          if (id.includes('node_modules/recharts') ||
+              id.includes('node_modules/framer-motion') ||
+              id.includes('node_modules/d3-')) {
+            return 'charts';
+          }
+          
+          // All other vendor code
           if (id.includes('node_modules/')) {
             return 'vendor';
           }
