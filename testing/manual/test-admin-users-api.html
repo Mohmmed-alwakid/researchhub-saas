@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .primary { background-color: #007bff; color: white; }
+        .secondary { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Admin User Management API Test</h1>
+    
+    <div class="test-section">
+        <h3>🔐 Step 1: Admin Login</h3>
+        <button class="primary" onclick="loginAdmin()">Login as Admin</button>
+        <div id="login-result" class="result">Click to login as admin user</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>👥 Step 2: Test User-Profile API</h3>
+        <button class="primary" onclick="testUserProfileAPI()">Test user-profile-consolidated API</button>
+        <div id="user-profile-result" class="result">Test user profile API endpoint</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🏛️ Step 3: Test Admin API</h3>
+        <button class="primary" onclick="testAdminAPI()">Test admin-consolidated API</button>
+        <div id="admin-result" class="result">Test admin API endpoint</div>
+    </div>
+
+    <script>
+        let authToken = null;
+
+        function showResult(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.innerHTML = message;
+        }
+
+        async function loginAdmin() {
+            try {
+                const response = await fetch('/api/auth-consolidated?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+admin@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    showResult('login-result', `✅ Admin login successful! Token: ${data.token.substring(0, 20)}...`, 'success');
+                } else {
+                    showResult('login-result', `❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('login-result', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUserProfileAPI() {
+            if (!authToken) {
+                showResult('user-profile-result', '❌ Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user-profile-consolidated?action=get-all-users', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                showResult('user-profile-result', 
+                    `<strong>User Profile API Result:</strong><br>
+                    Success: ${data.success}<br>
+                    Data type: ${typeof data.data}<br>
+                    Data: <pre>${JSON.stringify(data, null, 2)}</pre>`, 
+                    data.success ? 'success' : 'error'
+                );
+            } catch (error) {
+                showResult('user-profile-result', `❌ API error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAdminAPI() {
+            if (!authToken) {
+                showResult('admin-result', '❌ Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin-consolidated?action=users', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                showResult('admin-result', 
+                    `<strong>Admin API Result:</strong><br>
+                    Success: ${data.success}<br>
+                    Users found: ${data.users ? data.users.length : 'N/A'}<br>
+                    Data: <pre>${JSON.stringify(data, null, 2)}</pre>`, 
+                    data.success ? 'success' : 'error'
+                );
+            } catch (error) {
+                showResult('admin-result', `❌ API error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

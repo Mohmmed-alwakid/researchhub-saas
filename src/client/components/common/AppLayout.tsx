@@ -17,6 +17,15 @@ import {
   Layout,
   Loader2,
   Zap,
+  DollarSign,
+  Shield,
+  Activity,
+  CreditCard,
+  UserCheck,
+  Database,
+  Globe,
+  TrendingUp,
+  HeadphonesIcon,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
@@ -105,15 +114,24 @@ const AppLayout = () => {
     
     // For admins and super_admins - include all features
     if (userRole === 'admin' || userRole === 'super_admin') {
-      console.log('✅ AppLayout - Returning admin navigation');
+      console.log('✅ AppLayout - Returning comprehensive admin navigation');
       return [
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
+        { name: 'User Management', href: '/app/admin/users', icon: Users },
         { name: 'Studies', href: '/app/studies', icon: FileText },
+        { name: 'Analytics', href: '/app/admin/analytics', icon: BarChart3 },
         { name: 'Templates', href: '/app/templates', icon: Layout },
+        { name: 'Plan Management', href: '/app/admin/subscriptions', icon: CreditCard },
+        { name: 'Billing & Payments', href: '/app/admin/payments', icon: DollarSign },
+        { name: 'Financial Reports', href: '/app/admin/financial', icon: TrendingUp },
         { name: 'Organizations', href: '/app/organizations', icon: Building },
-        { name: 'Participants', href: '/app/participants', icon: Users },
-        { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
-        { name: 'Settings', href: '/app/settings', icon: Settings },
+        { name: 'Permissions', href: '/app/admin/permissions', icon: UserCheck },
+        { name: 'Security & Audit', href: '/app/admin/monitoring', icon: Shield },
+        { name: 'System Health', href: '/app/admin/health', icon: Activity },
+        { name: 'Database Admin', href: '/app/admin/database', icon: Database },
+        { name: 'API Management', href: '/app/admin/api', icon: Globe },
+        { name: 'Support Center', href: '/app/admin/support', icon: HeadphonesIcon },
+        { name: 'System Settings', href: '/app/admin/settings', icon: Settings },
       ];
     }
     

@@ -1095,6 +1095,148 @@ async function handleGetAllUsers(req, res) {
       });
     }
 
+    console.log('🔧 Get All Users Debug - Starting with mode:', {
+      useLocalAuth,
+      hasSupabaseAdmin: !!supabaseAdmin,
+      authUserId: authResult.user.id,
+      authUserEmail: authResult.user.email
+    });
+
+    // Handle fallback mode - return mock users
+    if (useLocalAuth || !supabaseAdmin) {
+      console.log('🔧 Using fallback mode for get-all-users');
+      
+      const fallbackUsers = [
+        {
+          id: 'admin-001',
+          email: 'abwanwr77+admin@gmail.com',
+          role: 'admin',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Admin',
+          last_name: 'User'
+        },
+        {
+          id: 'researcher-001',
+          email: 'abwanwr77+Researcher@gmail.com',
+          role: 'researcher',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Research',
+          last_name: 'User'
+        },
+        {
+          id: 'participant-001',
+          email: 'abwanwr77+participant@gmail.com',
+          role: 'participant',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Participant',
+          last_name: 'User'
+        },
+        {
+          id: 'researcher-002',
+          email: 'researcher2@example.com',
+          role: 'researcher',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Research',
+          last_name: 'User 2'
+        },
+        {
+          id: 'participant-002',
+          email: 'participant2@example.com',
+          role: 'participant',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Participant',
+          last_name: 'User 2'
+        },
+        {
+          id: 'participant-003',
+          email: 'participant3@example.com',
+          role: 'participant',
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          last_login: null,
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Participant',
+          last_name: 'User 3'
+        },
+        {
+          id: 'researcher-003',
+          email: 'researcher3@example.com',
+          role: 'researcher',
+          status: 'suspended',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 3,
+          locked_until: null,
+          first_name: 'Research',
+          last_name: 'User 3'
+        },
+        {
+          id: 'participant-004',
+          email: 'participant4@example.com',
+          role: 'participant',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Participant',
+          last_name: 'User 4'
+        },
+        {
+          id: 'participant-005',
+          email: 'participant5@example.com',
+          role: 'participant',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Participant',
+          last_name: 'User 5'
+        },
+        {
+          id: 'researcher-004',
+          email: 'researcher4@example.com',
+          role: 'researcher',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          login_attempts: 0,
+          locked_until: null,
+          first_name: 'Research',
+          last_name: 'User 4'
+        }
+      ];
+
+      console.log(`✅ Fallback mode: Returning ${fallbackUsers.length} mock users`);
+      
+      return res.status(200).json({
+        success: true,
+        data: fallbackUsers
+      });
+    }
+
     // For production, always fetch from auth.users to get all 15 users
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
     

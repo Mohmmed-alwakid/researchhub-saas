@@ -17,6 +17,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { IStudy } from '../../../shared/types';
 import StudyCardActions from '../../components/studies/StudyCardActions';
 import RenameStudyModal from '../../components/studies/RenameStudyModal';
+import DeleteStudyModal from '../../components/studies/DeleteStudyModal';
 import StudiesLoading from '../../components/studies/StudiesLoading';
 import '../../styles/study-card.css';
 
@@ -41,6 +42,11 @@ const StudiesPage: React.FC = () => {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [studyToRename, setStudyToRename] = useState<IStudy | null>(null);
   const [isRenaming, setIsRenaming] = useState(false);
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [studyToDelete, setStudyToDelete] = useState<IStudy | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchStudies();
@@ -167,18 +173,26 @@ const StudiesPage: React.FC = () => {
     return icons[type as keyof typeof icons] || '📊';
   };
 
-  const handleDelete = async (studyId: string) => {
-    if (window.confirm('Are you sure you want to delete this study? This action cannot be undone.')) {
-      try {
-        await deleteStudy(studyId);
-        // Refresh the studies list to reflect the deletion
-        await fetchStudies();
-        // Show success feedback (we'll add proper toast later)
-        alert('Study deleted successfully!');
-      } catch (error) {
-        console.error('Failed to delete study:', error);
-        alert('Failed to delete study. Please try again.');
-      }
+  const handleDelete = async (study: IStudy) => {
+    setStudyToDelete(study);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async (studyId: string) => {
+    setIsDeleting(true);
+    try {
+      await deleteStudy(studyId);
+      // Refresh the studies list to reflect the deletion
+      await fetchStudies();
+      setShowDeleteModal(false);
+      setStudyToDelete(null);
+      // Show success feedback (we'll add proper toast later)
+      alert('Study deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete study:', error);
+      throw error; // Let the modal handle the error display
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -521,7 +535,7 @@ const StudiesPage: React.FC = () => {
                     onEdit={handleEdit}
                     onRename={handleRename}
                     onDuplicate={handleDuplicate}
-                    onDelete={(study) => handleDelete(String(study.id || study._id))}
+                    onDelete={(study) => handleDelete(study)}
                     onLaunch={handleLaunch}
                     onPause={handlePause}
                     onViewResults={handleViewResults}
@@ -544,6 +558,18 @@ const StudiesPage: React.FC = () => {
         }}
         onRename={handleRenameSubmit}
         isLoading={isRenaming}
+      />
+
+      {/* Delete Study Modal */}
+      <DeleteStudyModal
+        isOpen={showDeleteModal}
+        study={studyToDelete}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setStudyToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
       />
     </div>
   );

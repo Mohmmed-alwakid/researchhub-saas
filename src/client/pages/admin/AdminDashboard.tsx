@@ -53,15 +53,35 @@ export default function AdminDashboard() {
 
   const loadUsers = React.useCallback(async () => {
     try {
+      console.log('🔧 Admin Debug - Loading users with token:', token ? 'Present' : 'Missing');
+      
       const response = await fetch('/api/user-profile-consolidated?action=get-all-users', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      console.log('🔧 Admin Debug - Response status:', response.status);
+      
       const result = await response.json();
-      if (result.success) {
-        setUsers(result.data || []);
+      
+      console.log('🔧 Admin Debug - API Response:', {
+        success: result.success,
+        dataType: typeof result.data,
+        dataLength: Array.isArray(result.data) ? result.data.length : 'Not an array',
+        errorMessage: result.error,
+        fullResult: result
+      });
+      
+      if (result.success && Array.isArray(result.data)) {
+        console.log('✅ Admin Debug - Setting users:', result.data.length, 'users found');
+        setUsers(result.data);
+      } else {
+        console.error('❌ Admin Debug - Invalid response format or failed request');
+        console.error('Response:', result);
+        setUsers([]);
       }
     } catch (error) {
-      console.error('Error loading users:', error);
+      console.error('❌ Admin Debug - Error loading users:', error);
+      setUsers([]);
     }
   }, [token]);
 
