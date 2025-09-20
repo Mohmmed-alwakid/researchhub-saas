@@ -171,6 +171,8 @@ const StudiesPage: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this study? This action cannot be undone.')) {
       try {
         await deleteStudy(studyId);
+        // Refresh the studies list to reflect the deletion
+        await fetchStudies();
         // Show success feedback (we'll add proper toast later)
         alert('Study deleted successfully!');
       } catch (error) {

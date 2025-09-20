@@ -476,6 +476,79 @@ async function updateStudy(req, res) {
 }
 
 /**
+ * Delete study - Only allows deletion of draft studies by the owner
+ */
+async function deleteStudy(req, res) {
+  try {
+    // Authenticate user
+    const authResult = await authenticateUser(req);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({ success: false, error: authResult.error });
+    }
+
+    const studyId = req.query.id || req.body.id;
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    // First check if study exists and user owns it
+    const { data: existingStudy, error: fetchError } = await supabase
+      .from('studies')
+      .select('id, title, status, researcher_id')
+      .eq('id', studyId)
+      .eq('researcher_id', authResult.user.id)
+      .single();
+
+    if (fetchError || !existingStudy) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found or access denied'
+      });
+    }
+
+    // Optional: Only allow deletion of draft studies (uncomment if needed)
+    // if (existingStudy.status !== 'draft') {
+    //   return res.status(400).json({
+    //     success: false,
+    //     error: 'Only draft studies can be deleted'
+    //   });
+    // }
+
+    // Delete the study
+    const { error: deleteError } = await supabase
+      .from('studies')
+      .delete()
+      .eq('id', studyId)
+      .eq('researcher_id', authResult.user.id);
+
+    if (deleteError) {
+      console.error('Database error deleting study:', deleteError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete study from database'
+      });
+    }
+
+    console.log(`✅ Study deleted: ${existingStudy.title} (UUID: ${studyId})`);
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Study deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete study error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
  * Get study analytics (placeholder for future implementation)
  */
 async function getDashboardAnalytics(req, res) {
@@ -776,6 +849,12 @@ export default async function handler(req, res) {
         }
         return await updateStudy(req, res);
 
+      case 'delete-study':
+        if (req.method !== 'DELETE') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await deleteStudy(req, res);
+
       case 'dashboard-analytics':
         if (req.method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
@@ -803,7 +882,7 @@ export default async function handler(req, res) {
       default:
         return res.status(400).json({
           success: false,
-          error: `Unknown action: ${action}. Available actions: create-study, get-studies, update-study, dashboard-analytics, get-sessions`
+          error: `Unknown action: ${action}. Available actions: create-study, get-studies, update-study, delete-study, dashboard-analytics, get-sessions`
         });
     }
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { StepProps } from '../types';
 import { StudyPreviewModal } from '../StudyPreviewModal';
 import { SaveAsTemplateModal } from '../SaveAsTemplateModal';
@@ -8,12 +7,8 @@ import { CheckCircle, AlertCircle, Edit2, Eye, BookOpen, Users, Clock, HelpCircl
 export const ReviewStep: React.FC<StepProps> = ({
   formData
 }) => {
-  const navigate = useNavigate();
   const [showPreview, setShowPreview] = useState(false);
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
-  const [showLaunchModal, setShowLaunchModal] = useState(false);
-  const [isLaunching, setIsLaunching] = useState(false);
-  const [isLaunched, setIsLaunched] = useState(false);
 
   // Study validation and readiness checks
   const getStudyReadiness = () => {
@@ -74,90 +69,6 @@ export const ReviewStep: React.FC<StepProps> = ({
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours} hour${hours > 1 ? 's' : ''}`;
-  };
-
-  const handleLaunchStudy = async () => {
-    setIsLaunching(true);
-    
-    try {
-      // Get token from Zustand auth store
-      const authStorage = localStorage.getItem('auth-storage');
-      let token = null;
-      if (authStorage) {
-        try {
-          const authData = JSON.parse(authStorage);
-          token = authData.state?.token;
-        } catch (e) {
-          console.warn('Failed to parse auth storage:', e);
-        }
-      }
-
-      // Fallback to direct token storage
-      if (!token) {
-        token = localStorage.getItem('token');
-      }
-
-      console.log('Using token for launch:', token ? 'Token present' : 'No token found');
-
-      // Transform StudyCreationWizard data to API format
-      const apiData = {
-        title: formData.title,
-        description: formData.description,
-        participantLimit: formData.target_participants || 15,
-        compensation: 25, // Default compensation
-        blocks: formData.blocks?.map((block, index) => ({
-          id: block.id,
-          order: index + 1,
-          type: block.type,
-          title: block.title,
-          description: block.description,
-          settings: block.settings
-        })) || [],
-        status: 'active',
-        type: formData.type || 'usability',
-        created_by: 'researcher'
-      };
-
-      const response = await fetch('/api/research-consolidated?action=create-study', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` })
-        },
-        body: JSON.stringify(apiData)
-      });
-
-      const result = await response.json();
-      console.log('Study creation result:', result);
-
-      if (result.success && result.data) {
-        setIsLaunched(true);
-        
-        // Store the created study data for immediate display
-        if (result.data) {
-          localStorage.setItem('newly-created-study', JSON.stringify(result.data));
-        }
-        
-        setTimeout(() => {
-          setShowLaunchModal(false);
-          navigate('/app/studies', { 
-            state: { 
-              fromStudyBuilder: true, 
-              newlyCreated: true,
-              studyData: result.data 
-            } 
-          });
-        }, 3000);
-      } else {
-        console.error('Failed to create study:', result.error);
-        alert(`Failed to launch study: ${result.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('Error launching study:', error);
-      alert('Failed to launch study. Please try again.');
-    } finally {
-      setIsLaunching(false);
-    }
   };
 
   return (
@@ -437,30 +348,28 @@ export const ReviewStep: React.FC<StepProps> = ({
                 <h3 className="text-lg font-bold text-green-900 mb-2">Ready to Launch!</h3>
                 <p className="text-sm text-green-700 mb-4">
                   Your study meets all requirements and is ready for participants.
+                  Use the "Launch" button in the header above to publish your study.
                 </p>
                 
-                <button
-                  onClick={() => setShowLaunchModal(true)}
-                  className="w-full mb-4 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
-                >
-                  <Rocket className="w-5 h-5" />
-                  <span>Launch Study Now</span>
-                </button>
-                
-                <div className="bg-green-100 rounded-lg p-3 text-left">
-                  <h4 className="font-semibold text-green-900 text-sm mb-2">After launch:</h4>
-                  <ul className="space-y-1 text-green-800 text-xs">
+                <div className="bg-green-100 rounded-lg p-4 text-left">
+                  <h4 className="font-semibold text-green-900 text-sm mb-2">
+                    <span className="inline-flex items-center">
+                      <Rocket className="w-4 h-4 mr-2" />
+                      Ready to Launch
+                    </span>
+                  </h4>
+                  <ul className="space-y-2 text-green-800 text-sm">
                     <li className="flex items-center space-x-2">
-                      <span className="w-1 h-1 bg-green-600 rounded-full"></span>
-                      <span>Immediately available to participants</span>
+                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+                      <span>Click "Launch" in the header to publish your study</span>
                     </li>
                     <li className="flex items-center space-x-2">
-                      <span className="w-1 h-1 bg-green-600 rounded-full"></span>
-                      <span>Real-time results tracking</span>
+                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+                      <span>Study will be immediately available to participants</span>
                     </li>
                     <li className="flex items-center space-x-2">
-                      <span className="w-1 h-1 bg-green-600 rounded-full"></span>
-                      <span>Automatic data collection</span>
+                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+                      <span>Real-time results tracking and data collection</span>
                     </li>
                   </ul>
                 </div>
@@ -472,79 +381,6 @@ export const ReviewStep: React.FC<StepProps> = ({
 
       {/* Modals */}
       
-      {/* Launch Confirmation Modal */}
-      {showLaunchModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full mx-4" style={{
-            width: '574px',
-            height: '458px',
-            background: '#F8F8FB',
-            borderRadius: '16px'
-          }}>
-            <div className="p-8 h-full flex flex-col items-center justify-center text-center">
-              {!isLaunched ? (
-                <>
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                    <Rocket className="w-10 h-10 text-blue-600" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    Ready to Launch Your Study?
-                  </h2>
-                  <p className="text-gray-600 mb-8 leading-relaxed">
-                    Once launched, your study will be immediately available to participants. 
-                    You can track results in real-time and manage responses from your dashboard.
-                  </p>
-                  
-                  <div className="flex space-x-4 w-full">
-                    <button
-                      onClick={() => setShowLaunchModal(false)}
-                      disabled={isLaunching}
-                      className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleLaunchStudy}
-                      disabled={isLaunching}
-                      className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                    >
-                      {isLaunching ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Launching...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Rocket className="w-5 h-5" />
-                          <span>Launch Study</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                    <CheckCircle className="w-10 h-10 text-green-600" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-green-900 mb-4">
-                    Study Launched Successfully! 🎉
-                  </h2>
-                  <p className="text-green-700 mb-8 leading-relaxed">
-                    Your study is now live and available to participants. 
-                    Redirecting to your studies dashboard...
-                  </p>
-                  
-                  <div className="w-12 h-12 mx-auto">
-                    <div className="w-full h-full border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       <StudyPreviewModal
         isOpen={showPreview}
         onClose={() => setShowPreview(false)}

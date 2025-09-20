@@ -9,7 +9,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Eye,
-  Filter,
   Settings,
 } from 'lucide-react';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
@@ -237,11 +236,7 @@ const DashboardPage = () => {
                 </p>
               </div>
             </div>
-          </div>          <div className="mt-6 md:mt-0 md:ml-4 flex space-x-3">
-            <Button variant="secondary" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
+          </div>          <div className="mt-6 md:mt-0 md:ml-4">
             <Button onClick={handleCreateNewStudy} data-testid="create-study">
               <Plus className="h-4 w-4 mr-2" />
               New Study
@@ -249,28 +244,34 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-8">
-          <nav className="flex space-x-8">
+        {/* Tab Navigation - Enhanced Design */}
+        <div className="bg-white rounded-xl border border-gray-200/60 shadow-sm mb-8 overflow-hidden">
+          <nav className="flex">
             {[
               { id: 'overview', name: 'Overview', icon: BarChart3 },
               { id: 'collaboration', name: 'Team', icon: Users },
               { id: 'analytics', name: 'Analytics', icon: Activity },
               { id: 'settings', name: 'Settings', icon: Settings }
-            ].map((tab) => {
+            ].map((tab, index) => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              const isNotLast = index < 3;
+              
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'overview' | 'collaboration' | 'analytics' | 'settings')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`flex-1 py-4 px-6 font-medium text-sm flex items-center justify-center transition-all duration-200 relative ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-b-2 border-blue-500'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/50'
+                  } ${isNotLast ? 'border-r border-gray-200/60' : ''}`}
                 >
-                  <Icon className="w-4 h-4 mr-2" />
+                  <Icon className={`w-4 h-4 mr-2 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
                   {tab.name}
+                  {isActive && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                  )}
                 </button>
               );
             })}
@@ -419,49 +420,60 @@ const DashboardPage = () => {
           </Card>
         </div>
 
-        {/* Activity Feed */}
+        {/* Activity Feed - Dynamic Data */}
         <Card variant="elevated" className="mt-8">
           <CardHeader 
             title="Recent Activity" 
             subtitle="Latest updates and notifications from your studies"
           />
           <CardContent>
-            <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    Study "E-commerce Checkout Flow" reached 150 participants
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">2 hours ago</p>
-                </div>
+            {dashboardData?.recentStudies && dashboardData.recentStudies.length > 0 ? (
+              <div className="space-y-6">
+                {dashboardData.recentStudies.slice(0, 3).map((study, index) => (
+                  <div key={study.id} className="flex items-start space-x-4">
+                    <div className={`h-10 w-10 bg-gradient-to-r rounded-full flex items-center justify-center ${
+                      index === 0 ? 'from-green-100 to-emerald-100' :
+                      index === 1 ? 'from-blue-100 to-indigo-100' :
+                      'from-purple-100 to-pink-100'
+                    }`}>
+                      {index === 0 ? (
+                        <Activity className="h-5 w-5 text-green-600" />
+                      ) : index === 1 ? (
+                        <AfkarLogo variant="icon" className="h-5 w-5 text-blue-600" />
+                      ) : (
+                        <FileText className="h-5 w-5 text-purple-600" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {study.status === 'active' 
+                          ? `Study "${study.title}" has ${study.participants} active participants`
+                          : study.status === 'completed'
+                          ? `Study "${study.title}" was completed successfully`
+                          : `Study "${study.title}" was updated`
+                        }
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {new Date(study.lastUpdate).toLocaleDateString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          day: 'numeric',
+                          month: 'short'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              
-              <div className="flex items-start space-x-4">                <div className="h-10 w-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
-                  <AfkarLogo variant="icon" className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    New analytics report generated for "Mobile App Navigation"
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">4 hours ago</p>
-                </div>
+            ) : (
+              <div className="text-center py-8">
+                <Activity className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No recent activity</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Your recent study activities will appear here.
+                </p>
               </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    Study "User Onboarding Flow" was completed successfully
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">1 day ago</p>
-                </div>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
           </>
