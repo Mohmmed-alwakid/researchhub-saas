@@ -18,8 +18,18 @@ This directory contains GitHub-specific configuration and documentation for the 
 
 ### GitHub Workflows
 
-- **`workflows/deploy.yml`** - Main deployment pipeline
+- **`workflows/deploy.yml`** - Main deployment pipeline with modern CI/CD
 - **`workflows/deploy-simple.yml`** - Simplified deployment workflow
+- **`workflows/completion-framework.yml`** - Systematic quality gates and validation
+
+### Modern Development Tools
+
+- **MCP Integration** - Model Context Protocol for AI-powered development
+  - Playwright MCP for automated browser testing
+  - Supabase MCP for database operations
+  - Memory Bank MCP for project context management
+- **n8n Workflows** - Automated development workflows and CI/CD
+- **AI Testing Framework** - Zero-manual-testing automation
 
 ## 🤖 AI Assistant Integration
 

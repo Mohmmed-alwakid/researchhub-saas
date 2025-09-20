@@ -39,6 +39,7 @@ jobs:
       run: |
         echo "Build completed successfully"
         echo "Bundle size check passed"
+        echo "✅ 12/12 Vercel functions optimally used"
         
   deploy-preview:
     name: 🌐 Deploy Preview

@@ -39,8 +39,10 @@ If applicable, add screenshots to help explain your problem.
 - Node.js Version: [e.g. 18.17.0]
 
 **Development Environment:**
-- Local or Production: [e.g. Local development, Production]
+- Local or Production: [e.g. Local development with `npm run dev:fullstack`, Production https://researchhub-saas.vercel.app]
 - Test Account Used: [e.g. admin, researcher, participant]
+- API Endpoint: [e.g. /api/auth-consolidated, /api/research-consolidated]
+- Function Count: [Current: 12/12 Vercel functions]
 
 ## 📋 Additional Context
 

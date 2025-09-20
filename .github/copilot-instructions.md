@@ -197,7 +197,7 @@ npm run cleanup          # Clean project structure automatically
 
 ### **Core Platform: Study-Centric Research SaaS**
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
-- **Backend**: 24 Vercel Serverless Functions (consolidated API pattern)
+- **Backend**: 12 Vercel Serverless Functions (consolidated API pattern)
 - **Database**: Supabase PostgreSQL with RLS policies
 - **Auth**: Supabase Auth with role-based access (researcher/participant/admin)
 - **Local Dev**: Express.js proxy server connecting to real Supabase
@@ -328,7 +328,7 @@ npm run cleanup        # Auto-organize project structure
 ## 🚨 Critical Constraints
 
 ### **File Management**
-- **24 API functions total** - consolidate, don't create new
+- **12 API functions total** - consolidate, don't create new
 - **No root directory clutter** - use proper subdirectories
 - **No duplicate directories** (e.g., tests/ when testing/ exists)
 - **Update documentation, don't create new files**
@@ -375,7 +375,7 @@ const templates = [
 
 ---
 
-**Last Updated:** August 15, 2025 | **Status:** Production-ready with 24 consolidated APIs
+**Last Updated:** September 20, 2025 | **Status:** Production-ready with 12 consolidated APIs
 
 ## 🌐 **HYBRID DEVELOPMENT STRATEGY** 
 
