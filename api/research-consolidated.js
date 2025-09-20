@@ -419,10 +419,24 @@ async function updateStudy(req, res) {
  */
 async function getDashboardAnalytics(req, res) {
   try {
-    // For now, return basic analytics from studies table
-    const { data: studies, error } = await supabase
+    // Authenticate user to get their ID - dashboard analytics should be user-specific
+    const authResult = await authenticateUser(req);
+    if (!authResult.success) {
+      console.error('❌ Authentication failed for dashboard analytics:', authResult.error);
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication required for dashboard analytics' 
+      });
+    }
+
+    const currentUserId = authResult.user.id;
+    console.log(`📊 Getting dashboard analytics for user: ${currentUserId}`);
+
+    // Get user-specific studies from database
+    const { data: studies, error } = await supabaseAdmin
       .from('studies')
-      .select('status, created_at');
+      .select('status, created_at')
+      .eq('researcher_id', currentUserId);
     
     if (error) {
       console.error('Analytics query error:', error);
@@ -431,6 +445,8 @@ async function getDashboardAnalytics(req, res) {
         error: 'Failed to fetch analytics'
       });
     }
+
+    console.log(`📈 Found ${studies.length} studies for user dashboard analytics`);
 
     const analytics = {
       totalStudies: studies.length,
