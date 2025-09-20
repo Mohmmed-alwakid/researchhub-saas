@@ -7,6 +7,39 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+/**
+ * CRITICAL: Validates that the studies API response matches the expected format
+ * This prevents the frontend from receiving unexpected response structures
+ * that would cause the studies page to show empty state incorrectly.
+ */
+function validateStudiesResponse(response) {
+  if (!response || typeof response !== 'object') {
+    throw new Error('VALIDATION ERROR: Response must be an object');
+  }
+  
+  if (response.success !== true) {
+    throw new Error('VALIDATION ERROR: Response must have success: true');
+  }
+  
+  if (!Array.isArray(response.studies)) {
+    throw new Error('VALIDATION ERROR: Response must have studies as an array');
+  }
+  
+  if (!response.pagination || typeof response.pagination !== 'object') {
+    throw new Error('VALIDATION ERROR: Response must have pagination object');
+  }
+  
+  const requiredPaginationFields = ['currentPage', 'totalPages', 'totalStudies', 'hasNext', 'hasPrev'];
+  for (const field of requiredPaginationFields) {
+    if (!(field in response.pagination)) {
+      throw new Error(`VALIDATION ERROR: Pagination must have ${field} field`);
+    }
+  }
+  
+  console.log('✅ Studies response format validation passed');
+  return true;
+}
+
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
@@ -227,6 +260,22 @@ async function createStudy(req, res) {
 
 /**
  * Get studies from database
+ * Updated 2025-01-22 - Force deployment refresh
+ * 
+ * CRITICAL: This function MUST return the following format:
+ * {
+ *   success: true,
+ *   studies: StudyObject[],
+ *   pagination: {
+ *     currentPage: number,
+ *     totalPages: number,
+ *     totalStudies: number,
+ *     hasNext: boolean,
+ *     hasPrev: boolean
+ *   }
+ * }
+ * 
+ * DO NOT change this format without updating the frontend StudiesResponse interface!
  */
 async function getStudies(req, res) {
   try {
@@ -292,7 +341,8 @@ async function getStudies(req, res) {
     
     console.log(`📚 Successfully formatted ${formattedStudies.length} studies for role: ${userRole}`);
     
-    return res.status(200).json({
+    // Create the response object with STRICT format validation
+    const response = {
       success: true,
       studies: formattedStudies,
       pagination: {
@@ -302,7 +352,12 @@ async function getStudies(req, res) {
         hasNext: false,
         hasPrev: false
       }
-    });
+    };
+
+    // CRITICAL: Validate response format before sending
+    validateStudiesResponse(response);
+    
+    return res.status(200).json(response);
 
   } catch (error) {
     console.error('❌ Get studies error:', error);

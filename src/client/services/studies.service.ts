@@ -1,5 +1,6 @@
 import { apiService } from './api-network-resilient.service';
 import type { Study, StudyStatus, StudyType, Task } from '../../shared/types';
+import { validateStudiesResponse } from '../types/api-contracts';
 
 export interface CreateStudyRequest {
   title: string;
@@ -73,6 +74,7 @@ export interface StudyAnalytics {
 export const studiesService = {
   /**
    * Get all studies with filters
+   * CRITICAL: Validates API response format to prevent empty state bugs
    */
   async getStudies(filters: StudyFilters = {}): Promise<StudiesResponse> {
     const params = new URLSearchParams();
@@ -87,7 +89,26 @@ export const studiesService = {
     const queryString = params.toString();
     const url = `research-consolidated?${queryString}`;
     
-    return apiService.get<StudiesResponse>(url);
+    try {
+      const response = await apiService.get<StudiesResponse>(url);
+      
+      // CRITICAL: Validate response format to prevent studies page empty state bug
+      if (!validateStudiesResponse(response)) {
+        console.error('❌ CRITICAL: API returned invalid studies response format!');
+        console.error('Expected: { success: true, studies: [...], pagination: {...} }');
+        console.error('Received:', response);
+        
+        // Throw error to prevent silent failures
+        throw new Error('Invalid API response format - this would cause studies page empty state bug');
+      }
+      
+      console.log('✅ Studies API response validation successful');
+      return response as StudiesResponse;
+      
+    } catch (error) {
+      console.error('❌ Studies API error:', error);
+      throw error;
+    }
   },
   /**
    * Get study by ID
