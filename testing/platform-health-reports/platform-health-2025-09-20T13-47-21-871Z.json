@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-09-20T13:47:16.954Z",
+  "overall": {
+    "status": "FAIR",
+    "score": 67,
+    "totalTests": 6,
+    "passedTests": 4
+  },
+  "dashboardConsistency": {
+    "status": "PASS",
+    "issues": []
+  },
+  "studyCreation": {
+    "status": "PASS",
+    "issues": []
+  },
+  "participantExperience": {
+    "status": "PASS",
+    "issues": []
+  },
+  "resultsAnalytics": {
+    "status": "FAIL",
+    "issues": [
+      "Analytics missing required fields: totalParticipants, weeklyStudyChange, weeklyParticipantChange"
+    ]
+  },
+  "apiContracts": {
+    "status": "PASS",
+    "issues": []
+  }
+}

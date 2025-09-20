@@ -496,7 +496,7 @@ async function getDashboardAnalytics(req, res) {
     // Get user-specific studies from database
     const { data: studies, error } = await supabaseAdmin
       .from('studies')
-      .select('status, created_at')
+      .select('id, status, created_at')
       .eq('researcher_id', currentUserId);
     
     if (error) {
@@ -507,13 +507,34 @@ async function getDashboardAnalytics(req, res) {
       });
     }
 
-    console.log(`📈 Found ${studies.length} studies for user dashboard analytics`);
+    // Get participant data for comprehensive analytics
+    const { data: applications, error: applicationsError } = await supabaseAdmin
+      .from('study_applications')
+      .select('created_at, study_id')
+      .in('study_id', studies.map(s => s.id) || []);
+
+    if (applicationsError) {
+      console.error('Applications query error:', applicationsError);
+      // Continue without participant data rather than fail completely
+    }
+
+    console.log(`📈 Found ${studies.length} studies and ${applications?.length || 0} applications for user dashboard analytics`);
+
+    // Calculate weekly changes
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const thisWeekStudies = studies.filter(s => new Date(s.created_at) > oneWeekAgo).length;
+    const thisWeekParticipants = applications?.filter(a => new Date(a.created_at) > oneWeekAgo).length || 0;
 
     const analytics = {
       totalStudies: studies.length,
+      totalParticipants: applications?.length || 0,
       activeStudies: studies.filter(s => s.status === 'active').length,
       draftStudies: studies.filter(s => s.status === 'draft').length,
       completedStudies: studies.filter(s => s.status === 'completed').length,
+      weeklyStudyChange: thisWeekStudies,
+      weeklyParticipantChange: thisWeekParticipants,
       recentActivity: studies.length > 0 ? studies[0].created_at : null
     };
     
@@ -622,6 +643,81 @@ async function debugSchema(req, res) {
 }
 
 /**
+ * Get study sessions for participant
+ */
+async function getSessions(req, res) {
+  try {
+    // Authenticate user
+    const authResult = await authenticateUser(req);
+    if (!authResult.success) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication required' 
+      });
+    }
+
+    const participantId = authResult.user.id;
+
+    // Get participant's study applications (sessions)
+    const { data: sessions, error } = await supabaseAdmin
+      .from('study_applications')
+      .select(`
+        id,
+        status,
+        created_at,
+        completed_at,
+        progress,
+        studies (
+          id,
+          title,
+          description,
+          status
+        )
+      `)
+      .eq('participant_id', participantId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Sessions query error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch sessions'
+      });
+    }
+
+    // Format sessions for frontend
+    const formattedSessions = sessions.map(session => ({
+      id: session.id,
+      studyId: session.studies?.id,
+      studyTitle: session.studies?.title || 'Untitled Study',
+      studyDescription: session.studies?.description,
+      status: session.status,
+      progress: session.progress || 0,
+      startedAt: session.created_at,
+      completedAt: session.completed_at,
+      canResume: session.status === 'in_progress'
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        sessions: formattedSessions,
+        totalSessions: formattedSessions.length,
+        activeSessions: formattedSessions.filter(s => s.status === 'in_progress').length,
+        completedSessions: formattedSessions.filter(s => s.status === 'completed').length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get sessions error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
  * Main API Handler
  */
 export default async function handler(req, res) {
@@ -698,10 +794,16 @@ export default async function handler(req, res) {
         }
         return await debugSchema(req, res);
 
+      case 'get-sessions':
+        if (req.method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await getSessions(req, res);
+
       default:
         return res.status(400).json({
           success: false,
-          error: `Unknown action: ${action}. Available actions: create-study, get-studies, update-study, dashboard-analytics`
+          error: `Unknown action: ${action}. Available actions: create-study, get-studies, update-study, dashboard-analytics, get-sessions`
         });
     }
 
