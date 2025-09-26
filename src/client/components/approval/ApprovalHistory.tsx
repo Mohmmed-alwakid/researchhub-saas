@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Clock, CheckCircle, XCircle, AlertTriangle, User, Calendar, Search, Filter } from 'lucide-react';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
 import type { ApprovalItem, ApprovalStatus } from './ApprovalQueue';
+
 
 interface ApprovalHistoryProps {
   /** List of historical approval items */

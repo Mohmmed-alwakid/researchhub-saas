@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area
@@ -8,6 +7,8 @@ import {
   TrendingUp, TrendingDown, Users, Clock, Target, Eye,
   Download, RefreshCw, Activity, Award, CheckCircle
 } from 'lucide-react';
+
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface StudyAnalytics {
   studyId: string;

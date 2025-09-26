@@ -1,10 +1,11 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuthStore } from '../../stores/authStore';
+
+
 /**
  * MY APPLICATIONS - PARTICIPANT EXPERIENCE
  * Shows all study applications with status tracking
  */
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '../../stores/authStore';
 
 interface Application {
   id: string;

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, ArrowRight, CheckCircle, Pause, Play, Save, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
+
 import { BlockRenderer, StudyBlock } from './StudyBlockComponents';
 
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
-import { ArrowLeft, ArrowRight, CheckCircle, Pause, Play, Save, Clock } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
 
 interface StudyBlockSessionProps {
   sessionId: string;

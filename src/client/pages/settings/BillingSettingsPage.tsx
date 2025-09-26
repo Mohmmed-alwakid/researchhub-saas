@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { 
   Users, 
   BarChart3, 
@@ -10,10 +9,12 @@ import {
   CreditCard
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { pointsService } from '../../services/payment.service';
-import { PointsManager } from '../../components/subscription/PointsManager';
-import { Card, CardContent, CardHeader } from '../../components/ui/Card';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
+
+import { Card, CardContent, CardHeader } from '../../components/ui/Card';
+import { PointsManager } from '../../components/subscription/PointsManager';
+import { pointsService } from '../../services/payment.service';
 
 interface UsageStats {
   success: boolean;

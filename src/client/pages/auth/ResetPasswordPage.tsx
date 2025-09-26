@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
+import { Eye, EyeOff, AlertCircle, CheckCircle, Shield } from 'lucide-react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, AlertCircle, CheckCircle, Shield } from 'lucide-react';
-import AfkarLogo from '../../../assets/brand/AfkarLogo';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
+
+import { authService } from '../../services';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
-import { authService } from '../../services';
-import toast from 'react-hot-toast';
+import AfkarLogo from '../../../assets/brand/AfkarLogo';
 
 // Form validation schema
 const resetPasswordSchema = z.object({

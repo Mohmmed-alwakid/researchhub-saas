@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   BarChart3,
   Users,
@@ -11,15 +12,15 @@ import {
   Eye,
   Settings,
 } from 'lucide-react';
-import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
+import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
-import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
 import { CollaborationDashboard } from '../../components/collaboration/CollaborationDashboard';
 import { useAuthStore } from '../../stores/authStore';
 import type { WorkspaceRole } from '../../../shared/types';
+
 
 // Define interfaces for type safety
 interface StudyData {

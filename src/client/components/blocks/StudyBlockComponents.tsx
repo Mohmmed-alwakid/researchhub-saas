@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { CheckCircle, Star } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader } from '../ui/Card';
 import { ConditionalBranchBlock, AIFollowUpBlock, CardSortBlock } from './AdvancedStudyBlocks';
+
 
 // Tree Test interfaces for type safety
 interface TreeTestNode {

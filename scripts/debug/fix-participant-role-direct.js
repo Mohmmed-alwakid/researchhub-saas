@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://vhqoawmwvxqnblhkrgqe.supabase.co';
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocW9hd213dnhxbmJsaGtyZ3FlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxODY2NDA3MywiZXhwIjoyMDM0MjQwMDczfQ.YBnE7Nt_8pLzxNg_gWgUo4wBkqtqI_nALKE-iXrKY0I';
+const supabaseServiceKey = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'';
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

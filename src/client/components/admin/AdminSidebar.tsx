@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { clsx } from 'clsx';
+
+import { Link } from 'react-router-dom';
 
 interface AdminRoute {
   path: string;

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { X, Save, Clock, Target, AlertTriangle, Plus, Trash2 } from 'lucide-react';
-import { type StudyTask } from './DragDropStudyBuilder';
-import { Button } from '../ui/Button';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
+
+import { Button } from '../ui/Button';
+import { type StudyTask } from './DragDropStudyBuilder';
 
 // Base configuration schema
 const successCriteriaSchema = z.object({

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { stcBankService, STCPaymentIntent, PaymentProvider } from '../../services/payment.service';
 
+
 interface STCBankPaymentFlowProps {
   amount: number;
   currency?: string;

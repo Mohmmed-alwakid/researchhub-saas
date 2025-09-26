@@ -5,7 +5,7 @@ async function testAdminRole() {
   console.log('🔍 Testing Admin Role Access...\n');
   
   const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-  const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.o2wPqRq5wgQTmfCL4wRLcCN8uVG91xwwLBZS2CGlsD8';
+  const supabaseServiceKey = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'';
   
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
   

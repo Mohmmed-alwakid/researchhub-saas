@@ -1,24 +1,25 @@
+import { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { useEffect, Suspense, lazy } from 'react';
+import { PerformanceMonitor } from './client/components/performance/PerformanceMonitor';
+import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
+import { SentryErrorBoundary } from './components/common/SentryErrorBoundary';
+import { useAuthStore } from './client/stores/authStore';
+import AdminDashboard from './../@/pages/admin/AdminDashboard';
 
-// Import layouts and core components directly (needed immediately)
+import AfkarLogo from './assets/brand/AfkarLogo';
 import AppLayout from './client/components/common/AppLayout';
 import AuthGuard from './client/components/auth/AuthGuard';
-import ProtectedRoute from './client/components/auth/ProtectedRoute';
-// Enhanced Sentry error boundaries
-import { SentryErrorBoundary } from './components/common/SentryErrorBoundary';
-// Connectivity status banner
 import ConnectivityStatusBanner from './components/common/ConnectivityStatusBanner';
-// Performance monitoring
-import { PerformanceMonitor } from './client/components/performance/PerformanceMonitor';
-// Lazy load error boundary
 import LazyLoadErrorBoundary from './client/components/common/LazyLoadErrorBoundary';
-import { useAuthStore } from './client/stores/authStore';
-import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
-import AfkarLogo from './assets/brand/AfkarLogo';
+import ProtectedRoute from './client/components/auth/ProtectedRoute';
 
+// Import layouts and core components directly (needed immediately)
+// Enhanced Sentry error boundaries
+// Connectivity status banner
+// Performance monitoring
+// Lazy load error boundary
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./client/pages/LandingPage'));
 const AboutPage = lazy(() => import('./client/pages/AboutPage'));
@@ -295,6 +296,7 @@ function App() {
             
             {/* 404 Catch-all route - Must be last */}
             <Route path="*" element={<NotFoundPage />} />
+                      <Route path="/app/admin" element={<AdminDashboard />} />
           </Routes>
               </Suspense>
             </LazyLoadErrorBoundary>

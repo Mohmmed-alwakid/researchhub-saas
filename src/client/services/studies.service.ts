@@ -1,6 +1,7 @@
 import { apiService } from './api-network-resilient.service';
-import type { Study, StudyStatus, StudyType, Task } from '../../shared/types';
 import { validateStudiesResponse } from '../types/api-contracts';
+
+import type { Study, StudyStatus, StudyType, Task } from '../../shared/types';
 
 export interface CreateStudyRequest {
   title: string;

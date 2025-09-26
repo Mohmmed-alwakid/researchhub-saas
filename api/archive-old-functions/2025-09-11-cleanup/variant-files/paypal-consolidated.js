@@ -1,7 +1,8 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 // PayPal Payment Integration for ResearchHub SaaS
 // Handles subscription plans, payments, and upgrades
-
-import { createClient } from '@supabase/supabase-js';
 
 // PayPal SDK configuration
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;

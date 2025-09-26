@@ -1,7 +1,8 @@
+import Redis from 'ioredis';
+
+
 // Week 4 Day 2: Redis Cache Implementation for ResearchHub
 // Date: June 29, 2025
-
-import Redis from 'ioredis';
 
 /**
  * Redis configuration and cache manager for ResearchHub enterprise collaboration

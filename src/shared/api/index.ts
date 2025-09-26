@@ -1,3 +1,8 @@
+import { ApiClient } from './ApiClient';
+import { routeOptimizer } from './RouteOptimizer';
+import type { ApiRequest, ApiResponse } from './ApiClient';
+
+
 /**
  * API Optimization Module - Centralized exports for ResearchHub API optimization
  * Part of the Vibe-Coder-MCP implementation
@@ -44,10 +49,6 @@ export {
 } from './RouteOptimizer';
 
 // Import for internal use
-import { ApiClient } from './ApiClient';
-import { routeOptimizer } from './RouteOptimizer';
-import type { ApiRequest, ApiResponse } from './ApiClient';
-
 /**
  * Default API optimization configuration for ResearchHub
  */

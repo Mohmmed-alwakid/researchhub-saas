@@ -1,3 +1,7 @@
+import { z } from 'zod';
+import DOMPurify from 'isomorphic-dompurify';
+
+
 /**
  * Security Hardening Manager for ResearchHub API
  * Implements comprehensive security measures for API protection
@@ -13,9 +17,6 @@
  * @author ResearchHub Team
  * @date June 29, 2025
  */
-
-import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
 
 class SecurityManager {
   constructor() {

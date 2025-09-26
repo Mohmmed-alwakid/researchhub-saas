@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 
+
 /**
  * Component that redirects users to appropriate dashboard based on their role
  */

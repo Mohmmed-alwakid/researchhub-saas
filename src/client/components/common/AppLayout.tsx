@@ -1,4 +1,3 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import {
   BarChart3,
@@ -27,8 +26,10 @@ import {
   TrendingUp,
   HeadphonesIcon,
 } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
+
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

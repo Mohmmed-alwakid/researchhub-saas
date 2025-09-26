@@ -12,8 +12,9 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import { ComingSoon } from '../common/ComingSoon';
+
+import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 
 interface SubscriptionPlan {
   id: string;

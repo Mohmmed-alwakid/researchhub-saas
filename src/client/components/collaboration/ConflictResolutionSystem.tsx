@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { Avatar } from '../ui/Avatar';
+import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { Avatar } from '../ui/Avatar';
 import { CollaboratorPresence } from '../../../shared/types';
+
 
 interface ConflictResolutionProps {
   /** Active conflicts to resolve */

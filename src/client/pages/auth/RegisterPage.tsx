@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { useAuthStore } from '../../stores/authStore';
 import GoogleOAuthButton from '../../components/auth/GoogleOAuthButton';
+
 
 // Form validation schema
 const registerSchema = z

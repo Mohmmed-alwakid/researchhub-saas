@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { getAllStudies, updateStudyStatus, type AdminStudy, type PaginatedResponse } from '../../services/admin.service';
 
+
 interface StudyOversightProps {
   className?: string;
 }

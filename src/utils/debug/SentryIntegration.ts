@@ -1,9 +1,10 @@
+import * as Sentry from '@sentry/react';
+
+
 /**
  * 🔍 Sentry Integration for ResearchHub
  * Professional error tracking with ResearchHub-specific context
  */
-
-import * as Sentry from '@sentry/react';
 
 interface ResearchContext {
   studyId?: string;

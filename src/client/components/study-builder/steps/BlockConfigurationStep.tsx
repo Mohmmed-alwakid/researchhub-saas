@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { EnhancedBlockEditor } from '../enhanced/EnhancedBlockEditor';
+
+import { EnhancedBlockPreview } from '../enhanced/EnhancedBlockPreview';
 import { StepProps, StudyBuilderBlock, BlockType, BLOCK_LIBRARY, getBlockDisplayName, getDefaultBlockDescription, getDefaultBlockSettings } from '../types';
 import { StudyPreviewModal } from '../StudyPreviewModal';
-import { EnhancedBlockPreview } from '../enhanced/EnhancedBlockPreview';
-import { EnhancedBlockEditor } from '../enhanced/EnhancedBlockEditor';
 
 export const BlockConfigurationStep: React.FC<StepProps> = ({
   formData,

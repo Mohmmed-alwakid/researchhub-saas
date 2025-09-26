@@ -1,9 +1,10 @@
+import { v4 as uuidv4 } from 'uuid';
+
+
 /**
  * Analytics Service for Study Creation Flow
  * Comprehensive tracking and measurement system
  */
-
-import { v4 as uuidv4 } from 'uuid';
 
 // Browser API interfaces for type safety
 interface WindowWithAnalytics extends Window {

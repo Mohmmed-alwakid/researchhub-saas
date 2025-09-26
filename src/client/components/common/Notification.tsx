@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle, AlertCircle, AlertTriangle, Info, X, Zap } from 'lucide-react';
 import { Button } from '../ui/Button';
 
+
 export type NotificationType = 'success' | 'error' | 'warning' | 'info' | 'loading';
 
 interface NotificationProps {

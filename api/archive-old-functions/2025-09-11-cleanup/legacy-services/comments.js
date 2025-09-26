@@ -1,9 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * Comments API
  * Handles threaded comment system
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,

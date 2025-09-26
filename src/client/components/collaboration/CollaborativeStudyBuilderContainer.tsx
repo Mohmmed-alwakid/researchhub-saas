@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '../../stores/authStore';
-import { commentsService } from '../../services/commentsService';
-import { CollaborationHeader } from './CollaborationHeader';
-import { CollaborationIndicators } from './CollaborationIndicators';
-import { CommentSystem } from './CommentSystem';
-import ActivityFeed from './ActivityFeed';
-import { EnhancedBlockPreview } from '../study-builder/blocks/EnhancedBlockPreview';
-import LiveCollaborationManager from './LiveCollaborationManager';
-import { Button } from '../ui/Button';
-import { Tabs } from '../ui/Tabs';
+import { MessageCircle, Activity, Users, Eye, EyeOff } from 'lucide-react';
+
 import { 
   IStudyComment, 
   CollaboratorPresence,
@@ -16,7 +8,16 @@ import {
   CollaborationActivity,
   StudyBuilderBlock
 } from '../../../shared/types';
-import { MessageCircle, Activity, Users, Eye, EyeOff } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { CollaborationHeader } from './CollaborationHeader';
+import { CollaborationIndicators } from './CollaborationIndicators';
+import { commentsService } from '../../services/commentsService';
+import { CommentSystem } from './CommentSystem';
+import { EnhancedBlockPreview } from '../study-builder/blocks/EnhancedBlockPreview';
+import { Tabs } from '../ui/Tabs';
+import { useAuthStore } from '../../stores/authStore';
+import ActivityFeed from './ActivityFeed';
+import LiveCollaborationManager from './LiveCollaborationManager';
 
 interface CollaborativeStudyBuilderContainerProps {
   studyId: string;

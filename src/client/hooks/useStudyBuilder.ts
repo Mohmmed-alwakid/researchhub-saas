@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ITask, Study } from '../../shared/types';
+
+import { StudyBuilderBlock } from '../components/studies/StudyBlocksManager';
+import { StudyFormData } from '../components/studies/StudyMetadataForm';
 import { useAppStore, TaskInput } from '../stores/appStore';
 import type { StudyInput } from '../stores/appStore';
-import { StudyFormData } from '../components/studies/StudyMetadataForm';
-import { StudyBuilderBlock } from '../components/studies/StudyBlocksManager';
-import { ITask, Study } from '../../shared/types';
 
 interface ValidationError {
   field: string;

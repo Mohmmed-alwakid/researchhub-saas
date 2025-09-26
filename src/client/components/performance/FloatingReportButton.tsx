@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bug, Send } from 'lucide-react';
 
+
 interface FloatingReportButtonProps {
   className?: string;
   showInProduction?: boolean;

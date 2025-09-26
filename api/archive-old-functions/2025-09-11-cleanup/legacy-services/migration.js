@@ -1,14 +1,15 @@
+import { createClient } from '@supabase/supabase-js';
+import { join } from 'path';
+
+import { readFileSync } from 'fs';
+
 /**
  * PHASE 1: DATABASE MIGRATION API ENDPOINT
  * Safely applies the platform foundation migration via API
  * Requirements Source: docs/requirements/01-PLATFORM_FOUNDATION.md
  */
-import { createClient } from '@supabase/supabase-js';
-import { readFileSync } from 'fs';
-import { join } from 'path';
-
 const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+const supabaseServiceKey = 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

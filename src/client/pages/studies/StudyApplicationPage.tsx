@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Clock, DollarSign, Users, CheckCircle, AlertCircle } from 'lucide-react';
-import { participantApplicationsService } from '../../services/participantApplications.service';
-import { Card, CardContent, CardHeader } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+
+import { Button } from '../../components/ui/Button';
+import { Card, CardContent, CardHeader } from '../../components/ui/Card';
+import { participantApplicationsService } from '../../services/participantApplications.service';
 
 interface StudyDetails {
   _id: string;

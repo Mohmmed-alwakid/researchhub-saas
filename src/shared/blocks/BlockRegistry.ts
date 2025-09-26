@@ -1,10 +1,3 @@
-/**
- * ResearchHub Study Blocks Registry
- * Vibe-Coder-MCP Implementation - Task 1.5
- * 
- * Centralized registry for managing study block types, metadata, and validation
- */
-
 import { z } from 'zod';
 import {
   BLOCK_TYPES,
@@ -28,6 +21,14 @@ import {
   type ImageUploadSettings,
   type FileUploadSettings
 } from './BlockTypes.js';
+
+
+/**
+ * ResearchHub Study Blocks Registry
+ * Vibe-Coder-MCP Implementation - Task 1.5
+ * 
+ * Centralized registry for managing study block types, metadata, and validation
+ */
 
 // Registry of all block types with their metadata
 export const BLOCK_REGISTRY: Record<BlockType, BlockMetadata> = {

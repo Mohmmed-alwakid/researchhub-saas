@@ -1,14 +1,15 @@
+import { 
+  initializeFallbackDatabase,
+  checkSupabaseConnectivity 
+} from '../scripts/development/network-resilient-fallback.js';
+
+
 /**
  * NETWORK-RESILIENT SERVICE LAYER API
  * Provides local fallback for wallet, studies, and applications services
  * ✅ REAL DATA MODE: Uses actual fallback database operations
  * 🔧 TRANSPARENT SWITCHING: Same API interface as remote services
  */
-
-import { 
-  initializeFallbackDatabase,
-  checkSupabaseConnectivity 
-} from '../scripts/development/network-resilient-fallback.js';
 
 let fallbackDb;
 let isInitialized = false;

@@ -17,6 +17,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 import { PublicHeader } from '../components/common/PublicHeader';
 
+
 const AboutPage: React.FC = () => {
   const stats = [
     { label: 'Active Researchers', value: '50,000+', icon: Users },

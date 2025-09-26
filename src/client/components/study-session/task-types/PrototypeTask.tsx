@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MousePointer, Eye, Clock, Target, BarChart3, CheckCircle, ExternalLink } from 'lucide-react';
 
+
 interface ClickTrackingTaskProps {
   task: {
     _id: string;

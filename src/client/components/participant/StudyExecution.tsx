@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Play, 
   Clock, 
@@ -8,8 +7,10 @@ import {
   ArrowLeft,
   ArrowRight
 } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
+import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+
+import { useAuthStore } from '../../stores/authStore';
 
 // Types for study execution
 interface StudyResponse {

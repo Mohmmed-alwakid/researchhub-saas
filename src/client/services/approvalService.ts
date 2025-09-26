@@ -1,9 +1,10 @@
+import type { ApprovalItem, ApprovalPriority, ApprovalStatus } from '../components/approval/ApprovalQueue';
+
+
 /**
  * Approval Service
  * Client-side service for approval workflow management
  */
-
-import type { ApprovalItem, ApprovalPriority, ApprovalStatus } from '../components/approval/ApprovalQueue';
 
 interface ApprovalFilter {
   status?: ApprovalStatus | 'all';

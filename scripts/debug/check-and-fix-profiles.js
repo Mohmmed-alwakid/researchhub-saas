@@ -3,7 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   'https://lbmirbnbacpcpahfujri.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxibWlyYm5iYWNwY3BhaGZ1anJpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNzc4MzYyMiwiZXhwIjoyMDIzMzU5NjIyfQ.ZaKUWxFBku8b-DA4eV5UUewP_rlKKpNaDN_lBNJyoHE'
+  ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY''
 );
 
 async function checkAndFixProfiles() {

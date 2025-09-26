@@ -1,9 +1,10 @@
+import type { IStudyComment } from '../../shared/types';
+
+
 /**
  * Comments Service
  * Client-side service for comment system management
  */
-
-import type { IStudyComment } from '../../shared/types';
 
 interface CommentReaction {
   id: string;

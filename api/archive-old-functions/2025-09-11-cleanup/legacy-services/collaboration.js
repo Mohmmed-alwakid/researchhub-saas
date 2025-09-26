@@ -1,9 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * Collaboration API
  * Handles real-time collaboration features
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,

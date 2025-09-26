@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { toast } from 'react-hot-toast';
 import { Play, Pause, Square, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { ISession, ITaskCompletion, IStudy, IParticipant, ITask } from '../../../shared/types';
-import { useRecording } from '../../hooks/useRecording.ts';
-import { NavigationTask } from './task-types/NavigationTask.tsx';
-import { SurveyTask } from './task-types/SurveyTask.tsx';
-import { PrototypeTask } from './task-types/PrototypeTask.tsx';
+import { toast } from 'react-hot-toast';
 import { CardSortingTask } from './task-types/CardSortingTask.tsx';
-import { WelcomeBlockTask } from './task-types/WelcomeBlockTask.tsx';
 import { ContextScreenTask } from './task-types/ContextScreenTask.tsx';
+
+import { ISession, ITaskCompletion, IStudy, IParticipant, ITask } from '../../../shared/types';
+import { NavigationTask } from './task-types/NavigationTask.tsx';
+import { PrototypeTask } from './task-types/PrototypeTask.tsx';
+import { SurveyTask } from './task-types/SurveyTask.tsx';
+import { useRecording } from '../../hooks/useRecording.ts';
+import { WelcomeBlockTask } from './task-types/WelcomeBlockTask.tsx';
 
 interface TaskRunnerProps {
   study: IStudy;

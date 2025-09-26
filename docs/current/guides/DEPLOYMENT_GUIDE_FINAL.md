@@ -36,7 +36,7 @@ Our testing proves the implementation is perfect:
 
 ```bash
 ✅ Login successful
-🔑 Token obtained: eyJhbGciOiJIUzI1NiIs...
+🔑 Token obtained: 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.
 💰 Points calculation: 110 points for test study
 📚 Study creation integration: Active and working
 🐛 Performance monitoring: Ready for issue reporting

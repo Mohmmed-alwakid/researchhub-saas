@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
-import { studiesService } from '../services/studies.service';
 import { participantsService } from '../services/participants.service';
 import { sessionsService } from '../services/sessions.service';
+import { studiesService } from '../services/studies.service';
 import type { 
   Study, 
   IParticipant, 
@@ -10,6 +10,7 @@ import type {
   StudyStatus
 } from '../../shared/types';
 import type { CreateStudyRequest } from '../services/studies.service';
+
 
 // Helper function to extract error message from errors
 const getErrorMessage = (error: unknown, defaultMessage: string): string => {

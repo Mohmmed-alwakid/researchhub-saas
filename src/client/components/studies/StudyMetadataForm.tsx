@@ -1,6 +1,7 @@
 import React from 'react';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 
+
 export interface StudyFormData {
   title: string;
   description?: string;

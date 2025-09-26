@@ -1,3 +1,16 @@
+import
+    if (action === 'import-test') {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+import failed',
+          details: importError.message,
+          timestamp: new Date().toISOString()
+        });
+import successful',
+          supabaseVersion: 'imported successfully',
+          timestamp: new Date().toISOString()
+        });
+
 /**
  * SIMPLIFIED RESEARCH API TEST
  * Testing step-by-step to isolate the issue
@@ -47,24 +60,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // Test 3: Supabase import
-    if (action === 'import-test') {
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        return res.status(200).json({
+    // Test 3: Supabase         return res.status(200).json({
           success: true,
-          message: 'Supabase import successful',
-          supabaseVersion: 'imported successfully',
-          timestamp: new Date().toISOString()
-        });
-      } catch (importError) {
+          message: 'Supabase       } catch (importError) {
         return res.status(500).json({
           success: false,
-          error: 'Supabase import failed',
-          details: importError.message,
-          timestamp: new Date().toISOString()
-        });
-      }
+          error: 'Supabase       }
     }
 
     // Test 4: Supabase client creation

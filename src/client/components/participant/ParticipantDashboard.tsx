@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
   Clock, 
@@ -15,8 +14,10 @@ import {
   ArrowRight,
   Search
 } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+
+import { useAuthStore } from '../../stores/authStore';
 
 // Types
 type TabId = 'overview' | 'applications' | 'sessions' | 'achievements';

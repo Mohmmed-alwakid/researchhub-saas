@@ -11,12 +11,13 @@ import {
   Loader2,
   UserCheck
 } from 'lucide-react';
-import { SecuritySettings } from '../../components/settings/SecuritySettings';
-import { PointsManager } from '../../components/subscription/PointsManager';
-import { Card, CardContent, CardHeader } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { useAuthStore } from '../../stores/authStore';
 import { apiService } from '../../services/api.service';
+
+import { Button } from '../../components/ui/Button';
+import { Card, CardContent, CardHeader } from '../../components/ui/Card';
+import { PointsManager } from '../../components/subscription/PointsManager';
+import { SecuritySettings } from '../../components/settings/SecuritySettings';
+import { useAuthStore } from '../../stores/authStore';
 
 type SettingsTab = 'profile' | 'demographics' | 'security' | 'billing' | 'notifications' | 'preferences';
 

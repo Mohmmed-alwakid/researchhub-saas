@@ -12,9 +12,10 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { authService } from '../../services/auth.service';
-import TwoFactorSetup from '../../components/auth/TwoFactorSetup';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader } from '../ui/Card';
+
+import TwoFactorSetup from '../../components/auth/TwoFactorSetup';
 
 interface SecuritySettingsProps {
   user?: {

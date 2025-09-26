@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import {
   Clock,
   CheckCircle,
@@ -16,12 +14,15 @@ import {
   UserCheck,
   UserX
 } from 'lucide-react';
-import { Card, CardContent } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { useParams, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { Card, CardContent } from '../../components/ui/Card';
 import { researcherApplicationsService } from '../../services/researcherApplications.service';
-import type { ApplicationReview, ResearcherApplication } from '../../services/researcherApplications.service';
 import { studiesService } from '../../services/studies.service';
+
+import type { ApplicationReview, ResearcherApplication } from '../../services/researcherApplications.service';
 
 interface StudyInfo {
   _id: string;

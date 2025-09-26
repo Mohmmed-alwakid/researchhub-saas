@@ -1,16 +1,17 @@
 import { useState } from 'react';
+import { Eye, EyeOff, AlertCircle, Sparkles, CheckCircle, TrendingUp } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, AlertCircle, Sparkles, CheckCircle, TrendingUp } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
-import { useAuthStore } from '../../stores/authStore';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
-import TwoFactorLogin from '../../components/auth/TwoFactorLogin';
+import { useAuthStore } from '../../stores/authStore';
 import BackupCodeLogin from '../../components/auth/BackupCodeLogin';
 import GoogleOAuthButton from '../../components/auth/GoogleOAuthButton';
+
+import TwoFactorLogin from '../../components/auth/TwoFactorLogin';
 
 // Form validation schema
 const loginSchema = z.object({

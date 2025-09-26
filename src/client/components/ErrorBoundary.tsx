@@ -3,6 +3,7 @@ import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Card } from './ui/Card';
 
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;

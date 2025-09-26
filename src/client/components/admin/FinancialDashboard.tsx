@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { getEnhancedFinancialOverview, type FinancialReport } from '../../services/admin.service';
 
+
 interface FinancialDashboardProps {
   className?: string;
 }

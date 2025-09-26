@@ -1,10 +1,14 @@
+import web-vitals library dynamically
+      const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
+      
+import { getPerformanceMonitor, PerformanceMetric } from './PerformanceMonitor';
+
+
 /**
  * Browser Performance Monitoring
  * Browser-specific performance monitoring and Web Vitals collection
  * Based on Vibe-Coder-MCP architectural patterns
  */
-
-import { getPerformanceMonitor, PerformanceMetric } from './PerformanceMonitor';
 
 /**
  * Web Vitals metrics interface
@@ -293,10 +297,7 @@ export class WebVitalsCollector {
    */
   async initialize(): Promise<void> {
     try {
-      // Try to import web-vitals library dynamically
-      const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
-      
-      this.setupWebVitals({ getCLS, getFID, getFCP, getLCP, getTTFB });
+      // Try to       this.setupWebVitals({ getCLS, getFID, getFCP, getLCP, getTTFB });
     } catch (error) {
       // Fallback to manual collection if web-vitals library is not available
       console.warn('WebVitalsCollector: web-vitals library not available, using fallback methods');

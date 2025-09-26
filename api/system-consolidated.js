@@ -1,10 +1,11 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * CONSOLIDATED SYSTEM OPERATIONS API
  * Merges: health.js + dashboard.js + migration.js
  * Handles: Health checks, dashboard data, system migrations
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 // Check if we're in local development mode
 const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
@@ -17,8 +18,8 @@ let supabaseAdmin = null;
 if (!isLocalDevelopment) {
   // Supabase configuration
   const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-  const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
 
   supabase = createClient(supabaseUrl, supabaseKey);
   supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);

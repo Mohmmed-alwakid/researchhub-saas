@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StepProps } from '../types';
 
+
 export const StudySetupStep: React.FC<StepProps> = ({
   formData,
   onUpdateFormData

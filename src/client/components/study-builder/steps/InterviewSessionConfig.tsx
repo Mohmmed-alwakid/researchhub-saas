@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StepProps, InterviewSessionConfig, InterviewQuestion } from '../types';
 import { Plus, Trash2, Clock, Video, Calendar, Users } from 'lucide-react';
+
+import { StepProps, InterviewSessionConfig, InterviewQuestion } from '../types';
 
 export const InterviewSessionConfigStep: React.FC<StepProps> = ({
   formData,

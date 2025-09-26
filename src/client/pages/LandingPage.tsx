@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { 
   PlayCircle, 
   Users, 
@@ -16,9 +15,11 @@ import {
   Activity,
   PieChart
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 import { PublicHeader } from '../components/common/PublicHeader';
+
 
 const EnhancedLandingPage = () => {
   const [activeDemo, setActiveDemo] = useState('screen-recording');

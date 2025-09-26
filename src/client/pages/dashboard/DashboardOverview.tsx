@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Users,
   FileText,
@@ -12,9 +11,11 @@ import {
   Eye,
   TrendingUp
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
+
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
-import { analyticsService, type DashboardAnalytics } from '../../services/analytics.service';
 
 interface DashboardOverviewProps {
   studyId?: string;

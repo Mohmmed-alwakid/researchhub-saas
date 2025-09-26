@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import {
   Clock,
   CheckCircle,
@@ -16,22 +14,25 @@ import {
   RefreshCw,
   Wallet
 } from 'lucide-react';
-import { Card, CardContent } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Badge } from '../../components/ui/Badge.tsx';
+import { Button } from '../../components/ui/Button';
+import { Card, CardContent } from '../../components/ui/Card';
+import { EnhancedTransactionHistory } from '../../components/wallet/EnhancedTransactionHistory';
+import { EnhancedWithdrawalForm } from '../../components/wallet/EnhancedWithdrawalForm';
 import { participantApplicationsService } from '../../services/participantApplications.service';
-import type { IParticipantApplication } from '../../../shared/types';
-import { WalletOverview } from '../../components/wallet/WalletOverview';
-// import { EnhancedWithdrawalForm } from '../../components/wallet/EnhancedWithdrawalForm';
-import { WithdrawalHistory } from '../../components/wallet/WithdrawalHistory';
-// import { EnhancedTransactionHistory } from '../../components/wallet/EnhancedTransactionHistory';
-// import { WithdrawalFormData } from '../../components/wallet/WithdrawalForm'; // TODO: Will be used when withdrawal form is implemented
 import { useEnhancedWallet } from '../../hooks/useEnhancedWallet';
-import WalletErrorBoundary from '../../components/wallet/WalletErrorBoundary';
-// import { WalletSkeleton } from '../../components/wallet/WalletSkeletons';
+import { WalletOverview } from '../../components/wallet/WalletOverview';
+import { WalletSkeleton } from '../../components/wallet/WalletSkeletons';
 import { walletToasts } from '../../utils/walletToasts';
 
-interface EnhancedApplication extends Omit<IParticipantApplication, 'studyId'> {
+import { WithdrawalHistory } from '../../components/wallet/WithdrawalHistory';
+import type { IParticipantApplication } from '../../../shared/types';
+import WalletErrorBoundary from '../../components/wallet/WalletErrorBoundary';
+
+// // // import { WithdrawalFormData } from '../../components/wallet/WithdrawalForm'; // TODO: Will be used when withdrawal form is implemented
+// interface EnhancedApplication extends Omit<IParticipantApplication, 'studyId'> {
   studyId: {
     _id: string;
     title: string;

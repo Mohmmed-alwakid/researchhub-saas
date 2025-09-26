@@ -1,9 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
-import { Button } from './ui/Button';
-import { Badge } from './ui/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
-import { Input } from './ui/Input';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -15,6 +10,12 @@ import {
   BarChart3,
   Activity
 } from 'lucide-react';
+
+import { Badge } from './ui/Badge';
+import { Button } from './ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
+import { Input } from './ui/Input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 
 /**
  * Admin Analytics Dashboard Component

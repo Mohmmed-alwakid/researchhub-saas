@@ -1,5 +1,6 @@
 import { apiService } from './api.service';
 
+
 // Supabase-compatible user type (matching the auth store)
 export interface SupabaseUser {
   id: string;

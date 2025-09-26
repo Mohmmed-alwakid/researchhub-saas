@@ -10,6 +10,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 
+
 interface SupportTicket {
   id: string;
   subject: string;

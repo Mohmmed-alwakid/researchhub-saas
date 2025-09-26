@@ -1,5 +1,6 @@
 import { apiService } from './api.service';
 
+
 export interface ResearcherApplication {
   id: string;
   status: string;

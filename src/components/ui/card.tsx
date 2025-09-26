@@ -1,8 +1,8 @@
+import React from 'react';
+
 /**
  * Card UI Components for ResearchHub
  */
-
-import React from 'react';
 
 interface CardProps {
   children: React.ReactNode;

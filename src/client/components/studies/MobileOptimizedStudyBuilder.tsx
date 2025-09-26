@@ -1,10 +1,4 @@
-/**
- * Mobile-Optimized Study Creation Flow
- * Comprehensive improvements from UI/UX, Product Manager, Product Design, and Fullstack perspectives
- */
-
 import React, { useState, useCallback, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -25,6 +19,13 @@ import {
   Target,
   Sparkles
 } from 'lucide-react';
+
+import { useForm } from 'react-hook-form';
+
+/**
+ * Mobile-Optimized Study Creation Flow
+ * Comprehensive improvements from UI/UX, Product Manager, Product Design, and Fullstack perspectives
+ */
 
 // Enhanced interface with better type safety and comprehensive fields
 interface StudyCreationFormData {

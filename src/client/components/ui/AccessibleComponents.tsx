@@ -1,13 +1,14 @@
+import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../../shared/utils';
+
+
 /**
  * Accessibility-Enhanced Consolidated Components
  * 
  * This file extends our consolidated components with comprehensive accessibility features
  * following WCAG 2.1 AA standards and systematic completion criteria.
  */
-
-import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '../../../shared/utils';
 
 // =============================================================================
 // ACCESSIBILITY UTILITIES

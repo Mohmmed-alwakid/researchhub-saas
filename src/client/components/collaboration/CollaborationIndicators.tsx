@@ -1,14 +1,15 @@
 import React from 'react';
-import { Avatar } from '../ui/Avatar';
-import { Badge } from '../ui/Badge';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { useTheme } from '../../../shared/design/hooks';
 import { 
   CollaboratorPresence, 
   EditingStatus, 
   CollaborationActivity 
 } from '../../../shared/types';
+
+import { Avatar } from '../ui/Avatar';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { useTheme } from '../../../shared/design/hooks';
 
 interface CollaborationIndicatorsProps {
   /** Current active collaborators */

@@ -1,10 +1,11 @@
+import * as Sentry from '@sentry/react';
+import { SentryUtils } from '../config/sentry';
+
+
 /**
  * ResearchHub Sentry Performance Monitoring
  * Tracks application performance and user interactions
  */
-
-import * as Sentry from '@sentry/react';
-import { SentryUtils } from '../config/sentry';
 
 export class PerformanceMonitor {
   private static instance: PerformanceMonitor;

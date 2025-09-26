@@ -1,9 +1,10 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { NotificationBell } from '../components/notifications/NotificationSystem';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { BarChart3, Users, CheckCircle, Sparkles } from 'lucide-react';
+
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { NotificationBell } from '../components/notifications/NotificationSystem';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 
 interface EnhancedDashboardProps {
   className?: string;

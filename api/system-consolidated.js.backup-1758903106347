@@ -1,0 +1,766 @@
+/**
+ * CONSOLIDATED SYSTEM OPERATIONS API
+ * Merges: health.js + dashboard.js + migration.js
+ * Handles: Health checks, dashboard data, system migrations
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+// Check if we're in local development mode
+const isLocalDevelopment = process.env.NODE_ENV === 'development' || 
+                          process.env.LOCAL_DEVELOPMENT_ONLY === 'true';
+
+let supabase = null;
+let supabaseAdmin = null;
+
+// Only initialize Supabase if not in local development mode
+if (!isLocalDevelopment) {
+  // Supabase configuration
+  const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+
+  supabase = createClient(supabaseUrl, supabaseKey);
+  supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+} else {
+  console.log('🔧 System API: Local development mode - Supabase disabled');
+}
+
+/**
+ * Helper function to authenticate user
+ */
+async function authenticateUser(req, requiredRoles = []) {
+  try {
+    // In local development mode, use fallback authentication
+    if (isLocalDevelopment) {
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return { success: false, error: 'Missing or invalid authorization header', status: 401 };
+      }
+
+      const token = authHeader.replace('Bearer ', '');
+      
+      // Handle fallback tokens for development
+      if (token.startsWith('fallback-token-')) {
+        const parts = token.split('-');
+        if (parts.length >= 4) {
+          const userId = parts[2];
+          const userRole = parts[3];
+          
+          const fallbackUser = {
+            id: userId,
+            email: `${userId}@example.com`,
+            user_metadata: { role: userRole }
+          };
+          
+          // Check role if specified
+          if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+            return { 
+              success: false, 
+              error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+              status: 403 
+            };
+          }
+          
+          return { success: true, user: fallbackUser };
+        }
+      }
+      
+      return { success: false, error: 'Invalid development token', status: 401 };
+    }
+
+    // Production Supabase authentication
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { success: false, error: 'Missing or invalid authorization header', status: 401 };
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    // Check role if specified
+    if (requiredRoles.length > 0) {
+      const userRole = user.user_metadata?.role || 'participant';
+      if (!requiredRoles.includes(userRole)) {
+        return { 
+          success: false, 
+          error: `Access denied. Required roles: ${requiredRoles.join(', ')}`, 
+          status: 403 
+        };
+      }
+    }
+
+    return { success: true, user };
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication failed', status: 500 };
+  }
+}
+
+/**
+ * Health Check Handler
+ */
+async function handleHealthCheck(req, res) {
+  const startTime = Date.now();
+  
+  try {
+    // Check if we're in local development mode (dynamic check)
+    const isDevelopmentMode = process.env.NODE_ENV === 'development' || 
+                             req.headers.host?.includes('localhost') ||
+                             req.headers.host?.includes('127.0.0.1');
+    
+    // In local development mode, skip database checks
+    if (isDevelopmentMode || !supabase) {
+      const responseTime = Date.now() - startTime;
+      
+      return res.status(200).json({
+        success: true,
+        status: 'healthy',
+        mode: 'development',
+        development_mode: true,
+        services: {
+          database: 'local-fallback',
+          api: 'operational'
+        },
+        timestamp: new Date().toISOString(),
+        responseTime: `${responseTime}ms`,
+        version: '1.0.0'
+      });
+    }
+
+    // Production: Test database connectivity
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('count')
+      .limit(1);
+
+    const responseTime = Date.now() - startTime;
+
+    if (error) {
+      console.error('Health check database error:', error);
+      return res.status(503).json({
+        success: false,
+        status: 'unhealthy',
+        error: 'Database connection failed',
+        timestamp: new Date().toISOString(),
+        responseTime: `${responseTime}ms`
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      status: 'healthy',
+      services: {
+        database: 'connected',
+        api: 'operational'
+      },
+      timestamp: new Date().toISOString(),
+      responseTime: `${responseTime}ms`,
+      version: '1.0.0'
+    });
+
+  } catch (error) {
+    const responseTime = Date.now() - startTime;
+    console.error('Health check exception:', error);
+    
+    return res.status(503).json({
+      success: false,
+      status: 'unhealthy',
+      error: 'Service unavailable',
+      timestamp: new Date().toISOString(),
+      responseTime: `${responseTime}ms`
+    });
+  }
+}
+
+/**
+ * Dashboard Statistics Handler
+ */
+async function handleDashboardStats(req, res) {
+  try {
+    const auth = await authenticateUser(req);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const userRole = auth.user.user_metadata?.role || 'participant';
+    const userId = auth.user.id;
+
+    let dashboardData = {
+      user: {
+        role: userRole,
+        id: userId
+      },
+      stats: {},
+      recentActivity: []
+    };
+
+    try {
+      if (userRole === 'admin') {
+        // Admin dashboard - system-wide statistics
+        const [
+          { count: totalUsers },
+          { count: totalStudies },
+          { count: activeStudies },
+          { count: totalApplications }
+        ] = await Promise.all([
+          supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }),
+          supabaseAdmin.from('studies').select('*', { count: 'exact', head: true }),
+          supabaseAdmin.from('studies').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+          supabaseAdmin.from('study_applications').select('*', { count: 'exact', head: true })
+        ]);
+
+        dashboardData.stats = {
+          totalUsers: totalUsers || 0,
+          totalStudies: totalStudies || 0,
+          activeStudies: activeStudies || 0,
+          totalApplications: totalApplications || 0
+        };
+
+        // Recent activity for admin
+        const { data: recentUsers } = await supabaseAdmin
+          .from('profiles')
+          .select('id, email, first_name, last_name, role, created_at')
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        dashboardData.recentActivity = recentUsers || [];
+
+      } else if (userRole === 'researcher') {
+        // Researcher dashboard - their studies and applications
+        const [
+          { count: myStudies },
+          { count: activeStudies },
+          { count: totalApplications }
+        ] = await Promise.all([
+          supabaseAdmin.from('studies').select('*', { count: 'exact', head: true }).eq('creator_id', userId),
+          supabaseAdmin.from('studies').select('*', { count: 'exact', head: true }).eq('creator_id', userId).eq('status', 'active'),
+          supabaseAdmin.from('study_applications').select('*', { count: 'exact', head: true }).in('study_id', 
+            supabaseAdmin.from('studies').select('id').eq('creator_id', userId)
+          )
+        ]);
+
+        dashboardData.stats = {
+          myStudies: myStudies || 0,
+          activeStudies: activeStudies || 0,
+          totalApplications: totalApplications || 0
+        };
+
+        // Recent studies for researcher
+        const { data: recentStudies } = await supabaseAdmin
+          .from('studies')
+          .select('id, title, status, created_at, participant_limit')
+          .eq('creator_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        dashboardData.recentActivity = recentStudies || [];
+
+      } else {
+        // Participant dashboard - their applications and earnings
+        const [
+          { count: myApplications },
+          { count: approvedApplications },
+          { count: completedStudies }
+        ] = await Promise.all([
+          supabaseAdmin.from('study_applications').select('*', { count: 'exact', head: true }).eq('user_id', userId),
+          supabaseAdmin.from('study_applications').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'approved'),
+          supabaseAdmin.from('study_applications').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'completed')
+        ]);
+
+        dashboardData.stats = {
+          myApplications: myApplications || 0,
+          approvedApplications: approvedApplications || 0,
+          completedStudies: completedStudies || 0
+        };
+
+        // Recent applications for participant
+        const { data: recentApplications } = await supabaseAdmin
+          .from('study_applications')
+          .select(`
+            id, status, applied_at, completed_at,
+            studies!inner(id, title, compensation)
+          `)
+          .eq('user_id', userId)
+          .order('applied_at', { ascending: false })
+          .limit(5);
+
+        dashboardData.recentActivity = recentApplications || [];
+
+        // Get wallet balance
+        const { data: wallet } = await supabaseAdmin
+          .from('participant_wallets')
+          .select('balance')
+          .eq('user_id', userId)
+          .single();
+
+        if (wallet) {
+          dashboardData.stats.walletBalance = wallet.balance || 0;
+        }
+      }
+
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      // Continue with basic dashboard data
+    }
+
+    return res.status(200).json({
+      success: true,
+      dashboard: dashboardData,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Dashboard stats exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * System Metrics Handler (Admin only)
+ */
+async function handleSystemMetrics(req, res) {
+  try {
+    const auth = await authenticateUser(req, ['admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const metrics = {
+      timestamp: new Date().toISOString(),
+      system: {
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        version: process.version
+      },
+      database: {},
+      api: {
+        responseTime: null,
+        requestCount: null
+      }
+    };
+
+    try {
+      // Database metrics
+      const startTime = Date.now();
+      
+      const [
+        { count: totalUsers },
+        { count: totalStudies },
+        { count: totalApplications },
+        { count: activeStudies }
+      ] = await Promise.all([
+        supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }),
+        supabaseAdmin.from('studies').select('*', { count: 'exact', head: true }),
+        supabaseAdmin.from('study_applications').select('*', { count: 'exact', head: true }),
+        supabaseAdmin.from('studies').select('*', { count: 'exact', head: true }).eq('status', 'active')
+      ]);
+
+      const dbResponseTime = Date.now() - startTime;
+
+      metrics.database = {
+        responseTime: `${dbResponseTime}ms`,
+        tables: {
+          users: totalUsers || 0,
+          studies: totalStudies || 0,
+          applications: totalApplications || 0,
+          activeStudies: activeStudies || 0
+        }
+      };
+
+    } catch (error) {
+      console.error('Error fetching system metrics:', error);
+      metrics.database.error = 'Failed to fetch database metrics';
+    }
+
+    return res.status(200).json({
+      success: true,
+      metrics
+    });
+
+  } catch (error) {
+    console.error('System metrics exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Migration Handler (Admin only)
+ */
+async function handleMigration(req, res) {
+  try {
+    const auth = await authenticateUser(req, ['admin']);
+    if (!auth.success) {
+      return res.status(auth.status).json({
+        success: false,
+        error: auth.error
+      });
+    }
+
+    const { action, migration_name } = req.query;
+
+    switch (action) {
+      case 'status':
+        return await handleMigrationStatus(req, res);
+      
+      case 'run':
+        return await handleRunMigration(req, res, migration_name);
+      
+      case 'list':
+        return await handleListMigrations(req, res);
+      
+      default:
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid migration action',
+          availableActions: ['status', 'run', 'list']
+        });
+    }
+
+  } catch (error) {
+    console.error('Migration handler exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Migration Status
+ */
+async function handleMigrationStatus(req, res) {
+  try {
+    // Check if migrations table exists
+    const { data: tables, error } = await supabaseAdmin
+      .from('information_schema.tables')
+      .select('table_name')
+      .eq('table_schema', 'public')
+      .eq('table_name', 'migrations');
+
+    const migrationsTableExists = tables && tables.length > 0;
+
+    if (!migrationsTableExists) {
+      return res.status(200).json({
+        success: true,
+        status: 'No migrations table found',
+        migrationsTableExists: false,
+        appliedMigrations: []
+      });
+    }
+
+    // Get applied migrations
+    const { data: migrations, error: migrationError } = await supabaseAdmin
+      .from('migrations')
+      .select('*')
+      .order('applied_at', { ascending: false });
+
+    if (migrationError) {
+      console.error('Error fetching migrations:', migrationError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch migration status'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      status: 'Migrations table found',
+      migrationsTableExists: true,
+      appliedMigrations: migrations || [],
+      totalMigrations: migrations?.length || 0
+    });
+
+  } catch (error) {
+    console.error('Migration status exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * List Available Migrations
+ */
+async function handleListMigrations(req, res) {
+  try {
+    // Available migrations (hardcoded list - in production this would come from files)
+    const availableMigrations = [
+      {
+        name: 'create_users_table',
+        description: 'Create users table with proper structure',
+        version: '001'
+      },
+      {
+        name: 'create_studies_table',
+        description: 'Create studies table for research projects',
+        version: '002'
+      },
+      {
+        name: 'create_applications_table',
+        description: 'Create study applications table',
+        version: '003'
+      },
+      {
+        name: 'create_wallets_table',
+        description: 'Create participant wallets for payments',
+        version: '004'
+      },
+      {
+        name: 'add_user_roles',
+        description: 'Add role-based access control',
+        version: '005'
+      }
+    ];
+
+    // Get applied migrations
+    const { data: appliedMigrations } = await supabaseAdmin
+      .from('migrations')
+      .select('migration_name')
+      .catch(() => ({ data: [] }));
+
+    const appliedNames = appliedMigrations?.map(m => m.migration_name) || [];
+
+    const migrationsWithStatus = availableMigrations.map(migration => ({
+      ...migration,
+      applied: appliedNames.includes(migration.name),
+      appliedAt: appliedMigrations?.find(m => m.migration_name === migration.name)?.applied_at || null
+    }));
+
+    return res.status(200).json({
+      success: true,
+      migrations: migrationsWithStatus,
+      totalAvailable: availableMigrations.length,
+      totalApplied: appliedNames.length
+    });
+
+  } catch (error) {
+    console.error('List migrations exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Run Migration
+ */
+async function handleRunMigration(req, res, migrationName) {
+  try {
+    if (!migrationName) {
+      return res.status(400).json({
+        success: false,
+        error: 'Migration name is required'
+      });
+    }
+
+    // Check if already applied
+    const { data: existingMigration } = await supabaseAdmin
+      .from('migrations')
+      .select('*')
+      .eq('migration_name', migrationName)
+      .single()
+      .catch(() => ({ data: null }));
+
+    if (existingMigration) {
+      return res.status(400).json({
+        success: false,
+        error: 'Migration already applied',
+        appliedAt: existingMigration.applied_at
+      });
+    }
+
+    // For demo purposes, we'll just record the migration
+    // In production, this would execute actual SQL
+    const migrationResult = {
+      migration_name: migrationName,
+      applied_at: new Date().toISOString(),
+      success: true,
+      description: `Applied migration: ${migrationName}`
+    };
+
+    // Record migration
+    const { error: recordError } = await supabaseAdmin
+      .from('migrations')
+      .insert(migrationResult);
+
+    if (recordError) {
+      console.error('Error recording migration:', recordError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to record migration'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Migration ${migrationName} applied successfully`,
+      result: migrationResult
+    });
+
+  } catch (error) {
+    console.error('Run migration exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Migration failed'
+    });
+  }
+}
+
+/**
+ * Database Check Handler
+ */
+async function handleDatabaseCheck(req, res) {
+  try {
+    const startTime = Date.now();
+    const checks = {};
+
+    // Test basic connectivity
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('count')
+        .limit(1);
+      
+      checks.connectivity = {
+        status: error ? 'failed' : 'success',
+        error: error?.message || null,
+        responseTime: Date.now() - startTime
+      };
+    } catch (error) {
+      checks.connectivity = {
+        status: 'failed',
+        error: error.message,
+        responseTime: Date.now() - startTime
+      };
+    }
+
+    // Test main tables
+    const tables = ['profiles', 'studies', 'study_applications'];
+    checks.tables = {};
+
+    for (const table of tables) {
+      try {
+        const tableStartTime = Date.now();
+        const { data, error } = await supabaseAdmin
+          .from(table)
+          .select('count')
+          .limit(1);
+        
+        checks.tables[table] = {
+          status: error ? 'failed' : 'success',
+          error: error?.message || null,
+          responseTime: Date.now() - tableStartTime
+        };
+      } catch (error) {
+        checks.tables[table] = {
+          status: 'failed',
+          error: error.message,
+          responseTime: Date.now() - tableStartTime
+        };
+      }
+    }
+
+    const overallStatus = Object.values(checks.connectivity).every(check => 
+      typeof check !== 'object' || check.status === 'success'
+    ) && Object.values(checks.tables).every(check => check.status === 'success');
+
+    return res.status(overallStatus ? 200 : 503).json({
+      success: overallStatus,
+      status: overallStatus ? 'healthy' : 'unhealthy',
+      checks,
+      timestamp: new Date().toISOString(),
+      totalResponseTime: Date.now() - startTime
+    });
+
+  } catch (error) {
+    console.error('Database check exception:', error);
+    return res.status(503).json({
+      success: false,
+      status: 'unhealthy',
+      error: 'Database check failed',
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+/**
+ * Main handler - routes to appropriate sub-handler
+ */
+export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    const { action } = req.query;
+
+    console.log(`=== SYSTEM ACTION: ${action} ===`);
+
+    switch (action) {
+      case 'health':
+      case 'health-check':
+        return await handleHealthCheck(req, res);
+      
+      case 'dashboard':
+      case 'stats':
+        return await handleDashboardStats(req, res);
+      
+      case 'metrics':
+        return await handleSystemMetrics(req, res);
+      
+      case 'migration':
+        return await handleMigration(req, res);
+      
+      case 'db-check':
+      case 'database-check':
+        return await handleDatabaseCheck(req, res);
+      
+      default:
+        // Default to health check
+        if (req.method === 'GET' && !action) {
+          return await handleHealthCheck(req, res);
+        }
+
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid action',
+          availableActions: [
+            'health', 'health-check', 'dashboard', 'stats', 'metrics', 
+            'migration', 'db-check', 'database-check'
+          ]
+        });
+    }
+  } catch (error) {
+    console.error('System handler exception:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}

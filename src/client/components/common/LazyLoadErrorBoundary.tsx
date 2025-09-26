@@ -1,6 +1,7 @@
 import React, { ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
+
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;

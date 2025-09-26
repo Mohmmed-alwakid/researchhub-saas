@@ -1,11 +1,12 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useEnhancedAuth, type User } from '../../hooks/useEnhancedAuth';
+
+
 /**
  * PHASE 3: ENHANCED STUDY CREATION WIZARD
  * Modern study creation interface with enhanced authentication integration
  * Requirements Source: docs/requirements/03-USER_EXPERIENCE_ENHANCEMENT.md
  */
-
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useEnhancedAuth, type User } from '../../hooks/useEnhancedAuth';
 
 // Type definitions for study creation
 interface StudyFormData {

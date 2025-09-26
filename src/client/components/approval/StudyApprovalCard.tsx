@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, User, Calendar } from 'lucide-react';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 
 // Local types for approval queue
 type ApprovalPriority = 'urgent' | 'high' | 'medium' | 'low';

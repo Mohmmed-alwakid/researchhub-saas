@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
 
-// Local interfaces to avoid import issues
+import issues
 interface StudyBuilderTask {
   id: string;
-  template_id: string;
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+
+// Local interfaces to avoid   template_id: string;
   name: string;
   description: string;
   estimated_duration: number;

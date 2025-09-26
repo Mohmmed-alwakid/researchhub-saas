@@ -1,6 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AfkarLogo } from '../../assets/brand/AfkarLogo';
+
 
 const NotFoundPage = () => {
   const navigate = useNavigate();

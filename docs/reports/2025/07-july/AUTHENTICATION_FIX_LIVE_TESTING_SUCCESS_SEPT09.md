@@ -39,7 +39,7 @@ The 401 authentication error that was blocking study creation has been **SUCCESS
 ✅ "💾 Auth Store - Final User Object: {id: 4c3d798b-2975-4ec4-b9e2-c6f128b8a066, email: abwanwr77+researcher@gmail.com...}"
 ✅ "🔧 Persist partialize called with state: {hasUser: true, hasToken: true, tokenLength: 978, isAuthenticated: true}"
 ✅ "✅ API Service GET success: research-consolidated?action=get-studies status: 200"
-✅ "🧪 Testing create-study API with token: eyJhbGciOiJIUzI1NiIsImtpZCI6Im..."
+✅ "🧪 Testing create-study API with token: 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'."
 
 // API TEST RESULT:
 - Authentication: ✅ WORKING (no 401 errors)

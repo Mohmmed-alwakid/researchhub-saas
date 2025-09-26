@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { JourneyPhase } from './types';
 
+
 interface JourneyProgressConstellationProps {
   progress: {
     currentPhase: JourneyPhase;

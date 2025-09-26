@@ -1,6 +1,7 @@
 import React from 'react';
 import { StudyBuilderBlock } from '../types';
 
+
 interface EnhancedBlockPreviewProps {
   block: StudyBuilderBlock;
   participantData?: Record<string, string | number | boolean>;

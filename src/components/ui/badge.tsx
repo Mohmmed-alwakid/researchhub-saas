@@ -1,8 +1,8 @@
+import React from 'react';
+
 /**
  * Badge UI Component for ResearchHub
  */
-
-import React from 'react';
 
 interface BadgeProps {
   children: React.ReactNode;

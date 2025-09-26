@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button, Input } from '../ui';
 
+
 interface RenameStudyModalProps {
   isOpen: boolean;
   currentTitle: string;

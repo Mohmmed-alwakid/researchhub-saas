@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { QrCode, Copy, Shield, CheckCircle, AlertCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
+
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
-import toast from 'react-hot-toast';
 
 // Generate random backup codes
 const generateBackupCodes = (): string[] => {

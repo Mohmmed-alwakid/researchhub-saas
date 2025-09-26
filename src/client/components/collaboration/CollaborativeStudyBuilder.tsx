@@ -1,9 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
-import CollaborationIndicators from './CollaborationIndicators';
-import CommentSystem from './CommentSystem';
 import { 
   IStudy,
   BaseBlock,
@@ -15,6 +10,12 @@ import {
   UserCursor,
   CollaborationLock
 } from '../../../shared/types';
+
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import CollaborationIndicators from './CollaborationIndicators';
+import CommentSystem from './CommentSystem';
 
 interface CollaborativeStudyBuilderProps {
   /** Study being edited */

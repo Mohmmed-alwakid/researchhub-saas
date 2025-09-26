@@ -1,5 +1,6 @@
 import { BlockType } from '../../shared/types';
 
+
 /**
  * Utility functions for managing study blocks
  */

@@ -24,6 +24,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 import { PublicHeader } from '../components/common/PublicHeader';
 
+
 interface Feature {
   id: string;
   title: string;

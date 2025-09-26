@@ -1,6 +1,7 @@
 import { apiService } from './api.service';
 import type { IParticipant } from '../../shared/types';
 
+
 export interface InviteParticipantRequest {
   studyId: string;
   email: string;

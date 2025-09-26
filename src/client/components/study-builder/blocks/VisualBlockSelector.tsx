@@ -1,6 +1,7 @@
 import React from 'react';
 import { BlockType } from '../../../../shared/types';
 
+
 interface VisualBlockSelectorProps {
   onBlockSelect: (blockType: BlockType) => void;
   selectedBlockType?: BlockType;

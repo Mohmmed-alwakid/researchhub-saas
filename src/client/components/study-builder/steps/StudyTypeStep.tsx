@@ -1,6 +1,7 @@
 import React from 'react';
 import { StepProps } from '../types';
 
+
 interface StudyTypeOption {
   id: 'usability' | 'interview';
   title: string;

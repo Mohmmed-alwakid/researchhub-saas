@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { useParams } from 'react-router-dom';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
 import { 
   BarChart3, 
   Users, 
@@ -16,27 +29,8 @@ import {
   Wifi,
   WifiOff
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
+import { useParams } from 'react-router-dom';
 import { Card, CardContent } from '../../components/ui/Card';
-
-// PHASE 4C: LAZY LOAD ANALYTICS COMPONENTS - September 14, 2025
-// Convert heavy analytics components to lazy loading for better performance
-const LazyHeatmapAnalytics = lazy(() => import('../../components/analytics/HeatmapAnalytics'));
-const LazySessionReplay = lazy(() => import('../../components/analytics/SessionReplay'));
-const LazyAdvancedAnalyticsDashboard = lazy(() => import('../../components/analytics/AdvancedAnalyticsDashboard'));
 
 import { useAppStore } from '../../stores/appStore';
 import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
@@ -48,6 +42,13 @@ import type {
   BlockPerformance,
   ParticipantJourney
 } from '../../../shared/types/analytics';
+
+
+// PHASE 4C: LAZY LOAD ANALYTICS COMPONENTS - September 14, 2025
+// Convert heavy analytics components to lazy loading for better performance
+const LazyHeatmapAnalytics = lazy(() => import('../../components/analytics/HeatmapAnalytics'));
+const LazySessionReplay = lazy(() => import('../../components/analytics/SessionReplay'));
+const LazyAdvancedAnalyticsDashboard = lazy(() => import('../../components/analytics/AdvancedAnalyticsDashboard'));
 
 // Enhanced AI Automation: Real-time connection indicator
 const RealTimeIndicator: React.FC<{ isConnected: boolean }> = ({ isConnected }) => (

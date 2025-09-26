@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Monitor, Mic } from 'lucide-react';
 import { Card } from '../ui';
 
+
 interface StudyCreationChoice {
   type: 'unmoderated' | 'moderated';
   title: string;

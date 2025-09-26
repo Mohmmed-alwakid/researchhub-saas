@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
 
+
 interface AvatarProps {
   src?: string;
   alt: string;

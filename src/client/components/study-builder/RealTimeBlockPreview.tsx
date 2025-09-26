@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
 import { StudyBuilderBlock } from './types';
 
+
 interface RealTimeBlockPreviewProps {
   blocks: StudyBuilderBlock[];
   currentEditingBlock?: StudyBuilderBlock;

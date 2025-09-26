@@ -1,9 +1,10 @@
+import * as Sentry from '@sentry/react';
+
+
 /**
  * Sentry Configuration for ResearchHub
  * Comprehensive error tracking and performance monitoring
  */
-
-import * as Sentry from '@sentry/react';
 
 // Environment-specific configuration
 const SENTRY_CONFIG = {

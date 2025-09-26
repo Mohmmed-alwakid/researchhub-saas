@@ -1,6 +1,7 @@
 import { apiService } from './api.service';
 import type { ISession } from '../../shared/types';
 
+
 export interface CreateSessionRequest {
   studyId: string;
   participantInfo: {

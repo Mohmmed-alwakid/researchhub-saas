@@ -1,11 +1,12 @@
+import React, { ReactNode } from 'react';
+import { colors, spacing, typography, shadows, borderRadius, transitions, componentTokens } from './tokens';
+import { ThemeContext, defaultTheme } from './context';
+
+
 /**
  * Design System Theme Provider
  * Provides design tokens to React components through context
  */
-
-import React, { ReactNode } from 'react';
-import { colors, spacing, typography, shadows, borderRadius, transitions, componentTokens } from './tokens';
-import { ThemeContext, defaultTheme } from './context';
 
 // Theme interface
 export interface Theme {

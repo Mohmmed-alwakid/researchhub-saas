@@ -1,10 +1,11 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * CONSOLIDATED ADMIN & SUBSCRIPTIONS API
  * Merges: admin.js + subscriptions.js + points.js
  * Handles: Admin operations, subscription management, points system
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 // Supabase configuration - prefer environment variables
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -326,8 +327,7 @@ async function handleListUsers(req, res) {
         }
       ];
       
-      return res.json({
-        success: true,
+      return res.status(200).json({ success: true,
         data: mockUsers,
         pagination: {
           total: mockUsers.length,

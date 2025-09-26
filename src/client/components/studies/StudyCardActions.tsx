@@ -2,6 +2,7 @@ import React from 'react';
 import { Edit, FileText, Copy, Trash2, Play, Pause, BarChart3 } from 'lucide-react';
 import { IStudy } from '../../../shared/types';
 
+
 interface StudyCardActionsProps {
   study: IStudy;
   onEdit: (study: IStudy) => void;

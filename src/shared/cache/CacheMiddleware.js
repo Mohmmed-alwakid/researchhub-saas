@@ -1,7 +1,8 @@
+import { cacheManager, CACHE_KEYS, CACHE_TTL } from './CacheManager.js';
+
+
 // Week 4 Day 2: Cache Middleware for ResearchHub API Endpoints
 // Date: June 29, 2025
-
-import { cacheManager, CACHE_KEYS, CACHE_TTL } from './CacheManager.js';
 
 /**
  * Cache middleware for API endpoints

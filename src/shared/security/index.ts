@@ -1,3 +1,14 @@
+import { 
+  InputValidator, 
+  SecurityCrypto, 
+  AuthenticationHelper, 
+  ThreatDetector, 
+  SecurityReporter, 
+  SecurityIntegration 
+} from './SecurityUtils';
+
+import { getSecurityManager } from './SecurityManager';
+
 /**
  * Security Module Index - Centralized exports for ResearchHub security system
  * Based on Vibe-Coder-MCP architectural patterns
@@ -51,16 +62,6 @@ export {
 } from './SecurityUtils';
 
 // Import for Security helper object
-import { getSecurityManager } from './SecurityManager';
-import { 
-  InputValidator, 
-  SecurityCrypto, 
-  AuthenticationHelper, 
-  ThreatDetector, 
-  SecurityReporter, 
-  SecurityIntegration 
-} from './SecurityUtils';
-
 /**
  * Quick access to commonly used security functions
  */

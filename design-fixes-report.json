@@ -1,0 +1,2645 @@
+{
+  "timestamp": "2025-09-26T15:22:01.920Z",
+  "summary": {
+    "totalFiles": 136,
+    "totalFixes": 617
+  },
+  "fixes": [
+    {
+      "file": "src\\client\\components\\studies\\MobileOptimizedStudyBuilder.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 10
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 6
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card, Input",
+          "count": 3
+        }
+      ],
+      "totalFixes": 22
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskConfigurationModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 14
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card, Input",
+          "count": 3
+        }
+      ],
+      "totalFixes": 20
+    },
+    {
+      "file": "src\\client\\components\\studies\\UsabilityStudyBuilder.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 12
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card, Input",
+          "count": 3
+        }
+      ],
+      "totalFixes": 19
+    },
+    {
+      "file": "src\\client\\components\\studies\\EnhancedUsabilityStudyBuilder.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 7
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card, Input",
+          "count": 3
+        }
+      ],
+      "totalFixes": 16
+    },
+    {
+      "file": "src\\client\\components\\participant\\StudyDiscovery.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 4
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 3
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 6
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 15
+    },
+    {
+      "file": "src\\client\\components\\participant\\AdvancedBlocks.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 3
+        },
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 3
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 15
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskEditModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card, Input",
+          "count": 3
+        }
+      ],
+      "totalFixes": 10
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyMetadataForm.tsx",
+      "fixes": [
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 9
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Input",
+          "count": 1
+        }
+      ],
+      "totalFixes": 10
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\InterviewTask.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 7
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 10
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyDetailPage.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 3
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card, Input",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 9
+    },
+    {
+      "file": "src\\client\\components\\payments\\ManualPaymentFlow.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 9
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\PrototypeTask.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 5
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 9
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockPreview.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 9
+    },
+    {
+      "file": "src\\client\\pages\\settings\\SettingsPage.tsx",
+      "fixes": [
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 6
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Input",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 8
+    },
+    {
+      "file": "src\\client\\components\\payments\\PaymentResultPage.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 8
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\NavigationTask.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 8
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\InterviewSessionConfig.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 3
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 8
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\BlockConfigurationStep.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card, Input",
+          "count": 3
+        }
+      ],
+      "totalFixes": 8
+    },
+    {
+      "file": "src\\client\\components\\admin\\users\\BulkOperations.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 8
+    },
+    {
+      "file": "src\\client\\pages\\auth\\RegisterPage.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Input",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\ui\\PayPalSubscriptionModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\study-session\\TaskRunner.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 3
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\studies\\TemplatePreviewModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\studies\\EnhancedTemplateGallery.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\participant\\StudyExecution.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 4
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\blocks\\AdvancedStudyBlocks.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\auth\\TwoFactorSetup.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 5
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\analytics\\SessionReplay.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 6
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\WelcomeBlockTask.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\ContextScreenTask.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 7
+    },
+    {
+      "file": "src\\client\\pages\\analytics\\AnalyticsPage.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\client\\components\\ui\\PlanLimitModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyBuilderProgress.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\client\\components\\payments\\STCBankPaymentFlow.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemSettings.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\client\\components\\admin\\users\\UserDetailView.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\shared\\errors\\ErrorBoundary.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\ui\\ValidationFeedback.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\StudyStateManager.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\EnhancedStudyCreationWizard.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\studies\\CompleteStudyBuilder.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\studies\\BlockEditModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\participant\\MyApplications.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\participant\\MobileParticipantExperience.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\participant\\LiveSessionParticipant.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\auth\\BackupCodeLogin.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\ai-interview\\AIInterviewModerator.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagement.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\admin\\SubscriptionManager.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\admin\\SimpleAdminOverview.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminOverview.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual green button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminDashboard.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\UsabilityStudyConfig.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 4
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\client\\components\\AdminAnalyticsDashboard.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyApplicationPage.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\pages\\studies\\ParticipantDashboardPage.tsx",
+      "fixes": [
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Input",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\ui\\UsageDashboard.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\ui\\PlanUsageDashboard.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\studies\\DeleteStudyModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\performance\\FloatingReportButton.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\participant\\RealTimeAnalytics.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\auth\\TwoFactorLogin.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborativeStudyBuilderContainer.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 3
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\SurveyTask.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button, Card",
+          "count": 2
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\shared\\StudyBuilderHeader.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 4
+    },
+    {
+      "file": "src\\utils\\debug\\ErrorBoundary\\SmartErrorBoundary.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyResultsPage.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\pages\\participants\\ParticipantsPage.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\pages\\auth\\ResetPasswordPage.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\pages\\auth\\LoginPage.tsx",
+      "fixes": [
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Input",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\pages\\auth\\ForgotPasswordPage.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\StudyPreviewModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\AIInterviewConfiguration.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\studies\\DragDropTaskList.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\studies\\DragDropBlockList.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\participant\\GamificationDashboard.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\common\\LazyLoadErrorBoundary.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagementPanel.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\admin\\SupportCenter.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\admin\\StudyOversight.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\admin\\FinancialDashboard.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\admin\\AnalyticsDashboard.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\ReviewStep.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\ReviewStep-new.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\EnhancedTemplateSelectionStep.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\blocks\\EnhancedBlockPreview.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 2
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 3
+    },
+    {
+      "file": "src\\components\\ui\\LoadingComponents.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\components\\common\\SentryErrorBoundary.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\ParticipantEarningsDashboard.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\pages\\payments\\ManualPaymentPage.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\pages\\journey\\CreativeJourneyPage.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WithdrawalHistory.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WalletErrorBoundary.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\ui\\EnhancedDesignSystem.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\templates\\TemplateManager.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\templates\\SimplifiedTemplateSelection.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\SaveAsTemplateModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskLibraryModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\studies\\SimplifiedStudyCreationModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\studies\\RenameStudyModal.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\studies\\DragDropStudyBuilder.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\studies\\BlockLibraryModal.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\common\\AppLayout.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\blocks\\StudyBlockComponents.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\blocks\\AdvancedStudyBlocksV2.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\AdvancedCollaborationDemo.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\approval\\StudyApprovalCard.tsx",
+      "fixes": [
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Input",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\approval\\ApprovalQueue.tsx",
+      "fixes": [
+        {
+          "type": "input",
+          "description": "Convert manual input styling to Input component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Input",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\analytics\\HeatmapAnalytics.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\analytics\\AdvancedAnalyticsDashboard.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagementTabs.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemAnalytics.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemAnalytics.new.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\ComprehensiveAdminPanel.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminSidebar.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminPointsManager.tsx",
+      "fixes": [
+        {
+          "type": "card",
+          "description": "Convert bordered div to Card component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Card",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\LaunchStep.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\SystemHealthWidget.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\QuickActionsPanel.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual red button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\AlertCenter.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\AdminReportsWidget.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\templates\\TemplateManagement.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual gray button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\components\\admin\\analytics\\PerformanceMetrics.tsx",
+      "fixes": [
+        {
+          "type": "button",
+          "description": "Convert manual blue button to Button component",
+          "count": 1
+        },
+        {
+          "type": "import",
+          "description": "Added imports: Button",
+          "count": 1
+        }
+      ],
+      "totalFixes": 2
+    },
+    {
+      "file": "src\\client\\pages\\templates\\TemplateDetailPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudySessionPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyApplicationsManagementPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudiesPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\studies\\MobileOptimizedStudiesPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\settings\\BillingSettingsPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\participant\\ParticipantStudyExecutionPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\organization\\OrganizationDashboard.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\UnifiedWorkspace.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\DashboardPage.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\DashboardOverview.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\collaboration\\StudyCollaborationCenter.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\client\\pages\\collaboration\\CollaborationTab.tsx",
+      "fixes": [
+        {
+          "type": "import",
+          "description": "Standardize UI component imports",
+          "count": 1
+        }
+      ],
+      "totalFixes": 1
+    }
+  ]
+}

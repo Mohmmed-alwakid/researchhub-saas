@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 // Use service role key for admin operations
 const supabase = createClient(
   'https://wxpwxzdgdvinlbtnbgdf.supabase.co', 
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.l-lLRLnAWuTPzJZ-iNrYITuagCcNz6RhOoOBAJFMxU8'
+  ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY''
 );
 
 // Test participant credentials

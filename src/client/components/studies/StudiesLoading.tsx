@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '../ui/Card';
 import Skeleton from '../ui/Skeleton';
 
+
 interface StudiesLoadingProps {
   count?: number;
 }

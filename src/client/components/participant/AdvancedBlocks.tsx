@@ -13,6 +13,7 @@ import {
   Volume2
 } from 'lucide-react';
 
+
 // Advanced Block Types with Screen Recording, Audio, and Video capabilities
 export interface AdvancedBlockConfig {
   screenRecording?: {

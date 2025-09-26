@@ -41,7 +41,7 @@
     "role": "researcher"
   },
   "session": {
-    "access_token": "eyJhbGciOiJIUzI1NiIs..."
+    "access_token": "'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'."
   }
 }
 ```

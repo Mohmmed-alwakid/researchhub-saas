@@ -1,3 +1,14 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { 
+  getSecurityManager, 
+  SecurityEvent, 
+  SecurityEventType, 
+  SecuritySeverity,
+  UserSecurityContext,
+  SecurityMetrics
+} from './SecurityManager';
+
+
 /**
  * SecurityHooks - React hooks for security management in ResearchHub
  * Based on Vibe-Coder-MCP architectural patterns
@@ -9,16 +20,6 @@
  * - Input validation
  * - Session management
  */
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  getSecurityManager, 
-  SecurityEvent, 
-  SecurityEventType, 
-  SecuritySeverity,
-  UserSecurityContext,
-  SecurityMetrics
-} from './SecurityManager';
 
 /**
  * Hook for managing authentication state

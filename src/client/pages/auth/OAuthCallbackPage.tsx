@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
-import { googleOAuthService } from '../../services/googleOAuth.service';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
+
+import { googleOAuthService } from '../../services/googleOAuth.service';
+import { useAuthStore } from '../../stores/authStore';
 
 const OAuthCallbackPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');

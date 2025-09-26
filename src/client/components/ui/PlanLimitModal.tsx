@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, CreditCard, TrendingUp, Users, BarChart3 } from 'lucide-react';
 import PayPalSubscriptionModal from './PayPalSubscriptionModal';
 
+
 interface PlanLimitError {
   success: false;
   error: string;

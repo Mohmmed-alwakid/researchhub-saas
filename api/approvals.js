@@ -1,9 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * Approvals API
  * Handles approval workflow system
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,

@@ -99,7 +99,7 @@ const templates = await supabase
 ### **Before Improvements**
 ```javascript
 // Security issues
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIs...'; // Exposed!
+const supabaseKey = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.'; // Exposed!
 
 // Noisy logging
 console.log('🚀 handleBlockResponse called with body:', JSON.stringify(req.body, null, 2));

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Users, 
@@ -7,9 +6,11 @@ import {
   Download,
   Search
 } from 'lucide-react';
-import { useAppStore } from '../../stores/appStore';
-import { IStudy } from '../../../shared/types';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../../components/ui/Card';
+
+import { IStudy } from '../../../shared/types';
+import { useAppStore } from '../../stores/appStore';
 
 interface ParticipantResponse {
   participantId: string;

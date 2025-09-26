@@ -1,5 +1,6 @@
 import { StudyDiscovery } from '../../components/participant/StudyDiscovery';
 
+
 /**
  * Study Discovery Page
  * 

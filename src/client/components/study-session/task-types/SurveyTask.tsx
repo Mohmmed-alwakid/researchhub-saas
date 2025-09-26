@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
 import { 
   Star, 
   ChevronRight, 
   Clock,
   AlertTriangle
 } from 'lucide-react';
+
+import { toast } from 'react-hot-toast';
 
 interface Question {
   id: string;

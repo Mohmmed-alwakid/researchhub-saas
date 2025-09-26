@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { PricingCTA } from '../components/pricing/PricingCTA';
 import { PublicHeader } from '../components/common/PublicHeader';
 
+
 interface PricingTier {
   id: string;
   name: string;

@@ -1,9 +1,10 @@
+import { twMerge } from 'tailwind-merge';
+
+import { type ClassValue, clsx } from 'clsx';
+
 /**
  * Utility functions for the unified design system
  */
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
 /**
  * Combines class names with clsx and merges them with tailwind-merge
  */

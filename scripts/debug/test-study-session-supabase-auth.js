@@ -17,7 +17,7 @@ async function testStudySessionWithSupabaseAuth() {
     // Use the same Supabase client to get a proper token
     const { createClient } = await import('@supabase/supabase-js');
     const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+    const supabaseKey = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'';
     const supabase = createClient(supabaseUrl, supabaseKey);
     
     // Step 1: Get proper Supabase auth token

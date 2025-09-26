@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Check, Loader2, AlertCircle, Settings, Users, Clock, DollarSign } from 'lucide-react';
-import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { Card, CardContent } from '../ui/Card';
 import type { EnhancedStudyTemplate } from '../../../shared/types/index';
+
 
 interface QuickStudyCreationFlowProps {
   isOpen: boolean;

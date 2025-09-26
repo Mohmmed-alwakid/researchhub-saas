@@ -1,6 +1,7 @@
 import React from 'react';
 import { Loader2, Zap } from 'lucide-react';
 
+
 interface LoadingProps {
   variant?: 'default' | 'page' | 'inline' | 'overlay';
   size?: 'sm' | 'md' | 'lg';

@@ -9,9 +9,10 @@ import {
   Clock,
   MoreHorizontal
 } from 'lucide-react';
-import { useAppStore } from '../../stores/appStore';
-import { Card, CardContent } from '../../components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
+
+import { Card, CardContent } from '../../components/ui/Card';
+import { useAppStore } from '../../stores/appStore';
 
 interface InviteData {
   studyId: string;

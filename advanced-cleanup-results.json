@@ -1,0 +1,811 @@
+{
+  "unusedComponents": [
+    {
+      "path": "src\\client\\components\\admin\\AdminOverview.tsx",
+      "size": "7KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\admin\\AdminSidebar.tsx",
+      "size": "3KB",
+      "lastModified": "2025-08-17"
+    },
+    {
+      "path": "src\\client\\components\\admin\\analytics\\PerformanceMetrics.tsx",
+      "size": "13KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\client\\components\\admin\\ComprehensiveAdminPanel.tsx",
+      "size": "12KB",
+      "lastModified": "2025-09-15"
+    },
+    {
+      "path": "src\\client\\components\\admin\\dashboard\\AdminReportsWidget.tsx",
+      "size": "9KB",
+      "lastModified": "2025-07-02"
+    },
+    {
+      "path": "src\\client\\components\\admin\\dashboard\\AlertCenter.tsx",
+      "size": "15KB",
+      "lastModified": "2025-07-02"
+    },
+    {
+      "path": "src\\client\\components\\admin\\dashboard\\QuickActionsPanel.tsx",
+      "size": "10KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\client\\components\\admin\\dashboard\\SystemHealthWidget.tsx",
+      "size": "10KB",
+      "lastModified": "2025-07-02"
+    },
+    {
+      "path": "src\\client\\components\\admin\\FinancialDashboard.tsx",
+      "size": "12KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\admin\\PaymentManagement.tsx",
+      "size": "24KB",
+      "lastModified": "2025-08-17"
+    },
+    {
+      "path": "src\\client\\components\\admin\\RolePermissionManager.tsx",
+      "size": "23KB",
+      "lastModified": "2025-07-01"
+    },
+    {
+      "path": "src\\client\\components\\admin\\SimpleAdminOverview.tsx",
+      "size": "7KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\admin\\StudyOversight.tsx",
+      "size": "13KB",
+      "lastModified": "2025-06-19"
+    },
+    {
+      "path": "src\\client\\components\\admin\\SubscriptionManager.tsx",
+      "size": "25KB",
+      "lastModified": "2025-08-17"
+    },
+    {
+      "path": "src\\client\\components\\admin\\SupportCenter.tsx",
+      "size": "20KB",
+      "lastModified": "2025-07-01"
+    },
+    {
+      "path": "src\\client\\components\\admin\\SystemAnalytics.new.tsx",
+      "size": "14KB",
+      "lastModified": "2025-09-15"
+    },
+    {
+      "path": "src\\client\\components\\admin\\SystemAnalytics.tsx",
+      "size": "14KB",
+      "lastModified": "2025-06-19"
+    },
+    {
+      "path": "src\\client\\components\\admin\\SystemSettings.tsx",
+      "size": "18KB",
+      "lastModified": "2025-07-03"
+    },
+    {
+      "path": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "size": "0B",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\admin\\UserManagementTabs.tsx",
+      "size": "4KB",
+      "lastModified": "2025-08-17"
+    },
+    {
+      "path": "src\\client\\components\\admin\\users\\BulkOperations.tsx",
+      "size": "20KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\client\\components\\admin\\users\\UserDetailView.tsx",
+      "size": "27KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\client\\components\\AdminAnalyticsDashboard.tsx",
+      "size": "31KB",
+      "lastModified": "2025-09-15"
+    },
+    {
+      "path": "src\\client\\components\\ai\\AIInsightsDashboard.tsx",
+      "size": "13KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\components\\analytics\\HeatmapAnalytics.tsx",
+      "size": "12KB",
+      "lastModified": "2025-06-15"
+    },
+    {
+      "path": "src\\client\\components\\analytics\\SessionReplay.tsx",
+      "size": "16KB",
+      "lastModified": "2025-06-15"
+    },
+    {
+      "path": "src\\client\\components\\auth\\RoleBasedRedirect.tsx",
+      "size": "1KB",
+      "lastModified": "2025-06-02"
+    },
+    {
+      "path": "src\\client\\components\\blocks\\AdvancedStudyBlocksV2.tsx",
+      "size": "29KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\client\\components\\blocks\\StudyBlocks.tsx",
+      "size": "17KB",
+      "lastModified": "2025-07-01"
+    },
+    {
+      "path": "src\\client\\components\\collaboration\\ConflictResolutionSystem.tsx",
+      "size": "15KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\collaboration\\LiveCursorSystem.tsx",
+      "size": "7KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\collaboration\\RealTimeTextEditor.tsx",
+      "size": "9KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\common\\ErrorBoundary.tsx",
+      "size": "4KB",
+      "lastModified": "2025-06-22"
+    },
+    {
+      "path": "src\\client\\components\\common\\Loading.tsx",
+      "size": "4KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\common\\Notification.tsx",
+      "size": "5KB",
+      "lastModified": "2025-09-08"
+    },
+    {
+      "path": "src\\client\\components\\ErrorBoundary.tsx",
+      "size": "5KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\client\\components\\journey\\ResearchJourneyOrchestrator.tsx",
+      "size": "8KB",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\participant\\AdvancedBlocks.tsx",
+      "size": "29KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\participant\\EnhancedParticipantProfile.tsx",
+      "size": "0B",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\participant\\GamificationDashboard.tsx",
+      "size": "29KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\participant\\LiveSessionParticipant.tsx",
+      "size": "20KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\participant\\MobileParticipantExperience.tsx",
+      "size": "21KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\participant\\MyApplications.tsx",
+      "size": "23KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\participant\\ParticipantDashboard.tsx",
+      "size": "23KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\components\\participant\\RealTimeAnalytics.tsx",
+      "size": "28KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\ParticipantEarningsDashboard.tsx",
+      "size": "18KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\payments\\ManualPaymentFlow.tsx",
+      "size": "21KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\payments\\PaymentResultPage.tsx",
+      "size": "8KB",
+      "lastModified": "2025-08-17"
+    },
+    {
+      "path": "src\\client\\components\\payments\\STCBankPaymentFlow.tsx",
+      "size": "9KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\performance\\FloatingReportButton.tsx",
+      "size": "4KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\ResearcherPointsDashboard.tsx",
+      "size": "20KB",
+      "lastModified": "2025-09-15"
+    },
+    {
+      "path": "src\\client\\components\\studies\\DragDropTaskList.tsx",
+      "size": "4KB",
+      "lastModified": "2025-06-20"
+    },
+    {
+      "path": "src\\client\\components\\studies\\EnhancedStudyCreationModal.tsx",
+      "size": "14KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\studies\\EnhancedUsabilityStudyBuilder.tsx",
+      "size": "25KB",
+      "lastModified": "2025-06-25"
+    },
+    {
+      "path": "src\\client\\components\\studies\\ImprovedBlockLibraryModal.tsx",
+      "size": "0B",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\studies\\MazeInspiredStudyCreationModal.tsx",
+      "size": "0B",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\studies\\MobileOptimizedStudyBuilder.tsx",
+      "size": "48KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\studies\\SimplifiedStudyCreationModal.tsx",
+      "size": "5KB",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\studies\\StudyBuilderIntegration.tsx",
+      "size": "9KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\studies\\StudyBuilderProgress.tsx",
+      "size": "10KB",
+      "lastModified": "2025-06-20"
+    },
+    {
+      "path": "src\\client\\components\\studies\\TaskEditModal.tsx",
+      "size": "23KB",
+      "lastModified": "2025-06-23"
+    },
+    {
+      "path": "src\\client\\components\\studies\\TaskLibraryModal.tsx",
+      "size": "13KB",
+      "lastModified": "2025-06-20"
+    },
+    {
+      "path": "src\\client\\components\\studies\\TaskPreview.tsx",
+      "size": "9KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\components\\studies\\UsabilityStudyBuilder.tsx",
+      "size": "25KB",
+      "lastModified": "2025-06-25"
+    },
+    {
+      "path": "src\\client\\components\\studies\\ValidationFeedback.tsx",
+      "size": "7KB",
+      "lastModified": "2025-06-20"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\AIInterviewConfiguration.tsx",
+      "size": "14KB",
+      "lastModified": "2025-08-29"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\blocks\\VisualBlockSelector.tsx",
+      "size": "6KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\CollaborativeStudyBuilderWrapper.tsx",
+      "size": "0B",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockEditor.tsx",
+      "size": "26KB",
+      "lastModified": "2025-09-09"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockPreview.tsx",
+      "size": "18KB",
+      "lastModified": "2025-09-09"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\EnhancedStudyBuilder.tsx",
+      "size": "0B",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\EnhancedStudyCreationWizard.tsx",
+      "size": "36KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\RealTimeBlockPreview.tsx",
+      "size": "19KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\shared\\StudyBuilderHeader.tsx",
+      "size": "7KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\BlockConfigurationStep.tsx",
+      "size": "41KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\InterviewSessionConfig.tsx",
+      "size": "23KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\LaunchStep.tsx",
+      "size": "13KB",
+      "lastModified": "2025-08-18"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\ReviewStep-new.tsx",
+      "size": "18KB",
+      "lastModified": "2025-09-09"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\ReviewStep.tsx",
+      "size": "19KB",
+      "lastModified": "2025-09-20"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\StudySetupStep.tsx",
+      "size": "8KB",
+      "lastModified": "2025-09-09"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\StudyTypeStep.tsx",
+      "size": "6KB",
+      "lastModified": "2025-09-09"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\steps\\UsabilityStudyConfig.tsx",
+      "size": "22KB",
+      "lastModified": "2025-09-09"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\StudyConfiguration.tsx",
+      "size": "0B",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\StudyCreationWizard.tsx",
+      "size": "18KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\StudyPreviewModal.tsx",
+      "size": "9KB",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\StudyReview.tsx",
+      "size": "0B",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\StudyStateManager.tsx",
+      "size": "9KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\StudyTypeSelector.tsx",
+      "size": "0B",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\TaskManagement.tsx",
+      "size": "0B",
+      "lastModified": "2025-06-28"
+    },
+    {
+      "path": "src\\client\\components\\study-builder\\types.ts",
+      "size": "9KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\study-session\\task-types\\InterviewTask.tsx",
+      "size": "24KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\study-session\\TaskRunner.tsx",
+      "size": "15KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\components\\subscription\\SubscriptionManager.clean.tsx",
+      "size": "7KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\components\\subscription\\SubscriptionManager.tsx",
+      "size": "7KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\components\\ui\\AccessibleComponents.tsx",
+      "size": "17KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\components\\ui\\DesignSystem.tsx",
+      "size": "17KB",
+      "lastModified": "2025-06-25"
+    },
+    {
+      "path": "src\\client\\components\\ui\\EnhancedDesignSystem.tsx",
+      "size": "19KB",
+      "lastModified": "2025-07-01"
+    },
+    {
+      "path": "src\\client\\components\\ui\\ErrorBoundary.tsx",
+      "size": "3KB",
+      "lastModified": "2025-08-19"
+    },
+    {
+      "path": "src\\client\\components\\ui\\LoadingSpinner.tsx",
+      "size": "1016B",
+      "lastModified": "2025-08-19"
+    },
+    {
+      "path": "src\\client\\components\\ui\\OptimizedImage.tsx",
+      "size": "5KB",
+      "lastModified": "2025-08-15"
+    },
+    {
+      "path": "src\\client\\components\\ui\\PlanLimitModal.tsx",
+      "size": "9KB",
+      "lastModified": "2025-09-03"
+    },
+    {
+      "path": "src\\client\\components\\ui\\PlanUsageDashboard.tsx",
+      "size": "14KB",
+      "lastModified": "2025-09-03"
+    },
+    {
+      "path": "src\\client\\components\\ui\\UnifiedDesignSystem.tsx",
+      "size": "18KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\components\\ui\\UsageDashboard.tsx",
+      "size": "8KB",
+      "lastModified": "2025-09-03"
+    },
+    {
+      "path": "src\\client\\components\\wallet\\TransactionHistory.tsx",
+      "size": "7KB",
+      "lastModified": "2025-07-06"
+    },
+    {
+      "path": "src\\client\\components\\workflow\\StreamlinedApprovalWorkflow.tsx",
+      "size": "27KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\pages\\admin\\AdminStudiesPage.tsx",
+      "size": "12KB",
+      "lastModified": "2025-09-07"
+    },
+    {
+      "path": "src\\client\\pages\\collaboration\\CollaborationPage.tsx",
+      "size": "1KB",
+      "lastModified": "2025-06-27"
+    },
+    {
+      "path": "src\\client\\pages\\collaboration\\StudyCollaborationCenter.tsx",
+      "size": "23KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\client\\pages\\dashboard\\UnifiedWorkspace.tsx",
+      "size": "11KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\pages\\EnhancedDashboard.tsx",
+      "size": "11KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\pages\\participant\\AIInterviewSessionPage.tsx",
+      "size": "7KB",
+      "lastModified": "2025-08-29"
+    },
+    {
+      "path": "src\\client\\pages\\studies\\MobileOptimizedStudiesPage.tsx",
+      "size": "17KB",
+      "lastModified": "2025-09-26"
+    },
+    {
+      "path": "src\\client\\hooks\\accessibility.ts",
+      "size": "2KB",
+      "lastModified": "2025-07-02"
+    },
+    {
+      "path": "src\\client\\hooks\\performance.ts",
+      "size": "5KB",
+      "lastModified": "2025-09-14"
+    },
+    {
+      "path": "src\\client\\hooks\\useNotifications.ts",
+      "size": "351B",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\client\\hooks\\useStudyBuilder.ts",
+      "size": "7KB",
+      "lastModified": "2025-09-16"
+    },
+    {
+      "path": "src\\client\\utils\\notificationUtils.ts",
+      "size": "499B",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\api\\ApiResponse.ts",
+      "size": "8KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\blocks\\BlockRegistry.ts",
+      "size": "19KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\blocks\\BlockTypes.ts",
+      "size": "5KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\cache\\CacheMiddleware.js",
+      "size": "14KB",
+      "lastModified": "2025-07-01"
+    },
+    {
+      "path": "src\\shared\\dev-tools\\ReactDevHooks.simple.tsx",
+      "size": "4KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\dev-tools\\ReactDevHooks.tsx",
+      "size": "4KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\errors\\ErrorBoundary.tsx",
+      "size": "12KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\errors\\ErrorHandler.ts",
+      "size": "10KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\errors\\ErrorTypes.ts",
+      "size": "4KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\errors\\Logger.ts",
+      "size": "11KB",
+      "lastModified": "2025-08-11"
+    },
+    {
+      "path": "src\\shared\\middleware\\RateLimitMiddleware.js",
+      "size": "9KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\shared\\middleware\\SecurityManager.js",
+      "size": "17KB",
+      "lastModified": "2025-07-01"
+    },
+    {
+      "path": "src\\shared\\types\\analytics.ts",
+      "size": "4KB",
+      "lastModified": "2025-06-29"
+    },
+    {
+      "path": "src\\shared\\utils\\logger.ts",
+      "size": "5KB",
+      "lastModified": "2025-08-11"
+    }
+  ],
+  "unusedUtilities": [],
+  "duplicateFiles": [
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "src\\client\\components\\participant\\EnhancedParticipantProfile.tsx",
+      "size": "0B"
+    },
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "src\\client\\components\\studies\\ImprovedBlockLibraryModal.tsx",
+      "size": "0B"
+    },
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "src\\client\\components\\studies\\MazeInspiredStudyCreationModal.tsx",
+      "size": "0B"
+    },
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "src\\client\\components\\study-creator\\index.ts",
+      "size": "0B"
+    },
+    {
+      "original": "src\\client\\components\\subscription\\SubscriptionManager.clean.tsx",
+      "duplicate": "src\\client\\components\\subscription\\SubscriptionManager.tsx",
+      "size": "7KB"
+    },
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "src\\utils\\debug\\SentryIntegration.js",
+      "size": "0B"
+    },
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "api\\ai-features.js",
+      "size": "0B"
+    },
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "api\\archive-old-functions\\2025-09-11-cleanup\\backup-files\\research-consolidated-broken-backup.js",
+      "size": "0B"
+    },
+    {
+      "original": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\points.js",
+      "duplicate": "api\\archive-old-functions\\points.js",
+      "size": "13KB"
+    },
+    {
+      "original": "api\\archive-old-functions\\templates-auth.js",
+      "duplicate": "api\\archive-old-functions\\templates.js",
+      "size": "20KB"
+    },
+    {
+      "original": "api\\archive-old-functions\\2025-09-11-cleanup\\variant-files\\user-enhanced.js",
+      "duplicate": "api\\archive-old-functions\\user-enhanced.js",
+      "size": "7KB"
+    },
+    {
+      "original": "api\\archive-old-functions\\services\\ApiResponse.js",
+      "duplicate": "api\\services\\ApiResponse.js",
+      "size": "3KB"
+    },
+    {
+      "original": "api\\archive-old-functions\\services\\BaseService.js",
+      "duplicate": "api\\services\\BaseService.js",
+      "size": "12KB"
+    },
+    {
+      "original": "src\\client\\components\\admin\\UnifiedUserManagement.tsx",
+      "duplicate": "scripts\\debug\\test-screen-recording-setup.js",
+      "size": "0B"
+    },
+    {
+      "original": "scripts\\development\\local-dev-clean.js",
+      "duplicate": "scripts\\development\\local-full-dev-fixed.js",
+      "size": "7KB"
+    }
+  ],
+  "emptyDirectories": [
+    ".framework\\reports",
+    ".productivity-data",
+    "archive\\2025-07-12-cleanup\\phase2-backups",
+    "archive\\2025-07-legacy\\reports",
+    "archive\\2025-07-legacy\\scripts",
+    "archive\\2025-07-legacy\\test-interfaces",
+    "archive\\documentation",
+    "archive\\outdated-session-docs",
+    "docs\\archive\\legacy",
+    "docs\\archive\\migration-logs",
+    "docs\\archive\\old-docs",
+    "docs\\archive\\product-manager-backup\\01_Strategic_Overview",
+    "docs\\archive\\product-manager-backup\\02_Requirements",
+    "docs\\archive\\product-manager-backup\\03_Technical_Decisions",
+    "docs\\archive\\product-manager-backup\\architecture",
+    "docs\\compitior-example",
+    "docs\\current\\api",
+    "docs\\current\\architecture",
+    "docs\\explanation\\best-practices",
+    "docs\\explanation\\design-decisions",
+    "docs\\explanation\\security",
+    "docs\\how-to-guides\\deployment",
+    "docs\\how-to-guides\\installation",
+    "docs\\how-to-guides\\integrations",
+    "docs\\how-to-guides\\troubleshooting",
+    "docs\\legacy",
+    "docs\\reference\\configuration",
+    "docs\\reference\\database-schema",
+    "docs\\reference\\study-blocks",
+    "docs\\requirements\\analytics-insights",
+    "docs\\requirements\\business",
+    "docs\\requirements\\core-platform",
+    "docs\\requirements\\enterprise",
+    "docs\\requirements\\user-experience",
+    "docs\\requirements\\user-stories\\by-priority\\p0-critical",
+    "docs\\requirements\\user-stories\\by-priority\\p1-important",
+    "docs\\requirements\\user-stories\\by-priority\\p2-enhancement",
+    "docs\\requirements\\user-stories\\by-priority",
+    "docs\\requirements\\user-stories\\by-role\\admin",
+    "docs\\requirements\\user-stories\\by-role\\participant",
+    "docs\\tutorials\\ai-features",
+    "docs\\tutorials\\participant-flow",
+    "docs\\vibe-coder\\architecture",
+    "lib",
+    "scripts\\deployment",
+    "scripts\\legacy",
+    "scripts\\reports",
+    "src\\client\\components\\admin\\templates",
+    "src\\client\\components\\dashboard",
+    "src\\client\\components\\participants",
+    "src\\client\\components\\templates",
+    "src\\client\\components\\testing",
+    "src\\client\\pages\\templates",
+    "src\\client\\store",
+    "src\\shared\\templates",
+    "testing\\automated\\integration",
+    "testing\\automated\\unit",
+    "testing\\comprehensive-testing-strategy\\performance-data",
+    "testing\\comprehensive-testing-strategy\\test-data",
+    "testing\\e2e\\integration",
+    "testing\\health-monitoring\\alerts",
+    "testing\\health-monitoring\\trends",
+    "testing\\screenshots\\archive",
+    "testing\\unit"
+  ],
+  "unusedImports": [],
+  "largeFiles": [],
+  "oldFiles": []
+}

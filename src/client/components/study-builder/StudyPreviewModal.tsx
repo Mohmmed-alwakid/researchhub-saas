@@ -1,6 +1,7 @@
 import React from 'react';
 import { StudyBuilderBlock, getBlockDisplayName } from './types';
 
+
 interface StudyPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;

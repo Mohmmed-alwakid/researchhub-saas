@@ -1,7 +1,8 @@
 import React from 'react';
 import { Clock, Target, AlertTriangle, ExternalLink, MousePointer, Star } from 'lucide-react';
-import { type StudyTask } from './DragDropStudyBuilder';
 import { Card, CardContent, CardHeader } from '../ui/Card';
+
+import { type StudyTask } from './DragDropStudyBuilder';
 
 interface TaskPreviewProps {
   task: StudyTask;

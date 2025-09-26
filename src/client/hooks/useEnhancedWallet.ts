@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { walletService, type WalletData, type Transaction, type WithdrawalRequest, type CreateWithdrawalRequest } from '../services/wallet.service';
 import toast from 'react-hot-toast';
+
+import { walletService, type WalletData, type Transaction, type WithdrawalRequest, type CreateWithdrawalRequest } from '../services/wallet.service';
 
 export interface UseEnhancedWalletReturn {
   wallet: WalletData | null;

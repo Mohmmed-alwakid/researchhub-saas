@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { JourneyAssistant } from './JourneyAssistant';
 import { JourneyPhase, JourneyProgress } from './types';
 import { JourneyProgressConstellation } from './JourneyProgressConstellation';
-import { PhaseTransitionEffect, MicroCelebration } from './JourneyEffects';
-import { JourneyAssistant } from './JourneyAssistant';
 import { MissionLaunchPad } from './phases/MissionLaunchPad';
+import { PhaseTransitionEffect, MicroCelebration } from './JourneyEffects';
 import { StudyTypeAdventure } from './phases/StudyTypeAdventure';
+
 
 // Placeholder components for remaining phases
 interface PlaceholderProps {

@@ -1,0 +1,423 @@
+/**
+ * ENHANCED RESEARCH API - With Supabase Database Integration
+ * Includes study creation, persistence, and cross-platform visibility
+ * 
+ * MIGRATION COMPLETE: Now uses Supabase database instead of in-memory storage
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.I_4j2vgcu2aR9Pw1d-QG2hpKunbmNKD8tWg3Psl0GNc';
+
+// Initialize Supabase clients
+const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+console.log('🔬 Research API initialized with Supabase database');
+
+/**
+ * Helper function to authenticate user
+ */
+async function authenticateUser(req) {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { success: false, error: 'Missing or invalid authorization header', status: 401 };
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    };
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Authentication service error', status: 500 };
+  }
+}
+
+/**
+ * Convert database study record to frontend-compatible format
+ */
+function formatStudyForFrontend(dbStudy, includeNumericId = true) {
+  try {
+    const settings = dbStudy.settings || {};
+    
+    // Create a hash-based numeric ID for frontend compatibility
+    const numericId = includeNumericId ? 
+      Math.abs(dbStudy.id.split('-').join('').slice(0, 8).split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0)) :
+      null;
+
+    return {
+      // Database fields
+      id: includeNumericId ? numericId : dbStudy.id,
+      _id: dbStudy.id, // UUID as string for compatibility
+      uuid: dbStudy.id, // Keep original UUID
+      title: dbStudy.title || 'Untitled Study',
+      description: dbStudy.description || '',
+      status: dbStudy.status || 'draft',
+      created_at: dbStudy.created_at,
+      updated_at: dbStudy.updated_at,
+      target_participants: dbStudy.target_participants || 10,
+      researcher_id: dbStudy.researcher_id,
+      
+      // Settings extracted fields (for backward compatibility)
+      type: settings.type || 'usability',
+      blocks: settings.blocks || [],
+      compensation: settings.compensation || 25,
+      duration: settings.duration || 30,
+      difficulty: settings.difficulty || 'beginner',
+      
+      // Frontend compatibility (camelCase)
+      createdAt: dbStudy.created_at,
+      updatedAt: dbStudy.updated_at || dbStudy.created_at,
+      created_by: 'researcher', // Maintain compatibility
+      
+      // Full settings object
+      settings: settings
+    };
+  } catch (error) {
+    console.error('Error formatting study:', error);
+    return dbStudy; // Return original if formatting fails
+  }
+}
+
+/**
+ * Create a new study in the database
+ */
+async function createStudy(req, res) {
+  try {
+    // Authenticate user
+    const authResult = await authenticateUser(req);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({ success: false, error: authResult.error });
+    }
+
+    const studyData = req.body;
+    const timestamp = new Date().toISOString();
+    
+    // Prepare study data for database
+    const dbStudyData = {
+      title: studyData.title || 'Untitled Study',
+      description: studyData.description || '',
+      status: studyData.status || 'draft',
+      researcher_id: authResult.user.id,
+      target_participants: studyData.target_participants || 10,
+      settings: {
+        type: studyData.type || 'usability',
+        blocks: studyData.blocks || [],
+        compensation: studyData.compensation || 25,
+        duration: studyData.duration || 30,
+        difficulty: studyData.difficulty || 'beginner',
+        // Include any additional settings
+        ...studyData.settings
+      }
+    };
+
+    // Insert into database
+    const { data: newStudy, error } = await supabase
+      .from('studies')
+      .insert([dbStudyData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error creating study:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create study in database'
+      });
+    }
+
+    console.log(`✅ Study created in database: ${newStudy.title} (UUID: ${newStudy.id})`);
+    
+    // Return formatted study for frontend
+    const formattedStudy = formatStudyForFrontend(newStudy);
+    
+    return res.status(201).json({
+      success: true,
+      data: formattedStudy,
+      message: 'Study created successfully'
+    });
+
+  } catch (error) {
+    console.error('Create study error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get studies from database
+ */
+async function getStudies(req, res) {
+  try {
+    const userRole = req.headers['x-user-role'] || 'researcher';
+    
+    let query = supabase
+      .from('studies')
+      .select('*');
+    
+    // Filter based on user role
+    if (userRole === 'participant') {
+      // Only show active/published studies for participants
+      query = query.in('status', ['active', 'published']);
+    }
+    
+    // Add ordering
+    query = query.order('created_at', { ascending: false });
+    
+    const { data: studies, error } = await query;
+
+    if (error) {
+      console.error('Database error fetching studies:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch studies from database'
+      });
+    }
+
+    // Format studies for frontend
+    const formattedStudies = studies.map(study => formatStudyForFrontend(study));
+    
+    console.log(`📚 Fetched ${studies.length} studies from database for role: ${userRole}`);
+    
+    return res.status(200).json({
+      success: true,
+      data: formattedStudies,
+      count: studies.length
+    });
+
+  } catch (error) {
+    console.error('Get studies error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Update study in database
+ */
+async function updateStudy(req, res) {
+  try {
+    // Authenticate user
+    const authResult = await authenticateUser(req);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({ success: false, error: authResult.error });
+    }
+
+    const studyId = req.query.id || req.body.id || req.body.uuid || req.body._id;
+    if (!studyId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Study ID is required'
+      });
+    }
+
+    const updateData = req.body;
+    
+    // Prepare update data
+    const dbUpdateData = {
+      updated_at: new Date().toISOString()
+    };
+    
+    // Update basic fields if provided
+    if (updateData.title !== undefined) dbUpdateData.title = updateData.title;
+    if (updateData.description !== undefined) dbUpdateData.description = updateData.description;
+    if (updateData.status !== undefined) dbUpdateData.status = updateData.status;
+    if (updateData.target_participants !== undefined) dbUpdateData.target_participants = updateData.target_participants;
+    
+    // Update settings if provided
+    if (updateData.type || updateData.blocks || updateData.compensation || updateData.duration || updateData.difficulty || updateData.settings) {
+      // First get current settings
+      const { data: currentStudy, error: fetchError } = await supabase
+        .from('studies')
+        .select('settings')
+        .eq('id', studyId)
+        .single();
+        
+      if (fetchError) {
+        console.error('Error fetching current study for update:', fetchError);
+        return res.status(404).json({
+          success: false,
+          error: 'Study not found'
+        });
+      }
+      
+      const currentSettings = currentStudy.settings || {};
+      
+      dbUpdateData.settings = {
+        ...currentSettings,
+        ...(updateData.settings || {}),
+        type: updateData.type || currentSettings.type,
+        blocks: updateData.blocks || currentSettings.blocks,
+        compensation: updateData.compensation || currentSettings.compensation,
+        duration: updateData.duration || currentSettings.duration,
+        difficulty: updateData.difficulty || currentSettings.difficulty
+      };
+    }
+
+    // Update in database
+    const { data: updatedStudy, error } = await supabase
+      .from('studies')
+      .update(dbUpdateData)
+      .eq('id', studyId)
+      .eq('researcher_id', authResult.user.id) // Ensure user owns the study
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error updating study:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update study in database'
+      });
+    }
+
+    if (!updatedStudy) {
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found or access denied'
+      });
+    }
+
+    console.log(`✅ Study updated in database: ${updatedStudy.title} (UUID: ${updatedStudy.id})`);
+    
+    // Return formatted study for frontend
+    const formattedStudy = formatStudyForFrontend(updatedStudy);
+    
+    return res.status(200).json({
+      success: true,
+      data: formattedStudy,
+      message: 'Study updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Update study error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Get study analytics (placeholder for future implementation)
+ */
+async function getDashboardAnalytics(req, res) {
+  try {
+    // For now, return basic analytics from studies table
+    const { data: studies, error } = await supabase
+      .from('studies')
+      .select('status, created_at');
+    
+    if (error) {
+      console.error('Analytics query error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch analytics'
+      });
+    }
+
+    const analytics = {
+      totalStudies: studies.length,
+      activeStudies: studies.filter(s => s.status === 'active').length,
+      draftStudies: studies.filter(s => s.status === 'draft').length,
+      completedStudies: studies.filter(s => s.status === 'completed').length,
+      recentActivity: studies.length > 0 ? studies[0].created_at : null
+    };
+    
+    return res.status(200).json({
+      success: true,
+      data: analytics
+    });
+
+  } catch (error) {
+    console.error('Analytics error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+/**
+ * Main API handler
+ */
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  try {
+    const { action } = req.query;
+    
+    console.log(`🔧 Research API (Database) - ${req.method} ${action}`);
+
+    switch (action) {
+      case 'create-study':
+        if (req.method !== 'POST') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await createStudy(req, res);
+
+      case 'get-studies':
+        if (req.method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await getStudies(req, res);
+
+      case 'update-study':
+        if (req.method !== 'PUT' && req.method !== 'PATCH') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await updateStudy(req, res);
+
+      case 'dashboard-analytics':
+        if (req.method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        return await getDashboardAnalytics(req, res);
+
+      default:
+        return res.status(400).json({
+          success: false,
+          error: `Unknown action: ${action}. Available actions: create-study, get-studies, update-study, dashboard-analytics`
+        });
+    }
+
+  } catch (error) {
+    console.error('Research API error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}

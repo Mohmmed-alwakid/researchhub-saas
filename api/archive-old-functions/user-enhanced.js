@@ -1,11 +1,12 @@
+import { corsMiddleware, validateAuthToken, sanitizeInput, rateLimitMiddleware } from './services/ApiResponse.js';
+
+import { createUserService, createSystemService } from './services/BaseService.js';
+
 /**
  * PHASE 1: ENHANCED USER API ENDPOINT
  * Modern API endpoint using service layer architecture
  * Requirements Source: docs/requirements/01-PLATFORM_FOUNDATION.md
  */
-
-import { createUserService, createSystemService } from './services/BaseService.js';
-import { corsMiddleware, validateAuthToken, sanitizeInput, rateLimitMiddleware } from './services/ApiResponse.js';
 
 /**
  * Enhanced User Management API

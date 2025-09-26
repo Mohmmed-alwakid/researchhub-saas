@@ -1,6 +1,7 @@
 import React from 'react';
 import type { IStudy, IParticipant } from '../../../../shared/types/index';
 
+
 interface TaskProps {
   task: unknown;
   study: IStudy;

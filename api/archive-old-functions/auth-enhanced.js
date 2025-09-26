@@ -1,16 +1,17 @@
+import { createClient } from '@supabase/supabase-js';
+import { ApiResponseHelper } from './services/ApiResponse.js';
+
+
 /**
  * PHASE 2: AUTHENTICATION & AUTHORIZATION ENHANCEMENT
  * Enhanced authentication system with JWT validation and role-based access
  * Requirements Source: docs/requirements/02-AUTHENTICATION_AUTHORIZATION.md
  */
 
-import { createClient } from '@supabase/supabase-js';
-import { ApiResponseHelper } from './services/ApiResponse.js';
-
 // Supabase configuration
 const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTk1ODAsImV4cCI6MjA2NTc3NTU4MH0.YMai9p4VQMbdqmc_9uWGeJ6nONHwuM9XT2FDTFy0aGk';
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.hM5DhDshOQOhXIepbPWiznEDgpN9MzGhB0kzlxGd_6Y';
+const supabaseKey = 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
+const supabaseServiceKey = 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);

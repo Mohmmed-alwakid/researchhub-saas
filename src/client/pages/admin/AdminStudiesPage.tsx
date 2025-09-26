@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Eye, Edit, Users, Calendar, AlertCircle } from 'lucide-react';
+
+import { Link } from 'react-router-dom';
 
 interface Study {
   id: string;

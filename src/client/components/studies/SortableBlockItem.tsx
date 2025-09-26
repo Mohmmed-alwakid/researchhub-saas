@@ -1,8 +1,9 @@
 import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Clock, Edit2, Copy, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
 import type { BlockType } from '../../../shared/types/index';
+
 
 interface Block {
   id: string;

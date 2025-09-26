@@ -1,9 +1,10 @@
+import { NotificationData, NotificationChannel, NotificationPriority } from './NotificationManager';
+
+
 /**
  * Client-side Real-time Notification System for ResearchHub
  * Handles SSE connections and notification management in the browser
  */
-
-import { NotificationData, NotificationChannel, NotificationPriority } from './NotificationManager';
 
 export interface NotificationClientConfig {
   baseUrl: string;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   MessageCircle, 
@@ -10,19 +9,21 @@ import {
   Bell,
   Activity
 } from 'lucide-react';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
-import { collaborationService } from '../../services/collaborationService';
+import { useNavigate } from 'react-router-dom';
 import { approvalService } from '../../services/approvalService';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { collaborationService } from '../../services/collaborationService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import ActivityFeed from '../collaboration/ActivityFeed';
 import ApprovalQueue from '../approval/ApprovalQueue';
-import type { WorkspaceRole } from '../../../shared/types';
 import type { 
   UserJoinedData, 
   UserLeftData, 
   ActivityUpdateData 
 } from './types';
+
+import type { WorkspaceRole } from '../../../shared/types';
 
 interface CollaborationDashboardProps {
   currentUser: {

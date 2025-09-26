@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { CheckCircle, Star } from 'lucide-react';
+
+import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader } from '../ui/Card';
 
 interface StudyBlock {
   id: string;

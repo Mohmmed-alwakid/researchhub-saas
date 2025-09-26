@@ -9,7 +9,7 @@
 ```javascript
 // Current: Hardcoded credentials (SECURITY RISK!)
 const supabaseUrl = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIs...';
+const supabaseKey = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.';
 
 // Fix: Use environment variables
 const supabaseUrl = process.env.SUPABASE_URL;

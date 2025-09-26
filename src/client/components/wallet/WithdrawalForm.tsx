@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { CreditCard, Banknote, DollarSign, AlertCircle, Check, X } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+import toast from 'react-hot-toast';
+
+import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
-import { Badge } from '../ui/Badge';
-import toast from 'react-hot-toast';
 
 interface WalletData {
   balance: number;

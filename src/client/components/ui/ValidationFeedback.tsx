@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, Info, X } from 'lucide-react';
 import type { ValidationError, ValidationResult } from '../../utils/validation';
 
+
 interface ValidationFeedbackProps {
   validation: ValidationResult;
   showSuccessMessage?: boolean;

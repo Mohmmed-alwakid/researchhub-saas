@@ -1,8 +1,3 @@
-/**
- * Enhanced Design System for AfakarM ResearchHub
- * Comprehensive UI components and utilities for consistent user experience
- */
-
 import React, { ReactNode } from 'react';
 import { 
   CheckCircle, 
@@ -14,6 +9,12 @@ import {
   Check,
   X
 } from 'lucide-react';
+
+
+/**
+ * Enhanced Design System for AfakarM ResearchHub
+ * Comprehensive UI components and utilities for consistent user experience
+ */
 
 // ================================
 // Color System

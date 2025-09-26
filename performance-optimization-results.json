@@ -1,0 +1,4237 @@
+{
+  "bundleAnalysis": {
+    "dependencies": 50,
+    "devDependencies": 36,
+    "heavyDependencies": [
+      "recharts"
+    ],
+    "unusedDependencies": [
+      "@executeautomation/playwright-mcp-server",
+      "@hookform/resolvers",
+      "@modelcontextprotocol/server-brave-search",
+      "@modelcontextprotocol/server-filesystem",
+      "@modelcontextprotocol/server-memory",
+      "@sentry/tracing",
+      "@sentry/vite-plugin",
+      "@tailwindcss/postcss",
+      "@types/multer",
+      "@types/nodemailer",
+      "@types/socket.io",
+      "@vercel/blob",
+      "@vercel/node",
+      "cors",
+      "dotenv",
+      "express-validator",
+      "glob",
+      "multer",
+      "node-fetch",
+      "nodemailer",
+      "openai",
+      "playwright",
+      "react-dom",
+      "socket.io"
+    ],
+    "sourceStats": {
+      "totalFiles": 448,
+      "totalSize": "5MB",
+      "largestFiles": [
+        {
+          "path": "src\\client\\components\\participant\\StudyDiscovery.tsx",
+          "size": 69192,
+          "sizeFormatted": "68KB"
+        },
+        {
+          "path": "src\\shared\\types\\index.ts",
+          "size": 65622,
+          "sizeFormatted": "64KB"
+        },
+        {
+          "path": "api\\user-profile-consolidated.js",
+          "size": 62446,
+          "sizeFormatted": "61KB"
+        },
+        {
+          "path": "api\\archive-old-functions\\admin.js",
+          "size": 62027,
+          "sizeFormatted": "61KB"
+        },
+        {
+          "path": "api\\archive-old-functions\\applications.js",
+          "size": 59069,
+          "sizeFormatted": "58KB"
+        },
+        {
+          "path": "src\\client\\components\\studies\\MobileOptimizedStudyBuilder.tsx",
+          "size": 49584,
+          "sizeFormatted": "48KB"
+        },
+        {
+          "path": "src\\client\\components\\blocks\\AdvancedStudyBlocks.tsx",
+          "size": 45388,
+          "sizeFormatted": "44KB"
+        },
+        {
+          "path": "api\\archive-old-functions\\studies.js",
+          "size": 42923,
+          "sizeFormatted": "42KB"
+        },
+        {
+          "path": "src\\client\\pages\\studies\\StudyDetailPage.tsx",
+          "size": 42783,
+          "sizeFormatted": "42KB"
+        },
+        {
+          "path": "src\\client\\components\\study-builder\\steps\\BlockConfigurationStep.tsx",
+          "size": 41748,
+          "sizeFormatted": "41KB"
+        }
+      ]
+    }
+  },
+  "importOptimizations": [
+    {
+      "file": "src\\App.tsx",
+      "backup": "src\\App.tsx.backup-1758903105803",
+      "changes": {
+        "originalImports": 15,
+        "optimizedImports": 15,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\assets\\brand\\AfkarLogo.tsx",
+      "backup": "src\\assets\\brand\\AfkarLogo.tsx.backup-1758903105805",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminDashboard.tsx",
+      "backup": "src\\client\\components\\admin\\AdminDashboard.tsx.backup-1758903105812",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminOverview.tsx",
+      "backup": "src\\client\\components\\admin\\AdminOverview.tsx.backup-1758903105814",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminPointsManager.tsx",
+      "backup": "src\\client\\components\\admin\\AdminPointsManager.tsx.backup-1758903105827",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminSidebar.tsx",
+      "backup": "src\\client\\components\\admin\\AdminSidebar.tsx.backup-1758903105833",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\analytics\\PerformanceMetrics.tsx",
+      "backup": "src\\client\\components\\admin\\analytics\\PerformanceMetrics.tsx.backup-1758903105834",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\AnalyticsDashboard.tsx",
+      "backup": "src\\client\\components\\admin\\AnalyticsDashboard.tsx.backup-1758903105836",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\ComprehensiveAdminPanel.tsx",
+      "backup": "src\\client\\components\\admin\\ComprehensiveAdminPanel.tsx.backup-1758903105838",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\AdminReportsWidget.tsx",
+      "backup": "src\\client\\components\\admin\\dashboard\\AdminReportsWidget.tsx.backup-1758903105840",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\AlertCenter.tsx",
+      "backup": "src\\client\\components\\admin\\dashboard\\AlertCenter.tsx.backup-1758903105842",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\QuickActionsPanel.tsx",
+      "backup": "src\\client\\components\\admin\\dashboard\\QuickActionsPanel.tsx.backup-1758903105844",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\SystemHealthWidget.tsx",
+      "backup": "src\\client\\components\\admin\\dashboard\\SystemHealthWidget.tsx.backup-1758903105847",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\FinancialDashboard.tsx",
+      "backup": "src\\client\\components\\admin\\FinancialDashboard.tsx.backup-1758903105849",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\PaymentManagement.tsx",
+      "backup": "src\\client\\components\\admin\\PaymentManagement.tsx.backup-1758903105851",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\RolePermissionManager.tsx",
+      "backup": "src\\client\\components\\admin\\RolePermissionManager.tsx.backup-1758903105853",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\SimpleAdminOverview.tsx",
+      "backup": "src\\client\\components\\admin\\SimpleAdminOverview.tsx.backup-1758903105856",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\StudyOversight.tsx",
+      "backup": "src\\client\\components\\admin\\StudyOversight.tsx.backup-1758903105857",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\SubscriptionManager.tsx",
+      "backup": "src\\client\\components\\admin\\SubscriptionManager.tsx.backup-1758903105860",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\SupportCenter.tsx",
+      "backup": "src\\client\\components\\admin\\SupportCenter.tsx.backup-1758903105861",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemAnalytics.new.tsx",
+      "backup": "src\\client\\components\\admin\\SystemAnalytics.new.tsx.backup-1758903105864",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemAnalytics.tsx",
+      "backup": "src\\client\\components\\admin\\SystemAnalytics.tsx.backup-1758903105865",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemSettings.tsx",
+      "backup": "src\\client\\components\\admin\\SystemSettings.tsx.backup-1758903105868",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagement.tsx",
+      "backup": "src\\client\\components\\admin\\UserManagement.tsx.backup-1758903105870",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagementPanel.tsx",
+      "backup": "src\\client\\components\\admin\\UserManagementPanel.tsx.backup-1758903105873",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagementTabs.tsx",
+      "backup": "src\\client\\components\\admin\\UserManagementTabs.tsx.backup-1758903105874",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\users\\BulkOperations.tsx",
+      "backup": "src\\client\\components\\admin\\users\\BulkOperations.tsx.backup-1758903105876",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\admin\\users\\UserDetailView.tsx",
+      "backup": "src\\client\\components\\admin\\users\\UserDetailView.tsx.backup-1758903105879",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\AdminAnalyticsDashboard.tsx",
+      "backup": "src\\client\\components\\AdminAnalyticsDashboard.tsx.backup-1758903105882",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ai\\AIInsightsDashboard.tsx",
+      "backup": "src\\client\\components\\ai\\AIInsightsDashboard.tsx.backup-1758903105886",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ai-interview\\AIInterviewModerator.tsx",
+      "backup": "src\\client\\components\\ai-interview\\AIInterviewModerator.tsx.backup-1758903105887",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\analytics\\AdvancedAnalyticsDashboard.tsx",
+      "backup": "src\\client\\components\\analytics\\AdvancedAnalyticsDashboard.tsx.backup-1758903105890",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\analytics\\HeatmapAnalytics.tsx",
+      "backup": "src\\client\\components\\analytics\\HeatmapAnalytics.tsx.backup-1758903105891",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\analytics\\SessionReplay.tsx",
+      "backup": "src\\client\\components\\analytics\\SessionReplay.tsx.backup-1758903105893",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\approval\\ApprovalHistory.tsx",
+      "backup": "src\\client\\components\\approval\\ApprovalHistory.tsx.backup-1758903105895",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\approval\\ApprovalQueue.tsx",
+      "backup": "src\\client\\components\\approval\\ApprovalQueue.tsx.backup-1758903105896",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\approval\\StudyApprovalCard.tsx",
+      "backup": "src\\client\\components\\approval\\StudyApprovalCard.tsx.backup-1758903105902",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\auth\\AuthGuard.tsx",
+      "backup": "src\\client\\components\\auth\\AuthGuard.tsx.backup-1758903105904",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\auth\\GoogleOAuthButton.tsx",
+      "backup": "src\\client\\components\\auth\\GoogleOAuthButton.tsx.backup-1758903105906",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\auth\\ProtectedRoute.tsx",
+      "backup": "src\\client\\components\\auth\\ProtectedRoute.tsx.backup-1758903105909",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\auth\\RoleBasedRedirect.tsx",
+      "backup": "src\\client\\components\\auth\\RoleBasedRedirect.tsx.backup-1758903105910",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\auth\\TwoFactorLogin.tsx",
+      "backup": "src\\client\\components\\auth\\TwoFactorLogin.tsx.backup-1758903105912",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\auth\\TwoFactorSetup.tsx",
+      "backup": "src\\client\\components\\auth\\TwoFactorSetup.tsx.backup-1758903105914",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\blocks\\AdvancedStudyBlocks.tsx",
+      "backup": "src\\client\\components\\blocks\\AdvancedStudyBlocks.tsx.backup-1758903105916",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\blocks\\AdvancedStudyBlocksV2.tsx",
+      "backup": "src\\client\\components\\blocks\\AdvancedStudyBlocksV2.tsx.backup-1758903105919",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\blocks\\StudyBlockComponents.tsx",
+      "backup": "src\\client\\components\\blocks\\StudyBlockComponents.tsx.backup-1758903105920",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\blocks\\StudyBlocks.tsx",
+      "backup": "src\\client\\components\\blocks\\StudyBlocks.tsx.backup-1758903105922",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\blocks\\StudyBlockSession.tsx",
+      "backup": "src\\client\\components\\blocks\\StudyBlockSession.tsx.backup-1758903105923",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\ActivityFeed.tsx",
+      "backup": "src\\client\\components\\collaboration\\ActivityFeed.tsx.backup-1758903105925",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborationDashboard.tsx",
+      "backup": "src\\client\\components\\collaboration\\CollaborationDashboard.tsx.backup-1758903105927",
+      "changes": {
+        "originalImports": 12,
+        "optimizedImports": 12,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborationHeader.tsx",
+      "backup": "src\\client\\components\\collaboration\\CollaborationHeader.tsx.backup-1758903105929",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborationIndicators.tsx",
+      "backup": "src\\client\\components\\collaboration\\CollaborationIndicators.tsx.backup-1758903105930",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborativeStudyBuilder.tsx",
+      "backup": "src\\client\\components\\collaboration\\CollaborativeStudyBuilder.tsx.backup-1758903105932",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborativeStudyBuilderContainer.tsx",
+      "backup": "src\\client\\components\\collaboration\\CollaborativeStudyBuilderContainer.tsx.backup-1758903105934",
+      "changes": {
+        "originalImports": 13,
+        "optimizedImports": 13,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CommentSystem.tsx",
+      "backup": "src\\client\\components\\collaboration\\CommentSystem.tsx.backup-1758903105935",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\ConflictResolutionSystem.tsx",
+      "backup": "src\\client\\components\\collaboration\\ConflictResolutionSystem.tsx.backup-1758903105937",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\LiveCollaborationManager.tsx",
+      "backup": "src\\client\\components\\collaboration\\LiveCollaborationManager.tsx.backup-1758903105938",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\LiveCursorSystem.tsx",
+      "backup": "src\\client\\components\\collaboration\\LiveCursorSystem.tsx.backup-1758903105939",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\RealTimeTextEditor.tsx",
+      "backup": "src\\client\\components\\collaboration\\RealTimeTextEditor.tsx.backup-1758903105940",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\types.ts",
+      "backup": "src\\client\\components\\collaboration\\types.ts.backup-1758903105941",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\common\\AppLayout.tsx",
+      "backup": "src\\client\\components\\common\\AppLayout.tsx.backup-1758903105943",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\common\\ComingSoon.tsx",
+      "backup": "src\\client\\components\\common\\ComingSoon.tsx.backup-1758903105945",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\common\\ErrorBoundary.tsx",
+      "backup": "src\\client\\components\\common\\ErrorBoundary.tsx.backup-1758903105947",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\common\\LazyLoadErrorBoundary.tsx",
+      "backup": "src\\client\\components\\common\\LazyLoadErrorBoundary.tsx.backup-1758903105948",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\common\\Loading.tsx",
+      "backup": "src\\client\\components\\common\\Loading.tsx.backup-1758903105949",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\common\\Notification.tsx",
+      "backup": "src\\client\\components\\common\\Notification.tsx.backup-1758903105950",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\common\\PublicHeader.tsx",
+      "backup": "src\\client\\components\\common\\PublicHeader.tsx.backup-1758903105952",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ErrorBoundary.tsx",
+      "backup": "src\\client\\components\\ErrorBoundary.tsx.backup-1758903105953",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\journey\\JourneyAssistant.tsx",
+      "backup": "src\\client\\components\\journey\\JourneyAssistant.tsx.backup-1758903105954",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\journey\\JourneyEffects.tsx",
+      "backup": "src\\client\\components\\journey\\JourneyEffects.tsx.backup-1758903105955",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\journey\\JourneyProgressConstellation.tsx",
+      "backup": "src\\client\\components\\journey\\JourneyProgressConstellation.tsx.backup-1758903105956",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\journey\\phases\\MissionLaunchPad.tsx",
+      "backup": "src\\client\\components\\journey\\phases\\MissionLaunchPad.tsx.backup-1758903105958",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\journey\\phases\\StudyTypeAdventure.tsx",
+      "backup": "src\\client\\components\\journey\\phases\\StudyTypeAdventure.tsx.backup-1758903105959",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\journey\\ResearchJourneyOrchestrator.tsx",
+      "backup": "src\\client\\components\\journey\\ResearchJourneyOrchestrator.tsx.backup-1758903105960",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\notifications\\NotificationSystem.tsx",
+      "backup": "src\\client\\components\\notifications\\NotificationSystem.tsx.backup-1758903105962",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\AdvancedBlocks.tsx",
+      "backup": "src\\client\\components\\participant\\AdvancedBlocks.tsx.backup-1758903105964",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\GamificationDashboard.tsx",
+      "backup": "src\\client\\components\\participant\\GamificationDashboard.tsx.backup-1758903105966",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\LiveSessionParticipant.tsx",
+      "backup": "src\\client\\components\\participant\\LiveSessionParticipant.tsx.backup-1758903105967",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\MobileParticipantExperience.tsx",
+      "backup": "src\\client\\components\\participant\\MobileParticipantExperience.tsx.backup-1758903105969",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\MyApplications.tsx",
+      "backup": "src\\client\\components\\participant\\MyApplications.tsx.backup-1758903105970",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\ParticipantDashboard.tsx",
+      "backup": "src\\client\\components\\participant\\ParticipantDashboard.tsx.backup-1758903105972",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\RealTimeAnalytics.tsx",
+      "backup": "src\\client\\components\\participant\\RealTimeAnalytics.tsx.backup-1758903105973",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\StudyDiscovery.tsx",
+      "backup": "src\\client\\components\\participant\\StudyDiscovery.tsx.backup-1758903105976",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\participant\\StudyExecution.tsx",
+      "backup": "src\\client\\components\\participant\\StudyExecution.tsx.backup-1758903105978",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ParticipantEarningsDashboard.tsx",
+      "backup": "src\\client\\components\\ParticipantEarningsDashboard.tsx.backup-1758903105980",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\payments\\ManualPaymentFlow.tsx",
+      "backup": "src\\client\\components\\payments\\ManualPaymentFlow.tsx.backup-1758903105982",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\payments\\PaymentResultPage.tsx",
+      "backup": "src\\client\\components\\payments\\PaymentResultPage.tsx.backup-1758903105983",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\payments\\STCBankPaymentFlow.tsx",
+      "backup": "src\\client\\components\\payments\\STCBankPaymentFlow.tsx.backup-1758903105984",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\performance\\FloatingReportButton.tsx",
+      "backup": "src\\client\\components\\performance\\FloatingReportButton.tsx.backup-1758903105985",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\performance\\PerformanceMonitor.tsx",
+      "backup": "src\\client\\components\\performance\\PerformanceMonitor.tsx.backup-1758903105986",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\pricing\\PricingCTA.tsx",
+      "backup": "src\\client\\components\\pricing\\PricingCTA.tsx.backup-1758903105987",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ResearcherPointsDashboard.tsx",
+      "backup": "src\\client\\components\\ResearcherPointsDashboard.tsx.backup-1758903105988",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\settings\\SecuritySettings.tsx",
+      "backup": "src\\client\\components\\settings\\SecuritySettings.tsx.backup-1758903105990",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\BlockEditModal.tsx",
+      "backup": "src\\client\\components\\studies\\BlockEditModal.tsx.backup-1758903105991",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\BlockLibraryModal.tsx",
+      "backup": "src\\client\\components\\studies\\BlockLibraryModal.tsx.backup-1758903105992",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\DragDropBlockList.tsx",
+      "backup": "src\\client\\components\\studies\\DragDropBlockList.tsx.backup-1758903105994",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\DragDropStudyBuilder.tsx",
+      "backup": "src\\client\\components\\studies\\DragDropStudyBuilder.tsx.backup-1758903105996",
+      "changes": {
+        "originalImports": 11,
+        "optimizedImports": 11,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\DragDropTaskList.tsx",
+      "backup": "src\\client\\components\\studies\\DragDropTaskList.tsx.backup-1758903105998",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\EnhancedStudyCreationModal.tsx",
+      "backup": "src\\client\\components\\studies\\EnhancedStudyCreationModal.tsx.backup-1758903105999",
+      "changes": {
+        "originalImports": 9,
+        "optimizedImports": 9,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\EnhancedUsabilityStudyBuilder.tsx",
+      "backup": "src\\client\\components\\studies\\EnhancedUsabilityStudyBuilder.tsx.backup-1758903106000",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\MobileOptimizedStudyBuilder.tsx",
+      "backup": "src\\client\\components\\studies\\MobileOptimizedStudyBuilder.tsx.backup-1758903106003",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\QuickStudyCreationFlow.tsx",
+      "backup": "src\\client\\components\\studies\\QuickStudyCreationFlow.tsx.backup-1758903106005",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\RenameStudyModal.tsx",
+      "backup": "src\\client\\components\\studies\\RenameStudyModal.tsx.backup-1758903106006",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\SimplifiedStudyCreationModal.tsx",
+      "backup": "src\\client\\components\\studies\\SimplifiedStudyCreationModal.tsx.backup-1758903106007",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\SortableBlockItem.tsx",
+      "backup": "src\\client\\components\\studies\\SortableBlockItem.tsx.backup-1758903106009",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\SortableTaskItem.tsx",
+      "backup": "src\\client\\components\\studies\\SortableTaskItem.tsx.backup-1758903106010",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudiesLoading.tsx",
+      "backup": "src\\client\\components\\studies\\StudiesLoading.tsx.backup-1758903106011",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyBlocksManager.tsx",
+      "backup": "src\\client\\components\\studies\\StudyBlocksManager.tsx.backup-1758903106013",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyBuilderIntegration.tsx",
+      "backup": "src\\client\\components\\studies\\StudyBuilderIntegration.tsx.backup-1758903106014",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyBuilderProgress.tsx",
+      "backup": "src\\client\\components\\studies\\StudyBuilderProgress.tsx.backup-1758903106016",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyCardActions.tsx",
+      "backup": "src\\client\\components\\studies\\StudyCardActions.tsx.backup-1758903106017",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyMetadataForm.tsx",
+      "backup": "src\\client\\components\\studies\\StudyMetadataForm.tsx.backup-1758903106018",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskConfigurationModal.tsx",
+      "backup": "src\\client\\components\\studies\\TaskConfigurationModal.tsx.backup-1758903106019",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskEditModal.tsx",
+      "backup": "src\\client\\components\\studies\\TaskEditModal.tsx.backup-1758903106020",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskLibraryModal.tsx",
+      "backup": "src\\client\\components\\studies\\TaskLibraryModal.tsx.backup-1758903106022",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskPreview.tsx",
+      "backup": "src\\client\\components\\studies\\TaskPreview.tsx.backup-1758903106023",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\UsabilityStudyBuilder.tsx",
+      "backup": "src\\client\\components\\studies\\UsabilityStudyBuilder.tsx.backup-1758903106024",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\studies\\ValidationFeedback.tsx",
+      "backup": "src\\client\\components\\studies\\ValidationFeedback.tsx.backup-1758903106025",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\AIInterviewConfiguration.tsx",
+      "backup": "src\\client\\components\\study-builder\\AIInterviewConfiguration.tsx.backup-1758903106026",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\blocks\\EnhancedBlockPreview.tsx",
+      "backup": "src\\client\\components\\study-builder\\blocks\\EnhancedBlockPreview.tsx.backup-1758903106027",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\blocks\\VisualBlockSelector.tsx",
+      "backup": "src\\client\\components\\study-builder\\blocks\\VisualBlockSelector.tsx.backup-1758903106028",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockEditor.tsx",
+      "backup": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockEditor.tsx.backup-1758903106030",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockPreview.tsx",
+      "backup": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockPreview.tsx.backup-1758903106031",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\EnhancedStudyCreationWizard.tsx",
+      "backup": "src\\client\\components\\study-builder\\EnhancedStudyCreationWizard.tsx.backup-1758903106033",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\RealTimeBlockPreview.tsx",
+      "backup": "src\\client\\components\\study-builder\\RealTimeBlockPreview.tsx.backup-1758903106034",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\shared\\StudyBuilderHeader.tsx",
+      "backup": "src\\client\\components\\study-builder\\shared\\StudyBuilderHeader.tsx.backup-1758903106035",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\BlockConfigurationStep.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\BlockConfigurationStep.tsx.backup-1758903106037",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\InterviewSessionConfig.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\InterviewSessionConfig.tsx.backup-1758903106038",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\LaunchStep.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\LaunchStep.tsx.backup-1758903106039",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\ReviewStep-new.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\ReviewStep-new.tsx.backup-1758903106041",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\ReviewStep.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\ReviewStep.tsx.backup-1758903106042",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\StudySetupStep.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\StudySetupStep.tsx.backup-1758903106043",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\StudyTypeStep.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\StudyTypeStep.tsx.backup-1758903106044",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\UsabilityStudyConfig.tsx",
+      "backup": "src\\client\\components\\study-builder\\steps\\UsabilityStudyConfig.tsx.backup-1758903106046",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\StudyCreationWizard.tsx",
+      "backup": "src\\client\\components\\study-builder\\StudyCreationWizard.tsx.backup-1758903106048",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\StudyPreviewModal.tsx",
+      "backup": "src\\client\\components\\study-builder\\StudyPreviewModal.tsx.backup-1758903106049",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\StudyStateManager.tsx",
+      "backup": "src\\client\\components\\study-builder\\StudyStateManager.tsx.backup-1758903106050",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\CardSortingTask.tsx",
+      "backup": "src\\client\\components\\study-session\\task-types\\CardSortingTask.tsx.backup-1758903106051",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\ContextScreenTask.tsx",
+      "backup": "src\\client\\components\\study-session\\task-types\\ContextScreenTask.tsx.backup-1758903106052",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\InterviewTask.tsx",
+      "backup": "src\\client\\components\\study-session\\task-types\\InterviewTask.tsx.backup-1758903106054",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\NavigationTask.tsx",
+      "backup": "src\\client\\components\\study-session\\task-types\\NavigationTask.tsx.backup-1758903106056",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\PrototypeTask.tsx",
+      "backup": "src\\client\\components\\study-session\\task-types\\PrototypeTask.tsx.backup-1758903106057",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\SurveyTask.tsx",
+      "backup": "src\\client\\components\\study-session\\task-types\\SurveyTask.tsx.backup-1758903106058",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\WelcomeBlockTask.tsx",
+      "backup": "src\\client\\components\\study-session\\task-types\\WelcomeBlockTask.tsx.backup-1758903106059",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\study-session\\TaskRunner.tsx",
+      "backup": "src\\client\\components\\study-session\\TaskRunner.tsx.backup-1758903106061",
+      "changes": {
+        "originalImports": 11,
+        "optimizedImports": 11,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\subscription\\PointsManager.tsx",
+      "backup": "src\\client\\components\\subscription\\PointsManager.tsx.backup-1758903106063",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\subscription\\SubscriptionManager.clean.tsx",
+      "backup": "src\\client\\components\\subscription\\SubscriptionManager.clean.tsx.backup-1758903106064",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\subscription\\SubscriptionManager.tsx",
+      "backup": "src\\client\\components\\subscription\\SubscriptionManager.tsx.backup-1758903106065",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\AccessibleComponents.tsx",
+      "backup": "src\\client\\components\\ui\\AccessibleComponents.tsx.backup-1758903106066",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Avatar.tsx",
+      "backup": "src\\client\\components\\ui\\Avatar.tsx.backup-1758903106067",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Badge.tsx",
+      "backup": "src\\client\\components\\ui\\Badge.tsx.backup-1758903106068",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Button.tsx",
+      "backup": "src\\client\\components\\ui\\Button.tsx.backup-1758903106069",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Card.tsx",
+      "backup": "src\\client\\components\\ui\\Card.tsx.backup-1758903106070",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\DesignSystem.tsx",
+      "backup": "src\\client\\components\\ui\\DesignSystem.tsx.backup-1758903106071",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\DesignTokens.ts",
+      "backup": "src\\client\\components\\ui\\DesignTokens.ts.backup-1758903106072",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\EnhancedDesignSystem.tsx",
+      "backup": "src\\client\\components\\ui\\EnhancedDesignSystem.tsx.backup-1758903106074",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\ErrorBoundary.tsx",
+      "backup": "src\\client\\components\\ui\\ErrorBoundary.tsx.backup-1758903106075",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Input.tsx",
+      "backup": "src\\client\\components\\ui\\Input.tsx.backup-1758903106076",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Label.tsx",
+      "backup": "src\\client\\components\\ui\\Label.tsx.backup-1758903106077",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\LoadingComponents.tsx",
+      "backup": "src\\client\\components\\ui\\LoadingComponents.tsx.backup-1758903106079",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\LoadingSpinner.tsx",
+      "backup": "src\\client\\components\\ui\\LoadingSpinner.tsx.backup-1758903106080",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\OptimizedImage.tsx",
+      "backup": "src\\client\\components\\ui\\OptimizedImage.tsx.backup-1758903106080",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\PayPalSubscriptionModal.tsx",
+      "backup": "src\\client\\components\\ui\\PayPalSubscriptionModal.tsx.backup-1758903106081",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\PlanLimitModal.tsx",
+      "backup": "src\\client\\components\\ui\\PlanLimitModal.tsx.backup-1758903106082",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\PlanUsageDashboard.tsx",
+      "backup": "src\\client\\components\\ui\\PlanUsageDashboard.tsx.backup-1758903106083",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\ProgressBar.tsx",
+      "backup": "src\\client\\components\\ui\\ProgressBar.tsx.backup-1758903106084",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Skeleton.tsx",
+      "backup": "src\\client\\components\\ui\\Skeleton.tsx.backup-1758903106085",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Tabs.tsx",
+      "backup": "src\\client\\components\\ui\\Tabs.tsx.backup-1758903106086",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Textarea.tsx",
+      "backup": "src\\client\\components\\ui\\Textarea.tsx.backup-1758903106087",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\Toast.tsx",
+      "backup": "src\\client\\components\\ui\\Toast.tsx.backup-1758903106087",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\UnifiedDesignSystem.tsx",
+      "backup": "src\\client\\components\\ui\\UnifiedDesignSystem.tsx.backup-1758903106088",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\UsageDashboard.tsx",
+      "backup": "src\\client\\components\\ui\\UsageDashboard.tsx.backup-1758903106090",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\ui\\ValidationFeedback.tsx",
+      "backup": "src\\client\\components\\ui\\ValidationFeedback.tsx.backup-1758903106091",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\wallet\\TransactionHistory.tsx",
+      "backup": "src\\client\\components\\wallet\\TransactionHistory.tsx.backup-1758903106092",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WalletErrorBoundary.tsx",
+      "backup": "src\\client\\components\\wallet\\WalletErrorBoundary.tsx.backup-1758903106093",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WalletOverview.tsx",
+      "backup": "src\\client\\components\\wallet\\WalletOverview.tsx.backup-1758903106094",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WithdrawalForm.tsx",
+      "backup": "src\\client\\components\\wallet\\WithdrawalForm.tsx.backup-1758903106095",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WithdrawalHistory.tsx",
+      "backup": "src\\client\\components\\wallet\\WithdrawalHistory.tsx.backup-1758903106097",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\components\\workflow\\StreamlinedApprovalWorkflow.tsx",
+      "backup": "src\\client\\components\\workflow\\StreamlinedApprovalWorkflow.tsx.backup-1758903106098",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\hooks\\accessibility.ts",
+      "backup": "src\\client\\hooks\\accessibility.ts.backup-1758903106099",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\hooks\\performance.ts",
+      "backup": "src\\client\\hooks\\performance.ts.backup-1758903106100",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\hooks\\useEnhancedWallet.ts",
+      "backup": "src\\client\\hooks\\useEnhancedWallet.ts.backup-1758903106102",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\hooks\\useNotifications.ts",
+      "backup": "src\\client\\hooks\\useNotifications.ts.backup-1758903106103",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\hooks\\useRecording.ts",
+      "backup": "src\\client\\hooks\\useRecording.ts.backup-1758903106103",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\hooks\\useStudyBuilder.ts",
+      "backup": "src\\client\\hooks\\useStudyBuilder.ts.backup-1758903106104",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\hooks\\useToast.ts",
+      "backup": "src\\client\\hooks\\useToast.ts.backup-1758903106105",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\AboutPage.tsx",
+      "backup": "src\\client\\pages\\AboutPage.tsx.backup-1758903106106",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\admin\\AdminDashboard.tsx",
+      "backup": "src\\client\\pages\\admin\\AdminDashboard.tsx.backup-1758903106107",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\admin\\AdminStudiesPage.tsx",
+      "backup": "src\\client\\pages\\admin\\AdminStudiesPage.tsx.backup-1758903106109",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\analytics\\AnalyticsPage.tsx",
+      "backup": "src\\client\\pages\\analytics\\AnalyticsPage.tsx.backup-1758903106111",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\auth\\ForgotPasswordPage.tsx",
+      "backup": "src\\client\\pages\\auth\\ForgotPasswordPage.tsx.backup-1758903106113",
+      "changes": {
+        "originalImports": 11,
+        "optimizedImports": 11,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\auth\\LoginPage.tsx",
+      "backup": "src\\client\\pages\\auth\\LoginPage.tsx.backup-1758903106115",
+      "changes": {
+        "originalImports": 13,
+        "optimizedImports": 13,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\auth\\OAuthCallbackPage.tsx",
+      "backup": "src\\client\\pages\\auth\\OAuthCallbackPage.tsx.backup-1758903106116",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\auth\\RegisterPage.tsx",
+      "backup": "src\\client\\pages\\auth\\RegisterPage.tsx.backup-1758903106117",
+      "changes": {
+        "originalImports": 9,
+        "optimizedImports": 9,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\auth\\ResetPasswordPage.tsx",
+      "backup": "src\\client\\pages\\auth\\ResetPasswordPage.tsx.backup-1758903106118",
+      "changes": {
+        "originalImports": 11,
+        "optimizedImports": 11,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\collaboration\\CollaborationPage.tsx",
+      "backup": "src\\client\\pages\\collaboration\\CollaborationPage.tsx.backup-1758903106119",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\collaboration\\CollaborationTab.tsx",
+      "backup": "src\\client\\pages\\collaboration\\CollaborationTab.tsx.backup-1758903106120",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\collaboration\\StudyCollaborationCenter.tsx",
+      "backup": "src\\client\\pages\\collaboration\\StudyCollaborationCenter.tsx.backup-1758903106122",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\DashboardOverview.tsx",
+      "backup": "src\\client\\pages\\dashboard\\DashboardOverview.tsx.backup-1758903106123",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\DashboardPage.tsx",
+      "backup": "src\\client\\pages\\dashboard\\DashboardPage.tsx.backup-1758903106124",
+      "changes": {
+        "originalImports": 10,
+        "optimizedImports": 10,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\UnifiedWorkspace.tsx",
+      "backup": "src\\client\\pages\\dashboard\\UnifiedWorkspace.tsx.backup-1758903106126",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\EnhancedDashboard.tsx",
+      "backup": "src\\client\\pages\\EnhancedDashboard.tsx.backup-1758903106127",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\FeaturesPage.tsx",
+      "backup": "src\\client\\pages\\FeaturesPage.tsx.backup-1758903106129",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\journey\\CreativeJourneyPage.tsx",
+      "backup": "src\\client\\pages\\journey\\CreativeJourneyPage.tsx.backup-1758903106130",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\LandingPage.tsx",
+      "backup": "src\\client\\pages\\LandingPage.tsx.backup-1758903106131",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\NotFoundPage.tsx",
+      "backup": "src\\client\\pages\\NotFoundPage.tsx.backup-1758903106133",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\organization\\OrganizationDashboard.tsx",
+      "backup": "src\\client\\pages\\organization\\OrganizationDashboard.tsx.backup-1758903106134",
+      "changes": {
+        "originalImports": 9,
+        "optimizedImports": 9,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\participant\\AIInterviewSessionPage.tsx",
+      "backup": "src\\client\\pages\\participant\\AIInterviewSessionPage.tsx.backup-1758903106135",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\participant\\ParticipantStudyExecutionPage.tsx",
+      "backup": "src\\client\\pages\\participant\\ParticipantStudyExecutionPage.tsx.backup-1758903106137",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\participants\\ParticipantsPage.tsx",
+      "backup": "src\\client\\pages\\participants\\ParticipantsPage.tsx.backup-1758903106138",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\payments\\ManualPaymentPage.tsx",
+      "backup": "src\\client\\pages\\payments\\ManualPaymentPage.tsx.backup-1758903106139",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\PricingPage.tsx",
+      "backup": "src\\client\\pages\\PricingPage.tsx.backup-1758903106140",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\settings\\BillingSettingsPage.tsx",
+      "backup": "src\\client\\pages\\settings\\BillingSettingsPage.tsx.backup-1758903106142",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\settings\\SettingsPage.tsx",
+      "backup": "src\\client\\pages\\settings\\SettingsPage.tsx.backup-1758903106144",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\InterviewBuilderPage.tsx",
+      "backup": "src\\client\\pages\\studies\\InterviewBuilderPage.tsx.backup-1758903106145",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\MobileOptimizedStudiesPage.tsx",
+      "backup": "src\\client\\pages\\studies\\MobileOptimizedStudiesPage.tsx.backup-1758903106147",
+      "changes": {
+        "originalImports": 9,
+        "optimizedImports": 9,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\ParticipantDashboardPage.tsx",
+      "backup": "src\\client\\pages\\studies\\ParticipantDashboardPage.tsx.backup-1758903106149",
+      "changes": {
+        "originalImports": 17,
+        "optimizedImports": 17,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudiesPage.tsx",
+      "backup": "src\\client\\pages\\studies\\StudiesPage.tsx.backup-1758903106151",
+      "changes": {
+        "originalImports": 13,
+        "optimizedImports": 13,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyApplicationPage.tsx",
+      "backup": "src\\client\\pages\\studies\\StudyApplicationPage.tsx.backup-1758903106153",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyApplicationsManagementPage.tsx",
+      "backup": "src\\client\\pages\\studies\\StudyApplicationsManagementPage.tsx.backup-1758903106155",
+      "changes": {
+        "originalImports": 10,
+        "optimizedImports": 10,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyDetailPage.tsx",
+      "backup": "src\\client\\pages\\studies\\StudyDetailPage.tsx.backup-1758903106157",
+      "changes": {
+        "originalImports": 8,
+        "optimizedImports": 8,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyDiscoveryPage.tsx",
+      "backup": "src\\client\\pages\\studies\\StudyDiscoveryPage.tsx.backup-1758903106158",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyResultsPage.tsx",
+      "backup": "src\\client\\pages\\studies\\StudyResultsPage.tsx.backup-1758903106159",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudySessionPage.tsx",
+      "backup": "src\\client\\pages\\studies\\StudySessionPage.tsx.backup-1758903106161",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\pages\\study-builder\\StudyBuilderPage.tsx",
+      "backup": "src\\client\\pages\\study-builder\\StudyBuilderPage.tsx.backup-1758903106163",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\admin.service.ts",
+      "backup": "src\\client\\services\\admin.service.ts.backup-1758903106164",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\analytics.service.ts",
+      "backup": "src\\client\\services\\analytics.service.ts.backup-1758903106165",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\api-network-resilient.service.ts",
+      "backup": "src\\client\\services\\api-network-resilient.service.ts.backup-1758903106166",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\api.service.ts",
+      "backup": "src\\client\\services\\api.service.ts.backup-1758903106167",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\approvalService.ts",
+      "backup": "src\\client\\services\\approvalService.ts.backup-1758903106168",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\auth.service.ts",
+      "backup": "src\\client\\services\\auth.service.ts.backup-1758903106170",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\collaborationService.ts",
+      "backup": "src\\client\\services\\collaborationService.ts.backup-1758903106171",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\commentsService.ts",
+      "backup": "src\\client\\services\\commentsService.ts.backup-1758903106172",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\googleOAuth.service.ts",
+      "backup": "src\\client\\services\\googleOAuth.service.ts.backup-1758903106173",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\participantApplications.service.ts",
+      "backup": "src\\client\\services\\participantApplications.service.ts.backup-1758903106174",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\participants.service.ts",
+      "backup": "src\\client\\services\\participants.service.ts.backup-1758903106175",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\payment.service.ts",
+      "backup": "src\\client\\services\\payment.service.ts.backup-1758903106176",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\performance.service.ts",
+      "backup": "src\\client\\services\\performance.service.ts.backup-1758903106177",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\researcherApplications.service.ts",
+      "backup": "src\\client\\services\\researcherApplications.service.ts.backup-1758903106178",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\sessions.service.ts",
+      "backup": "src\\client\\services\\sessions.service.ts.backup-1758903106180",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\studies.service.ts",
+      "backup": "src\\client\\services\\studies.service.ts.backup-1758903106181",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\studyCreationAnalytics.service.ts",
+      "backup": "src\\client\\services\\studyCreationAnalytics.service.ts.backup-1758903106182",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\wallet.service.ts",
+      "backup": "src\\client\\services\\wallet.service.ts.backup-1758903106183",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\services\\WebSocketService.ts",
+      "backup": "src\\client\\services\\WebSocketService.ts.backup-1758903106185",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\stores\\appStore.ts",
+      "backup": "src\\client\\stores\\appStore.ts.backup-1758903106187",
+      "changes": {
+        "originalImports": 7,
+        "optimizedImports": 7,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\stores\\authStore.ts",
+      "backup": "src\\client\\stores\\authStore.ts.backup-1758903106188",
+      "changes": {
+        "originalImports": 4,
+        "optimizedImports": 4,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\utils\\blockUtils.ts",
+      "backup": "src\\client\\utils\\blockUtils.ts.backup-1758903106190",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\utils\\cn.ts",
+      "backup": "src\\client\\utils\\cn.ts.backup-1758903106191",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\client\\utils\\walletToasts.ts",
+      "backup": "src\\client\\utils\\walletToasts.ts.backup-1758903106192",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\components\\admin\\SentryDashboard.tsx",
+      "backup": "src\\components\\admin\\SentryDashboard.tsx.backup-1758903106194",
+      "changes": {
+        "originalImports": 6,
+        "optimizedImports": 6,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\components\\common\\ConnectivityStatusBanner.tsx",
+      "backup": "src\\components\\common\\ConnectivityStatusBanner.tsx.backup-1758903106195",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\components\\common\\SentryErrorBoundary.tsx",
+      "backup": "src\\components\\common\\SentryErrorBoundary.tsx.backup-1758903106197",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\components\\ui\\badge.tsx",
+      "backup": "src\\components\\ui\\badge.tsx.backup-1758903106198",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\components\\ui\\button.tsx",
+      "backup": "src\\components\\ui\\button.tsx.backup-1758903106199",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\components\\ui\\card.tsx",
+      "backup": "src\\components\\ui\\card.tsx.backup-1758903106200",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\components\\ui\\LoadingComponents.tsx",
+      "backup": "src\\components\\ui\\LoadingComponents.tsx.backup-1758903106201",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\config\\sentry.ts",
+      "backup": "src\\config\\sentry.ts.backup-1758903106202",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\main.tsx",
+      "backup": "src\\main.tsx.backup-1758903106203",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 2,
+        "reduction": -1
+      }
+    },
+    {
+      "file": "src\\server\\services\\BaseService.ts",
+      "backup": "src\\server\\services\\BaseService.ts.backup-1758903106205",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\services\\ai\\ResearchHubAI.ts",
+      "backup": "src\\services\\ai\\ResearchHubAI.ts.backup-1758903106206",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\services\\sentryMonitoring.ts",
+      "backup": "src\\services\\sentryMonitoring.ts.backup-1758903106207",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\analytics\\ExecutiveDashboardService.ts",
+      "backup": "src\\shared\\analytics\\ExecutiveDashboardService.ts.backup-1758903106208",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\api\\ApiClient.ts",
+      "backup": "src\\shared\\api\\ApiClient.ts.backup-1758903106210",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\api\\index.ts",
+      "backup": "src\\shared\\api\\index.ts.backup-1758903106212",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\api\\RouteOptimizer.ts",
+      "backup": "src\\shared\\api\\RouteOptimizer.ts.backup-1758903106214",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\blocks\\BlockRegistry.ts",
+      "backup": "src\\shared\\blocks\\BlockRegistry.ts.backup-1758903106217",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\blocks\\BlockTypes.ts",
+      "backup": "src\\shared\\blocks\\BlockTypes.ts.backup-1758903106218",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\cache\\CacheManager.js",
+      "backup": "src\\shared\\cache\\CacheManager.js.backup-1758903106219",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\cache\\CacheMiddleware.js",
+      "backup": "src\\shared\\cache\\CacheMiddleware.js.backup-1758903106221",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\config\\environment.ts",
+      "backup": "src\\shared\\config\\environment.ts.backup-1758903106222",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\design\\context.ts",
+      "backup": "src\\shared\\design\\context.ts.backup-1758903106223",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\design\\hooks.ts",
+      "backup": "src\\shared\\design\\hooks.ts.backup-1758903106225",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\design\\theme.tsx",
+      "backup": "src\\shared\\design\\theme.tsx.backup-1758903106226",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\dev-tools\\ReactDevHooks.simple.tsx",
+      "backup": "src\\shared\\dev-tools\\ReactDevHooks.simple.tsx.backup-1758903106227",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\dev-tools\\ReactDevHooks.tsx",
+      "backup": "src\\shared\\dev-tools\\ReactDevHooks.tsx.backup-1758903106229",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\errors\\ErrorBoundary.tsx",
+      "backup": "src\\shared\\errors\\ErrorBoundary.tsx.backup-1758903106231",
+      "changes": {
+        "originalImports": 5,
+        "optimizedImports": 5,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\errors\\ErrorHandler.ts",
+      "backup": "src\\shared\\errors\\ErrorHandler.ts.backup-1758903106234",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\errors\\index.ts",
+      "backup": "src\\shared\\errors\\index.ts.backup-1758903106235",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\jobs\\JobUtils.ts",
+      "backup": "src\\shared\\jobs\\JobUtils.ts.backup-1758903106237",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\middleware\\RateLimitManager.js",
+      "backup": "src\\shared\\middleware\\RateLimitManager.js.backup-1758903106238",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\middleware\\RateLimitMiddleware.js",
+      "backup": "src\\shared\\middleware\\RateLimitMiddleware.js.backup-1758903106239",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\middleware\\SecurityManager.js",
+      "backup": "src\\shared\\middleware\\SecurityManager.js.backup-1758903106240",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\monitoring\\index.ts",
+      "backup": "src\\shared\\monitoring\\index.ts.backup-1758903106242",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\monitoring\\ProductionDeploymentManager.ts",
+      "backup": "src\\shared\\monitoring\\ProductionDeploymentManager.ts.backup-1758903106243",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\monitoring\\ProductionMonitor.ts",
+      "backup": "src\\shared\\monitoring\\ProductionMonitor.ts.backup-1758903106245",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\monitoring\\ProductionMonitoringDashboard.ts",
+      "backup": "src\\shared\\monitoring\\ProductionMonitoringDashboard.ts.backup-1758903106246",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\notifications\\index.ts",
+      "backup": "src\\shared\\notifications\\index.ts.backup-1758903106248",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\notifications\\NotificationClient.ts",
+      "backup": "src\\shared\\notifications\\NotificationClient.ts.backup-1758903106249",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\performance\\BrowserPerformance.ts",
+      "backup": "src\\shared\\performance\\BrowserPerformance.ts.backup-1758903106251",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\performance\\PerformanceHooks.tsx",
+      "backup": "src\\shared\\performance\\PerformanceHooks.tsx.backup-1758903106253",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\performance\\PerformanceUtils.ts",
+      "backup": "src\\shared\\performance\\PerformanceUtils.ts.backup-1758903106254",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\security\\index.ts",
+      "backup": "src\\shared\\security\\index.ts.backup-1758903106255",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\security\\SecurityHooks.tsx",
+      "backup": "src\\shared\\security\\SecurityHooks.tsx.backup-1758903106258",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\security\\SecurityUtils.ts",
+      "backup": "src\\shared\\security\\SecurityUtils.ts.backup-1758903106260",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\types\\index.ts",
+      "backup": "src\\shared\\types\\index.ts.backup-1758903106262",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\shared\\utils.ts",
+      "backup": "src\\shared\\utils.ts.backup-1758903106264",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\utils\\debug\\ErrorBoundary\\SmartErrorBoundary.tsx",
+      "backup": "src\\utils\\debug\\ErrorBoundary\\SmartErrorBoundary.tsx.backup-1758903106265",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\utils\\debug\\SentryIntegration.ts",
+      "backup": "src\\utils\\debug\\SentryIntegration.ts.backup-1758903106267",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\utils\\debug\\SentryIntegrationSimple.ts",
+      "backup": "src\\utils\\debug\\SentryIntegrationSimple.ts.backup-1758903106269",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "src\\utils\\sentryPerformance.ts",
+      "backup": "src\\utils\\sentryPerformance.ts.backup-1758903106270",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\admin-consolidated.js",
+      "backup": "api\\admin-consolidated.js.backup-1758903106272",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\approvals.js",
+      "backup": "api\\approvals.js.backup-1758903106274",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\backup-files\\applications-database.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\backup-files\\applications-database.js.backup-1758903106275",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\backup-files\\applications-inmemory-backup.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\backup-files\\applications-inmemory-backup.js.backup-1758903106277",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\api-monitor.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\api-monitor.js.backup-1758903106279",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\collaboration.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\collaboration.js.backup-1758903106280",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\comments.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\comments.js.backup-1758903106281",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\migration.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\migration.js.backup-1758903106283",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\notion-webhooks.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\notion-webhooks.js.backup-1758903106284",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\points.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\points.js.backup-1758903106285",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\services-fallback.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\services-fallback.js.backup-1758903106286",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\stc-bank-integration.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\stc-bank-integration.js.backup-1758903106287",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\study-sessions.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\study-sessions.js.backup-1758903106288",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\wallets.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\wallets.js.backup-1758903106289",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\research-variants\\research-consolidated-database.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\research-variants\\research-consolidated-database.js.backup-1758903106291",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\test-files\\research-test.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\test-files\\research-test.js.backup-1758903106292",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\test-files\\test-minimal.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\test-files\\test-minimal.js.backup-1758903106293",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\variant-files\\paypal-consolidated.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\variant-files\\paypal-consolidated.js.backup-1758903106295",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\variant-files\\user-enhanced.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\variant-files\\user-enhanced.js.backup-1758903106296",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\variant-files\\user-profile-production.js",
+      "backup": "api\\archive-old-functions\\2025-09-11-cleanup\\variant-files\\user-profile-production.js.backup-1758903106297",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\admin.js",
+      "backup": "api\\archive-old-functions\\admin.js.backup-1758903106299",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\applications.js",
+      "backup": "api\\archive-old-functions\\applications.js.backup-1758903106300",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\auth-debug.js",
+      "backup": "api\\archive-old-functions\\auth-debug.js.backup-1758903106301",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\auth-enhanced.js",
+      "backup": "api\\archive-old-functions\\auth-enhanced.js.backup-1758903106302",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\auth.js",
+      "backup": "api\\archive-old-functions\\auth.js.backup-1758903106304",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\blocks.js",
+      "backup": "api\\archive-old-functions\\blocks.js.backup-1758903106305",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\dashboard\\analytics.js",
+      "backup": "api\\archive-old-functions\\dashboard\\analytics.js.backup-1758903106307",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\dashboard.js",
+      "backup": "api\\archive-old-functions\\dashboard.js.backup-1758903106308",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\admin\\payments\\analytics.js",
+      "backup": "api\\archive-old-functions\\future-features\\admin\\payments\\analytics.js.backup-1758903106309",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\admin\\payments\\credits\\add.js",
+      "backup": "api\\archive-old-functions\\future-features\\admin\\payments\\credits\\add.js.backup-1758903106309",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\admin\\payments\\requests\\[requestId]\\[action].js",
+      "backup": "api\\archive-old-functions\\future-features\\admin\\payments\\requests\\[requestId]\\[action].js.backup-1758903106310",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\admin\\payments\\requests.js",
+      "backup": "api\\archive-old-functions\\future-features\\admin\\payments\\requests.js.backup-1758903106312",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\admin-analytics.js",
+      "backup": "api\\archive-old-functions\\future-features\\admin-analytics.js.backup-1758903106314",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\admin-consolidated.js",
+      "backup": "api\\archive-old-functions\\future-features\\admin-consolidated.js.backup-1758903106315",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\payments.js",
+      "backup": "api\\archive-old-functions\\future-features\\payments.js.backup-1758903106316",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\performance.js",
+      "backup": "api\\archive-old-functions\\future-features\\performance.js.backup-1758903106317",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\points-improved.js",
+      "backup": "api\\archive-old-functions\\future-features\\points-improved.js.backup-1758903106318",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\points-with-plans-and-earnings.js",
+      "backup": "api\\archive-old-functions\\future-features\\points-with-plans-and-earnings.js.backup-1758903106319",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\future-features\\points.js",
+      "backup": "api\\archive-old-functions\\future-features\\points.js.backup-1758903106320",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\health.js",
+      "backup": "api\\archive-old-functions\\health.js.backup-1758903106321",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\migration.js",
+      "backup": "api\\archive-old-functions\\migration.js.backup-1758903106323",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\points.js",
+      "backup": "api\\archive-old-functions\\points.js.backup-1758903106324",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\profile.js",
+      "backup": "api\\archive-old-functions\\profile.js.backup-1758903106325",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\services\\BaseService.js",
+      "backup": "api\\archive-old-functions\\services\\BaseService.js.backup-1758903106326",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\studies.js",
+      "backup": "api\\archive-old-functions\\studies.js.backup-1758903106328",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\study-sessions.js",
+      "backup": "api\\archive-old-functions\\study-sessions.js.backup-1758903106329",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\subscriptions.js",
+      "backup": "api\\archive-old-functions\\subscriptions.js.backup-1758903106331",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\templates-auth.js",
+      "backup": "api\\archive-old-functions\\templates-auth.js.backup-1758903106331",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\templates-old.js",
+      "backup": "api\\archive-old-functions\\templates-old.js.backup-1758903106333",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\templates.js",
+      "backup": "api\\archive-old-functions\\templates.js.backup-1758903106334",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\user-enhanced.js",
+      "backup": "api\\archive-old-functions\\user-enhanced.js.backup-1758903106335",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\wallets-simulated.js",
+      "backup": "api\\archive-old-functions\\wallets-simulated.js.backup-1758903106336",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\archive-old-functions\\wallets.js",
+      "backup": "api\\archive-old-functions\\wallets.js.backup-1758903106337",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\auth-consolidated.js",
+      "backup": "api\\auth-consolidated.js.backup-1758903106338",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\diagnostic.js",
+      "backup": "api\\diagnostic.js.backup-1758903106339",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\lib\\ResearchHubAI.js",
+      "backup": "api\\lib\\ResearchHubAI.js.backup-1758903106340",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\payments-consolidated-full.js",
+      "backup": "api\\payments-consolidated-full.js.backup-1758903106342",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\planEnforcementMiddleware.js",
+      "backup": "api\\planEnforcementMiddleware.js.backup-1758903106343",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\research-consolidated.js",
+      "backup": "api\\research-consolidated.js.backup-1758903106344",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\services\\BaseService.js",
+      "backup": "api\\services\\BaseService.js.backup-1758903106345",
+      "changes": {
+        "originalImports": 2,
+        "optimizedImports": 2,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\setup.js",
+      "backup": "api\\setup.js.backup-1758903106346",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\system-consolidated.js",
+      "backup": "api\\system-consolidated.js.backup-1758903106347",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\templates-consolidated.js",
+      "backup": "api\\templates-consolidated.js.backup-1758903106348",
+      "changes": {
+        "originalImports": 1,
+        "optimizedImports": 1,
+        "reduction": 0
+      }
+    },
+    {
+      "file": "api\\user-profile-consolidated.js",
+      "backup": "api\\user-profile-consolidated.js.backup-1758903106350",
+      "changes": {
+        "originalImports": 3,
+        "optimizedImports": 3,
+        "reduction": 0
+      }
+    }
+  ],
+  "codeSpittingOpportunities": [
+    {
+      "file": "src\\client\\pages\\AboutPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\pages\\admin\\AdminDashboard.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\pages\\admin\\AdminStudiesPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\pages\\analytics\\AnalyticsPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "33KB"
+    },
+    {
+      "file": "src\\client\\pages\\auth\\ForgotPasswordPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\pages\\auth\\LoginPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\pages\\auth\\OAuthCallbackPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\pages\\auth\\RegisterPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "18KB"
+    },
+    {
+      "file": "src\\client\\pages\\auth\\ResetPasswordPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "15KB"
+    },
+    {
+      "file": "src\\client\\pages\\collaboration\\CollaborationTab.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "18KB"
+    },
+    {
+      "file": "src\\client\\pages\\collaboration\\StudyCollaborationCenter.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\DashboardOverview.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\DashboardPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\pages\\dashboard\\UnifiedWorkspace.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "11KB"
+    },
+    {
+      "file": "src\\client\\pages\\EnhancedDashboard.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "11KB"
+    },
+    {
+      "file": "src\\client\\pages\\FeaturesPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\pages\\LandingPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\pages\\organization\\OrganizationDashboard.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "22KB"
+    },
+    {
+      "file": "src\\client\\pages\\participant\\AIInterviewSessionPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\pages\\participants\\ParticipantsPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\pages\\PricingPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "24KB"
+    },
+    {
+      "file": "src\\client\\pages\\settings\\BillingSettingsPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "15KB"
+    },
+    {
+      "file": "src\\client\\pages\\settings\\SettingsPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "28KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\InterviewBuilderPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\MobileOptimizedStudiesPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\ParticipantDashboardPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "29KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudiesPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "22KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyApplicationPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "29KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyApplicationsManagementPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyDetailPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "42KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudyResultsPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\pages\\studies\\StudySessionPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "10KB"
+    },
+    {
+      "file": "src\\client\\pages\\study-builder\\StudyBuilderPage.tsx",
+      "reason": "Large component (>10KB)",
+      "size": "10KB"
+    }
+  ],
+  "lazyLoadingCandidates": [
+    {
+      "file": "src\\client\\components\\admin\\AdminDashboard.tsx",
+      "component": "AdminDashboard",
+      "size": "27KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminOverview.tsx",
+      "component": "Unknown",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\AdminPointsManager.tsx",
+      "component": "Unknown",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\analytics\\PerformanceMetrics.tsx",
+      "component": "PerformanceMetrics",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\AnalyticsDashboard.tsx",
+      "component": "AnalyticsDashboard",
+      "size": "10KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\ComprehensiveAdminPanel.tsx",
+      "component": "ComprehensiveAdminPanel",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\AdminReportsWidget.tsx",
+      "component": "Unknown",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\AlertCenter.tsx",
+      "component": "Unknown",
+      "size": "15KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\QuickActionsPanel.tsx",
+      "component": "Unknown",
+      "size": "10KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\dashboard\\SystemHealthWidget.tsx",
+      "component": "Unknown",
+      "size": "10KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\FinancialDashboard.tsx",
+      "component": "FinancialDashboard",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\PaymentManagement.tsx",
+      "component": "Unknown",
+      "size": "24KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\RolePermissionManager.tsx",
+      "component": "Unknown",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\SimpleAdminOverview.tsx",
+      "component": "Unknown",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\StudyOversight.tsx",
+      "component": "StudyOversight",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\SubscriptionManager.tsx",
+      "component": "Unknown",
+      "size": "25KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\SupportCenter.tsx",
+      "component": "for",
+      "size": "20KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemAnalytics.new.tsx",
+      "component": "Unknown",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemAnalytics.tsx",
+      "component": "Unknown",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\SystemSettings.tsx",
+      "component": "Unknown",
+      "size": "18KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagement.tsx",
+      "component": "Unknown",
+      "size": "36KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\UserManagementPanel.tsx",
+      "component": "UserManagementPanel",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\users\\BulkOperations.tsx",
+      "component": "Unknown",
+      "size": "20KB"
+    },
+    {
+      "file": "src\\client\\components\\admin\\users\\UserDetailView.tsx",
+      "component": "Unknown",
+      "size": "27KB"
+    },
+    {
+      "file": "src\\client\\components\\AdminAnalyticsDashboard.tsx",
+      "component": "Unknown",
+      "size": "31KB"
+    },
+    {
+      "file": "src\\client\\components\\ai\\AIInsightsDashboard.tsx",
+      "component": "AIInsightsDashboard",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\components\\ai-interview\\AIInterviewModerator.tsx",
+      "component": "AIInterviewModerator",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\components\\analytics\\AdvancedAnalyticsDashboard.tsx",
+      "component": "Unknown",
+      "size": "24KB"
+    },
+    {
+      "file": "src\\client\\components\\analytics\\HeatmapAnalytics.tsx",
+      "component": "HeatmapAnalytics",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\components\\analytics\\SessionReplay.tsx",
+      "component": "SessionReplay",
+      "size": "16KB"
+    },
+    {
+      "file": "src\\client\\components\\approval\\ApprovalHistory.tsx",
+      "component": "Unknown",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\components\\approval\\ApprovalQueue.tsx",
+      "component": "ApprovalQueue",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\components\\approval\\StudyApprovalCard.tsx",
+      "component": "Unknown",
+      "size": "8KB"
+    },
+    {
+      "file": "src\\client\\components\\auth\\TwoFactorLogin.tsx",
+      "component": "Unknown",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\auth\\TwoFactorSetup.tsx",
+      "component": "Unknown",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\components\\blocks\\AdvancedStudyBlocks.tsx",
+      "component": "blockAnimations",
+      "size": "44KB"
+    },
+    {
+      "file": "src\\client\\components\\blocks\\AdvancedStudyBlocksV2.tsx",
+      "component": "YesNoBlock",
+      "size": "29KB"
+    },
+    {
+      "file": "src\\client\\components\\blocks\\StudyBlockComponents.tsx",
+      "component": "WelcomeBlock",
+      "size": "36KB"
+    },
+    {
+      "file": "src\\client\\components\\blocks\\StudyBlocks.tsx",
+      "component": "WelcomeBlock",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\ActivityFeed.tsx",
+      "component": "Unknown",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborationHeader.tsx",
+      "component": "CollaborationHeader",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborationIndicators.tsx",
+      "component": "CollaborationIndicators",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborativeStudyBuilder.tsx",
+      "component": "CollaborativeStudyBuilder",
+      "size": "21KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CollaborativeStudyBuilderContainer.tsx",
+      "component": "CollaborativeStudyBuilderContainer",
+      "size": "22KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\CommentSystem.tsx",
+      "component": "CommentSystem",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\ConflictResolutionSystem.tsx",
+      "component": "ConflictResolutionSystem",
+      "size": "15KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\LiveCollaborationManager.tsx",
+      "component": "Unknown",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\LiveCursorSystem.tsx",
+      "component": "LiveCursorSystem",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\collaboration\\RealTimeTextEditor.tsx",
+      "component": "RealTimeTextEditor",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\common\\AppLayout.tsx",
+      "component": "Unknown",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\components\\common\\Loading.tsx",
+      "component": "PageLoading",
+      "size": "4KB"
+    },
+    {
+      "file": "src\\client\\components\\common\\Notification.tsx",
+      "component": "BannerNotification",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\components\\journey\\JourneyEffects.tsx",
+      "component": "PhaseTransitionEffect",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\components\\journey\\JourneyProgressConstellation.tsx",
+      "component": "JourneyProgressConstellation",
+      "size": "6KB"
+    },
+    {
+      "file": "src\\client\\components\\journey\\phases\\MissionLaunchPad.tsx",
+      "component": "MissionLaunchPad",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\components\\journey\\phases\\StudyTypeAdventure.tsx",
+      "component": "StudyTypeAdventure",
+      "size": "15KB"
+    },
+    {
+      "file": "src\\client\\components\\notifications\\NotificationSystem.tsx",
+      "component": "useNotifications",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\AdvancedBlocks.tsx",
+      "component": "ScreenRecordingBlock",
+      "size": "29KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\LiveSessionParticipant.tsx",
+      "component": "LiveSessionManager",
+      "size": "20KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\MobileParticipantExperience.tsx",
+      "component": "MobileNavigation",
+      "size": "21KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\MyApplications.tsx",
+      "component": "MyApplications",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\ParticipantDashboard.tsx",
+      "component": "ParticipantDashboard",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\RealTimeAnalytics.tsx",
+      "component": "RealTimeAnalytics",
+      "size": "28KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\StudyDiscovery.tsx",
+      "component": "StudyDiscovery",
+      "size": "68KB"
+    },
+    {
+      "file": "src\\client\\components\\participant\\StudyExecution.tsx",
+      "component": "StudyExecution",
+      "size": "32KB"
+    },
+    {
+      "file": "src\\client\\components\\ParticipantEarningsDashboard.tsx",
+      "component": "Unknown",
+      "size": "18KB"
+    },
+    {
+      "file": "src\\client\\components\\payments\\ManualPaymentFlow.tsx",
+      "component": "Unknown",
+      "size": "21KB"
+    },
+    {
+      "file": "src\\client\\components\\payments\\PaymentResultPage.tsx",
+      "component": "Unknown",
+      "size": "8KB"
+    },
+    {
+      "file": "src\\client\\components\\payments\\STCBankPaymentFlow.tsx",
+      "component": "Unknown",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\performance\\FloatingReportButton.tsx",
+      "component": "FloatingReportButton",
+      "size": "4KB"
+    },
+    {
+      "file": "src\\client\\components\\performance\\PerformanceMonitor.tsx",
+      "component": "PerformanceMonitor",
+      "size": "2KB"
+    },
+    {
+      "file": "src\\client\\components\\ResearcherPointsDashboard.tsx",
+      "component": "Unknown",
+      "size": "20KB"
+    },
+    {
+      "file": "src\\client\\components\\settings\\SecuritySettings.tsx",
+      "component": "SecuritySettings",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\BlockEditModal.tsx",
+      "component": "BlockEditModal",
+      "size": "20KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\BlockLibraryModal.tsx",
+      "component": "BlockLibraryModal",
+      "size": "22KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\DragDropStudyBuilder.tsx",
+      "component": "DragDropStudyBuilder",
+      "size": "16KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\EnhancedStudyCreationModal.tsx",
+      "component": "EnhancedStudyCreationModal",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\EnhancedUsabilityStudyBuilder.tsx",
+      "component": "EnhancedUsabilityStudyBuilder",
+      "size": "25KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\MobileOptimizedStudyBuilder.tsx",
+      "component": "MobileOptimizedStudyBuilder",
+      "size": "48KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\QuickStudyCreationFlow.tsx",
+      "component": "QuickStudyCreationFlow",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\RenameStudyModal.tsx",
+      "component": "Unknown",
+      "size": "3KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\SimplifiedStudyCreationModal.tsx",
+      "component": "SimplifiedStudyCreationModal",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\SortableBlockItem.tsx",
+      "component": "SortableBlockItem",
+      "size": "6KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\SortableTaskItem.tsx",
+      "component": "SortableTaskItem",
+      "size": "6KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyBlocksManager.tsx",
+      "component": "StudyBlocksManager",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyBuilderIntegration.tsx",
+      "component": "StudyBuilderIntegration",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyBuilderProgress.tsx",
+      "component": "StudyBuilderProgress",
+      "size": "10KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyCardActions.tsx",
+      "component": "Unknown",
+      "size": "4KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\StudyMetadataForm.tsx",
+      "component": "StudyMetadataForm",
+      "size": "8KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskConfigurationModal.tsx",
+      "component": "TaskConfigurationModal",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskEditModal.tsx",
+      "component": "TaskEditModal",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\TaskLibraryModal.tsx",
+      "component": "TaskLibraryModal",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\UsabilityStudyBuilder.tsx",
+      "component": "UsabilityStudyBuilder",
+      "size": "25KB"
+    },
+    {
+      "file": "src\\client\\components\\studies\\ValidationFeedback.tsx",
+      "component": "ValidationFeedback",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\blocks\\EnhancedBlockPreview.tsx",
+      "component": "EnhancedBlockPreview",
+      "size": "12KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\blocks\\VisualBlockSelector.tsx",
+      "component": "VisualBlockSelector",
+      "size": "6KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\enhanced\\EnhancedBlockEditor.tsx",
+      "component": "EnhancedBlockEditor",
+      "size": "26KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\EnhancedStudyCreationWizard.tsx",
+      "component": "EnhancedStudyCreationWizard",
+      "size": "36KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\BlockConfigurationStep.tsx",
+      "component": "BlockConfigurationStep",
+      "size": "41KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\InterviewSessionConfig.tsx",
+      "component": "InterviewSessionConfigStep",
+      "size": "23KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\LaunchStep.tsx",
+      "component": "LaunchStep",
+      "size": "13KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\ReviewStep-new.tsx",
+      "component": "ReviewStep",
+      "size": "18KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\ReviewStep.tsx",
+      "component": "ReviewStep",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\StudySetupStep.tsx",
+      "component": "StudySetupStep",
+      "size": "8KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\StudyTypeStep.tsx",
+      "component": "StudyTypeStep",
+      "size": "6KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\steps\\UsabilityStudyConfig.tsx",
+      "component": "UsabilityStudyConfigStep",
+      "size": "22KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\StudyCreationWizard.tsx",
+      "component": "StudyCreationWizard",
+      "size": "18KB"
+    },
+    {
+      "file": "src\\client\\components\\study-builder\\StudyPreviewModal.tsx",
+      "component": "StudyPreviewModal",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\ContextScreenTask.tsx",
+      "component": "ContextScreenTask",
+      "size": "6KB"
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\InterviewTask.tsx",
+      "component": "InterviewTask",
+      "size": "24KB"
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\PrototypeTask.tsx",
+      "component": "ClickTrackingTask",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\SurveyTask.tsx",
+      "component": "SurveyTask",
+      "size": "20KB"
+    },
+    {
+      "file": "src\\client\\components\\study-session\\task-types\\WelcomeBlockTask.tsx",
+      "component": "WelcomeBlockTask",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\subscription\\PointsManager.tsx",
+      "component": "PointsManager",
+      "size": "10KB"
+    },
+    {
+      "file": "src\\client\\components\\subscription\\SubscriptionManager.clean.tsx",
+      "component": "PointsManager",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\subscription\\SubscriptionManager.tsx",
+      "component": "PointsManager",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\AccessibleComponents.tsx",
+      "component": "useAriaLiveRegion",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\Avatar.tsx",
+      "component": "Avatar",
+      "size": "2KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\Badge.tsx",
+      "component": "Badge",
+      "size": "2KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\Button.tsx",
+      "component": "Unknown",
+      "size": "4KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\Card.tsx",
+      "component": "Unknown",
+      "size": "4KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\DesignSystem.tsx",
+      "component": "DesignTokens",
+      "size": "17KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\EnhancedDesignSystem.tsx",
+      "component": "colors",
+      "size": "19KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\Input.tsx",
+      "component": "Unknown",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\OptimizedImage.tsx",
+      "component": "OptimizedImage",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\PayPalSubscriptionModal.tsx",
+      "component": "PayPalSubscriptionModal",
+      "size": "16KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\PlanLimitModal.tsx",
+      "component": "PlanLimitModal",
+      "size": "9KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\PlanUsageDashboard.tsx",
+      "component": "UsageDashboard",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\ProgressBar.tsx",
+      "component": "ProgressBar",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\Tabs.tsx",
+      "component": "Tabs",
+      "size": "3KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\Textarea.tsx",
+      "component": "Unknown",
+      "size": "1KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\UnifiedDesignSystem.tsx",
+      "component": "DesignTokens",
+      "size": "18KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\UsageDashboard.tsx",
+      "component": "UsageDashboard",
+      "size": "8KB"
+    },
+    {
+      "file": "src\\client\\components\\ui\\ValidationFeedback.tsx",
+      "component": "ValidationFeedback",
+      "size": "10KB"
+    },
+    {
+      "file": "src\\client\\components\\wallet\\TransactionHistory.tsx",
+      "component": "TransactionHistory",
+      "size": "7KB"
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WalletOverview.tsx",
+      "component": "WalletOverview",
+      "size": "5KB"
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WithdrawalForm.tsx",
+      "component": "WithdrawalForm",
+      "size": "14KB"
+    },
+    {
+      "file": "src\\client\\components\\wallet\\WithdrawalHistory.tsx",
+      "component": "WithdrawalHistory",
+      "size": "8KB"
+    },
+    {
+      "file": "src\\client\\components\\workflow\\StreamlinedApprovalWorkflow.tsx",
+      "component": "Unknown",
+      "size": "27KB"
+    }
+  ],
+  "performanceIssues": [],
+  "optimizations": [
+    "Package.json optimized"
+  ]
+}

@@ -13,6 +13,7 @@ import {
   Eye
 } from 'lucide-react';
 
+
 interface Alert {
   id: string;
   type: 'system' | 'security' | 'business' | 'maintenance';

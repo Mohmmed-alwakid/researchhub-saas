@@ -1,9 +1,10 @@
+import { PerformanceMetric, MetricType, getPerformanceMonitor } from './PerformanceMonitor';
+
+
 /**
  * Performance Utilities
  * Helper classes and utilities for performance monitoring
  */
-
-import { PerformanceMetric, MetricType, getPerformanceMonitor } from './PerformanceMonitor';
 
 export class PerformanceUtils {
   /**

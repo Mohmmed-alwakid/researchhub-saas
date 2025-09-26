@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
@@ -26,6 +26,7 @@ const browserNoisePatterns = [
   'hook.js'
 ];
 
+
 // Store original methods for selective restoration
 const originalConsole = {
   warn: console.warn,
@@ -46,22 +47,14 @@ const isBrowserNoise = (args: any[]): boolean => {
 if (import.meta.env.PROD) {
   // In production: Filter browser noise but allow application errors
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  console.warn = (...args: any[]) => {
-    if (!isBrowserNoise(args)) {
-      originalConsole.warn.apply(console, args);
     }
   };
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  console.error = (...args: any[]) => {
-    if (!isBrowserNoise(args)) {
-      originalConsole.error.apply(console, args);
     }
   };
 } else {
   // In development: Show everything for debugging
-  console.warn = originalConsole.warn;
-  console.error = originalConsole.error;
 }
 
 // Global error handlers - only suppress browser extension noise
@@ -84,7 +77,23 @@ if (typeof window !== 'undefined') {
 }
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  
+// Minimal error suppression for browser-specific warnings
+const originalError = console.error;
+console.error = (...args) => {
+  const message = args.join(' ');
+  
+  // Only suppress known browser permission warnings
+  if (message.includes('Permission-Policy') || 
+      message.includes('browsing-topics')) {
+    return;
+  }
+  
+  // Show all other errors for debugging
+  originalError.apply(console, args);
+};
+
+<StrictMode>
     <App />
   </StrictMode>,
 )

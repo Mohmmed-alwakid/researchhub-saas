@@ -1,12 +1,13 @@
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
+import toast from 'react-hot-toast';
+
+
 /**
  * NETWORK-RESILIENT API SERVICE LAYER
  * Automatically switches between remote APIs and local fallback database
  * ✅ REAL DATA MODE: Uses actual database operations (no mock data)
  * 🔧 SEAMLESS FALLBACK: Transparent switching based on connectivity
  */
-
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import toast from 'react-hot-toast';
 
 // Network connectivity detection
 let isOnline = true;

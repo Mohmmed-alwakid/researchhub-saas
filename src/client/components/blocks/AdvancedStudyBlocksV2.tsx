@@ -1,12 +1,13 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
+
+
 /**
  * Advanced Study Block Components - Version 2
  * 
  * Week 2 Implementation: Context Screen, Yes/No, 5-Second Test, Card Sort, Tree Test
  * Created: June 30, 2025
  */
-
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
 
 // Animation variants - simplified for compatibility
 const blockAnimations = {

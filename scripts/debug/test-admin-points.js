@@ -69,7 +69,7 @@ async function testAdminPointsAssignment() {
         // Test 3: Verify researcher balance
         console.log('\n🔍 Step 3: Verify researcher points balance');
         const checkBalanceReq = createMockReq('GET', '/api/points?action=balance', null, {
-          'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6ImtNTk9JUFUzZGs1VUZiSzAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3d4cHd4emRnZHZpbmxidG5iZ2RmLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUxMzY1MjQyLCJpYXQiOjE3NTEzNjE2NDIsImVtYWlsIjoiYWJ3YW53cjc3K3Jlc2VhcmNoZXJAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImFid2Fud3I3NytyZXNlYXJjaGVyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmVzZWFyY2hlciIsImxhc3RfbmFtZSI6InRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6InJlc2VhcmNoZXIiLCJzdWIiOiI0YzNkNzk4Yi0yOTc1LTRlYzQtYjllMi1jNmYxMjhiOGEwNjYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MTM2MTY0Mn1dLCJzZXNzaW9uX2lkIjoiZTA2ZDdjMDYtZTJlYi00YzNmLThiNDItZWY3NGQxZDJhNmFlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gbRzTXK_SGQjehRqexWWmmQ_Xq5qBwGt64lqHkUjKMmc'
+          'authorization': 'Bearer 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY''
         });
         const checkBalanceRes = createMockRes();
         

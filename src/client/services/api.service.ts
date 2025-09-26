@@ -2,6 +2,7 @@ import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse 
 import toast from 'react-hot-toast';
 import { apiCache } from './api.cache';
 
+
 /**
  * API configuration and interceptors with performance caching
  */

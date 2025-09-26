@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, AlertCircle } from 'lucide-react';
 import type { BlockType } from '../../../shared/types/index';
 
+
 interface Block {
   id: string;
   templateId: string;

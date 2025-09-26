@@ -1,3 +1,6 @@
+import RateLimitManager from './RateLimitManager.js';
+
+
 /**
  * Rate Limiting Middleware for ResearchHub API
  * Express.js middleware that implements rate limiting with Redis storage
@@ -11,8 +14,6 @@
  * @author ResearchHub Team
  * @date June 29, 2025
  */
-
-import RateLimitManager from './RateLimitManager.js';
 
 class RateLimitMiddleware {
   constructor(cacheManager = null, options = {}) {

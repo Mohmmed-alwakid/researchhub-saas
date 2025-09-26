@@ -1,9 +1,10 @@
+import * as Sentry from '@sentry/react';
+
+
 /**
  * 🔍 Simple Sentry Integration for Afkar
  * Professional error tracking with Afkar-specific context
  */
-
-import * as Sentry from '@sentry/react';
 
 class AfkarSentry {
   private isInitialized: boolean = false;

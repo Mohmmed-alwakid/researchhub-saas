@@ -1,8 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
-import { Button } from '../ui/Button';
 import { ArrowRight, CreditCard } from 'lucide-react';
+
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../ui/Button';
+import { useAuthStore } from '../../stores/authStore';
 
 interface PricingCTAProps {
   planId: string;

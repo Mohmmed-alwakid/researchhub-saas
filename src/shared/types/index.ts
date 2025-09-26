@@ -1,7 +1,8 @@
 import type { Request } from 'express';
-// import type { IUserDocument } from '../../database/models/index.js';
+import type { IUserDocument } from '../../database/models/index.js';
 
-// Temporary user document interface
+
+// // Temporary user document interface
 interface IUserDocument extends IUser {
   save(): Promise<void>;
 }

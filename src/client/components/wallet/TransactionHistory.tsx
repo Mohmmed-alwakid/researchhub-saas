@@ -1,8 +1,9 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Calendar, Filter } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 
 interface WalletTransaction {
   id: string;

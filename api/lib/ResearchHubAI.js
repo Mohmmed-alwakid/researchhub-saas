@@ -1,8 +1,9 @@
-// Vercel AI Gateway Service for ResearchHub
-// Simple JavaScript version for Node.js compatibility
-
 import { generateText, generateObject } from 'ai';
 import { z } from 'zod';
+
+
+// Vercel AI Gateway Service for ResearchHub
+// Simple JavaScript version for Node.js compatibility
 
 // AI Services for ResearchHub Features
 export class ResearchHubAI {

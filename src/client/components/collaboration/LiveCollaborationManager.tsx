@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useAuthStore } from '../../stores/authStore';
 import { 
   CollaboratorPresence,
   EditingStatus,
   CollaborationActivity,
   WorkspaceRole
 } from '../../../shared/types';
+
+import { useAuthStore } from '../../stores/authStore';
 
 interface WebSocketMessage {
   type: string;

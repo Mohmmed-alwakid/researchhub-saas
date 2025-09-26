@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CollaboratorPresence } from '../../../shared/types';
 
+
 interface LiveCursorSystemProps {
   /** Active collaborators with cursor positions */
   collaborators: CollaboratorPresence[];

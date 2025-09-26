@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
@@ -9,18 +8,20 @@ import {
   DollarSign,
   RefreshCw
 } from 'lucide-react';
-// Enhanced UI components for professional appearance
-import { Button, Input } from '../../components/ui';
-import { Card, CardContent } from '../../components/ui/Card';
-import { useAppStore } from '../../stores/appStore';
 import { formatDistanceToNow } from 'date-fns';
-import { IStudy } from '../../../shared/types';
-import StudyCardActions from '../../components/studies/StudyCardActions';
-import RenameStudyModal from '../../components/studies/RenameStudyModal';
-import DeleteStudyModal from '../../components/studies/DeleteStudyModal';
-import StudiesLoading from '../../components/studies/StudiesLoading';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../../styles/study-card.css';
 
+import { Button, Input } from '../../components/ui';
+import { Card, CardContent } from '../../components/ui/Card';
+import { IStudy } from '../../../shared/types';
+import { useAppStore } from '../../stores/appStore';
+import DeleteStudyModal from '../../components/studies/DeleteStudyModal';
+import RenameStudyModal from '../../components/studies/RenameStudyModal';
+import StudiesLoading from '../../components/studies/StudiesLoading';
+import StudyCardActions from '../../components/studies/StudyCardActions';
+
+// Enhanced UI components for professional appearance
 const StudiesPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();

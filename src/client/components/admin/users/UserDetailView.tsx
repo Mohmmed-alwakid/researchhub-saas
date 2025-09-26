@@ -1,8 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
-type TabType = 'overview' | 'activity' | 'studies' | 'settings';
-type UserRole = 'admin' | 'researcher' | 'participant';
-type UserStatus = 'active' | 'inactive' | 'suspended';
 import { 
   User,
   Mail,
@@ -19,6 +15,10 @@ import {
   X
 } from 'lucide-react';
 
+
+type TabType = 'overview' | 'activity' | 'studies' | 'settings';
+type UserRole = 'admin' | 'researcher' | 'participant';
+type UserStatus = 'active' | 'inactive' | 'suspended';
 interface UserProfile {
   id: string;
   email: string;

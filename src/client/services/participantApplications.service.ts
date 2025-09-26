@@ -1,6 +1,7 @@
 import { apiService } from './api-network-resilient.service';
 import type { ParticipantApplication, IParticipantApplication } from '../../shared/types';
 
+
 // Helper function to detect if we're in fallback mode
 const isFallbackMode = (): boolean => {
   try {

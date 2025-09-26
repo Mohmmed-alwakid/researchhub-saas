@@ -1,5 +1,11 @@
 import React from 'react';
 import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
   DndContext,
   closestCenter,
   KeyboardSensor,
@@ -7,15 +13,10 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
 import { Clock } from 'lucide-react';
+import type { DragEndEvent } from '@dnd-kit/core';
 import SortableTaskItem from './SortableTaskItem.tsx';
+
 
 interface Task {
   id: string;

@@ -1,12 +1,13 @@
-/**
- * Collaboration Service
- * Client-side service for real-time collaboration features
- */
-
 import type { 
   CollaborationActivity,
   UserCursor
 } from '../../shared/types';
+
+
+/**
+ * Collaboration Service
+ * Client-side service for real-time collaboration features
+ */
 
 interface CollaborationSession {
   id: string;

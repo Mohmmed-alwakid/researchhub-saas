@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckCircle, 
   Clock, 
@@ -17,6 +16,8 @@ import {
   Trash2,
   Send
 } from 'lucide-react';
+
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Application {
   id: string;

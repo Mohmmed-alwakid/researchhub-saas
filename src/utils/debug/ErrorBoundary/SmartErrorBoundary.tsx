@@ -1,11 +1,12 @@
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import devDebugConsole from '../DevDebugConsole';
+
+import sentryIntegration from '../SentryIntegrationSimple';
+
 /**
  * 🛡️ Smart Error Boundary for ResearchHub
  * Enhanced error handling with automatic recovery and user-friendly interfaces
  */
-
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import sentryIntegration from '../SentryIntegrationSimple';
-import devDebugConsole from '../DevDebugConsole';
 
 interface ErrorBoundaryState {
   hasError: boolean;

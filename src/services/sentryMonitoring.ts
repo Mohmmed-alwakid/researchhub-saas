@@ -1,9 +1,10 @@
+import * as Sentry from '@sentry/react';
+
+
 /**
  * Real-time Sentry Monitoring Service
  * Provides live monitoring capabilities and Sentry integration
  */
-
-import * as Sentry from '@sentry/react';
 
 export interface SentryEvent {
   id: string;

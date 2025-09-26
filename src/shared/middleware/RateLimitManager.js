@@ -1,3 +1,6 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * Rate Limiting Manager for ResearchHub API
  * Implements configurable rate limiting with Redis storage
@@ -11,8 +14,6 @@
  * @author ResearchHub Team
  * @date June 29, 2025
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 class RateLimitManager {
   constructor(cacheManager = null) {

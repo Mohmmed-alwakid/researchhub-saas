@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Activity, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
+
 interface SystemMetric {
   id: string;
   name: string;

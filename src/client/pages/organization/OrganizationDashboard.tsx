@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { Plus, Users, Settings, Activity, BarChart3, Shield } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+
 import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
 import { Textarea } from '../../components/ui/Textarea';
-import { Plus, Users, Settings, Activity, BarChart3, Shield } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 
 interface Organization {
   id: string;

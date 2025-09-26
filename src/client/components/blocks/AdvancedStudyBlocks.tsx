@@ -1,12 +1,13 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+
 /**
  * Advanced Study Block Components
  * 
  * Includes advanced block types with conditional logic, branching, and AI integration
  * Created: June 25, 2025
  */
-
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 // Types for advanced blocks
 type ConditionValue = string | number | boolean;

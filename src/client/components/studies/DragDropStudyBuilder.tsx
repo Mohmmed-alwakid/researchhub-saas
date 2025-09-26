@@ -1,9 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { 
   GripVertical, 
   Plus, 
@@ -19,10 +14,16 @@ import {
   Palette,
   Zap
 } from 'lucide-react';
-import { Card, CardContent } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { TaskConfigurationModal } from './TaskConfigurationModal';
+import { CSS } from '@dnd-kit/utilities';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
 import toast from 'react-hot-toast';
+
+import { Button } from '../ui/Button';
+import { Card, CardContent } from '../ui/Card';
+import { TaskConfigurationModal } from './TaskConfigurationModal';
 
 export interface TaskTemplate {
   id: string;

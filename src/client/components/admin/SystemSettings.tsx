@@ -11,8 +11,9 @@ import {
   AlertTriangle,
   CheckCircle
 } from 'lucide-react';
-import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 import { ComingSoon } from '../common/ComingSoon';
+
+import { useFeatureFlags } from '../../../shared/config/featureFlags.ts';
 
 interface SystemConfiguration {
   platform: {

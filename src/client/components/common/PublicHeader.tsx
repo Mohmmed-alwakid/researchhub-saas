@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AfkarLogo } from '../../../assets/brand/AfkarLogo';
 import { Button } from '../ui/Button';
 
+
 interface PublicHeaderProps {
   currentPage?: 'home' | 'pricing' | 'features' | 'about';
 }

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { CheckCircle, AlertCircle, Edit2, Eye, BookOpen, Users, Clock, HelpCircle, Monitor, Rocket } from 'lucide-react';
+
+import { SaveAsTemplateModal } from '../SaveAsTemplateModal';
 import { StepProps } from '../types';
 import { StudyPreviewModal } from '../StudyPreviewModal';
-import { SaveAsTemplateModal } from '../SaveAsTemplateModal';
-import { CheckCircle, AlertCircle, Edit2, Eye, BookOpen, Users, Clock, HelpCircle, Monitor, Rocket } from 'lucide-react';
 
 export const ReviewStep: React.FC<StepProps> = ({
   formData

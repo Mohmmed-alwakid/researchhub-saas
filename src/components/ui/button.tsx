@@ -1,8 +1,8 @@
+import React from 'react';
+
 /**
  * Button UI Component for ResearchHub
  */
-
-import React from 'react';
 
 interface ButtonProps {
   children: React.ReactNode;

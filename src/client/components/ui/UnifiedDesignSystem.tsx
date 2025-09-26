@@ -1,9 +1,3 @@
-/**
- * Unified Design System
- * Consolidates the best features from both DesignSystem.tsx and EnhancedDesignSystem.tsx
- * Provides a single source of truth for all UI components
- */
-
 import React, { useEffect, useRef } from 'react';
 import { 
   AlertCircle, 
@@ -12,6 +6,13 @@ import {
   XCircle, 
   X
 } from 'lucide-react';
+
+
+/**
+ * Unified Design System
+ * Consolidates the best features from both DesignSystem.tsx and EnhancedDesignSystem.tsx
+ * Provides a single source of truth for all UI components
+ */
 
 // ================================
 // Design Tokens (Centralized)

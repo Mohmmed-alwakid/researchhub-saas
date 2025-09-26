@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, Wifi, WifiOff } from 'lucide-react';
 
+
 interface ConnectivityStatus {
   isOnline: boolean;
   apiHealthy: boolean;

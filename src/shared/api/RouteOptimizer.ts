@@ -1,3 +1,7 @@
+import { ApiClient, ApiRequest, ApiResponse } from './ApiClient';
+import { ResponseOptimizer, ResponseConfig } from './ResponseOptimizer';
+
+
 /**
  * API Route Optimization - Intelligent route management and optimization
  * Part of the Vibe-Coder-MCP implementation for ResearchHub
@@ -9,9 +13,6 @@
  * - Performance monitoring per route
  * - Automatic retry and circuit breaker patterns
  */
-
-import { ApiClient, ApiRequest, ApiResponse } from './ApiClient';
-import { ResponseOptimizer, ResponseConfig } from './ResponseOptimizer';
 
 export interface RouteConfig {
   path: string;

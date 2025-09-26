@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
-import { Button } from './ui/Button';
-import { Badge } from './ui/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 import { 
   Coins, 
   CreditCard, 
@@ -14,6 +10,11 @@ import {
   Clock,
   DollarSign
 } from 'lucide-react';
+
+import { Badge } from './ui/Badge';
+import { Button } from './ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 
 /**
  * Researcher Points Dashboard Component

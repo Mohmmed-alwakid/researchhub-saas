@@ -1,7 +1,8 @@
 import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Clock, Edit2, Copy, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
+
+import { useSortable } from '@dnd-kit/sortable';
 
 interface Task {
   id: string;

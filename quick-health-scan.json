@@ -1,0 +1,157 @@
+{
+  "timestamp": "2025-09-26T15:58:48.375Z",
+  "summary": {
+    "totalIssues": 16,
+    "critical": 4,
+    "important": 11,
+    "minor": 1
+  },
+  "issues": [
+    {
+      "type": "missing-useeffect-deps",
+      "count": 2,
+      "severity": "low",
+      "message": "2 useEffect hooks with empty dependency arrays",
+      "fix": "Review useEffect dependencies for potential bugs"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\ai-features.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\backup-files\\research-consolidated-broken-backup.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\legacy-services\\stc-bank-integration.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-api-error-handling",
+      "file": "api\\archive-old-functions\\2025-09-11-cleanup\\test-files\\test.js",
+      "severity": "high",
+      "message": "API handler without error handling may cause 500 errors",
+      "fix": "Add try-catch blocks around API logic"
+    },
+    {
+      "type": "missing-api-error-handling",
+      "file": "api\\archive-old-functions\\future-features\\points-with-plans-and-earnings.js",
+      "severity": "high",
+      "message": "API handler without error handling may cause 500 errors",
+      "fix": "Add try-catch blocks around API logic"
+    },
+    {
+      "type": "missing-api-error-handling",
+      "file": "api\\archive-old-functions\\services\\ApiResponse.js",
+      "severity": "high",
+      "message": "API handler without error handling may cause 500 errors",
+      "fix": "Add try-catch blocks around API logic"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\archive-old-functions\\services\\ApiResponse.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\archive-old-functions\\services\\BaseService.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\lib\\ResearchHubAI.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\lib\\sentry.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-api-error-handling",
+      "file": "api\\services\\ApiResponse.js",
+      "severity": "high",
+      "message": "API handler without error handling may cause 500 errors",
+      "fix": "Add try-catch blocks around API logic"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\services\\ApiResponse.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "missing-status-codes",
+      "file": "api\\services\\BaseService.js",
+      "severity": "medium",
+      "message": "API responses without explicit status codes",
+      "fix": "Add res.status() calls for proper HTTP responses"
+    },
+    {
+      "type": "potentially-broken-links",
+      "count": 2,
+      "examples": [
+        {
+          "file": "src\\App.tsx",
+          "link": "/app/admin",
+          "type": "navigate"
+        },
+        {
+          "file": "src\\App.tsx",
+          "link": "/app/dashboard",
+          "type": "navigate"
+        }
+      ],
+      "severity": "medium",
+      "message": "Found 2 navigation links that may be broken",
+      "fix": "Verify all navigation routes exist and are properly configured"
+    },
+    {
+      "type": "large-files",
+      "count": 14,
+      "examples": [
+        {
+          "file": "src\\client\\components\\participant\\StudyDiscovery.tsx",
+          "size": 68
+        },
+        {
+          "file": "src\\shared\\types\\index.ts",
+          "size": 64
+        },
+        {
+          "file": "src\\client\\components\\studies\\MobileOptimizedStudyBuilder.tsx",
+          "size": 48
+        },
+        {
+          "file": "src\\client\\components\\blocks\\AdvancedStudyBlocks.tsx",
+          "size": 44
+        },
+        {
+          "file": "src\\client\\pages\\studies\\StudyDetailPage.tsx",
+          "size": 42
+        }
+      ],
+      "severity": "medium",
+      "message": "14 large files that might benefit from splitting",
+      "fix": "Consider splitting large components or adding code splitting"
+    }
+  ]
+}

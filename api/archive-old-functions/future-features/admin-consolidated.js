@@ -1,9 +1,10 @@
+import { fileURLToPath } from 'url';
+
+import { join, dirname } from 'path';
+import { readFileSync } from 'fs';
+
 // Consolidated Admin API - All admin functions in one endpoint
 // This reduces multiple admin functions to a single endpoint
-
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

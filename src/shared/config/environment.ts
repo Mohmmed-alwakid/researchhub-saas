@@ -1,9 +1,10 @@
+import { Environment } from './AppConfig';
+
+
 /**
  * Environment Configuration
  * Environment-specific configuration values and console error reduction
  */
-
-import { Environment } from './AppConfig';
 
 // Sentry mock interface
 interface SentryMock {

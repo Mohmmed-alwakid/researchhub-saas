@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSystemAnalytics, type SystemAnalytics } from '../../services/admin.service';
 
+
 interface AnalyticsDashboardProps {
   className?: string;
 }

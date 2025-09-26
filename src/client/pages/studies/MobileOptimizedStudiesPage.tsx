@@ -1,10 +1,4 @@
-/**
- * Mobile-optimized StudiesPage integration demo
- * Demonstrates how to integrate mobile components into existing pages
- */
-
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
@@ -19,21 +13,28 @@ import {
   BarChart3
 } from 'lucide-react';
 
-// Import mobile-optimized components
+import { formatDistanceToNow } from 'date-fns';
+
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   MobileButton, 
   MobileInput, 
   MobileCard, 
   MobileNav 
 } from '../../components/ui/MobileOptimizedComponents';
-import { useMobileViewport } from '../../hooks/mobile';
-
-// Enhanced UI components for desktop fallback
 import { Button, Input } from '../../components/ui';
 import { Card, CardContent } from '../../components/ui/Card';
 import { useAppStore } from '../../stores/appStore';
-import { formatDistanceToNow } from 'date-fns';
+import { useMobileViewport } from '../../hooks/mobile';
 
+
+/**
+ * Mobile-optimized StudiesPage integration demo
+ * Demonstrates how to integrate mobile components into existing pages
+ */
+
+// Import mobile-optimized components
+// Enhanced UI components for desktop fallback
 const MobileOptimizedStudiesPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -401,7 +402,7 @@ const MobileOptimizedStudiesPage: React.FC = () => {
               Studies
             </button>
             <button 
-              onClick={() => navigate('/templates')}
+              onClick={() => navigate('/app/templates')}
               className="touch-target-comfortable flex flex-col items-center text-xs font-medium text-gray-600"
             >
               <Calendar className="w-6 h-6 mb-1" />

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Clock, CheckCircle, XCircle, AlertCircle, Eye, FileText } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { formatCurrency, SupportedCurrency } from '../../services/wallet.service';
+
 
 interface WithdrawalRequest {
   id: string;

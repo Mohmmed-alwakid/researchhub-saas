@@ -1,11 +1,12 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuthStore } from '../../stores/authStore';
+
+
 /**
  * PHASE 5.1: PARTICIPANT EXPERIENCE - STUDY DISCOVERY
  * Comprehensive study discovery and browsing interface for participants
  * Requirements Source: docs/requirements/05-PARTICIPANT_EXPERIENCE.md
  */
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '../../stores/authStore';
 
 // Type definitions for study discovery
 interface PublicStudy {

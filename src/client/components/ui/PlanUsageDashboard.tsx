@@ -9,6 +9,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 
+
 interface SubscriptionPlan {
   id: string;
   name: string;

@@ -1,0 +1,467 @@
+import { tokens } from './DesignTokens';
+
+/**
+ * 🎨 ResearchHub Design Token System
+ * 
+ * Centralized design tokens for consistent UI/UX across the platform.
+ * This is the single source of truth for all design decisions.
+ * 
+ * Usage:
+ *  * className={tokens.colors.primary.main}
+ */
+
+export const tokens = {
+  // ================================
+  // COLOR SYSTEM
+  // ================================
+  colors: {
+    primary: {
+      main: 'bg-blue-600',
+      hover: 'hover:bg-blue-700',
+      light: 'bg-blue-50',
+      dark: 'bg-blue-800',
+      text: 'text-blue-600',
+      border: 'border-blue-600'
+    },
+    
+    secondary: {
+      main: 'bg-purple-600',
+      hover: 'hover:bg-purple-700',
+      light: 'bg-purple-50',
+      dark: 'bg-purple-800',
+      text: 'text-purple-600',
+      border: 'border-purple-600'
+    },
+
+    success: {
+      main: 'bg-green-600',
+      hover: 'hover:bg-green-700',
+      light: 'bg-green-50',
+      text: 'text-green-600',
+      border: 'border-green-600'
+    },
+
+    warning: {
+      main: 'bg-yellow-500',
+      hover: 'hover:bg-yellow-600',
+      light: 'bg-yellow-50',
+      text: 'text-yellow-600',
+      border: 'border-yellow-500'
+    },
+
+    danger: {
+      main: 'bg-red-600',
+      hover: 'hover:bg-red-700',
+      light: 'bg-red-50',
+      text: 'text-red-600',
+      border: 'border-red-600'
+    },
+
+    neutral: {
+      white: 'bg-white',
+      gray50: 'bg-gray-50',
+      gray100: 'bg-gray-100',
+      gray200: 'bg-gray-200',
+      gray300: 'bg-gray-300',
+      gray400: 'bg-gray-400',
+      gray500: 'bg-gray-500',
+      gray600: 'bg-gray-600',
+      gray700: 'bg-gray-700',
+      gray800: 'bg-gray-800',
+      gray900: 'bg-gray-900'
+    }
+  },
+
+  // ================================
+  // SPACING SYSTEM
+  // ================================
+  spacing: {
+    // Component internal spacing
+    component: {
+      xs: 'p-2',      // 8px
+      sm: 'p-3',      // 12px
+      md: 'p-4',      // 16px
+      lg: 'p-6',      // 24px
+      xl: 'p-8'       // 32px
+    },
+
+    // Layout spacing
+    layout: {
+      xs: 'space-y-2',   // 8px
+      sm: 'space-y-4',   // 16px
+      md: 'space-y-6',   // 24px
+      lg: 'space-y-8',   // 32px
+      xl: 'space-y-12'   // 48px
+    },
+
+    // Margins
+    margin: {
+      xs: 'm-2',
+      sm: 'm-4',
+      md: 'm-6',
+      lg: 'm-8',
+      xl: 'm-12'
+    },
+
+    // Gaps (for flexbox/grid)
+    gap: {
+      xs: 'gap-2',
+      sm: 'gap-4',
+      md: 'gap-6',
+      lg: 'gap-8',
+      xl: 'gap-12'
+    }
+  },
+
+  // ================================
+  // TYPOGRAPHY SYSTEM
+  // ================================
+  typography: {
+    // Headings
+    heading: {
+      h1: 'text-3xl font-bold text-gray-900',
+      h2: 'text-2xl font-semibold text-gray-900',
+      h3: 'text-xl font-semibold text-gray-900',
+      h4: 'text-lg font-semibold text-gray-900',
+      h5: 'text-base font-semibold text-gray-900',
+      h6: 'text-sm font-semibold text-gray-900'
+    },
+
+    // Body text
+    body: {
+      large: 'text-lg text-gray-700',
+      base: 'text-base text-gray-700',
+      small: 'text-sm text-gray-600',
+      xs: 'text-xs text-gray-500'
+    },
+
+    // Labels
+    label: {
+      primary: 'text-sm font-medium text-gray-700',
+      secondary: 'text-xs font-medium text-gray-500',
+      required: 'text-sm font-medium text-gray-700 after:content-["*"] after:text-red-500'
+    },
+
+    // Links
+    link: {
+      primary: 'text-blue-600 hover:text-blue-800 underline',
+      secondary: 'text-gray-600 hover:text-gray-800',
+      button: 'text-blue-600 hover:text-blue-800 font-medium'
+    }
+  },
+
+  // ================================
+  // BORDER & RADIUS SYSTEM  
+  // ================================
+  borders: {
+    radius: {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      base: 'rounded',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      xl: 'rounded-xl',
+      full: 'rounded-full'
+    },
+
+    width: {
+      none: 'border-0',
+      thin: 'border',
+      thick: 'border-2'
+    },
+
+    style: {
+      solid: 'border-solid',
+      dashed: 'border-dashed',
+      dotted: 'border-dotted'
+    }
+  },
+
+  // ================================
+  // SHADOW SYSTEM
+  // ================================
+  shadows: {
+    none: 'shadow-none',
+    sm: 'shadow-sm',
+    base: 'shadow',
+    md: 'shadow-md',
+    lg: 'shadow-lg',
+    xl: 'shadow-xl'
+  },
+
+  // ================================
+  // ANIMATION SYSTEM
+  // ================================
+  animations: {
+    transition: {
+      fast: 'transition-all duration-150 ease-in-out',
+      base: 'transition-all duration-200 ease-in-out',
+      slow: 'transition-all duration-300 ease-in-out'
+    },
+
+    hover: {
+      scale: 'hover:scale-105 transform transition-transform duration-200',
+      lift: 'hover:shadow-lg hover:-translate-y-1 transition-all duration-200'
+    }
+  }
+};
+
+// ================================
+// COMPONENT VARIANTS
+// ================================
+export const componentVariants = {
+  button: {
+    primary: [
+      tokens.colors.primary.main,
+      tokens.colors.primary.hover,
+      'text-white',
+      tokens.spacing.component.sm,
+      tokens.borders.radius.md,
+      tokens.animations.transition.base,
+      'font-medium',
+      'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+    ].join(' '),
+
+    secondary: [
+      'bg-white',
+      'hover:bg-gray-50',
+      'text-gray-700',
+      'border border-gray-300',
+      tokens.spacing.component.sm,
+      tokens.borders.radius.md,
+      tokens.animations.transition.base,
+      'font-medium',
+      'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+    ].join(' '),
+
+    danger: [
+      tokens.colors.danger.main,
+      tokens.colors.danger.hover,
+      'text-white',
+      tokens.spacing.component.sm,
+      tokens.borders.radius.md,
+      tokens.animations.transition.base,
+      'font-medium',
+      'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+    ].join(' '),
+
+    ghost: [
+      'bg-transparent',
+      'hover:bg-gray-100',
+      'text-gray-700',
+      tokens.spacing.component.sm,
+      tokens.borders.radius.md,
+      tokens.animations.transition.base,
+      'font-medium'
+    ].join(' ')
+  },
+
+  card: {
+    default: [
+      'bg-white',
+      tokens.borders.radius.lg,
+      tokens.shadows.base,
+      'border border-gray-200'
+    ].join(' '),
+
+    elevated: [
+      'bg-white',
+      tokens.borders.radius.lg,
+      tokens.shadows.lg,
+      'border border-gray-100'
+    ].join(' '),
+
+    flat: [
+      'bg-white',
+      tokens.borders.radius.lg,
+      'border border-gray-200'
+    ].join(' ')
+  },
+
+  input: {
+    default: [
+      'bg-white',
+      'border border-gray-300',
+      tokens.borders.radius.md,
+      tokens.spacing.component.sm,
+      'text-gray-900',
+      'placeholder-gray-500',
+      'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+      tokens.animations.transition.base
+    ].join(' '),
+
+    error: [
+      'bg-white',
+      'border border-red-300',
+      tokens.borders.radius.md,
+      tokens.spacing.component.sm,
+      'text-gray-900',
+      'placeholder-gray-500',
+      'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500',
+      tokens.animations.transition.base
+    ].join(' '),
+
+    success: [
+      'bg-white',
+      'border border-green-300',
+      tokens.borders.radius.md,
+      tokens.spacing.component.sm,
+      'text-gray-900',
+      'placeholder-gray-500',
+      'focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500',
+      tokens.animations.transition.base
+    ].join(' ')
+  },
+
+  alert: {
+    info: [
+      tokens.colors.primary.light,
+      'border',
+      tokens.colors.primary.border,
+      tokens.borders.radius.md,
+      tokens.spacing.component.md,
+      tokens.colors.primary.text
+    ].join(' '),
+
+    success: [
+      tokens.colors.success.light,
+      'border',
+      tokens.colors.success.border,
+      tokens.borders.radius.md,
+      tokens.spacing.component.md,
+      tokens.colors.success.text
+    ].join(' '),
+
+    warning: [
+      tokens.colors.warning.light,
+      'border',
+      tokens.colors.warning.border,
+      tokens.borders.radius.md,
+      tokens.spacing.component.md,
+      tokens.colors.warning.text
+    ].join(' '),
+
+    error: [
+      tokens.colors.danger.light,
+      'border',
+      tokens.colors.danger.border,
+      tokens.borders.radius.md,
+      tokens.spacing.component.md,
+      tokens.colors.danger.text
+    ].join(' ')
+  }
+};
+
+// ================================
+// LAYOUT PATTERNS
+// ================================
+export const layoutPatterns = {
+  page: {
+    container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+    section: tokens.spacing.layout.lg,
+    content: 'space-y-6'
+  },
+
+  form: {
+    container: 'space-y-6',
+    fieldGroup: 'space-y-1',
+    actions: 'flex justify-end space-x-3'
+  },
+
+  grid: {
+    responsive: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
+    cards: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4',
+    dashboard: 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6'
+  }
+};
+
+// ================================
+// DESIGN SYSTEM UTILITIES
+// ================================
+export const designUtils = {
+  /**
+   * Combine multiple token classes
+   */
+  combine: (...classes: string[]): string => {
+    return classes.filter(Boolean).join(' ');
+  },
+
+  /**
+   * Apply variant with custom overrides
+   */
+  variant: (variant: string, overrides?: string): string => {
+    return designUtils.combine(variant, overrides || '');
+  },
+
+  /**
+   * Generate responsive classes
+   */
+  responsive: (base: string, md?: string, lg?: string): string => {
+    const classes = [base];
+    if (md) classes.push(`md:${md}`);
+    if (lg) classes.push(`lg:${lg}`);
+    return classes.join(' ');
+  }
+};
+
+// ================================
+// COMPONENT BUILDER HELPERS
+// ================================
+export const buildComponent = {
+  /**
+   * Build button classes
+   */
+  button: (variant: keyof typeof componentVariants.button = 'primary', size: 'sm' | 'md' | 'lg' = 'md') => {
+    const sizeClasses = {
+      sm: 'px-3 py-1.5 text-sm',
+      md: 'px-4 py-2 text-sm', 
+      lg: 'px-6 py-3 text-base'
+    };
+    
+    return designUtils.combine(
+      componentVariants.button[variant],
+      sizeClasses[size]
+    );
+  },
+
+  /**
+   * Build card classes
+   */
+  card: (variant: keyof typeof componentVariants.card = 'default', padding: 'sm' | 'md' | 'lg' = 'md') => {
+    const paddingClasses = {
+      sm: 'p-4',
+      md: 'p-6',
+      lg: 'p-8'
+    };
+    
+    return designUtils.combine(
+      componentVariants.card[variant],
+      paddingClasses[padding]
+    );
+  },
+
+  /**
+   * Build input classes
+   */
+  input: (variant: keyof typeof componentVariants.input = 'default', size: 'sm' | 'md' | 'lg' = 'md') => {
+    const sizeClasses = {
+      sm: 'px-3 py-1.5 text-sm',
+      md: 'px-3 py-2 text-sm',
+      lg: 'px-4 py-3 text-base'
+    };
+    
+    return designUtils.combine(
+      componentVariants.input[variant],
+      sizeClasses[size]
+    );
+  }
+};
+
+// Export everything for easy access
+export default {
+  tokens,
+  componentVariants,
+  layoutPatterns,
+  designUtils,
+  buildComponent
+};

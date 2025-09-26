@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   BarChart3,
   Users,
@@ -16,11 +15,13 @@ import {
   Target,
   Activity
 } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { IStudy } from '../../../shared/types';
+
 import { useAppStore } from '../../stores/appStore';
 import { useAuthStore } from '../../stores/authStore';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
-import { IStudy } from '../../../shared/types';
 
 type TabType = 'overview' | 'analytics' | 'participants' | 'collaboration' | 'settings';
 

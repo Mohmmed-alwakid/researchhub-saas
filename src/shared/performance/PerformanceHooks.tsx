@@ -1,11 +1,12 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getPerformanceMonitor, PerformanceMetric, MetricType, PerformanceSession, PerformanceAnalytics } from './PerformanceMonitor';
+
+
 /**
  * Performance React Hooks
  * React hooks for performance monitoring and metrics collection
  * Based on Vibe-Coder-MCP architectural patterns
  */
-
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { getPerformanceMonitor, PerformanceMetric, MetricType, PerformanceSession, PerformanceAnalytics } from './PerformanceMonitor';
 
 /**
  * Hook for tracking custom performance metrics

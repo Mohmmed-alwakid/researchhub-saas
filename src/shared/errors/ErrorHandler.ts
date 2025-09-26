@@ -1,9 +1,10 @@
+import { ResearchHubError, ErrorCategory, ErrorSeverity, ErrorContext, ERROR_CODES } from './ErrorTypes.js';
+
+
 /**
  * Error Handler Utilities for ResearchHub
  * Provides comprehensive error handling, logging, and recovery mechanisms
  */
-
-import { ResearchHubError, ErrorCategory, ErrorSeverity, ErrorContext, ERROR_CODES } from './ErrorTypes.js';
 
 export interface ErrorHandlerConfig {
   enableConsoleLogging: boolean;

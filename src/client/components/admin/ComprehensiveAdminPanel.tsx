@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AdminDashboard } from './AdminDashboard';
-import { UserManagementPanel } from './UserManagementPanel';
-import { AnalyticsDashboard } from './AnalyticsDashboard';
-import { useAuthStore } from '../../stores/authStore';
 import { 
   LayoutDashboard, Users, BarChart3, Settings, 
   AlertTriangle, Bell, Shield, LogOut 
 } from 'lucide-react';
+
+import { AdminDashboard } from './AdminDashboard';
+import { AnalyticsDashboard } from './AnalyticsDashboard';
+import { useAuthStore } from '../../stores/authStore';
+import { UserManagementPanel } from './UserManagementPanel';
 
 // User type for API compatibility
 interface User {

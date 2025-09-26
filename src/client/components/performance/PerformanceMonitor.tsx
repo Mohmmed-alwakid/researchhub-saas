@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { usePerformanceSession } from '../../../shared/performance';
 
+
 interface PerformanceMonitorProps {
   showMetrics?: boolean;
   enabled?: boolean;

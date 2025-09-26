@@ -9,7 +9,7 @@ Our comprehensive API testing has confirmed that the **points system integration
 #### 1. Authentication Integration ✅
 ```
 ✅ Login successful
-🔑 Token obtained: eyJhbGciOiJIUzI1NiIs...
+🔑 Token obtained: 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.
 ```
 - User authentication works flawlessly
 - JWT token generation and parsing confirmed
@@ -79,7 +79,7 @@ The points system is **production-ready** and will work immediately once:
 
 | Component | Status | Evidence |
 |-----------|--------|----------|
-| Authentication | ✅ Working | Token: `eyJhbGciOiJIUzI1NiIs...` |
+| Authentication | ✅ Working | Token: `'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.` |
 | Points Calculation | ✅ Working | Cost: `110 points` calculated |
 | API Integration | ✅ Working | All endpoints respond correctly |
 | Error Handling | ✅ Working | Graceful failures with clear messages |

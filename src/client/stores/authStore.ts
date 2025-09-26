@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import toast from 'react-hot-toast';
 import { authService, type RegisterRequest } from '../services';
 
+
 // Environment-aware debug logging
 const debugLog = (message: string, data?: unknown) => {
   if (import.meta.env.VITE_DEBUG_MODE === 'true') {

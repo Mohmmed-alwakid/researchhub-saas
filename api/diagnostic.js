@@ -1,3 +1,7 @@
+import
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+
 /**
  * ENVIRONMENT DIAGNOSTIC API
  * Checks environment variables and dependencies
@@ -38,10 +42,7 @@ export default async function handler(req, res) {
       }
     };
 
-    // Test Supabase import
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      diagnosis.supabaseImport = 'success';
+    // Test Supabase       diagnosis.supabaseImport = 'success';
       
       // Try to create client
       if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {

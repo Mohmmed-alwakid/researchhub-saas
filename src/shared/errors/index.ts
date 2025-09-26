@@ -1,3 +1,5 @@
+import { globalErrorHandler } from './ErrorHandler.js';
+
 /**
  * Centralized Error Handling System for ResearchHub
  * Based on Vibe-Coder-MCP architectural patterns
@@ -109,4 +111,3 @@ export function initializeErrorHandling(config?: {
   console.info('✅ ResearchHub Error Handling System initialized');
 }
 
-import { globalErrorHandler } from './ErrorHandler.js';

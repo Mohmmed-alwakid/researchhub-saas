@@ -1,7 +1,8 @@
 import React from 'react';
-import { useAuthStore } from '../../stores/authStore';
 import { CollaborationDashboard } from '../../components/collaboration/CollaborationDashboard';
+import { useAuthStore } from '../../stores/authStore';
 import type { WorkspaceRole } from '../../../shared/types';
+
 
 const CollaborationPage: React.FC = () => {
   const { user } = useAuthStore();

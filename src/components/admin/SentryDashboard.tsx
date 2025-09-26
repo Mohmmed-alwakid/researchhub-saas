@@ -1,14 +1,15 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { AlertTriangle, Activity, Users, Zap, TrendingUp, Shield, RefreshCw } from 'lucide-react';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { sentryMonitoring, type SentryDashboardData } from '../../services/sentryMonitoring';
+
+
 /**
  * Advanced Sentry Dashboard Component for ResearchHub
  * Real-time monitoring and error management interface
  */
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { AlertTriangle, Activity, Users, Zap, TrendingUp, Shield, RefreshCw } from 'lucide-react';
-import { sentryMonitoring, type SentryDashboardData } from '../../services/sentryMonitoring';
 
 export const SentryDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<SentryDashboardData | null>(null);

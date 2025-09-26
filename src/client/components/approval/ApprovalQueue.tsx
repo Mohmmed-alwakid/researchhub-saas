@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Filter, Clock, CheckCircle, XCircle, AlertTriangle, Users } from 'lucide-react';
+import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
-import type { WorkspaceRole } from '../../../shared/types/index';
 import StudyApprovalCard from './StudyApprovalCard';
+
+import type { WorkspaceRole } from '../../../shared/types/index';
 
 // Local types for approval queue
 export type ApprovalPriority = 'urgent' | 'high' | 'medium' | 'low';

@@ -1,7 +1,12 @@
 import React, { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
+import
+          console.log(`Study initialized from template: ${templateData.name}`);
 import { StudyBuilderHeader } from './shared/StudyBuilderHeader';
-import { StudyTypeStep } from './steps/StudyTypeStep';
+import { StudyFormData } from './types';
+
 import { StudySetupStep } from './steps/StudySetupStep';
+
+import { StudyTypeStep } from './steps/StudyTypeStep';
 
 // PHASE 4D: LAZY LOAD HEAVY STUDY BUILDER COMPONENTS - September 14, 2025
 // Convert heavy step components to lazy loading for better performance
@@ -9,8 +14,6 @@ const LazyBlockConfigurationStep = lazy(() => import('./steps/BlockConfiguration
 const LazyReviewStep = lazy(() => import('./steps/ReviewStep').then(module => ({ default: module.ReviewStep })));
 const LazyInterviewSessionConfigStep = lazy(() => import('./steps/InterviewSessionConfig').then(module => ({ default: module.InterviewSessionConfigStep })));
 const LazyUsabilityStudyConfigStep = lazy(() => import('./steps/UsabilityStudyConfig').then(module => ({ default: module.UsabilityStudyConfigStep })));
-
-import { StudyFormData } from './types';
 
 interface StudyCreationWizardProps {
   onComplete?: (studyData: StudyFormData) => void;
@@ -116,9 +119,7 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
         
         // Show success message
         setTimeout(() => {
-          // Note: toast should be available from context/import
-          console.log(`Study initialized from template: ${templateData.name}`);
-        }, 500);
+          // Note: toast should be available from context/        }, 500);
         
         return; // Skip draft loading if template was used
       } catch (error) {

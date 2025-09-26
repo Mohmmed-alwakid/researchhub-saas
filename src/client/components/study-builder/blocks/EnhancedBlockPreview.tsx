@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StudyBuilderBlock } from '../../../../shared/types';
 
+
 interface EnhancedBlockPreviewProps {
   block: StudyBuilderBlock;
   mode: 'edit' | 'preview' | 'participant';

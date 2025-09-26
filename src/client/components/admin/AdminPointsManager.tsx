@@ -10,9 +10,10 @@ import {
   Search
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { pointsService, type PointsBalance, type PointsTransaction } from '../../services/payment.service';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader } from '../ui/Card';
+
+import { pointsService, type PointsBalance, type PointsTransaction } from '../../services/payment.service';
 
 interface UserBalance extends PointsBalance {
   user: {

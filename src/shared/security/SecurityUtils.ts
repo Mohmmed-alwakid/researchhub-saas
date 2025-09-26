@@ -1,3 +1,7 @@
+import crypto from 'crypto';
+import { getSecurityManager, SecurityEventType, SecuritySeverity, SecurityMetrics } from './SecurityManager';
+
+
 /**
  * SecurityUtils - Comprehensive security utilities for ResearchHub
  * Based on Vibe-Coder-MCP architectural patterns
@@ -9,9 +13,6 @@
  * - Security monitoring
  * - Threat detection
  */
-
-import crypto from 'crypto';
-import { getSecurityManager, SecurityEventType, SecuritySeverity, SecurityMetrics } from './SecurityManager';
 
 export interface ValidationRule {
   type: 'required' | 'min_length' | 'max_length' | 'pattern' | 'custom';

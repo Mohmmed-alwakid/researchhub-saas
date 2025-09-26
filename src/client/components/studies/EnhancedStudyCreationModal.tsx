@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { X, Sparkles, Clock, Users, ArrowRight, Plus, Star, Eye } from 'lucide-react';
-import { Card, CardContent } from '../ui/Card';
-import { Button } from '../ui/Button';
-import EnhancedTemplateGallery from './EnhancedTemplateGallery';
-import { QuickStudyCreationFlow } from './QuickStudyCreationFlow';
-import { CompleteStudyBuilder } from './CompleteStudyBuilder';
 import { 
   getTemplatesByCategory
 } from '../../../shared/templates/enhanced-templates';
+import { Button } from '../ui/Button';
+import { Card, CardContent } from '../ui/Card';
+import { CompleteStudyBuilder } from './CompleteStudyBuilder';
+import { QuickStudyCreationFlow } from './QuickStudyCreationFlow';
+import EnhancedTemplateGallery from './EnhancedTemplateGallery';
 import type { 
   EnhancedStudyTemplate
 } from '../../../shared/types/index';
+
 
 interface EnhancedStudyCreationModalProps {
   isOpen: boolean;

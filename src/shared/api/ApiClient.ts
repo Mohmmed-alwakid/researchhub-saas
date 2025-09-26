@@ -1,3 +1,6 @@
+import { SecurityManager } from '../security/SecurityManager';
+
+
 /**
  * Enhanced API Client for ResearchHub
  * Provides optimized HTTP communication with advanced features
@@ -11,8 +14,6 @@
  * - Performance monitoring
  * - Security integration
  */
-
-import { SecurityManager } from '../security/SecurityManager';
 
 export interface ApiConfig {
   baseUrl: string;

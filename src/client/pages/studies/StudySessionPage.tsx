@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Monitor, Mic, Clock, Target } from 'lucide-react';
-import { StudyBlockSession } from '../../components/blocks/StudyBlockSession';
+import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
-import toast from 'react-hot-toast';
+import { StudyBlockSession } from '../../components/blocks/StudyBlockSession';
 
 interface Study {
   _id: string;

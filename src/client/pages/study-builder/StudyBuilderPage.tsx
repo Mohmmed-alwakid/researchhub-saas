@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { StudyCreationWizard } from '../../components/study-builder/StudyCreationWizard';
-import { StudyStateManager } from '../../components/study-builder/StudyStateManager';
 import { studiesService } from '../../services/studies.service';
+import { StudyCreationWizard } from '../../components/study-builder/StudyCreationWizard';
 import { StudyFormData } from '../../components/study-builder/types';
+
+import { StudyStateManager } from '../../components/study-builder/StudyStateManager';
 
 // Define types locally
 type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';

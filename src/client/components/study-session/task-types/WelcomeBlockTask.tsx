@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Clock, ArrowRight } from 'lucide-react';
 
+
 interface WelcomeBlockTaskProps {
   task: {
     _id: string;

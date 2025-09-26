@@ -1,6 +1,7 @@
-// 🚀 COLLABORATION SYSTEM TYPE FIXES
-
 import { WorkspaceRole } from '../../../shared/types';
+
+
+// 🚀 COLLABORATION SYSTEM TYPE FIXES
 
 // Activity types for collaboration
 export type ActivityType = 

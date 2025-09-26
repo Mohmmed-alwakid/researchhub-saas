@@ -49,6 +49,11 @@
 
 - **[CHANGELOG.md](CHANGELOG.md)** - ⭐ **NEW** Complete project changelog with recent updates
 
+### Design & Code Standards ✨ **NEW - SEPTEMBER 2025**
+
+- **[DESIGN_STANDARDS_GUIDE.md](DESIGN_STANDARDS_GUIDE.md)** - 🎨 **NEW** Complete design consistency guide and component usage rules
+- **[DESIGN_CHECKLIST.md](DESIGN_CHECKLIST.md)** - ⚡ **NEW** Quick reference checklist for developers
+
 ## 🎯 Core Features & Systems
 
 ### 🎨 Template Creation System ⭐ **NEW - JULY 10, 2025**

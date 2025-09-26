@@ -1,9 +1,10 @@
+import { z } from 'zod';
+
+
 /**
  * ResearchHub Study Blocks Type Definitions
  * Type-safe definitions for the block registry system
  */
-
-import { z } from 'zod';
 
 // Core block type definitions
 export const BLOCK_TYPES = {

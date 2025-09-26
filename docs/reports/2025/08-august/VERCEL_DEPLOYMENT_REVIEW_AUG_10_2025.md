@@ -37,8 +37,8 @@
 #### **Required Updates for Production**
 ```bash
 ✅ SUPABASE_URL: https://wxpwxzdgdvinlbtnbgdf.supabase.co
-✅ SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIs... (current working key)
-✅ SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIs... (current working key)
+✅ SUPABASE_ANON_KEY: 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'. (current working key)
+✅ SUPABASE_SERVICE_ROLE_KEY: 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'. (current working key)
 🔧 NODE_ENV: production (should be automatic)
 🔧 VITE_API_URL: https://afkar-saas.vercel.app/api (configured in vercel.json)
 ```
@@ -213,10 +213,10 @@ vercel env add SUPABASE_URL production
 # Enter: https://wxpwxzdgdvinlbtnbgdf.supabase.co
 
 vercel env add SUPABASE_ANON_KEY production  
-# Enter: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+# Enter: 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.
 
 vercel env add SUPABASE_SERVICE_ROLE_KEY production
-# Enter: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+# Enter: 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.
 ```
 
 ### **Step 2: Deploy (2 minutes)**

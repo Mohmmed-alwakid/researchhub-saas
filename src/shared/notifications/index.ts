@@ -1,3 +1,14 @@
+import { 
+  globalNotificationManager, 
+  NotificationManager, 
+  type NotificationChannel 
+} from './NotificationManager';
+import { 
+  NotificationClient, 
+  createNotificationHook 
+} from './NotificationClient';
+
+
 /**
  * Real-time Notifications System for ResearchHub
  * Server-Sent Events (SSE) implementation for real-time updates
@@ -40,16 +51,6 @@ export type {
 } from './NotificationClient';
 
 // Import for internal use
-import { 
-  globalNotificationManager, 
-  NotificationManager, 
-  type NotificationChannel 
-} from './NotificationManager';
-import { 
-  NotificationClient, 
-  createNotificationHook 
-} from './NotificationClient';
-
 // Integration utilities
 export class NotificationIntegration {
   /**

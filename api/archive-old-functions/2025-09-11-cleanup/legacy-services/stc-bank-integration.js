@@ -1,10 +1,11 @@
+import crypto from 'crypto';
+
+
 /**
  * STC BANK PAYMENT INTEGRATION
  * Integration module for STC Bank payment gateway
  * Works alongside existing DodoPayments system
  */
-
-import crypto from 'crypto';
 
 // STC Bank API configuration
 const STC_BANK_CONFIG = {

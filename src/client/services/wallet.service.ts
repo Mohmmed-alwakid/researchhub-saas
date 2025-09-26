@@ -1,6 +1,7 @@
 import { toast } from 'react-hot-toast';
 import { apiService } from './api-network-resilient.service';
 
+
 // Supported currencies: USD and SAR only
 export type SupportedCurrency = 'USD' | 'SAR';
 

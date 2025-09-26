@@ -1,6 +1,7 @@
-// Study Sessions API - Participant completion workflow
 import { createClient } from '@supabase/supabase-js';
 
+
+// Study Sessions API - Participant completion workflow
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 

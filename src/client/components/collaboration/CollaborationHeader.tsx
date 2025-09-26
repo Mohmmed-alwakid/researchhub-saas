@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Users, MessageCircle, Activity, Eye, Edit3 } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
-import { collaborationService } from '../../services/collaborationService';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { collaborationService } from '../../services/collaborationService';
+import { useAuthStore } from '../../stores/authStore';
 
 interface CollaborationHeaderProps {
   entityType: string;

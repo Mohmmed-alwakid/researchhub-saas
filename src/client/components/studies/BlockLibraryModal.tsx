@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Clock, Users, Star, Eye, Plus } from 'lucide-react';
 import type { BlockTemplate, BlockType } from '../../../shared/types/index';
 
+
 interface Block {
   id: string;
   templateId: string;

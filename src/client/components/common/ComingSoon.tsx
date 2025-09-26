@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, Star, Zap, AlertCircle } from 'lucide-react';
 
+
 interface ComingSoonProps {
   title: string;
   description?: string;

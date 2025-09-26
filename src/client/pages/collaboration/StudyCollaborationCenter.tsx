@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { toast } from 'react-hot-toast';
+
+import { Users, MessageSquare, Clock, Eye, Edit, Share, CheckCircle, AlertCircle } from 'lucide-react';
 import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
-import { Users, MessageSquare, Clock, Eye, Edit, Share, CheckCircle, AlertCircle } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 
 interface StudyCollaborator {
   id: string;

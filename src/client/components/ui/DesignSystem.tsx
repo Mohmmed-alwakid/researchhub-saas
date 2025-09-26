@@ -1,8 +1,9 @@
-// Design System - Enhanced UI Components
-// Comprehensive component library for study creation flow
-
 import React from 'react';
 import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react';
+
+
+// Design System - Enhanced UI Components
+// Comprehensive component library for study creation flow
 
 // Design System Tokens
 export const DesignTokens = {

@@ -1,8 +1,8 @@
+import React from 'react';
+
 /**
  * Accessibility hooks and utilities
  */
-import React from 'react';
-
 export const useAriaLiveRegion = (message: string, type: 'polite' | 'assertive' = 'polite') => {
   React.useEffect(() => {
     if (!message) return;

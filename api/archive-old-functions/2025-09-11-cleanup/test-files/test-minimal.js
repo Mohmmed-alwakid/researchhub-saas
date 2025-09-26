@@ -1,3 +1,8 @@
+import and connection
+    const { createClient } = await import('@supabase/supabase-js');
+import successful');
+
+
 // Minimal test API to debug the issue
 export default async function handler(req, res) {
   try {
@@ -18,11 +23,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Test Supabase import and connection
-    const { createClient } = await import('@supabase/supabase-js');
-    console.log('Supabase import successful');
-
-    const supabase = createClient(
+    // Test Supabase     console.log('Supabase     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_ANON_KEY
     );

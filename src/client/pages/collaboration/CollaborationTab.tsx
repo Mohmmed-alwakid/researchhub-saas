@@ -14,6 +14,7 @@ import {
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 
+
 interface CollaborationTabProps {
   studyId?: string;
   workspaceId?: string;

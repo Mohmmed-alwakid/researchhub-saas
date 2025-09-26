@@ -1,11 +1,12 @@
+import type { BusinessIntelligenceService, ExecutiveSummary } from './BusinessIntelligenceService';
+import type { UsageAnalyticsService, EngagementMetrics } from './UsageAnalyticsService';
+
+
 /**
  * Executive Dashboard Service
  * Creates executive dashboards and reports for ResearchHub leadership
  * Part of Vibe-Coder-MCP Phase 4 Task 4.4 implementation
  */
-
-import type { BusinessIntelligenceService, ExecutiveSummary } from './BusinessIntelligenceService';
-import type { UsageAnalyticsService, EngagementMetrics } from './UsageAnalyticsService';
 
 export interface DashboardWidget {
   id: string;

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bell, User, CheckCircle, AlertCircle, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+
 export interface Notification {
   id: string;
   type: 'participant_applied' | 'study_started' | 'study_completed' | 'application_approved' | 'system_update' | 'achievement';

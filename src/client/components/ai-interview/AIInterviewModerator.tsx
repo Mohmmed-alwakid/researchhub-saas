@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
+
 export interface AIInterviewMessage {
   id: string;
   role: 'ai' | 'participant';

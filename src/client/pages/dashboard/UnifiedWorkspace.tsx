@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   BarChart3, 
   Users, 
@@ -10,14 +9,16 @@ import {
   Settings,
   Clock
 } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 
-// Import existing components that will become tabs
-import DashboardOverview from './DashboardOverview';
-import CollaborationTab from '../collaboration/CollaborationTab';
-import TemplateManager from '../../components/templates/TemplateManager';
 import AdvancedAnalyticsDashboard from '../../components/analytics/AdvancedAnalyticsDashboard';
 
+import CollaborationTab from '../collaboration/CollaborationTab';
+import DashboardOverview from './DashboardOverview';
+import TemplateManager from '../../components/templates/TemplateManager';
+
+// Import existing components that will become tabs
 // Create wrapper components to match expected prop interface
 const StudyAnalyticsTab: React.FC<{ studyId?: string; workspaceId?: string }> = ({ studyId }) => (
   <AdvancedAnalyticsDashboard 

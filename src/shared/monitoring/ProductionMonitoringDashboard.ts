@@ -1,3 +1,7 @@
+import { ProductionPerformanceMonitor, PerformanceReport, PerformanceMetrics } from './ProductionPerformanceMonitor';
+import { RealTimeAnalytics, AnalyticsReport } from './RealTimeAnalytics';
+
+
 /**
  * Production Monitoring Dashboard
  * Unified monitoring system combining performance monitoring and real-time analytics
@@ -9,9 +13,6 @@
  * - Executive summary and business intelligence
  * - Health status and system overview
  */
-
-import { ProductionPerformanceMonitor, PerformanceReport, PerformanceMetrics } from './ProductionPerformanceMonitor';
-import { RealTimeAnalytics, AnalyticsReport } from './RealTimeAnalytics';
 
 export interface DashboardConfig {
   performance: {

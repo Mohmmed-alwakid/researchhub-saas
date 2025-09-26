@@ -1,10 +1,11 @@
+import { EventEmitter } from 'events';
+
+
 /**
  * Production Monitoring Framework
  * Comprehensive monitoring and analytics for ResearchHub production deployment
  * Part of Vibe-Coder-MCP Phase 4 implementation
  */
-
-import { EventEmitter } from 'events';
 
 // Configuration interfaces
 export interface MonitoringConfig {

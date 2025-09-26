@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import { 
   Brain,
   TrendingUp,
@@ -13,10 +12,12 @@ import {
   BarChart3,
   Users
 } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
+import { useParams } from 'react-router-dom';
 import { aiInsightsEngine, AIInsight, QualityScore, TrendInsight, Recommendation } from '../../../services/ai/aiInsightsEngine';
+
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader } from '../ui/Card';
 
 interface AIInsightsDashboardProps {
   studyId?: string;

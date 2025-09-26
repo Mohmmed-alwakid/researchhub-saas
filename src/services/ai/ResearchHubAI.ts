@@ -1,8 +1,9 @@
-// Vercel AI Gateway Service for ResearchHub
-// Integrates AI-powered features using Vercel AI Gateway
-
 import { generateText, generateObject } from 'ai';
 import { z } from 'zod';
+
+
+// Vercel AI Gateway Service for ResearchHub
+// Integrates AI-powered features using Vercel AI Gateway
 
 // AI Services for ResearchHub Features
 export class ResearchHubAI {

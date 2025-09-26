@@ -1,13 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { Avatar } from '../ui/Avatar';
-import { Badge } from '../ui/Badge';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { 
   IStudyComment,
   CommentReaction,
   CollaboratorPresence
 } from '../../../shared/types';
+
+import { Avatar } from '../ui/Avatar';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 
 interface CommentSystemProps {
   /** Study or entity ID for comments */

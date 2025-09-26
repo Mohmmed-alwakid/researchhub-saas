@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle, Circle, AlertCircle, Clock, Users, Settings, Play } from 'lucide-react';
 
+
 interface ProgressStep {
   id: string;
   title: string;

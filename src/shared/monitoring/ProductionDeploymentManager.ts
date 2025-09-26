@@ -1,11 +1,12 @@
+import { performance } from 'perf_hooks';
+
+import { ProductionMonitor } from './ProductionMonitor.js';
+
 /**
  * Production Deployment Manager
  * Handles deployment, validation, and rollback for ResearchHub production deployment
  * Part of Vibe-Coder-MCP Phase 4 implementation
  */
-
-import { ProductionMonitor } from './ProductionMonitor.js';
-import { performance } from 'perf_hooks';
 
 export interface DeploymentConfig {
   environment: 'staging' | 'production';

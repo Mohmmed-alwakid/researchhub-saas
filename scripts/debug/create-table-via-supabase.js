@@ -4,7 +4,7 @@
 const fetch = require('node-fetch');
 
 const SUPABASE_URL = 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cHd4emRnZHZpbmxidG5iZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDE5OTU4MCwiZXhwIjoyMDY1Nzc1NTgwfQ.pHO2-V_kKqOgbRqBQW1HjZmTfBqxLdQECCCv1fKKqRo';
+const SUPABASE_SERVICE_KEY = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'';
 
 const SQL_CREATE_TABLE = `
 -- Create payment_requests table

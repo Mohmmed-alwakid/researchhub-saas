@@ -2,7 +2,7 @@
 const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = 'https://jdpxixlvpqsygxmrdlvv.supabase.co';
-const supabaseKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkcHhpeGx2cHFzeWd4bXJkbHZ2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxODI0MzQ5NywiZXhwIjoyMDMzODE5NDk3fQ.1YSkWlhYolJL_wRb9vU3UiFrNQBwzJekIKZm3eUWKtk';
+const supabaseKey = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 

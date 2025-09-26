@@ -1,3 +1,7 @@
+import { createMonitoringSystem } from './monitoring';
+import { ProductionMonitoringDashboard, DashboardConfig } from './ProductionMonitoringDashboard';
+
+
 /**
  * Production Monitoring System
  * Complete monitoring infrastructure for ResearchHub production environment
@@ -10,8 +14,7 @@
  * 
  * Usage:
  * ```typescript
- * import { createMonitoringSystem } from './monitoring';
- * 
+ *  * 
  * const monitoring = createMonitoringSystem({
  *   performance: { enabled: true },
  *   analytics: { enabled: true },
@@ -87,8 +90,6 @@ export type {
   HealthIncident,
   HealthSummary
 } from './HealthCheckService';
-
-import { ProductionMonitoringDashboard, DashboardConfig } from './ProductionMonitoringDashboard';
 
 /**
  * Create a complete monitoring system with recommended defaults

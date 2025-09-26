@@ -1,6 +1,7 @@
 import React from 'react';
 import { StudyBuilderBlock } from '../types';
 
+
 interface EnhancedBlockEditorProps {
   block: StudyBuilderBlock;
   onUpdate: (blockId: string, updates: Partial<StudyBuilderBlock>) => void;

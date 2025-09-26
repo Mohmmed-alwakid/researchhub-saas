@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StepProps, UsabilityConfig, ScreeningQuestion } from '../types';
 import { HelpCircle, Monitor, Clock, CheckCircle, Settings, Plus, X } from 'lucide-react';
+
+import { StepProps, UsabilityConfig, ScreeningQuestion } from '../types';
 
 export const UsabilityStudyConfigStep: React.FC<StepProps> = ({
   formData,

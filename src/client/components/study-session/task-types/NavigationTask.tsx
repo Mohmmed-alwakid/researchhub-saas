@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ExternalLink, CheckCircle, Clock, ArrowRight } from 'lucide-react';
 import type { IStudy, IParticipant } from '../../../../shared/types/index';
 
+
 interface NavigationTaskData {
   configuration?: {
     url?: string;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { stcBankService, STCPaymentVerification } from '../../services/payment.service';
 
+
 interface PaymentResultProps {
   type: 'success' | 'failure' | 'cancel';
   paymentId?: string;

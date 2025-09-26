@@ -1,9 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * Notion Product Management Hub - Webhook API
  * Handles automation between ResearchHub and Notion
  */
-
-import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;

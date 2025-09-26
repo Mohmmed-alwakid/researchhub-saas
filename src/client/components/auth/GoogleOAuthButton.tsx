@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { googleOAuthService } from '../../services/googleOAuth.service';
 import { Button } from '../ui/Button';
+
+import { googleOAuthService } from '../../services/googleOAuth.service';
 
 interface GoogleOAuthButtonProps {
   mode?: 'signin' | 'signup';

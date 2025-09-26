@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { cn } from '../../utils/cn';
 
+
 export interface SkeletonProps {
   className?: string;
   lines?: number;

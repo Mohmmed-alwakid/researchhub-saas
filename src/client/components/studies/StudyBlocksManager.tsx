@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
+import { BlockEditModal } from './BlockEditModal';
+
+import { BlockLibraryModal } from './BlockLibraryModal';
 import { BlockType, BlockTemplate } from '../../../shared/types';
 import { createDefaultBlock } from '../../utils/blockUtils';
-import { BlockLibraryModal } from './BlockLibraryModal';
 import { DragDropBlockList } from './DragDropBlockList';
-import { BlockEditModal } from './BlockEditModal';
 
 export interface StudyBuilderBlock {
   id: string;

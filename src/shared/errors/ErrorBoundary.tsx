@@ -1,13 +1,14 @@
+import React, { Component, ReactNode, ErrorInfo } from 'react';
+import { Button } from '../../client/components/ui/Button';
+
+import { Card } from '../../client/components/ui/Card';
+import { globalErrorHandler } from './ErrorHandler.js';
+import { ResearchHubError, ErrorCategory, ErrorSeverity, ERROR_CODES } from './ErrorTypes.js';
+
 /**
  * React Error Boundary Components for ResearchHub
  * Provides graceful error handling in React components
  */
-
-import React, { Component, ReactNode, ErrorInfo } from 'react';
-import { ResearchHubError, ErrorCategory, ErrorSeverity, ERROR_CODES } from './ErrorTypes.js';
-import { globalErrorHandler } from './ErrorHandler.js';
-import { Card } from '../../client/components/ui/Card';
-import { Button } from '../../client/components/ui/Button';
 
 interface ErrorBoundaryState {
   hasError: boolean;

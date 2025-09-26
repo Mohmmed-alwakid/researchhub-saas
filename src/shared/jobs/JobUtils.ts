@@ -1,7 +1,11 @@
-/**
- * Job Utilities and Helper Functions for ResearchHub
- * Convenience functions for common job operations
- */
+import {
+  StudyCreationJobData,
+  DataExportJobData,
+  EmailNotificationJobData,
+  CreateStudyJobOptions,
+  CreateExportJobOptions,
+  CreateEmailJobOptions
+} from './JobTypes';
 
 import { 
   globalJobManager, 
@@ -11,14 +15,11 @@ import {
   JobStatus,
   JobPriority 
 } from './JobManager';
-import {
-  StudyCreationJobData,
-  DataExportJobData,
-  EmailNotificationJobData,
-  CreateStudyJobOptions,
-  CreateExportJobOptions,
-  CreateEmailJobOptions
-} from './JobTypes';
+
+/**
+ * Job Utilities and Helper Functions for ResearchHub
+ * Convenience functions for common job operations
+ */
 
 /**
  * Study-specific job creation helpers

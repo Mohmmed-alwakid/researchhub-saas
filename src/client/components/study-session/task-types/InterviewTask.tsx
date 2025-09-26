@@ -1,10 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Video, Mic, MicOff, VideoOff, Clock, Users, ExternalLink, AlertCircle, CheckCircle, PhoneOff } from 'lucide-react';
 
-// Conditional Zoom SDK import to prevent React version conflicts
+import failed:', error);
+import to prevent bundling issues in production
+  if (typeof window !== 'undefined') {
+    // Using dynamic import with proper error handling
+    const loadZoomSDK = async () => {
+      try {
+        // @ts-expect-error - Optional dependency, may not be available
+        const module = await import('@zoom/meetingsdk/embedded');
+import to prevent React version conflicts
 interface ZoomClient {
   init(config: unknown): Promise<unknown>;
-  join(joinConfig: unknown): Promise<unknown>;
+
+// Conditional Zoom SDK   join(joinConfig: unknown): Promise<unknown>;
   on(event: string, callback: (payload: unknown) => void): void;
   leave(): Promise<unknown>;
 }
@@ -16,14 +25,7 @@ interface ZoomSDK {
 
 let ZoomMtgEmbedded: ZoomSDK | null = null;
 try {
-  // Dynamic import to prevent bundling issues in production
-  if (typeof window !== 'undefined') {
-    // Using dynamic import with proper error handling
-    const loadZoomSDK = async () => {
-      try {
-        // @ts-expect-error - Optional dependency, may not be available
-        const module = await import('@zoom/meetingsdk/embedded');
-        ZoomMtgEmbedded = module.default as ZoomSDK;
+  // Dynamic         ZoomMtgEmbedded = module.default as ZoomSDK;
       } catch (err) {
         console.warn('Zoom SDK not available:', err);
       }
@@ -31,8 +33,7 @@ try {
     loadZoomSDK();
   }
 } catch (error) {
-  console.warn('Zoom SDK import failed:', error);
-}
+  console.warn('Zoom SDK }
 
 interface ZoomMeetingConfig {
   meetingNumber: string;

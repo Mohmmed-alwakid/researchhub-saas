@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { studiesService } from '../../services/studies.service';
-
-// Define types locally to avoid import issues
+import issues
 type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
 
-interface StudyStateManagerProps {
+import { studiesService } from '../../services/studies.service';
+
+
+// Define types locally to avoid interface StudyStateManagerProps {
   studyId: string;
   currentStatus: StudyStatus;
   onStatusChange?: (newStatus: StudyStatus) => void;

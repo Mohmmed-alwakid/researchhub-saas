@@ -14,6 +14,7 @@ import {
   Flame
 } from 'lucide-react';
 
+
 // Gamification Types
 export interface ParticipantPoints {
   total: number;

@@ -274,8 +274,8 @@ export default async function handler(req, res) {
 ```bash
 # Vercel Dashboard - Add these environment variables:
 SUPABASE_URL=https://wxpwxzdgdvinlbtnbgdf.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_ANON_KEY='PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.
+SUPABASE_SERVICE_ROLE_KEY='PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'.
 NODE_ENV=production
 ```
 

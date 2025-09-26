@@ -33,7 +33,7 @@ I successfully debugged the ResearchHub admin dashboard user management system a
 **Issue**: The hardcoded Supabase service role key in `local-full-dev.js` is invalid/expired
 ```javascript
 // THIS KEY IS INVALID:
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3d4cHd4emRnZHZpbmxidG5iZ2RmLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJiYzI4ZGE5ZC1mNjBmLTQ3OTgtOWU5MC1jOGM0M2NkNWE5NjMiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNzUwMTk5NTgwLCJleHAiOjIwNjU3NzU1ODB9.YBpDlH9CRVn_8kKocdW5R_X4N-rMJpR4PG8wWmhMw38';
+const supabaseServiceKey = ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'';
 ```
 
 **Error Message**: `"Invalid API key" hint: "Double check your Supabase anon or service_role API key."`

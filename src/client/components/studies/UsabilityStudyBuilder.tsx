@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+
+import { useForm } from 'react-hook-form';
 
 interface UsabilityStudyFormData {
   // Step 1: Study Overview

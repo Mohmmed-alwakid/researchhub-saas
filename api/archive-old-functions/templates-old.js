@@ -1,3 +1,6 @@
+import { createClient } from '@supabase/supabase-js';
+
+
 /**
  * Templates API - Complete study template management system with Authentication
  * 
@@ -16,11 +19,9 @@
  * Status: Development mode - using fallback templates with auth integration
  */
 
-import { createClient } from '@supabase/supabase-js';
-
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL || 'https://bpcgkrsmcttfvkhwvclp.supabase.co';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwY2drcnNtY3R0ZnZraHd2Y2xwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNDQ5NTc2NSwiZXhwIjoyMDUwMDcxNzY1fQ.J-6rGFqVxwdQ1cSDLnhKR1Y5teDr5q0L4_3jUNhFqms';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AIInterviewModerator } from '../../components/ai-interview';
 import type { AIInterviewSessionData } from '../../components/ai-interview';
 
+
 interface Study {
   id: string;
   title: string;

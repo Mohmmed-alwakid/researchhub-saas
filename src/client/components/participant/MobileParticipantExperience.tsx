@@ -16,6 +16,7 @@ import {
   Signal
 } from 'lucide-react';
 
+
 // Mobile-specific interfaces
 export interface MobileViewport {
   width: number;

@@ -2,6 +2,7 @@ import React, { createContext, useState, useCallback } from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 
+
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 export interface Toast {

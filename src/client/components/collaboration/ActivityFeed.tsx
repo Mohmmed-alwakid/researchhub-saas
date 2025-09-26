@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Clock, User, MessageCircle, Edit, CheckCircle, XCircle, AlertTriangle, Users, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
 import type { WorkspaceRole } from '../../../shared/types/index';
+
 
 // Activity types for the feed
 export type ActivityType = 

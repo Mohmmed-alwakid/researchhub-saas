@@ -1,7 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import StudyExecution from '../../components/participant/StudyExecution';
 import { Card, CardContent } from '../../components/ui/Card';
+
+import StudyExecution from '../../components/participant/StudyExecution';
 
 const ParticipantStudyExecutionPage: React.FC = () => {
   const { studyId } = useParams<{ studyId: string }>();

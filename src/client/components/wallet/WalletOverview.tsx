@@ -1,9 +1,10 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Wallet, Eye, EyeOff } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { formatCurrency, SupportedCurrency } from '../../services/wallet.service';
+
 
 interface WalletData {
   balance: number;
