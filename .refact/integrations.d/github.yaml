@@ -1,5 +1,5 @@
 gh_binary_path: ''
-gh_token: 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
+gh_token: ''
 available:
   on_your_laptop: true
   when_isolated: false
