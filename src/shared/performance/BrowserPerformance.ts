@@ -1,6 +1,4 @@
-import web-vitals library dynamically
-      const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
-      
+// Import web-vitals library dynamically
 import { getPerformanceMonitor, PerformanceMetric } from './PerformanceMonitor';
 
 

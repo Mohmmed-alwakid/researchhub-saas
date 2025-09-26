@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import issues
-type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
-
 import { studiesService } from '../../services/studies.service';
 
+type StudyStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
 
-// Define types locally to avoid interface StudyStateManagerProps {
+interface StudyStateManagerProps {
   studyId: string;
   currentStatus: StudyStatus;
   onStatusChange?: (newStatus: StudyStatus) => void;

@@ -32,7 +32,8 @@ import type { IParticipantApplication } from '../../../shared/types';
 import WalletErrorBoundary from '../../components/wallet/WalletErrorBoundary';
 
 // // // import { WithdrawalFormData } from '../../components/wallet/WithdrawalForm'; // TODO: Will be used when withdrawal form is implemented
-// interface EnhancedApplication extends Omit<IParticipantApplication, 'studyId'> {
+
+interface EnhancedApplication extends Omit<IParticipantApplication, 'studyId'> {
   studyId: {
     _id: string;
     title: string;

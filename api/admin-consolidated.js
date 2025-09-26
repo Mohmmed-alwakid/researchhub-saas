@@ -12,6 +12,12 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Debug environment variables
+console.log('🔍 Admin API Debug:');
+console.log('🔍 SUPABASE_URL:', supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'MISSING');
+console.log('🔍 SUPABASE_ANON_KEY:', supabaseKey ? `Found (${supabaseKey.length} chars)` : 'MISSING');
+console.log('🔍 SUPABASE_SERVICE_ROLE_KEY:', supabaseServiceKey ? `Found (${supabaseServiceKey.length} chars)` : 'MISSING');
+
 // Only create Supabase clients if credentials are available
 let supabase = null;
 let supabaseAdmin = null;

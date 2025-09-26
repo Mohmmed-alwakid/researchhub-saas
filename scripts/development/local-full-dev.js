@@ -24,25 +24,31 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Development Mode: Disable Supabase entirely for local development
-console.log('🔧 DEVELOPMENT MODE: Disabling Supabase connections for local development');
-console.log('🔧 Using fallback authentication and file storage only');
+// Enable Supabase for local development with proper credentials
+console.log('🔧 LOCAL DEVELOPMENT: Using real Supabase with credentials from .env');
+console.log('🔧 Supabase URL:', process.env.SUPABASE_URL);
+console.log('🔧 Anon Key:', process.env.SUPABASE_ANON_KEY ? 'Found' : 'Missing');
+console.log('🔧 Service Key:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Found' : 'Missing');
 
-// Set environment to indicate pure local development
-process.env.LOCAL_DEVELOPMENT_ONLY = 'true';
+// Set environment for production-like authentication
 process.env.NODE_ENV = 'development';
 
-// Import consolidated API handlers
-import authHandler from '../../api/auth-consolidated.js';
-import templatesHandler from '../../api/templates-consolidated.js';
-import paymentsHandler from '../../api/payments-consolidated-full.js';
-import userProfileHandler from '../../api/user-profile-consolidated.js';
-import systemHandler from '../../api/system-consolidated.js';
-import researchHandler from '../../api/research-consolidated.js';
-import adminHandler from '../../api/admin-consolidated.js';
-import applicationsHandler from '../../api/applications.js';
-
 console.log('🔍 Testing Supabase connectivity...');
+
+// Dynamic import of API handlers after environment is set
+let authHandler, templatesHandler, paymentsHandler, userProfileHandler, systemHandler, researchHandler, adminHandler, applicationsHandler;
+
+async function loadHandlers() {
+  authHandler = (await import('../../api/auth-consolidated.js')).default;
+  templatesHandler = (await import('../../api/templates-consolidated.js')).default;
+  paymentsHandler = (await import('../../api/payments-consolidated-full.js')).default;
+  userProfileHandler = (await import('../../api/user-profile-consolidated.js')).default;
+  systemHandler = (await import('../../api/system-consolidated.js')).default;
+  researchHandler = (await import('../../api/research-consolidated.js')).default;
+  adminHandler = (await import('../../api/admin-consolidated.js')).default;
+  applicationsHandler = (await import('../../api/applications.js')).default;
+  console.log('✅ API handlers loaded with environment variables');
+}
 
 // === CONSOLIDATED API ROUTES ===
 
@@ -219,6 +225,9 @@ async function clearDemoDataOnStart() {
 
 // Start backend server
 app.listen(API_PORT, async () => {
+  // Load API handlers after server starts and environment is fully set
+  await loadHandlers();
+  
   console.log('🚀 LOCAL FULLSTACK DEVELOPMENT SERVER');
   console.log(`📡 Backend API: http://localhost:${API_PORT}`);
   console.log(`🌐 Frontend: http://localhost:${FRONTEND_PORT}`);

@@ -8,7 +8,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Supabase configuration (same as auth service)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY'';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'PLACEHOLDER_SUPABASE_SERVICE_ROLE_KEY';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 

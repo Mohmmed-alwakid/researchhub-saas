@@ -27,15 +27,6 @@ const browserNoisePatterns = [
 ];
 
 
-// Store original methods for selective restoration
-const originalConsole = {
-  warn: console.warn,
-  error: console.error,
-  info: console.info,
-  debug: console.debug,
-  log: console.log
-};
-
 // Production-safe error filtering
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isBrowserNoise = (args: any[]): boolean => {
@@ -46,11 +37,19 @@ const isBrowserNoise = (args: any[]): boolean => {
 // Enhanced console methods - suppress only browser noise, preserve real errors
 if (import.meta.env.PROD) {
   // In production: Filter browser noise but allow application errors
+  const originalConsoleError = console.error;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.error = (...args: any[]) => {
+    if (!isBrowserNoise(args)) {
+      originalConsoleError.apply(console, args);
     }
   };
   
+  const originalConsoleWarn = console.warn;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.warn = (...args: any[]) => {
+    if (!isBrowserNoise(args)) {
+      originalConsoleWarn.apply(console, args);
     }
   };
 } else {
@@ -76,8 +75,6 @@ if (typeof window !== 'undefined') {
   };
 }
 
-createRoot(document.getElementById('root')!).render(
-  
 // Minimal error suppression for browser-specific warnings
 const originalError = console.error;
 console.error = (...args) => {
@@ -93,7 +90,8 @@ console.error = (...args) => {
   originalError.apply(console, args);
 };
 
-<StrictMode>
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
     <App />
   </StrictMode>,
 )

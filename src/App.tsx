@@ -6,7 +6,6 @@ import { PerformanceMonitor } from './client/components/performance/PerformanceM
 import { RouteLoadingSpinner } from './client/components/ui/LoadingComponents';
 import { SentryErrorBoundary } from './components/common/SentryErrorBoundary';
 import { useAuthStore } from './client/stores/authStore';
-import AdminDashboard from './../@/pages/admin/AdminDashboard';
 
 import AfkarLogo from './assets/brand/AfkarLogo';
 import AppLayout from './client/components/common/AppLayout';

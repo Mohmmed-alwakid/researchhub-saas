@@ -1,6 +1,4 @@
 import React, { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
-import
-          console.log(`Study initialized from template: ${templateData.name}`);
 import { StudyBuilderHeader } from './shared/StudyBuilderHeader';
 import { StudyFormData } from './types';
 
@@ -119,7 +117,9 @@ export const StudyCreationWizard: React.FC<StudyCreationWizardProps> = ({
         
         // Show success message
         setTimeout(() => {
-          // Note: toast should be available from context/        }, 500);
+          // Note: toast should be available from context
+          console.log(`Study initialized from template: ${templateData.name}`);
+        }, 500);
         
         return; // Skip draft loading if template was used
       } catch (error) {

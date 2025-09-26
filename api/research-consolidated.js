@@ -43,8 +43,8 @@ function validateStudiesResponse(response) {
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://wxpwxzdgdvinlbtnbgdf.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here'';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'your_supabase_anon_key_here';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'your_supabase_service_role_key_here';
 
 // Initialize Supabase clients
 const supabase = createClient(supabaseUrl, supabaseKey);
