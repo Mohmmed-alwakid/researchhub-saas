@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Study 404 Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-section { border: 1px solid #ccc; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .success { color: green; background: #e8f5e8; padding: 10px; border-radius: 3px; }
+        .error { color: red; background: #fde8e8; padding: 10px; border-radius: 3px; }
+        .info { color: blue; background: #e8f1ff; padding: 10px; border-radius: 3px; }
+        button { padding: 10px 20px; margin: 10px 5px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; white-space: pre-wrap; }
+        .step { margin: 10px 0; padding: 10px; background: #f9f9f9; border-left: 4px solid #007cba; }
+    </style>
+</head>
+<body>
+    <h1>🐛 Delete Study 404 Error - Debug & Fix Test</h1>
+    <p><strong>Issue:</strong> User reports "Request failed with status code 404" when trying to delete draft studies</p>
+    
+    <div class="step">
+        <h3>Step 1: Authenticate as Researcher</h3>
+        <button onclick="authenticateUser()">🔑 Login as Test Researcher</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="step">
+        <h3>Step 2: Create a Test Draft Study</h3>
+        <button onclick="createTestStudy()">📝 Create Draft Study</button>
+        <div id="create-result"></div>
+    </div>
+
+    <div class="step">
+        <h3>Step 3: Test Delete Functionality (Reproduce 404)</h3>
+        <button onclick="deleteStudy()">🗑️ Delete Study (Test)</button>
+        <div id="delete-result"></div>
+    </div>
+
+    <div class="step">
+        <h3>Step 4: Debug API Request Details</h3>
+        <button onclick="debugAPICall()">🔍 Debug Delete API Call</button>
+        <div id="debug-result"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let testStudyId = null;
+
+        async function authenticateUser() {
+            const result = document.getElementById('auth-result');
+            result.innerHTML = '<div class="info">Authenticating researcher...</div>';
+
+            try {
+                const response = await fetch('http://localhost:3003/api/auth?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'abwanwr77+Researcher@gmail.com',
+                        password: 'Testtest123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    result.innerHTML = `
+                        <div class="success">✅ Authenticated successfully!</div>
+                        <pre>Token: ${authToken.substring(0, 50)}...</pre>
+                        <pre>Role: ${data.user?.role || 'Unknown'}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">❌ Authentication failed</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function createTestStudy() {
+            if (!authToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const result = document.getElementById('create-result');
+            result.innerHTML = '<div class="info">Creating test draft study...</div>';
+
+            try {
+                const response = await fetch('http://localhost:3003/api/research-consolidated?action=create-study', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: 'Delete Test Study - ' + new Date().toISOString(),
+                        description: 'Test study created for delete 404 debugging',
+                        type: 'unmoderated',
+                        status: 'draft',
+                        duration: 30,
+                        compensation: 10
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.study?.id) {
+                    testStudyId = data.study.id;
+                    result.innerHTML = `
+                        <div class="success">✅ Test study created successfully!</div>
+                        <pre>Study ID: ${testStudyId}</pre>
+                        <pre>Title: ${data.study.title}</pre>
+                        <pre>Status: ${data.study.status}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">❌ Failed to create study</div>
+                        <pre>Response: ${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function deleteStudy() {
+            if (!authToken || !testStudyId) {
+                alert('Please authenticate and create a test study first!');
+                return;
+            }
+
+            const result = document.getElementById('delete-result');
+            result.innerHTML = '<div class="info">🗑️ Attempting to delete study...</div>';
+
+            try {
+                // This is how the frontend service makes the DELETE request
+                const response = await fetch(`http://localhost:3003/api/research-consolidated?action=delete-study`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: testStudyId })
+                });
+
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <div class="${response.ok ? 'success' : 'error'}">
+                        ${response.ok ? '✅' : '❌'} Status: ${response.status} ${response.statusText}
+                    </div>
+                    <pre><strong>Response Data:</strong>
+${JSON.stringify(data, null, 2)}</pre>
+                    <pre><strong>Request Details:</strong>
+URL: http://localhost:3003/api/research-consolidated?action=delete-study
+Method: DELETE
+Study ID: ${testStudyId}
+Auth Token: ${authToken.substring(0, 30)}...</pre>
+                `;
+
+                if (response.status === 404) {
+                    result.innerHTML += `
+                        <div class="error">
+                            <h4>🚨 404 Error Reproduced!</h4>
+                            <p>This confirms the user's issue. The delete endpoint is returning 404.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        async function debugAPICall() {
+            if (!authToken) {
+                alert('Please authenticate first!');
+                return;
+            }
+
+            const result = document.getElementById('debug-result');
+            result.innerHTML = '<div class="info">🔍 Running API debug checks...</div>';
+
+            let debugInfo = '';
+
+            // Test 1: Check if endpoint exists
+            try {
+                const response = await fetch('http://localhost:3003/api/research-consolidated', {
+                    method: 'OPTIONS',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                debugInfo += `✅ Base endpoint accessible (Status: ${response.status})\n`;
+            } catch (error) {
+                debugInfo += `❌ Base endpoint error: ${error.message}\n`;
+            }
+
+            // Test 2: Check available actions
+            try {
+                const response = await fetch('http://localhost:3003/api/research-consolidated?action=debug-auth', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await response.json();
+                debugInfo += `✅ Auth debug endpoint works (Status: ${response.status})\n`;
+                debugInfo += `User ID: ${data.user?.id}\nRole: ${data.user?.role}\n`;
+            } catch (error) {
+                debugInfo += `❌ Auth debug failed: ${error.message}\n`;
+            }
+
+            // Test 3: Check if study exists before delete
+            if (testStudyId) {
+                try {
+                    const response = await fetch(`http://localhost:3003/api/research-consolidated?action=get-studies`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    const data = await response.json();
+                    const studyExists = data.studies?.find(s => s.id === testStudyId);
+                    debugInfo += `${studyExists ? '✅' : '❌'} Test study exists in database: ${!!studyExists}\n`;
+                    if (studyExists) {
+                        debugInfo += `Study Owner: ${studyExists.researcher_id}\nStatus: ${studyExists.status}\n`;
+                    }
+                } catch (error) {
+                    debugInfo += `❌ Study lookup failed: ${error.message}\n`;
+                }
+            }
+
+            result.innerHTML = `
+                <div class="info">
+                    <h4>🔍 Debug Results:</h4>
+                    <pre>${debugInfo}</pre>
+                </div>
+            `;
+        }
+    </script>
+
+    <div class="test-section">
+        <h3>📋 Expected Behavior:</h3>
+        <ul>
+            <li>✅ User should be able to delete their own draft studies</li>
+            <li>✅ DELETE request should return 200 OK with success message</li>
+            <li>❌ Currently getting 404 error instead</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>🔧 Debugging Checklist:</h3>
+        <ul>
+            <li>☐ Verify API endpoint routing for delete-study action</li>
+            <li>☐ Check if study ID parameter is being passed correctly</li>
+            <li>☐ Confirm authentication and ownership validation</li>
+            <li>☐ Test database query for study existence</li>
+            <li>☐ Verify DELETE method is allowed for the endpoint</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Study Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .step { border-left: 4px solid #007bff; padding: 10px; margin: 10px 0; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; max-height: 300px; }
+        .status { font-weight: bold; padding: 5px; border-radius: 3px; }
+        .status.pass { background-color: #d4edda; color: #155724; }
+        .status.fail { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Delete Study Fix Validation Test</h1>
+    <p><strong>Purpose:</strong> Test that the 404 error is fixed after changing the deleteStudy API call</p>
+    
+    <div class="test-section info">
+        <h3>🔍 What We Fixed</h3>
+        <p><strong>Issue:</strong> Frontend was sending DELETE request with body: <code>{ data: { id: studyId } }</code></p>
+        <p><strong>Fix:</strong> Changed to send ID in query string: <code>?action=delete-study&id=${studyId}</code></p>
+        <p><strong>Reason:</strong> Other DELETE endpoints in the same service use query string pattern</p>
+    </div>
+
+    <div class="step">
+        <h3>📊 Test Progress</h3>
+        <div id="testStatus">
+            <div class="status" id="authStatus">⏳ Authentication: Pending</div>
+            <div class="status" id="createStatus">⏳ Study Creation: Pending</div>
+            <div class="status" id="deleteStatus">⏳ Study Deletion: Pending</div>
+            <div class="status" id="verifyStatus">⏳ Verification: Pending</div>
+        </div>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="test-section">
+        <button id="startTest" onclick="runFullTest()">🚀 Run Complete Test</button>
+        <button id="resetTest" onclick="resetTest()">🔄 Reset Test</button>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3003/api';
+        const TEST_ACCOUNTS = {
+            researcher: { email: 'abwanwr77+Researcher@gmail.com', password: 'Testtest123' }
+        };
+
+        let authToken = null;
+        let testStudyId = null;
+        let testResults = [];
+
+        function updateStatus(statusId, text, status) {
+            const element = document.getElementById(statusId);
+            element.textContent = text;
+            element.className = `status ${status}`;
+        }
+
+        function log(message, type = 'info', step = null) {
+            const resultsDiv = document.getElementById('results');
+            const logDiv = document.createElement('div');
+            logDiv.className = `test-section ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const stepText = step ? `<strong>[${step}]</strong> ` : '';
+            logDiv.innerHTML = `${stepText}<small>[${timestamp}]</small> ${message}`;
+            
+            resultsDiv.appendChild(logDiv);
+            console.log(`[${timestamp}] ${step || ''} ${message}`);
+        }
+
+        function logJson(label, data, step = null) {
+            log(`<strong>${label}:</strong><pre>${JSON.stringify(data, null, 2)}</pre>`, 'info', step);
+        }
+
+        function resetTest() {
+            document.getElementById('results').innerHTML = '';
+            authToken = null;
+            testStudyId = null;
+            testResults = [];
+            
+            updateStatus('authStatus', '⏳ Authentication: Pending', '');
+            updateStatus('createStatus', '⏳ Study Creation: Pending', '');
+            updateStatus('deleteStatus', '⏳ Study Deletion: Pending', '');
+            updateStatus('verifyStatus', '⏳ Verification: Pending', '');
+            
+            document.getElementById('startTest').disabled = false;
+        }
+
+        async function runFullTest() {
+            document.getElementById('startTest').disabled = true;
+            resetTest();
+            
+            try {
+                // Step 1: Authenticate
+                log('Starting comprehensive delete study test...', 'info', 'INIT');
+                updateStatus('authStatus', '🔄 Authenticating...', '');
+                
+                await authenticate();
+                updateStatus('authStatus', '✅ Authentication: SUCCESS', 'pass');
+                
+                // Step 2: Create test study
+                updateStatus('createStatus', '🔄 Creating test study...', '');
+                await createTestStudy();
+                updateStatus('createStatus', '✅ Study Creation: SUCCESS', 'pass');
+                
+                // Step 3: Test delete (the main fix)
+                updateStatus('deleteStatus', '🔄 Testing delete (with fix)...', '');
+                await testDeleteStudy();
+                updateStatus('deleteStatus', '✅ Study Deletion: SUCCESS', 'pass');
+                
+                // Step 4: Verify deletion
+                updateStatus('verifyStatus', '🔄 Verifying deletion...', '');
+                await verifyDeletion();
+                updateStatus('verifyStatus', '✅ Verification: SUCCESS', 'pass');
+                
+                // Final success
+                log('🎉 All tests passed! The delete study fix is working correctly.', 'success', 'COMPLETE');
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`, 'error', 'ERROR');
+                
+                // Update failed status
+                if (!authToken) updateStatus('authStatus', '❌ Authentication: FAILED', 'fail');
+                else if (!testStudyId) updateStatus('createStatus', '❌ Study Creation: FAILED', 'fail');
+                else updateStatus('deleteStatus', '❌ Study Deletion: FAILED', 'fail');
+                
+                console.error('Full error:', error);
+            } finally {
+                document.getElementById('startTest').disabled = false;
+            }
+        }
+
+        async function authenticate() {
+            log('Authenticating as researcher...', 'info', 'AUTH');
+            
+            const response = await fetch(`${BASE_URL}/auth-consolidated?action=login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(TEST_ACCOUNTS.researcher)
+            });
+            
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(`Authentication failed: ${data.error}`);
+            }
+            
+            authToken = data.user?.access_token;
+            if (!authToken) {
+                throw new Error('No access token received');
+            }
+            
+            log('Authentication successful', 'success', 'AUTH');
+            logJson('User Data', { 
+                id: data.user?.id, 
+                email: data.user?.email, 
+                role: data.user?.user_metadata?.role 
+            }, 'AUTH');
+        }
+
+        async function createTestStudy() {
+            log('Creating test study for deletion...', 'info', 'CREATE');
+            
+            const studyData = {
+                title: `Delete Test Study ${new Date().getTime()}`,
+                description: 'This study will be created and then deleted to test the fix',
+                type: 'unmoderated_study',
+                targetParticipants: 5,
+                duration: 15,
+                compensation: 20,
+                requirements: ['Must be 18+ years old'],
+                tasks: [],
+                settings: {
+                    recordScreen: false,
+                    recordAudio: false,
+                    recordWebcam: false,
+                    trackClicks: true,
+                    trackHovers: true,
+                    trackScrolls: true
+                }
+            };
+            
+            const response = await fetch(`${BASE_URL}/research-consolidated?action=create-study`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify(studyData)
+            });
+            
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(`Study creation failed: ${data.error}`);
+            }
+            
+            testStudyId = data.study?.id;
+            if (!testStudyId) {
+                throw new Error('No study ID received from creation');
+            }
+            
+            log('Test study created successfully', 'success', 'CREATE');
+            logJson('Created Study', { 
+                id: testStudyId, 
+                title: data.study?.title, 
+                status: data.study?.status 
+            }, 'CREATE');
+        }
+
+        async function testDeleteStudy() {
+            log('Testing delete study with fixed API call...', 'warning', 'DELETE');
+            
+            // This uses our fixed API call format
+            const response = await fetch(`${BASE_URL}/research-consolidated?action=delete-study&id=${testStudyId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            const data = await response.json();
+            
+            log(`Delete Response Status: ${response.status}`, response.status === 200 ? 'success' : 'error', 'DELETE');
+            logJson('Delete Response', data, 'DELETE');
+            
+            if (response.status === 404) {
+                throw new Error('Still getting 404! The fix may not be complete.');
+            }
+            
+            if (response.status !== 200 || !data.success) {
+                throw new Error(`Delete failed: Status ${response.status}, ${data.error || 'Unknown error'}`);
+            }
+            
+            log('✅ Delete operation successful - No more 404 errors!', 'success', 'DELETE');
+        }
+
+        async function verifyDeletion() {
+            log('Verifying that study was actually deleted from database...', 'info', 'VERIFY');
+            
+            // Try to fetch the deleted study - should return 404 or empty result
+            const response = await fetch(`${BASE_URL}/research-consolidated?action=get-studies`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.studies) {
+                const deletedStudy = data.studies.find(study => study.id === testStudyId);
+                
+                if (deletedStudy) {
+                    throw new Error('Study still exists in database after deletion!');
+                }
+                
+                log('✅ Study successfully removed from database', 'success', 'VERIFY');
+                logJson('Remaining Studies Count', { count: data.studies.length }, 'VERIFY');
+            } else {
+                throw new Error('Could not verify deletion - unable to fetch studies list');
+            }
+        }
+
+        // Auto-start test
+        log('Delete Study Fix Test loaded and ready', 'info', 'INIT');
+        log('Click "Run Complete Test" to validate the fix', 'info', 'INIT');
+    </script>
+</body>
+</html>

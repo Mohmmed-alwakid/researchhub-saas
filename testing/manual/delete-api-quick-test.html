@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Study API Quick Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #0056b3; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .log { background-color: #f8f9fa; padding: 10px; border-left: 3px solid #007bff; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Delete Study API Quick Test</h1>
+    <p>This test will help us identify why delete study returns 404</p>
+
+    <div id="results"></div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3003/api';
+        const TEST_ACCOUNTS = {
+            researcher: { email: 'abwanwr77+Researcher@gmail.com', password: 'Testtest123' }
+        };
+
+        let authToken = null;
+        let testStudyId = null;
+
+        function log(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const logDiv = document.createElement('div');
+            logDiv.className = `test-section ${type}`;
+            logDiv.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            resultsDiv.appendChild(logDiv);
+            console.log(message);
+        }
+
+        function logJson(label, data) {
+            log(`<strong>${label}:</strong><pre>${JSON.stringify(data, null, 2)}</pre>`);
+        }
+
+        async function testDeleteAPI() {
+            try {
+                // Step 1: Login
+                log('🔐 Step 1: Authenticating as researcher...', 'info');
+                const loginResponse = await fetch(`${BASE_URL}/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(TEST_ACCOUNTS.researcher)
+                });
+                
+                const loginData = await loginResponse.json();
+                if (!loginData.success) {
+                    throw new Error(`Login failed: ${loginData.error}`);
+                }
+                
+                authToken = loginData.user?.access_token;
+                if (!authToken) {
+                    throw new Error('No access token received from login');
+                }
+                
+                log('✅ Authentication successful', 'success');
+                logJson('Login Response', loginData);
+
+                // Step 2: Create a test study
+                log('📝 Step 2: Creating a test study...', 'info');
+                const createResponse = await fetch(`${BASE_URL}/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        title: 'Test Study for Deletion',
+                        description: 'This study will be deleted to test the delete API',
+                        type: 'unmoderated_study',
+                        targetParticipants: 5,
+                        duration: 15,
+                        compensation: 20,
+                        requirements: ['Must be 18+ years old'],
+                        tasks: []
+                    })
+                });
+
+                const createData = await createResponse.json();
+                if (!createData.success) {
+                    throw new Error(`Study creation failed: ${createData.error}`);
+                }
+
+                testStudyId = createData.study?.id;
+                if (!testStudyId) {
+                    throw new Error('No study ID received from creation');
+                }
+
+                log('✅ Test study created successfully', 'success');
+                logJson('Created Study', createData.study);
+
+                // Step 3: Test the delete endpoint that's failing
+                log('🗑️ Step 3: Testing delete study with current frontend approach...', 'warning');
+                
+                const deleteResponse = await fetch(`${BASE_URL}/research-consolidated?action=delete-study`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ id: testStudyId })
+                });
+
+                const deleteData = await deleteResponse.json();
+                
+                log(`Delete Response Status: ${deleteResponse.status}`, deleteResponse.status === 200 ? 'success' : 'error');
+                logJson('Delete Response', deleteData);
+
+                if (deleteResponse.status === 404) {
+                    log('🔍 404 Error reproduced! Let\'s test alternative approaches...', 'warning');
+                    
+                    // Test with query parameter instead
+                    log('🔄 Testing with query parameter approach...', 'info');
+                    const altDeleteResponse = await fetch(`${BASE_URL}/research-consolidated?action=delete-study&id=${testStudyId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    
+                    const altDeleteData = await altDeleteResponse.json();
+                    log(`Alternative Delete Status: ${altDeleteResponse.status}`, altDeleteResponse.status === 200 ? 'success' : 'error');
+                    logJson('Alternative Delete Response', altDeleteData);
+                }
+
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        // Auto-start the test
+        log('🚀 Starting delete study API test...', 'info');
+        testDeleteAPI();
+    </script>
+</body>
+</html>
