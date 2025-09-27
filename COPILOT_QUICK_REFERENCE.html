@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchHub Copilot Prompts - Quick Reference</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #1e1e2e; 
+            color: #cdd6f4; 
+            padding: 20px;
+            line-height: 1.5;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #89b4fa, #cba6f7);
+            color: #1e1e2e;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #313244;
+            border: 1px solid #45475a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .card h3 {
+            color: #89b4fa;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #45475a;
+            padding-bottom: 10px;
+        }
+        .code-pattern {
+            background: #1e1e2e;
+            border: 1px solid #45475a;
+            border-radius: 5px;
+            padding: 12px;
+            margin: 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .type-this {
+            color: #f9e2af;
+            font-weight: bold;
+        }
+        .expect-this {
+            color: #a6e3a1;
+            font-style: italic;
+            margin-left: 20px;
+        }
+        .warning {
+            background: #585b70;
+            border-left: 4px solid #f38ba8;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .success {
+            background: #585b70;
+            border-left: 4px solid #a6e3a1;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .active { background: #a6e3a1; color: #1e1e2e; }
+        .quick-test {
+            background: #45475a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .quick-test h4 {
+            color: #cba6f7;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ResearchHub Copilot Prompts</h1>
+            <p>Quick Reference for Daily Development</p>
+            <span class="status-indicator active">ACTIVE</span>
+        </div>
+
+        <div class="reference-grid">
+            <!-- Study Builder Reference -->
+            <div class="card">
+                <h3>🧩 Study Builder Prompts</h3>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: interface StudyBuilderBlock {</div>
+                    <div class="expect-this">→ id: string; type: BlockType; order: number;</div>
+                </div>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: type BlockType =</div>
+                    <div class="expect-this">→ 'welcome' | 'open_question' | 'opinion_scale'...</div>
+                </div>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: const newBlock = { id:</div>
+                    <div class="expect-this">→ crypto.randomUUID()</div>
+                </div>
+                
+                <div class="success">
+                    <strong>✅ Active When:</strong> Working on Study Builder components, block types, validation logic
+                </div>
+            </div>
+
+            <!-- API Development Reference -->
+            <div class="card">
+                <h3>🔌 API Development Prompts</h3>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: export default async function handler(req, res) {</div>
+                    <div class="expect-this">→ const { action } = req.query; switch (action)</div>
+                </div>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: const auth = await authenticateUser(</div>
+                    <div class="expect-this">→ req, ['researcher', 'admin']</div>
+                </div>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: await supabase.from('studies')</div>
+                    <div class="expect-this">→ .eq('researcher_id', userId)</div>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Constraint:</strong> Will warn against creating new API files (12/12 limit)
+                </div>
+            </div>
+
+            <!-- Global Context Reference -->
+            <div class="card">
+                <h3>🌍 Global Context Prompts</h3>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: const testAccount = { email:</div>
+                    <div class="expect-this">→ 'abwanwr77+Researcher@gmail.com'</div>
+                </div>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Creating files in root directory</div>
+                    <div class="expect-this">→ Suggests testing/, docs/, scripts/ instead</div>
+                </div>
+                
+                <div class="code-pattern">
+                    <div class="type-this">Type: npm run</div>
+                    <div class="expect-this">→ dev:fullstack, test:quick, cleanup</div>
+                </div>
+                
+                <div class="success">
+                    <strong>✅ Always Active:</strong> Provides ResearchHub architecture awareness across all files
+                </div>
+            </div>
+
+            <!-- Quick Tests -->
+            <div class="card">
+                <h3>🧪 Quick Prompt Tests</h3>
+                
+                <div class="quick-test">
+                    <h4>Morning Check (30 seconds)</h4>
+                    <div class="code-pattern">
+                        <div class="type-this">1. Open any .tsx file</div>
+                        <div class="type-this">2. Type: interface StudyBuilderBlock {</div>
+                        <div class="expect-this">3. Should suggest ResearchHub properties</div>
+                    </div>
+                </div>
+                
+                <div class="quick-test">
+                    <h4>API Check (30 seconds)</h4>
+                    <div class="code-pattern">
+                        <div class="type-this">1. Open any API file</div>
+                        <div class="type-this">2. Type: export default async function</div>
+                        <div class="expect-this">3. Should suggest action-based routing</div>
+                    </div>
+                </div>
+                
+                <div class="quick-test">
+                    <h4>Constraint Check</h4>
+                    <div class="code-pattern">
+                        <div class="type-this">1. Try creating api/new-file.js</div>
+                        <div class="expect-this">2. Should warn about function limit</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="card">
+                <h3>🔧 Troubleshooting</h3>
+                
+                <div class="warning">
+                    <strong>Not Getting ResearchHub Suggestions?</strong>
+                </div>
+                
+                <div class="code-pattern">
+                    <div class="type-this">✅ Check Copilot is enabled (VS Code status bar)</div>
+                    <div class="type-this">✅ Verify prompt files exist in .github/prompts/</div>
+                    <div class="type-this">✅ Check .vscode/settings.copilot.json</div>
+                    <div class="type-this">✅ Restart VS Code if needed</div>
+                </div>
+                
+                <div class="success">
+                    <strong>Working Signs:</strong> Specific ResearchHub patterns, constraint awareness, block type knowledge
+                </div>
+            </div>
+
+            <!-- Daily Workflow -->
+            <div class="card">
+                <h3>📅 Daily Development Flow</h3>
+                
+                <div class="quick-test">
+                    <h4>Your New Routine</h4>
+                    <div class="code-pattern">
+                        <div class="type-this">1. Open ResearchHub file</div>
+                        <div class="type-this">2. Start typing as normal</div>
+                        <div class="type-this">3. Pause at Copilot suggestions</div>
+                        <div class="type-this">4. Accept ResearchHub-specific ones</div>
+                        <div class="type-this">5. Trust the architectural guidance</div>
+                    </div>
+                </div>
+                
+                <div class="success">
+                    <strong>Result:</strong> Less typing, better patterns, fewer mistakes, faster development!
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; color: #89b4fa;">
+            <p><strong>🎯 Remember:</strong> The prompts work invisibly - just type and trust the enhanced suggestions!</p>
+            <p style="margin-top: 10px; opacity: 0.8;">Keep this reference open while developing for quick pattern lookup</p>
+        </div>
+    </div>
+
+    <script>
+        // Add copy-to-clipboard functionality for code patterns
+        document.querySelectorAll('.type-this').forEach(element => {
+            element.style.cursor = 'pointer';
+            element.title = 'Click to copy';
+            element.addEventListener('click', () => {
+                const text = element.textContent.replace('Type: ', '');
+                navigator.clipboard.writeText(text).then(() => {
+                    const original = element.style.backgroundColor;
+                    element.style.backgroundColor = '#a6e3a1';
+                    element.style.color = '#1e1e2e';
+                    setTimeout(() => {
+                        element.style.backgroundColor = original;
+                        element.style.color = '#f9e2af';
+                    }, 500);
+                });
+            });
+        });
+
+        // Log reference card loading
+        console.log('🚀 ResearchHub Copilot Prompts Reference Card Loaded');
+        console.log('📋 Quick tests available for prompt verification');
+        console.log('🎯 Click any "Type:" pattern to copy to clipboard');
+    </script>
+</body>
+</html>

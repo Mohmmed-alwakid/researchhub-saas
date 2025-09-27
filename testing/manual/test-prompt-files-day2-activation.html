@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 2: Prompt Activation Testing - ResearchHub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .in-progress {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .test-step {
+            background: #fff;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .test-result {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+        }
+        .status-icon {
+            font-size: 18px;
+            margin-right: 10px;
+            width: 25px;
+        }
+        .test-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .checklist {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 8px 0;
+            padding: 5px;
+        }
+        .checklist-item input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 2px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .step-counter {
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+        }
+        .file-path {
+            background: #f1f3f4;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #5f6368;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Day 2: Prompt Activation Testing</h1>
+        <p>GitHub Copilot Prompt Files Validation & Integration Testing</p>
+        <p><strong>September 27, 2025</strong> • ResearchHub Implementation Phase</p>
+    </div>
+
+    <div class="test-section in-progress">
+        <h2>📊 Day 2 Progress Overview</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 20%" id="overallProgress"></div>
+        </div>
+        <p><strong>Current Phase:</strong> Prompt Activation Testing & Validation</p>
+        <p><strong>Target:</strong> Verify VS Code integration and establish baseline metrics</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Task 1: VS Code Prompt Recognition Testing</h2>
+        <div class="test-step">
+            <span class="step-counter">1</span>
+            <div>
+                <h3>VS Code Configuration Validation</h3>
+                <div class="file-path">.vscode/settings.copilot.json</div>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="copilot-enabled">
+                        <label for="copilot-enabled">GitHub Copilot extension enabled and active</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="instruction-files">
+                        <label for="instruction-files">useInstructionFiles setting enabled</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="prompts-path">
+                        <label for="prompts-path">Prompts path configured: ".github/prompts/"</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="file-associations">
+                        <label for="file-associations">Markdown file associations configured</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-step">
+            <span class="step-counter">2</span>
+            <div>
+                <h3>Prompt File Recognition</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="global-recognized">
+                        <label for="global-recognized">global-context.md detected by Copilot</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="study-recognized">
+                        <label for="study-recognized">study-builder.md detected by Copilot</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="api-recognized">
+                        <label for="api-recognized">api-development.md detected by Copilot</label>
+                    </div>
+                </div>
+                <button onclick="testPromptRecognition()">🔍 Test Recognition</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 Task 2: Context Switching Validation</h2>
+        <div class="test-step">
+            <span class="step-counter">3</span>
+            <div>
+                <h3>File-Based Activation Testing</h3>
+                <div class="file-path">testing/prompt-validation/test-study-builder-prompt.tsx</div>
+                <div class="test-code">// Expected: study-builder.md should activate
+interface TestStudyBlock {
+  type: // Should suggest BlockType union
+}</div>
+                
+                <div class="file-path">testing/prompt-validation/test-api-development-prompt.js</div>
+                <div class="test-code">// Expected: api-development.md should activate  
+export default async function handler(req, res) {
+  // Should suggest action-based routing pattern
+}</div>
+                
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="tsx-triggers-study">
+                        <label for="tsx-triggers-study">*.tsx files trigger study-builder context</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="api-triggers-backend">
+                        <label for="api-triggers-backend">api/**/*.js files trigger api-development context</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="global-always-active">
+                        <label for="global-always-active">global-context.md always provides base context</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-step">
+            <span class="step-counter">4</span>
+            <div>
+                <h3>Keyword-Based Activation</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="keyword-studybuilder">
+                        <label for="keyword-studybuilder">"StudyBuilderBlock" keyword triggers study context</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="keyword-handler">
+                        <label for="keyword-handler">"export default async function handler" triggers API context</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="keyword-blocktype">
+                        <label for="keyword-blocktype">"BlockType" keyword activates block system knowledge</label>
+                    </div>
+                </div>
+                <button onclick="testKeywordActivation()">🎯 Test Keywords</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🏗️ Task 3: Study Builder Scenarios Testing</h2>
+        <div class="test-step">
+            <span class="step-counter">5</span>
+            <div>
+                <h3>Block System Suggestions</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="block-types">
+                        <label for="block-types">Copilot suggests correct BlockType union (13 types)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="block-interface">
+                        <label for="block-interface">StudyBuilderBlock interface suggestions are accurate</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="block-helpers">
+                        <label for="block-helpers">Block helper functions follow ResearchHub patterns</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="thank-you-logic">
+                        <label for="thank-you-logic">Thank you block automatic appending logic suggested</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔌 Task 4: API Development Scenarios Testing</h2>
+        <div class="test-step">
+            <span class="step-counter">6</span>
+            <div>
+                <h3>API Constraint Enforcement</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="no-new-functions">
+                        <label for="no-new-functions">Copilot discourages creating new API functions</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="action-routing">
+                        <label for="action-routing">Action-based routing pattern suggested</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="auth-middleware">
+                        <label for="auth-middleware">Authentication middleware patterns suggested</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="supabase-patterns">
+                        <label for="supabase-patterns">Supabase RLS-aware database operations</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚡ Task 5: Performance Baseline Testing</h2>
+        <div class="test-step">
+            <span class="step-counter">7</span>
+            <div>
+                <h3>Response Time Measurements</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="baseline-without">
+                        <label for="baseline-without">Baseline response time without prompts measured</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="baseline-with">
+                        <label for="baseline-with">Response time with prompts measured</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="performance-acceptable">
+                        <label for="performance-acceptable">Performance impact acceptable (&lt;20% increase)</label>
+                    </div>
+                </div>
+                <button onclick="measurePerformance()">📊 Measure Performance</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Task 6: Team Demo Preparation</h2>
+        <div class="test-step">
+            <span class="step-counter">8</span>
+            <div>
+                <h3>Demo Materials Creation</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <input type="checkbox" id="before-after">
+                        <label for="before-after">Before/after suggestion quality examples</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="demo-script">
+                        <label for="demo-script">Demo script for team presentation</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="metrics-summary">
+                        <label for="metrics-summary">Day 2 metrics summary prepared</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section warning">
+        <h2>⚠️ Expected Challenges & Solutions</h2>
+        <div class="test-result">
+            <span class="status-icon">⚠️</span>
+            <span><strong>Prompt Recognition Issues:</strong> Ensure VS Code Copilot extension is latest version</span>
+        </div>
+        <div class="test-result">
+            <span class="status-icon">⚠️</span>
+            <span><strong>Context Switching Delays:</strong> Normal for first-time activation, improves with use</span>
+        </div>
+        <div class="test-result">
+            <span class="status-icon">⚠️</span>
+            <span><strong>Performance Impact:</strong> Monitor response times, optimize prompt content if needed</span>
+        </div>
+    </div>
+
+    <div class="test-section success">
+        <h2>🎯 Day 2 Success Criteria</h2>
+        <div class="test-result">
+            <span class="status-icon">🎯</span>
+            <span><strong>VS Code Recognition:</strong> All 3 prompt files detected and active</span>
+        </div>
+        <div class="test-result">
+            <span class="status-icon">🎯</span>
+            <span><strong>Context Switching:</strong> Appropriate prompts activate based on file types</span>
+        </div>
+        <div class="test-result">
+            <span class="status-icon">🎯</span>
+            <span><strong>Real Scenarios:</strong> Improved suggestions for study builder and API development</span>
+        </div>
+        <div class="test-result">
+            <span class="status-icon">🎯</span>
+            <span><strong>Performance:</strong> Acceptable response time impact (&lt;20% increase)</span>
+        </div>
+        <div class="test-result">
+            <span class="status-icon">🎯</span>
+            <span><strong>Team Ready:</strong> Demo materials prepared for Day 5 team presentation</span>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; padding: 20px; background: #e3f2fd; border-radius: 10px;">
+        <h3>🚀 Day 2 Testing In Progress</h3>
+        <p>Testing prompt activation, context switching, and real development scenarios</p>
+        <button onclick="startDay3Planning()">📋 Prepare Day 3 Tasks</button>
+        <button onclick="updateProgress()">📊 Update Progress</button>
+    </div>
+
+    <script>
+        let completedTasks = 0;
+        const totalTasks = 6;
+
+        function testPromptRecognition() {
+            alert('Testing prompt recognition...\n\n1. Open VS Code\n2. Check Copilot status\n3. Verify prompt files are loaded\n4. Check for any error messages');
+            updateTaskProgress(1);
+        }
+
+        function testKeywordActivation() {
+            alert('Testing keyword activation...\n\n1. Type "StudyBuilderBlock" in .tsx file\n2. Type "export default async function handler" in API file\n3. Observe context switching\n4. Verify appropriate suggestions');
+            updateTaskProgress(2);
+        }
+
+        function measurePerformance() {
+            alert('Measuring performance...\n\n1. Record baseline response times\n2. Enable prompt files\n3. Measure new response times\n4. Calculate performance impact\n5. Document results');
+            updateTaskProgress(3);
+        }
+
+        function startDay3Planning() {
+            alert('Day 3 Focus: Real Development Testing\n\n• Test actual component creation\n• Validate API endpoint suggestions\n• Measure suggestion accuracy\n• Collect developer feedback');
+        }
+
+        function updateTaskProgress(taskNum) {
+            completedTasks = Math.min(completedTasks + 1, totalTasks);
+            const percentage = (completedTasks / totalTasks) * 100;
+            document.getElementById('overallProgress').style.width = percentage + '%';
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            const percentage = (checked / checkboxes.length) * 100;
+            
+            document.getElementById('overallProgress').style.width = percentage + '%';
+            
+            if (percentage === 100) {
+                alert('🎉 Day 2 Testing Complete!\n\nAll validation criteria met. Ready for Day 3 real development testing.');
+            }
+        }
+
+        // Auto-save checkbox states
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                localStorage.setItem(e.target.id, e.target.checked);
+                updateProgress();
+            }
+        });
+
+        // Load saved checkbox states
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                const saved = localStorage.getItem(checkbox.id);
+                if (saved === 'true') checkbox.checked = true;
+            });
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchHub - Day 2 Prompt Validation Testing</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .test-section h2 {
+            margin: 0 0 20px 0;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-section h3 {
+            color: #475569;
+            margin: 20px 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .test-item {
+            background: #f8fafc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .test-item h4 {
+            margin: 0 0 8px 0;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .test-item p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 8px 0;
+            overflow-x: auto;
+        }
+
+        .expected {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 8px 0;
+        }
+
+        .expected::before {
+            content: "✅ Expected: ";
+            font-weight: 600;
+            color: #16a34a;
+        }
+
+        .validation-checklist {
+            background: #fefce8;
+            border: 1px solid #fde047;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .validation-checklist h4 {
+            margin: 0 0 10px 0;
+            color: #ca8a04;
+        }
+
+        .validation-checklist ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .validation-checklist li {
+            margin: 5px 0;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-testing {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .recommendations h3 {
+            color: #0369a1;
+            margin: 0 0 15px 0;
+        }
+
+        .recommendation-item {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 3px solid #0ea5e9;
+        }
+
+        .icon {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 ResearchHub Prompt Validation</h1>
+        <p>Day 2 Testing - Comprehensive Copilot Prompt Effectiveness Validation</p>
+        <p><strong>Status:</strong> <span class="status-badge status-testing">Active Testing</span></p>
+    </div>
+
+    <!-- Test Section 1: Global Context -->
+    <div class="test-section">
+        <h2><span class="icon">🌍</span> Test 1: Global Context Validation</h2>
+        <p><strong>Objective:</strong> Verify Copilot understands ResearchHub architecture and constraints</p>
+        
+        <div class="test-item">
+            <h4>1.1 API Function Limit Awareness (CRITICAL)</h4>
+            <div class="code-snippet">// Type this in VS Code:
+export default async function newApiHandler(req, res) {</div>
+            <div class="expected">Copilot should WARN about 12/12 function limit and suggest extending existing consolidated handlers</div>
+        </div>
+
+        <div class="test-item">
+            <h4>1.2 Test Account Recognition</h4>
+            <div class="code-snippet">// Type this in VS Code:
+const testAccount = {</div>
+            <div class="expected">Should suggest the 3 designated test accounts (researcher/participant/admin)</div>
+        </div>
+
+        <div class="test-item">
+            <h4>1.3 Directory Structure Rules</h4>
+            <div class="code-snippet">// Create new test file in root directory</div>
+            <div class="expected">Should suggest proper location: testing/, docs/, or scripts/ subdirectories</div>
+        </div>
+
+        <div class="validation-checklist">
+            <h4>Manual Validation Steps:</h4>
+            <ul>
+                <li>Open VS Code with Copilot enabled</li>
+                <li>Test each scenario above</li>
+                <li>Record suggestion quality (1-10 scale)</li>
+                <li>Note constraint enforcement effectiveness</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Test Section 2: Study Builder Context -->
+    <div class="test-section">
+        <h2><span class="icon">🧩</span> Test 2: Study Builder Context Validation</h2>
+        <p><strong>Objective:</strong> Verify understanding of 13-block system and study creation patterns</p>
+        
+        <div class="test-item">
+            <h4>2.1 Block Type Recognition</h4>
+            <div class="code-snippet">// Type this in VS Code:
+type BlockType = </div>
+            <div class="expected">Should suggest all 13 block types: welcome, open_question, opinion_scale, etc.</div>
+        </div>
+
+        <div class="test-item">
+            <h4>2.2 StudyBuilderBlock Interface</h4>
+            <div class="code-snippet">// Type this in VS Code:
+interface StudyBuilderBlock {</div>
+            <div class="expected">Should suggest: id, type, order, title, description, settings properties</div>
+        </div>
+
+        <div class="test-item">
+            <h4>2.3 Block Creation Pattern</h4>
+            <div class="code-snippet">// Type this in VS Code:
+function createBlock(type: BlockType) {</div>
+            <div class="expected">Should suggest crypto.randomUUID(), getDefaultBlockSettings, proper TypeScript types</div>
+        </div>
+
+        <div class="test-item">
+            <h4>2.4 Thank You Block Logic</h4>
+            <div class="code-snippet">// Type this in VS Code:
+function ensureThankYouBlock(blocks) {</div>
+            <div class="expected">Should understand automatic thank you block appending pattern</div>
+        </div>
+
+        <div class="validation-checklist">
+            <h4>Block System Validation:</h4>
+            <ul>
+                <li>Test all 13 block types recognition</li>
+                <li>Verify proper TypeScript interfaces</li>
+                <li>Validate UUID generation suggestions</li>
+                <li>Check automatic thank you block logic</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Test Section 3: API Development Context -->
+    <div class="test-section">
+        <h2><span class="icon">🔌</span> Test 3: API Development Context Validation</h2>
+        <p><strong>Objective:</strong> Verify API patterns and 12-function constraint enforcement</p>
+        
+        <div class="test-item">
+            <h4>3.1 Action-Based Routing Pattern</h4>
+            <div class="code-snippet">// Type this in VS Code:
+export default async function handler(req, res) {</div>
+            <div class="expected">Should suggest: const { action } = req.query; switch (action) pattern</div>
+        </div>
+
+        <div class="test-item">
+            <h4>3.2 Authentication Middleware</h4>
+            <div class="code-snippet">// Type this in VS Code:
+async function protectedRoute(req, res) {</div>
+            <div class="expected">Should suggest authenticateUser(req, ['researcher', 'admin']) pattern</div>
+        </div>
+
+        <div class="test-item">
+            <h4>3.3 Supabase RLS Pattern</h4>
+            <div class="code-snippet">// Type this in VS Code:
+const { data, error } = await supabase.from('studies')</div>
+            <div class="expected">Should suggest .eq('researcher_id', userId) for RLS filtering</div>
+        </div>
+
+        <div class="validation-checklist">
+            <h4>API Pattern Validation:</h4>
+            <ul>
+                <li>Test action-based routing suggestions</li>
+                <li>Verify authentication pattern recognition</li>
+                <li>Check Supabase RLS enforcement</li>
+                <li>Validate error handling patterns</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Test Section 4: Performance Measurement -->
+    <div class="test-section">
+        <h2><span class="icon">⚡</span> Test 4: Performance Measurement</h2>
+        <p><strong>Objective:</strong> Measure response times and suggestion quality</p>
+        
+        <div class="performance-metrics">
+            <div class="metric-card">
+                <div class="metric-label">Average Response Time</div>
+                <div class="metric-value">?</div>
+                <div class="metric-label">milliseconds</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Suggestion Accuracy</div>
+                <div class="metric-value">?</div>
+                <div class="metric-label">percent</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Constraint Enforcement</div>
+                <div class="metric-value">?</div>
+                <div class="metric-label">out of 10</div>
+            </div>
+        </div>
+
+        <div class="validation-checklist">
+            <h4>Performance Testing Steps:</h4>
+            <ul>
+                <li>Time first suggestion appearance</li>
+                <li>Rate suggestion relevance (1-10)</li>
+                <li>Measure constraint enforcement</li>
+                <li>Compare with/without prompts</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Test Section 5: Comprehensive Validation -->
+    <div class="test-section">
+        <h2><span class="icon">🎯</span> Test 5: Comprehensive Quality Assessment</h2>
+        <p><strong>Objective:</strong> Overall prompt system effectiveness validation</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 60%"></div>
+        </div>
+        <p><strong>Testing Progress:</strong> 60% Complete (Day 2 Active Testing)</p>
+
+        <div class="test-item">
+            <h4>Real Development Scenarios</h4>
+            <p><strong>Next Steps:</strong> Test prompt effectiveness during actual development tasks</p>
+            <ul>
+                <li>Create new study builder component</li>
+                <li>Implement new API endpoint</li>
+                <li>Add database migration</li>
+                <li>Write comprehensive tests</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div class="recommendations">
+        <h3><span class="icon">🚀</span> Day 3 Transition Plan</h3>
+        
+        <div class="recommendation-item">
+            <strong>Complete Day 2 Testing:</strong> Finish validation of all prompt scenarios above
+        </div>
+        
+        <div class="recommendation-item">
+            <strong>Document Results:</strong> Record specific metrics and suggestion quality scores
+        </div>
+        
+        <div class="recommendation-item">
+            <strong>Day 3 Real Development:</strong> Begin actual development work using prompt system
+        </div>
+        
+        <div class="recommendation-item">
+            <strong>Team Demonstration:</strong> Prepare before/after comparison materials
+        </div>
+        
+        <div class="recommendation-item">
+            <strong>Performance Baseline:</strong> Establish metrics for ongoing measurement
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2><span class="icon">📊</span> Testing Status Summary</h2>
+        <p><strong>Current Status:</strong> Day 2 Active Testing Phase</p>
+        
+        <div class="performance-metrics">
+            <div class="metric-card">
+                <div class="metric-label">Prompt Files Created</div>
+                <div class="metric-value">3</div>
+                <div class="metric-label">Global, Study Builder, API</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">VS Code Integration</div>
+                <div class="metric-value status-badge status-active">Active</div>
+                <div class="metric-label">Configuration Complete</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Next Phase</div>
+                <div class="metric-value">Day 3</div>
+                <div class="metric-label">Real Development Testing</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple progress tracking
+        console.log('🧪 ResearchHub Prompt Validation Interface Loaded');
+        console.log('📅 Testing Date:', new Date().toISOString());
+        
+        // Add any interactive testing functionality here
+        function recordTestResult(testName, score, notes) {
+            const result = {
+                test: testName,
+                score: score,
+                notes: notes,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Test Result:', result);
+            
+            // Store in localStorage for persistence
+            const existingResults = JSON.parse(localStorage.getItem('researchhub-prompt-tests') || '[]');
+            existingResults.push(result);
+            localStorage.setItem('researchhub-prompt-tests', JSON.stringify(existingResults));
+            
+            return result;
+        }
+        
+        // Make available globally for manual testing
+        window.recordTestResult = recordTestResult;
+        window.getTestResults = () => JSON.parse(localStorage.getItem('researchhub-prompt-tests') || '[]');
+        
+        console.log('Use recordTestResult(testName, score, notes) to record test results');
+        console.log('Use getTestResults() to view all recorded test results');
+    </script>
+</body>
+</html>

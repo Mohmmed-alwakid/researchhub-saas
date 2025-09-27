@@ -1,4 +1,4 @@
-# Afkar - AI Coding Agent Instructions
+# ResearchHub (Afkar) - AI Coding Agent Instructions
 
 ## 📖 How to Use This File
 
@@ -11,7 +11,7 @@ This file provides workspace-specific instructions to GitHub Copilot. To enable 
 
 2. **Verify it's working**:
    - Copilot will automatically reference these instructions
-   - Ask Copilot about ResearchHub features - it should know our architecture
+   - Ask Copilot about ResearchHub/Afkar features - it should know our architecture
    - Code suggestions should follow our patterns and rules
 
 3. **File location**: Must be in `.github/copilot-instructions.md` (this file)
@@ -21,9 +21,333 @@ This file provides workspace-specific instructions to GitHub Copilot. To enable 
 ## 🎯 SINGLE SOURCE OF TRUTH
 **ALL specifications are in `docs/requirements/` - never contradict this folder.**
 
-## 📋 **REQUIREMENTS ORGANIZATION & STORY ID BEST PRACTICES**
+## 🏗️ **CORE ARCHITECTURE OVERVIEW**
 
-### **Folder Structure (Feature-Based Organization)**
+**ResearchHub (Afkar)** is a usability testing platform similar to Maze.co, featuring an AI-powered **block-based study builder** system for creating comprehensive user research studies:
+
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
+- **Backend**: 12 Vercel Serverless Functions (at function limit) + Supabase PostgreSQL
+- **Auth**: Supabase Auth with role-based access (researcher/participant/admin)
+- **Local Dev**: Express proxy server (`scripts/development/local-full-dev.js`) connecting to production Supabase
+- **Testing**: Comprehensive automated testing with MCP Playwright integration
+
+### **Critical Vercel Function Limit (12/12 USED)**
+```
+api/auth-consolidated.js           # Authentication system
+api/research-consolidated.js       # Study management & operations  
+api/templates-consolidated.js      # Template system
+api/payments-consolidated-full.js  # Payment processing
+api/user-profile-consolidated.js   # User profiles
+api/admin-consolidated.js          # Admin operations
+api/system-consolidated.js         # System functions
+api/health.js                      # Health monitoring
+api/applications.js                # Study applications
+api/setup.js                       # System setup
+api/ai-features.js                 # AI functionality
+api/diagnostic.js                  # System diagnostics
+```
+**⚠️ NEVER create new API files - extend existing consolidated handlers instead**
+
+## 🧩 **USABILITY TESTING PLATFORM - CORE INNOVATION**
+
+ResearchHub/Afkar competes with Maze.co by offering a **modular block-based approach** to usability testing and user research:
+
+```typescript
+// Core block interface - the foundation of all usability studies
+interface StudyBuilderBlock {
+  id: string;
+  type: BlockType; // 13 available types for comprehensive testing
+  order: number;
+  title: string;
+  description: string;
+  settings: Record<string, unknown>;
+}
+
+// 13 Block Types for Comprehensive Usability Testing:
+type BlockType = 
+  | 'welcome'           // Study introduction & participant onboarding
+  | 'open_question'     // Qualitative feedback collection
+  | 'opinion_scale'     // SUS scores, satisfaction ratings (1-10)
+  | 'simple_input'      // User data collection (text/number/date)
+  | 'multiple_choice'   // Task completion, preference selection
+  | 'context_screen'    // Task instructions & scenario setup
+  | 'yes_no'           // Binary usability decisions
+  | '5_second_test'    // First impression & memory testing
+  | 'card_sort'        // Information architecture testing
+  | 'tree_test'        // Navigation & findability testing
+  | 'thank_you'        // Study completion & debriefing
+  | 'image_upload'     // Visual prototype testing
+  | 'file_upload'      // Document/asset collection
+```
+
+### **Usability Testing Focus Areas**
+- **Task-Based Testing**: Users complete real tasks while being observed
+- **Navigation Testing**: Tree tests and card sorting for IA validation
+- **First Impressions**: 5-second tests for immediate user reactions
+- **Satisfaction Measurement**: SUS scores and opinion scales
+- **Prototype Validation**: Image uploads and interactive testing
+- **Qualitative Insights**: Open questions and feedback collection
+
+### **Key Competitive Advantages vs Maze.co**
+- **AI-Powered Study Generation**: Automated study creation and optimization
+- **Flexible Block System**: Mix and match testing methods in one study
+- **Real-time Collaboration**: Team-based study building and analysis
+- **Advanced Analytics**: AI-driven insights and pattern recognition
+- **Multi-Modal Testing**: Support for various prototype types and formats
+
+### **Key Study Builder Components**
+- `StudyBuilderPage.tsx` - Main usability study creation interface
+- `DragDropBlockList.tsx` - Visual block reordering for test flow
+- `BlockLibraryModal.tsx` - Usability testing method selection
+- `BlockEditModal.tsx` - Individual test configuration (SUS, tasks, etc.)
+- `StudyPreviewModal.tsx` - Preview participant testing experience
+
+### **Usability Study Types Supported**
+- **Unmoderated Testing**: Self-guided user testing sessions
+- **Moderated Interviews**: Live researcher-facilitated sessions  
+- **First Click Testing**: Initial user interaction analysis
+- **Prototype Testing**: Early-stage design validation
+- **Comparative Testing**: A/B testing for design alternatives
+- **Navigation Testing**: Website/app structure validation
+
+## 🔐 **AUTHENTICATION PATTERNS**
+
+### **Role-Based Access Control**
+```typescript
+// Standard authentication pattern across all API handlers
+async function authenticateUser(req, requiredRoles = []) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return { success: false, error: 'Missing auth header', status: 401 };
+  }
+  
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  
+  if (error || !user) {
+    return { success: false, error: 'Invalid token', status: 401 };
+  }
+  
+  // Check role if specified
+  const userRole = user.user_metadata?.role || 'participant';
+  if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+    return { success: false, error: 'Access denied', status: 403 };
+  }
+  
+  return { success: true, user };
+}
+```
+
+### **Three User Roles**
+- **Researcher**: Creates usability studies, manages test participants, analyzes results
+- **Participant**: Discovers usability tests, applies to studies, completes testing sessions
+- **Admin**: Platform administration, user management, usability analytics
+
+### **Test Accounts (MANDATORY - Use Only These)**
+```javascript
+// Never create new test accounts - use these designated accounts
+const TEST_ACCOUNTS = {
+  researcher: { email: 'abwanwr77+Researcher@gmail.com', password: 'Testtest123' },
+  participant: { email: 'abwanwr77+participant@gmail.com', password: 'Testtest123' },
+  admin: { email: 'abwanwr77+admin@gmail.com', password: 'Testtest123' }
+};
+```
+
+## 💻 **DEVELOPMENT WORKFLOW**
+
+### **Essential Commands**
+```bash
+npm run dev:fullstack    # 🚀 Primary development (Frontend:5175 + Backend:3003)
+npm run dev              # Standard React development  
+npm run test:quick       # Comprehensive automated testing
+npm run cleanup          # Auto-organize project structure
+```
+
+### **Local Development Architecture**
+The `scripts/development/local-full-dev.js` creates a hybrid environment:
+```javascript
+// Express proxy server that imports Vercel functions directly
+import authHandler from '../../api/auth-consolidated.js';
+app.use('/api/auth', authHandler);
+
+// Benefits:
+// - Real Supabase connection (production database)
+// - Hot reload during development
+// - Identical function behavior to production
+// - No separate local database setup needed
+```
+
+### **Project Structure Rules (ENFORCED)**
+```
+✅ CORRECT LOCATIONS:
+- Tests: testing/ (never create tests/, e2e-tests/, etc.)
+- Docs: docs/ (never scatter .md files in root)
+- Scripts: scripts/ (never put .js utilities in root)
+- API: api/ (12 consolidated handlers only)
+
+❌ NEVER CREATE:
+- Duplicate directories (tests/ when testing/ exists)
+- Root directory clutter (debug files, screenshots)
+- New API functions (extend existing consolidated handlers)
+- Files with naming conflicts (Tests/ vs testing/)
+```
+
+## 🧪 **TESTING STRATEGY**
+
+### **Automated Testing Framework**
+```bash
+# Testing command hierarchy
+npm run test:quick       # Daily development testing
+npm run test:weekly      # Comprehensive validation  
+npm run test:deployment  # Pre-deployment checks
+npm run test:playwright  # Browser automation
+```
+
+### **MCP Playwright Integration**
+- **Automated E2E Testing**: Complete user flows without manual intervention
+- **Cross-Browser Testing**: Chrome, Firefox, Safari compatibility
+- **Visual Regression**: Screenshot comparison and validation
+- **Performance Testing**: Lighthouse audits and metrics
+
+### **Testing Guidelines**
+1. **Test locally first**: Use `npm run dev:fullstack`
+2. **Use designated test accounts only**: Never create new accounts
+3. **Production validation**: Ensure fixes work on live site
+4. **Automated coverage**: Leverage comprehensive test suites
+
+## 🎨 **COMPONENT PATTERNS**
+
+### **React Component Standards**
+```typescript
+// Preferred component pattern
+interface ComponentProps {
+  data: DataType;
+  onUpdate: (data: DataType) => void;
+  className?: string;
+}
+
+export const Component: React.FC<ComponentProps> = ({ 
+  data, 
+  onUpdate, 
+  className = '' 
+}) => {
+  // Implementation with proper TypeScript types
+};
+```
+
+### **API Response Pattern**
+```javascript
+// Consistent API response structure
+export default async function handler(req, res) {
+  try {
+    const { action } = req.query;
+    
+    switch (action) {
+      case 'get-studies': return await getStudies(req, res);
+      case 'create-study': return await createStudy(req, res);
+      default: return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid action' 
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+}
+```
+
+## 📦 **STATE MANAGEMENT & DATA FLOW**
+
+### **Zustand Store Pattern**
+```typescript
+// Authentication store example
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      isLoading: false,
+      
+      login: async (credentials) => {
+        set({ isLoading: true });
+        // Implementation
+        set({ user, isLoading: false });
+      },
+      
+      logout: () => set({ user: null })
+    }),
+    { name: 'auth-storage' }
+  )
+);
+```
+
+### **React Query Integration**
+```typescript
+// Data fetching pattern
+export const useStudies = () => {
+  return useQuery({
+    queryKey: ['studies'],
+    queryFn: async () => {
+      const response = await studiesService.getStudies();
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes
+  });
+};
+```
+
+## 🚀 **DEPLOYMENT CONFIGURATION**
+
+### **Vercel Setup**
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Framework**: Vite
+- **Regions**: `["iad1"]`
+- **Function Timeout**: 30s for APIs, 10s for health
+
+### **Environment Variables**
+```bash
+# Supabase (Required)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-key
+
+# Optional integrations
+DODOPAYMENTS_API_KEY=your-api-key
+```
+
+## 🔍 **DEBUGGING & MONITORING**
+
+### **Development Tools**
+```bash
+npm run debug:start         # Debug mode with enhanced logging
+npm run debug:researcher    # Role-specific debugging  
+npm run health:scan         # Quick health check
+npm run monitor:auth        # Authentication monitoring
+```
+
+### **Production Monitoring**
+- **Health Endpoint**: `/api/health` for system status
+- **Error Tracking**: Built-in error boundary components
+- **Performance**: PerformanceMonitor component integration
+
+## 🎯 **KEY SUCCESS PATTERNS**
+
+1. **Usability-First Thinking**: Everything revolves around usability testing methodologies and UX research
+2. **Block-Based Testing**: 13 block types designed specifically for comprehensive user testing
+3. **Maze.co Competition**: Position as a more flexible, AI-powered alternative to existing platforms
+4. **Consolidated APIs**: Always extend existing handlers vs. creating new ones (12/12 function limit)
+5. **Role-Based Development**: Consider researcher/participant/admin perspectives in usability context
+6. **Production-First**: Test on production environment, use local for development
+7. **Test Account Discipline**: Never create new accounts, use designated test accounts
+8. **Automated Testing**: Leverage comprehensive test suites for validation
+9. **Documentation Updates**: Update existing docs, don't create new files
+
+This architecture enables rapid usability study creation while maintaining production stability and comprehensive test coverage for user research workflows.
+
+---
 ```
 docs/requirements/
 ├── 00_MASTER_INDEX.md              # Central navigation
