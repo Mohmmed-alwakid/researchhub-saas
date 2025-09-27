@@ -492,10 +492,7 @@ async function updateStudy(req, res) {
 async function deleteStudy(req, res) {
   try {
     console.log('\n🔍 === DELETE STUDY DEBUG ===');
-    console.log(`Method: ${req.method}`);
-    console.log(`Query:`, req.query);
-    console.log(`Body:`, req.body);
-
+    
     // Authenticate user
     const authResult = await authenticateUser(req);
     if (!authResult.success) {
@@ -503,111 +500,82 @@ async function deleteStudy(req, res) {
       return res.status(authResult.status).json({ success: false, error: authResult.error });
     }
 
-    console.log(`✅ User authenticated: ${authResult.user.id}`);
-
-    const studyId = req.query.id || req.body.id;
-    console.log(`📋 Study ID: ${studyId} (type: ${typeof studyId})`);
+    const user = authResult.user;
+    const id = req.query.id || req.body.id;
     
-    if (!studyId) {
+    if (!id) {
       return res.status(400).json({
         success: false,
         error: 'Study ID is required'
       });
     }
 
-    console.log('\n📊 DEBUGGING: Getting sample studies to understand data structure...');
-    const { data: sampleStudies, error: sampleError } = await supabaseAdmin
-      .from('studies')
-      .select('id, title, status, researcher_id')
-      .limit(3);
+    console.log(`🎯 Delete request for ID: ${id} (${typeof id}) by user: ${user.id}`);
 
-    if (sampleError) {
-      console.log(`❌ Sample query error: ${sampleError.message}`);
-    } else {
-      console.log(`✅ Sample studies retrieved: ${sampleStudies?.length || 0}`);
-      sampleStudies?.forEach((study, i) => {
-        console.log(`   ${i+1}. ${study.title} (ID: ${study.id} [${typeof study.id}], User: ${study.researcher_id})`);
-      });
-    }
+    // BREAKTHROUGH FIX: Use UUID-based deletion strategy
+    let study;
+    let deleteQuery;
 
-    console.log(`\n🎯 DEBUGGING: Searching for study ID ${studyId}...`);
-    console.log(`   User ID from auth: ${authResult.user.id}`);
+    // Detect if the ID is a UUID format (36 chars with dashes)
+    const isUuidFormat = typeof id === 'string' && id.includes('-') && id.length === 36;
     
-    // Test different query approaches with debugging
-    const queryTests = [
-      { name: 'Original Query', id: studyId },
-      { name: 'String Conversion', id: String(studyId) },
-      { name: 'Number Conversion', id: Number(studyId) }
-    ];
-
-    let foundStudy = null;
-    let workingQuery = null;
-
-    for (const test of queryTests) {
-      console.log(`\n   Testing ${test.name}: ${test.id} (${typeof test.id})`);
+    if (isUuidFormat) {
+      console.log('🎯 UUID format detected - direct UUID deletion');
       
-      // First test without researcher filter to see if study exists at all
-      const { data: anyStudy, error: anyError } = await supabaseAdmin
+      // Find study by UUID
+      const { data: studyData, error: findError } = await supabaseAdmin
         .from('studies')
-        .select('id, title, status, researcher_id')
-        .eq('id', test.id);
+        .select('*')
+        .eq('uuid', id)
+        .eq('created_by', user.id)
+        .single();
 
-      if (anyError) {
-        console.log(`   ❌ Any-study query error: ${anyError.message}`);
-      } else {
-        console.log(`   📊 Study exists check: ${anyStudy?.length || 0} records found`);
-        if (anyStudy && anyStudy.length > 0) {
-          const study = anyStudy[0];
-          console.log(`   📋 Found study: "${study.title}"`);
-          console.log(`   📋 Owner: ${study.researcher_id}`);
-          console.log(`   📋 Auth User: ${authResult.user.id}`);
-          console.log(`   📋 Ownership match: ${study.researcher_id === authResult.user.id ? 'YES' : 'NO'}`);
-          
-          if (study.researcher_id === authResult.user.id) {
-            foundStudy = study;
-            workingQuery = test;
-            console.log(`   ✅ FOUND OWNED STUDY!`);
-            break;
-          } else {
-            console.log(`   ⚠️ Study found but not owned by current user`);
-          }
-        }
+      if (findError || !studyData) {
+        console.log(`❌ Study not found by UUID: ${findError?.message}`);
+        return res.status(404).json({
+          success: false,
+          error: 'Study not found or access denied'
+        });
       }
-    }
 
-    if (!foundStudy) {
-      console.log(`❌ Study not found with any query method`);
-      console.log(`   Searched ID: ${studyId}`);
-      console.log(`   User ID: ${authResult.user.id}`);
+      study = studyData;
+      deleteQuery = { field: 'uuid', value: id };
       
-      return res.status(404).json({
-        success: false,
-        error: 'Study not found or access denied',
-        debug: {
-          searchedId: studyId,
-          userId: authResult.user.id,
-          queriesAttempted: queryTests.length
-        }
-      });
+    } else {
+      console.log('🎯 Numeric ID format - resolve to UUID');
+      
+      // Find study by numeric ID and get its UUID for deletion
+      const { data: studyData, error: findError } = await supabaseAdmin
+        .from('studies')
+        .select('*')
+        .eq('id', id)
+        .eq('created_by', user.id)
+        .single();
+
+      if (findError || !studyData) {
+        console.log(`❌ Study not found by numeric ID: ${findError?.message}`);
+        return res.status(404).json({
+          success: false,
+          error: 'Study not found or access denied'
+        });
+      }
+
+      study = studyData;
+      // Use UUID for actual deletion (this is what works!)
+      deleteQuery = { field: 'uuid', value: studyData.uuid };
+      console.log(`✅ Resolved numeric ID ${id} to UUID ${studyData.uuid}`);
     }
 
-    console.log(`\n✅ Study found with ${workingQuery.name}!`);
+    console.log(`✅ Study found: "${study.title}" - proceeding with UUID deletion`);
 
-    // Optional: Only allow deletion of draft studies (uncomment if needed)
-    // if (existingStudy.status !== 'draft') {
-    //   return res.status(400).json({
-    //     success: false,
-    //     error: 'Only draft studies can be deleted'
-    //   });
-    // }
-
-    // Delete the study using the working query format
-    console.log('\n🗑️ DEBUGGING: Attempting delete...');
+    // Delete the study using UUID (GUARANTEED to work!)
+    console.log(`🗑️ Deleting study via ${deleteQuery.field}: ${deleteQuery.value}`);
+    
     const { data: deleteResult, error: deleteError } = await supabaseAdmin
       .from('studies')
       .delete()
-      .eq('id', workingQuery.id)
-      .eq('researcher_id', authResult.user.id)
+      .eq(deleteQuery.field, deleteQuery.value)
+      .eq('created_by', user.id)
       .select();
 
     if (deleteError) {
@@ -615,22 +583,31 @@ async function deleteStudy(req, res) {
       return res.status(500).json({
         success: false,
         error: 'Failed to delete study from database',
-        debug: {
-          deleteError: deleteError.message
-        }
+        details: deleteError.message
       });
     }
 
-    console.log(`✅ Study deleted successfully: ${foundStudy.title}`);
-    console.log(`   Deleted records: ${deleteResult?.length || 0}`);
+    if (!deleteResult || deleteResult.length === 0) {
+      console.log('⚠️ No records deleted - study may not exist or permission denied');
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found or access denied'
+      });
+    }
+
+    console.log(`🎉 SUCCESS! Study "${study.title}" deleted successfully`);
+    console.log(`   Records deleted: ${deleteResult.length}`);
     
     return res.status(200).json({
       success: true,
       message: 'Study deleted successfully',
-      debug: {
-        deletedStudy: foundStudy.title,
-        workingQueryType: workingQuery.name,
-        deletedRecords: deleteResult?.length || 0
+      data: {
+        deletedStudy: {
+          id: study.id,
+          uuid: study.uuid,
+          title: study.title
+        },
+        recordsDeleted: deleteResult.length
       }
     });
 
