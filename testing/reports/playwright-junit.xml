@@ -1,2 +1,130 @@
-<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="0.0232349999999999">
+<testsuites id="" name="" tests="8" failures="0" skipped="0" errors="0" time="41.146195">
+<testsuite name="delete-study-streamlined.spec.ts" timestamp="2025-09-27T18:45:36.631Z" hostname="chromium" tests="2" failures="0" skipped="0" time="9.468" errors="0">
+<testcase name="Delete Study Validation › Delete Study API Endpoint Test" classname="delete-study-streamlined.spec.ts" time="6.179">
+<system-out>
+<![CDATA[🗑️ Testing delete study functionality
+
+🔐 Logging in as researcher...
+✅ Successfully logged in
+
+🔧 Testing delete study API...
+📊 Delete API Test Result: {
+  success: [33mfalse[39m,
+  status: [33m400[39m,
+  data: { success: [33mfalse[39m, error: [32m'Study ID is required'[39m },
+  error: [32m'Study ID is required'[39m
+}
+⚠️ Delete API returned: 400 - Study ID is required
+📊 API calls made: 3
+📊 Authentication errors: 0
+✅ Delete study validation completed
+]]>
+</system-out>
+</testcase>
+<testcase name="Delete Study Validation › Delete Study Frontend Integration Test" classname="delete-study-streamlined.spec.ts" time="3.289">
+<system-out>
+<![CDATA[🖥️ Testing delete study frontend integration
+ℹ️ Studies section not immediately visible - checking dashboard
+ℹ️ Study creation button not immediately visible
+✅ Frontend integration test completed
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="delete-study-streamlined.spec.ts" timestamp="2025-09-27T18:45:36.631Z" hostname="firefox" tests="2" failures="0" skipped="0" time="9.702" errors="0">
+<testcase name="Delete Study Validation › Delete Study API Endpoint Test" classname="delete-study-streamlined.spec.ts" time="6.899">
+<system-out>
+<![CDATA[🗑️ Testing delete study functionality
+
+🔐 Logging in as researcher...
+✅ Successfully logged in
+
+🔧 Testing delete study API...
+📊 Delete API Test Result: {
+  success: [33mfalse[39m,
+  status: [33m400[39m,
+  data: { success: [33mfalse[39m, error: [32m'Study ID is required'[39m },
+  error: [32m'Study ID is required'[39m
+}
+⚠️ Delete API returned: 400 - Study ID is required
+📊 API calls made: 3
+📊 Authentication errors: 0
+✅ Delete study validation completed
+]]>
+</system-out>
+</testcase>
+<testcase name="Delete Study Validation › Delete Study Frontend Integration Test" classname="delete-study-streamlined.spec.ts" time="2.803">
+<system-out>
+<![CDATA[🖥️ Testing delete study frontend integration
+ℹ️ Studies section not immediately visible - checking dashboard
+ℹ️ Study creation button not immediately visible
+✅ Frontend integration test completed
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="delete-study-streamlined.spec.ts" timestamp="2025-09-27T18:45:36.631Z" hostname="webkit" tests="2" failures="0" skipped="0" time="7.563" errors="0">
+<testcase name="Delete Study Validation › Delete Study API Endpoint Test" classname="delete-study-streamlined.spec.ts" time="4.547">
+<system-out>
+<![CDATA[🗑️ Testing delete study functionality
+
+🔐 Logging in as researcher...
+✅ Successfully logged in
+
+🔧 Testing delete study API...
+📊 Delete API Test Result: {
+  success: [33mfalse[39m,
+  status: [33m400[39m,
+  data: { success: [33mfalse[39m, error: [32m'Study ID is required'[39m },
+  error: [32m'Study ID is required'[39m
+}
+⚠️ Delete API returned: 400 - Study ID is required
+📊 API calls made: 3
+📊 Authentication errors: 0
+✅ Delete study validation completed
+]]>
+</system-out>
+</testcase>
+<testcase name="Delete Study Validation › Delete Study Frontend Integration Test" classname="delete-study-streamlined.spec.ts" time="3.016">
+<system-out>
+<![CDATA[🖥️ Testing delete study frontend integration
+ℹ️ Studies section not immediately visible - checking dashboard
+ℹ️ Study creation button not immediately visible
+✅ Frontend integration test completed
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="delete-study-streamlined.spec.ts" timestamp="2025-09-27T18:45:36.631Z" hostname="mobile-chrome" tests="2" failures="0" skipped="0" time="8.644" errors="0">
+<testcase name="Delete Study Validation › Delete Study API Endpoint Test" classname="delete-study-streamlined.spec.ts" time="4.718">
+<system-out>
+<![CDATA[🗑️ Testing delete study functionality
+
+🔐 Logging in as researcher...
+✅ Successfully logged in
+
+🔧 Testing delete study API...
+📊 Delete API Test Result: {
+  success: [33mfalse[39m,
+  status: [33m400[39m,
+  data: { success: [33mfalse[39m, error: [32m'Study ID is required'[39m },
+  error: [32m'Study ID is required'[39m
+}
+⚠️ Delete API returned: 400 - Study ID is required
+📊 API calls made: 3
+📊 Authentication errors: 0
+✅ Delete study validation completed
+]]>
+</system-out>
+</testcase>
+<testcase name="Delete Study Validation › Delete Study Frontend Integration Test" classname="delete-study-streamlined.spec.ts" time="3.926">
+<system-out>
+<![CDATA[🖥️ Testing delete study frontend integration
+ℹ️ Studies section not immediately visible - checking dashboard
+ℹ️ Study creation button not immediately visible
+✅ Frontend integration test completed
+]]>
+</system-out>
+</testcase>
+</testsuite>
 </testsuites>

@@ -168,32 +168,52 @@ class NetworkResilientApiService {
               const refreshToken = state?.refreshToken;
               
               if (refreshToken) {
-                // Try to refresh with appropriate endpoint
+                console.log('🔄 API Service: Attempting token refresh due to 401 error');
+                
+                // Use the correct auth-consolidated endpoint
                 const refreshUrl = isOnline ? 
-                  `${this.api.defaults.baseURL}/auth-network-resilient?action=refresh` :
-                  `${this.fallbackBaseUrl}/auth-network-resilient?action=refresh`;
+                  `${this.api.defaults.baseURL}/auth-consolidated?action=refresh` :
+                  `${this.fallbackBaseUrl}/auth-consolidated?action=refresh`;
                 
                 const response = await axios.post(refreshUrl, {
-                  refresh_token: refreshToken,
+                  refreshToken: refreshToken, // Use correct field name
                 });
 
+                // Extract token with improved logic matching auth service response structure
                 const token = response.data.session?.access_token || 
-                            response.data.data?.accessToken || 
+                            response.data.tokens?.authToken ||
                             response.data.token;
+                            
+                const newRefreshToken = response.data.session?.refresh_token || 
+                                      response.data.tokens?.refreshToken ||
+                                      refreshToken; // Keep existing if not provided
                 
-                // Update both localStorage and trigger Zustand store update
-                const updatedState = { ...state, token };
-                localStorage.setItem('auth-storage', JSON.stringify({ 
-                  state: updatedState, 
-                  version: 0 
-                }));
-                
-                // Retry the original request with new token
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-                return this.api(originalRequest);
+                if (token) {
+                  console.log('✅ API Service: Token refresh successful');
+                  
+                  // Update both localStorage and trigger Zustand store update
+                  const updatedState = { 
+                    ...state, 
+                    token: token,
+                    refreshToken: newRefreshToken
+                  };
+                  localStorage.setItem('auth-storage', JSON.stringify({ 
+                    state: updatedState, 
+                    version: 0 
+                  }));
+                  
+                  // Retry the original request with new token
+                  originalRequest.headers.Authorization = `Bearer ${token}`;
+                  return this.api(originalRequest);
+                } else {
+                  console.error('❌ API Service: No token in refresh response');
+                  throw new Error('No token in refresh response');
+                }
               }
             }
           } catch (refreshError) {
+            console.error('❌ API Service: Token refresh failed:', refreshError);
+            
             // Check if this is local/mock authentication before clearing
             const authStorage = localStorage.getItem('auth-storage');
             let isLocalAuth = false;
@@ -210,18 +230,38 @@ class NetworkResilientApiService {
             
             if (!isLocalAuth) {
               // Only clear auth for real authentication failures
+              console.log('🚨 API Service: Clearing authentication due to refresh failure');
               localStorage.removeItem('auth-storage');
-              window.location.href = '/login';
+              
+              // Show authentication error instead of generic error
+              toast.error('Your session has expired. Please log in again.');
+              
+              // Redirect to login page after a brief delay
+              setTimeout(() => {
+                window.location.href = '/login';
+              }, 2000);
             } else {
-              console.warn('🔧 Auth interceptor: Skipping logout for local/fallback authentication');
+              console.warn('🔧 API Service: Skipping logout for local/fallback authentication');
             }
             
-            return Promise.reject(refreshError);
+            return Promise.reject(new Error('Authentication failed - session expired'));
           }
         }
 
-        // Handle other API errors
-        const message = error.response?.data?.message || error.message || 'An error occurred';
+        // Handle other API errors with improved messaging
+        let message = 'An error occurred';
+        
+        if (error.response?.status === 401) {
+          message = 'Authentication failed - please log in again';
+        } else if (error.response?.status === 403) {
+          message = 'Access denied - insufficient permissions';
+        } else if (error.response?.status >= 500) {
+          message = 'Server error - please try again later';
+        } else if (error.code === 'ECONNREFUSED' || error.message?.includes('ENOTFOUND')) {
+          message = 'Connection failed - please check your internet connection';
+        } else {
+          message = error.response?.data?.message || error.message || 'An error occurred';
+        }
         
         // Don't show toast for certain errors
         const skipToast = [401, 403].includes(error.response?.status) || 
@@ -229,6 +269,9 @@ class NetworkResilientApiService {
         
         if (!skipToast) {
           toast.error(message);
+        } else if (error.response?.status === 401) {
+          // For 401s, we already handled the user feedback in the retry logic above
+          console.log('🔧 API Service: 401 error handled by token refresh logic');
         }
 
         return Promise.reject(error);

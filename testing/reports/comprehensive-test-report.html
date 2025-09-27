@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ResearchHub Comprehensive Test Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #2563eb; color: white; padding: 20px; border-radius: 8px; }
+        .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .metric { background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; }
+        .metric-value { font-size: 2em; font-weight: bold; color: #1e40af; }
+        .test-result { margin: 10px 0; padding: 15px; border-radius: 8px; }
+        .passed { background: #dcfce7; border-left: 4px solid #16a34a; }
+        .failed { background: #fee2e2; border-left: 4px solid #dc2626; }
+        .status { font-weight: bold; }
+        .timestamp { color: #6b7280; font-size: 0.9em; }
+        .description { color: #4b5563; margin: 5px 0; }
+        .duration { color: #7c3aed; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 ResearchHub Comprehensive Test Report</h1>
+        <p class="timestamp">Generated: 9/27/2025, 6:29:56 PM</p>
+        <p>Environment: development</p>
+    </div>
+
+    <div class="summary">
+        <div class="metric">
+            <div class="metric-value">3</div>
+            <div>Total Tests</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value" style="color: #16a34a">0</div>
+            <div>Passed</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value" style="color: #dc2626">3</div>
+            <div>Failed</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">0.0%</div>
+            <div>Success Rate</div>
+        </div>
+    </div>
+
+    <h2>📋 Test Results</h2>
+    
+        <div class="test-result failed">
+            <h3>Delete Study Validation</h3>
+            <div class="status">Status: FAILED ❌</div>
+            <div class="duration">Duration: 7.4s</div>
+            <div style="color: #dc2626; margin-top: 10px;"><strong>Error:</strong> Command failed: npx playwright test "testing/playwright/delete-study-validation.spec.js" --reporter=html --output-dir=testing/reports/delete-study-validation
+error: unknown option '--output-dir=testing/reports/delete-study-validation'
+</div>
+        </div>
+    
+        <div class="test-result failed">
+            <h3>Admin Dashboard Comprehensive</h3>
+            <div class="status">Status: FAILED ❌</div>
+            <div class="duration">Duration: 1.4s</div>
+            <div style="color: #dc2626; margin-top: 10px;"><strong>Error:</strong> Command failed: npx playwright test "testing/playwright/admin-dashboard-comprehensive.spec.js" --reporter=html --output-dir=testing/reports/admin-dashboard-comprehensive
+error: unknown option '--output-dir=testing/reports/admin-dashboard-comprehensive'
+</div>
+        </div>
+    
+        <div class="test-result failed">
+            <h3>Multi-Role Workflow</h3>
+            <div class="status">Status: FAILED ❌</div>
+            <div class="duration">Duration: 1.6s</div>
+            <div style="color: #dc2626; margin-top: 10px;"><strong>Error:</strong> Command failed: npx playwright test "testing/playwright/comprehensive-multi-role-test.spec.js" --reporter=html --output-dir=testing/reports/multi-role-workflow
+error: unknown option '--output-dir=testing/reports/multi-role-workflow'
+</div>
+        </div>
+    
+
+    <div style="margin-top: 30px; padding: 15px; background: #f1f5f9; border-radius: 8px;">
+        <h3>🎯 Test Coverage Summary</h3>
+        <ul>
+            <li><strong>Delete Study Validation:</strong> Ensures the 404 bug fix is working correctly</li>
+            <li><strong>Admin Dashboard Testing:</strong> Validates previously missing admin functionality</li>
+            <li><strong>Multi-Role Workflow:</strong> End-to-end testing of all user roles working together</li>
+        </ul>
+        <p><strong>Total Coverage:</strong> Complete platform validation from researcher → participant → admin workflows</p>
+    </div>
+</body>
+</html>
+  

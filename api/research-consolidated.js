@@ -67,28 +67,13 @@ async function authenticateUser(req) {
     const token = authHeader.replace('Bearer ', '');
     console.log('🔍 Attempting to verify token:', token.substring(0, 20) + '...');
     
-    // First try with admin client for server-side verification
-    const { data: { user }, error: adminError } = await supabaseAdmin.auth.getUser(token);
+    // Optimized: Use only regular client to avoid timeout issues
+    // This prevents the cascade of timeout errors seen in production
+    const { data: { user }, error } = await supabase.auth.getUser(token);
     
-    if (adminError || !user) {
-      console.log('❌ Admin token verification failed:', adminError?.message);
-      
-      // Fallback: Try with regular client
-      const { data: { user: fallbackUser }, error: fallbackError } = await supabase.auth.getUser(token);
-      
-      if (fallbackError || !fallbackUser) {
-        console.log('❌ Fallback token verification failed:', fallbackError?.message);
-        return { success: false, error: 'Invalid or expired token', status: 401 };
-      }
-      
-      console.log('✅ Token verified with fallback method for user:', fallbackUser.email);
-      return {
-        success: true,
-        user: {
-          id: fallbackUser.id,
-          email: fallbackUser.email
-        }
-      };
+    if (error || !user) {
+      console.log('❌ Token verification failed:', error?.message);
+      return { success: false, error: 'Invalid or expired token', status: 401 };
     }
 
     console.log('✅ Token verified for user:', user.email);
@@ -280,28 +265,41 @@ async function createStudy(req, res) {
  */
 async function getStudies(req, res) {
   try {
+    // Set a timeout for the entire operation
+    const timeoutId = setTimeout(() => {
+      console.error('❌ getStudies operation timed out after 8 seconds');
+      if (!res.headersSent) {
+        return res.status(408).json({
+          success: false,
+          error: 'Request timeout',
+          details: 'Operation timed out - please try again'
+        });
+      }
+    }, 8000);
+
     const userRole = req.headers['x-user-role'] || 'researcher';
     
-    console.log(`📚 Getting studies for role: ${userRole} - Fixed query logic`);
+    console.log(`📚 Getting studies for role: ${userRole} - Optimized query logic`);
     
-    // Authenticate user to get their ID
+    // Simplified authentication for performance
     let currentUserId = null;
     if (userRole === 'researcher') {
-      // For researchers, we need to filter by their own studies
       const authResult = await authenticateUser(req);
       if (authResult.success) {
         currentUserId = authResult.user.id;
         console.log(`🔐 Authenticated researcher: ${currentUserId}`);
       } else {
+        clearTimeout(timeoutId);
         console.error(`❌ Authentication failed for researcher: ${authResult.error}`);
         return res.status(401).json({ success: false, error: 'Authentication required' });
       }
     }
     
-    // Build the query properly
-    let query = supabaseAdmin
+    // Optimized database query with limits
+    let query = supabase
       .from('studies')
-      .select('*');
+      .select('*')
+      .limit(50); // Limit results to prevent large queries
     
     // Filter based on user role
     if (userRole === 'participant') {
@@ -315,8 +313,11 @@ async function getStudies(req, res) {
     // Add ordering
     query = query.order('created_at', { ascending: false });
     
-    console.log('🗄️ Executing database query...');
+    console.log('🗄️ Executing optimized database query...');
     const { data: studies, error } = await query;
+
+    // Clear timeout since we got a response
+    clearTimeout(timeoutId);
 
     if (error) {
       console.error('❌ Database error fetching studies:', error);
@@ -327,11 +328,10 @@ async function getStudies(req, res) {
       });
     }
 
-    console.log(`📊 Found ${studies.length} studies in database`);
+    console.log(`📊 Found ${studies?.length || 0} studies in database`);
 
-    // Format studies for frontend
-    console.log('🔄 Formatting studies for frontend...');
-    const formattedStudies = studies.map(study => {
+    // Format studies for frontend (with error handling)
+    const formattedStudies = (studies || []).map(study => {
       try {
         return formatStudyForFrontend(study);
       } catch (formatError) {
@@ -349,15 +349,25 @@ async function getStudies(req, res) {
       pagination: {
         currentPage: 1,
         totalPages: 1,
-        totalStudies: studies.length,
+        totalStudies: formattedStudies.length,
         hasNext: false,
         hasPrev: false
       }
     };
 
     // CRITICAL: Validate response format before sending
-    validateStudiesResponse(response);
+    try {
+      validateStudiesResponse(response);
+    } catch (validationError) {
+      console.error('❌ Response validation failed:', validationError);
+      return res.status(500).json({
+        success: false,
+        error: 'Response validation failed',
+        details: validationError.message
+      });
+    }
     
+    console.log('✅ Sending optimized studies response');
     return res.status(200).json(response);
 
   } catch (error) {

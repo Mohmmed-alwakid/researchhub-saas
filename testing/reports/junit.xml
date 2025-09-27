@@ -1,28 +1,620 @@
-<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="12.188496">
-<testsuite name="ui-inspector.spec.js" timestamp="2025-09-20T15:32:01.160Z" hostname="chromium" tests="1" failures="0" skipped="0" time="8.735" errors="0">
-<testcase name="UI Inspector: Find Study Creation Elements" classname="ui-inspector.spec.js" time="8.735">
+<testsuites id="" name="" tests="10" failures="10" skipped="0" errors="0" time="28.044704000000003">
+<testsuite name="delete-study-validation.spec.js" timestamp="2025-09-27T18:42:45.566Z" hostname="chromium" tests="2" failures="2" skipped="0" time="28.536" errors="0">
+<testcase name="Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation)" classname="delete-study-validation.spec.js" time="20.541">
+<failure message="delete-study-validation.spec.js:28:3 Delete Draft Study - No 404 Errors (API Fix Validation)" type="FAILURE">
+<![CDATA[  [chromium] › delete-study-validation.spec.js:28:3 › Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation) 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=Login')
+
+
+      42 |
+      43 |       // Login
+    > 44 |       await page.click('text=Login');
+         |                  ^
+      45 |       await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+      46 |       await page.fill('input[type="email"]', RESEARCHER_EMAIL);
+      47 |       await page.fill('input[type="password"]', PASSWORD);
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:44:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--chromium\error-context.md
+]]>
+</failure>
 <system-out>
-<![CDATA[🔍 Inspecting ResearchHub UI for study creation elements...
-🔐 Logging in as Researcher...
-✅ Researcher login successful
-📍 Current URL: https://researchhub-saas.vercel.app/researcher/studies
-📋 Page title: Afkar - User Testing Research Platform
-🔘 Found 1 buttons on the page
-🔘 Button 1: "Go Back" | aria-label: null | data-testid: null
-   Classes: w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200
-🔗 Found 4 links on the page
-🔗 Link 1: "Go Home" | href: /
-🔗 Link 2: "Features" | href: /features
-🔗 Link 3: "Pricing" | href: /pricing
-🔗 Link 4: "About Us" | href: /about
-📝 Elements containing "create": 0
-📝 Elements containing "new": 0
-📝 Elements containing "add": 0
-📝 Elements containing "start": 0
-📝 Elements containing "begin": 0
-📝 Elements containing "study": 0
-🎨 Tailwind detected: 12 elements
-✅ UI inspection completed - check console output and screenshot
+<![CDATA[🗑️ Testing delete study fix - No more 404 errors
+
+🔐 RESEARCHER LOGIN
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--chromium\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--chromium\error-context.md]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[❌ Delete study test failed: page.click: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('text=Login')[22m
+
+    at [90mD:\MAMP\AfakarM\[39mtesting\playwright\delete-study-validation.spec.js:44:18 {
+  name: [32m'TimeoutError'[39m,
+  [32mSymbol(step)[39m: {
+    stepId: [32m'pw:api@11'[39m,
+    location: {
+      file: [32m'D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js'[39m,
+      line: [33m44[39m,
+      column: [33m18[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m"Click locator('text=Login')"[39m,
+    apiName: [32m'page.click'[39m,
+    params: { selector: [32m'text=Login'[39m, timeout: [33m10000[39m },
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@11'[39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1758998586704[39m,
+    error: {
+      message: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m,
+      stack: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m +
+        [32m'\n'[39m +
+        [32m'    at D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js:44:18'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+]]>
+</system-err>
+</testcase>
+<testcase name="Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation" classname="delete-study-validation.spec.js" time="7.995">
+<failure message="delete-study-validation.spec.js:426:3 API Direct Test - Delete Study Endpoint Validation" type="FAILURE">
+<![CDATA[  [chromium] › delete-study-validation.spec.js:426:3 › Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation 
+
+    Error: page.evaluate: TypeError: window.testDeleteAPI is not a function
+        at eval (eval at evaluate (:291:30), <anonymous>:1:14)
+        at UtilityScript.evaluate (<anonymous>:293:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at eval (eval at evaluate (:291:30), <anonymous>:1:14)
+        at UtilityScript.evaluate (<anonymous>:293:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:500:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🔧 Testing delete study API directly
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-chromium\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="delete-study-validation.spec.js" timestamp="2025-09-27T18:42:45.566Z" hostname="firefox" tests="2" failures="2" skipped="0" time="29.034" errors="0">
+<testcase name="Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation)" classname="delete-study-validation.spec.js" time="19.064">
+<failure message="delete-study-validation.spec.js:28:3 Delete Draft Study - No 404 Errors (API Fix Validation)" type="FAILURE">
+<![CDATA[  [firefox] › delete-study-validation.spec.js:28:3 › Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation) 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=Login')
+
+
+      42 |
+      43 |       // Login
+    > 44 |       await page.click('text=Login');
+         |                  ^
+      45 |       await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+      46 |       await page.fill('input[type="email"]', RESEARCHER_EMAIL);
+      47 |       await page.fill('input[type="password"]', PASSWORD);
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:44:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--firefox\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🗑️ Testing delete study fix - No more 404 errors
+
+🔐 RESEARCHER LOGIN
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--firefox\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--firefox\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--firefox\error-context.md]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[❌ Delete study test failed: page.click: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('text=Login')[22m
+
+    at [90mD:\MAMP\AfakarM\[39mtesting\playwright\delete-study-validation.spec.js:44:18 {
+  name: [32m'TimeoutError'[39m,
+  [32mSymbol(step)[39m: {
+    stepId: [32m'pw:api@11'[39m,
+    location: {
+      file: [32m'D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js'[39m,
+      line: [33m44[39m,
+      column: [33m18[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m"Click locator('text=Login')"[39m,
+    apiName: [32m'page.click'[39m,
+    params: { selector: [32m'text=Login'[39m, timeout: [33m10000[39m },
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@11'[39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1758998588253[39m,
+    error: {
+      message: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m,
+      stack: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m +
+        [32m'\n'[39m +
+        [32m'    at D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js:44:18'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+]]>
+</system-err>
+</testcase>
+<testcase name="Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation" classname="delete-study-validation.spec.js" time="9.97">
+<failure message="delete-study-validation.spec.js:426:3 API Direct Test - Delete Study Endpoint Validation" type="FAILURE">
+<![CDATA[  [firefox] › delete-study-validation.spec.js:426:3 › Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation 
+
+    Error: page.evaluate: window.testDeleteAPI is not a function
+    @debugger eval code line 291 > eval:1:14
+    evaluate@debugger eval code:293:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 291 > eval:1:14
+        at evaluate@debugger eval code:293:16
+        at @debugger eval code:1:44
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:500:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-firefox\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🔧 Testing delete study API directly
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-firefox\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-firefox\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-firefox\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="delete-study-validation.spec.js" timestamp="2025-09-27T18:42:45.566Z" hostname="webkit" tests="2" failures="2" skipped="0" time="31.945" errors="0">
+<testcase name="Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation)" classname="delete-study-validation.spec.js" time="23.361">
+<failure message="delete-study-validation.spec.js:28:3 Delete Draft Study - No 404 Errors (API Fix Validation)" type="FAILURE">
+<![CDATA[  [webkit] › delete-study-validation.spec.js:28:3 › Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation) 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=Login')
+
+
+      42 |
+      43 |       // Login
+    > 44 |       await page.click('text=Login');
+         |                  ^
+      45 |       await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+      46 |       await page.fill('input[type="email"]', RESEARCHER_EMAIL);
+      47 |       await page.fill('input[type="password"]', PASSWORD);
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:44:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--webkit\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🗑️ Testing delete study fix - No more 404 errors
+
+🔐 RESEARCHER LOGIN
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--webkit\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--webkit\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--webkit\error-context.md]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[❌ Delete study test failed: page.click: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('text=Login')[22m
+
+    at [90mD:\MAMP\AfakarM\[39mtesting\playwright\delete-study-validation.spec.js:44:18 {
+  name: [32m'TimeoutError'[39m,
+  [32mSymbol(step)[39m: {
+    stepId: [32m'pw:api@11'[39m,
+    location: {
+      file: [32m'D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js'[39m,
+      line: [33m44[39m,
+      column: [33m18[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m"Click locator('text=Login')"[39m,
+    apiName: [32m'page.click'[39m,
+    params: { selector: [32m'text=Login'[39m, timeout: [33m10000[39m },
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@11'[39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1758998586850[39m,
+    error: {
+      message: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m,
+      stack: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m +
+        [32m'\n'[39m +
+        [32m'    at D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js:44:18'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+]]>
+</system-err>
+</testcase>
+<testcase name="Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation" classname="delete-study-validation.spec.js" time="8.584">
+<failure message="delete-study-validation.spec.js:426:3 API Direct Test - Delete Study Endpoint Validation" type="FAILURE">
+<![CDATA[  [webkit] › delete-study-validation.spec.js:426:3 › Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation 
+
+    Error: page.evaluate: TypeError: window.testDeleteAPI is not a function. (In 'window.testDeleteAPI()', 'window.testDeleteAPI' is undefined)
+
+      498 |
+      499 |     // Execute the API test
+    > 500 |     const result = await page.evaluate(() => window.testDeleteAPI());
+          |                               ^
+      501 |     
+      502 |     console.log('API Test Result:', result);
+      503 |     
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:500:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-webkit\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🔧 Testing delete study API directly
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-webkit\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="delete-study-validation.spec.js" timestamp="2025-09-27T18:42:45.566Z" hostname="mobile-chrome" tests="2" failures="2" skipped="0" time="29.996" errors="0">
+<testcase name="Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation)" classname="delete-study-validation.spec.js" time="22.223">
+<failure message="delete-study-validation.spec.js:28:3 Delete Draft Study - No 404 Errors (API Fix Validation)" type="FAILURE">
+<![CDATA[  [mobile-chrome] › delete-study-validation.spec.js:28:3 › Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation) 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=Login')
+
+
+      42 |
+      43 |       // Login
+    > 44 |       await page.click('text=Login');
+         |                  ^
+      45 |       await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+      46 |       await page.fill('input[type="email"]', RESEARCHER_EMAIL);
+      47 |       await page.fill('input[type="password"]', PASSWORD);
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:44:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-chrome\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-chrome\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🗑️ Testing delete study fix - No more 404 errors
+
+🔐 RESEARCHER LOGIN
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-chrome\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-chrome\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-chrome\error-context.md]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[❌ Delete study test failed: page.click: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('text=Login')[22m
+
+    at [90mD:\MAMP\AfakarM\[39mtesting\playwright\delete-study-validation.spec.js:44:18 {
+  name: [32m'TimeoutError'[39m,
+  [32mSymbol(step)[39m: {
+    stepId: [32m'pw:api@11'[39m,
+    location: {
+      file: [32m'D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js'[39m,
+      line: [33m44[39m,
+      column: [33m18[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m"Click locator('text=Login')"[39m,
+    apiName: [32m'page.click'[39m,
+    params: { selector: [32m'text=Login'[39m, timeout: [33m10000[39m },
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@11'[39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1758998586070[39m,
+    error: {
+      message: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m,
+      stack: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m +
+        [32m'\n'[39m +
+        [32m'    at D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js:44:18'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+]]>
+</system-err>
+</testcase>
+<testcase name="Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation" classname="delete-study-validation.spec.js" time="7.773">
+<failure message="delete-study-validation.spec.js:426:3 API Direct Test - Delete Study Endpoint Validation" type="FAILURE">
+<![CDATA[  [mobile-chrome] › delete-study-validation.spec.js:426:3 › Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation 
+
+    Error: page.evaluate: TypeError: window.testDeleteAPI is not a function
+        at eval (eval at evaluate (:291:30), <anonymous>:1:14)
+        at UtilityScript.evaluate (<anonymous>:293:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at eval (eval at evaluate (:291:30), <anonymous>:1:14)
+        at UtilityScript.evaluate (<anonymous>:293:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:500:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-chrome\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-chrome\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🔧 Testing delete study API directly
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-chrome\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-chrome\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-chrome\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="delete-study-validation.spec.js" timestamp="2025-09-27T18:42:45.566Z" hostname="mobile-safari" tests="2" failures="2" skipped="0" time="18.783" errors="0">
+<testcase name="Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation)" classname="delete-study-validation.spec.js" time="15.747">
+<failure message="delete-study-validation.spec.js:28:3 Delete Draft Study - No 404 Errors (API Fix Validation)" type="FAILURE">
+<![CDATA[  [mobile-safari] › delete-study-validation.spec.js:28:3 › Delete Study Fix Validation › Delete Draft Study - No 404 Errors (API Fix Validation) 
+
+    TimeoutError: page.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('text=Login')
+
+
+      42 |
+      43 |       // Login
+    > 44 |       await page.click('text=Login');
+         |                  ^
+      45 |       await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+      46 |       await page.fill('input[type="email"]', RESEARCHER_EMAIL);
+      47 |       await page.fill('input[type="password"]', PASSWORD);
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:44:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-safari\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-safari\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-safari\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🗑️ Testing delete study fix - No more 404 errors
+
+🔐 RESEARCHER LOGIN
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-safari\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-safari\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-deb44--Errors-API-Fix-Validation--mobile-safari\error-context.md]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[❌ Delete study test failed: page.click: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('text=Login')[22m
+
+    at [90mD:\MAMP\AfakarM\[39mtesting\playwright\delete-study-validation.spec.js:44:18 {
+  name: [32m'TimeoutError'[39m,
+  [32mSymbol(step)[39m: {
+    stepId: [32m'pw:api@11'[39m,
+    location: {
+      file: [32m'D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js'[39m,
+      line: [33m44[39m,
+      column: [33m18[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m"Click locator('text=Login')"[39m,
+    apiName: [32m'page.click'[39m,
+    params: { selector: [32m'text=Login'[39m, timeout: [33m10000[39m },
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@11'[39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1758998591646[39m,
+    error: {
+      message: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m,
+      stack: [32m'TimeoutError: page.click: Timeout 10000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=Login')\x1B[22m\n"[39m +
+        [32m'\n'[39m +
+        [32m'    at D:\\MAMP\\AfakarM\\testing\\playwright\\delete-study-validation.spec.js:44:18'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+]]>
+</system-err>
+</testcase>
+<testcase name="Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation" classname="delete-study-validation.spec.js" time="3.036">
+<failure message="delete-study-validation.spec.js:426:3 API Direct Test - Delete Study Endpoint Validation" type="FAILURE">
+<![CDATA[  [mobile-safari] › delete-study-validation.spec.js:426:3 › Delete Study Fix Validation › API Direct Test - Delete Study Endpoint Validation 
+
+    Error: page.evaluate: TypeError: window.testDeleteAPI is not a function. (In 'window.testDeleteAPI()', 'window.testDeleteAPI' is undefined)
+
+      498 |
+      499 |     // Execute the API test
+    > 500 |     const result = await page.evaluate(() => window.testDeleteAPI());
+          |                               ^
+      501 |     
+      502 |     console.log('API Test Result:', result);
+      503 |     
+        at D:\MAMP\AfakarM\testing\playwright\delete-study-validation.spec.js:500:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-safari\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-safari\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-safari\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🔧 Testing delete study API directly
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-safari\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-safari\video.webm]]
+
+[[ATTACHMENT|..\..\test-results\delete-study-validation-De-8035c-e-Study-Endpoint-Validation-mobile-safari\error-context.md]]
 ]]>
 </system-out>
 </testcase>

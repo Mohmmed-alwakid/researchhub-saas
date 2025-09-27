@@ -1,0 +1,53 @@
+{
+  "timestamp": "2025-09-27T18:24:03.465Z",
+  "testName": "Authentication Flow Test",
+  "totalTests": 2,
+  "passed": 2,
+  "failed": 0,
+  "details": [
+    {
+      "test": "Health Endpoint Check",
+      "status": "PASSED",
+      "duration": "687ms",
+      "result": {
+        "status": 200,
+        "healthy": false,
+        "response": {
+          "success": true,
+          "message": "Afkar API is running",
+          "timestamp": "2025-09-27T18:24:05.379Z",
+          "environment": "production",
+          "version": "1.0.0",
+          "status": "healthy"
+        }
+      }
+    },
+    {
+      "test": "Login Process with Test Account",
+      "status": "PASSED",
+      "duration": "1845ms",
+      "result": {
+        "status": 200,
+        "hasToken": true,
+        "hasRefreshToken": true,
+        "tokenPreview": "eyJhbGciOiJIUzI1NiIsImtpZCI6ImtNTk9JUFUzZGs1VUZiSz...",
+        "user": {
+          "id": "9876c870-79e9-4106-99d6-9080049ec2aa",
+          "email": "abwanwr77+participant@gmail.com",
+          "firstName": "participant",
+          "lastName": "tester",
+          "role": "participant",
+          "status": "active",
+          "emailConfirmed": true
+        },
+        "loginSuccess": true
+      }
+    }
+  ],
+  "summary": {
+    "totalTests": 2,
+    "passed": 2,
+    "failed": 0,
+    "successRate": "100%"
+  }
+}

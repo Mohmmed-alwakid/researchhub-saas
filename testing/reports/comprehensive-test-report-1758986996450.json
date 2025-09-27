@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-09-27T15:29:56.450Z",
+  "environment": "development",
+  "configuration": {
+    "headless": true,
+    "workers": 2,
+    "timeout": 180000,
+    "retries": 1,
+    "browsers": [
+      "chromium"
+    ]
+  },
+  "summary": {
+    "totalSuites": 3,
+    "passed": 0,
+    "failed": 3,
+    "successRate": 0,
+    "totalDuration": 10411
+  },
+  "results": [
+    {
+      "suite": "Delete Study Validation",
+      "status": "FAILED",
+      "duration": 7375,
+      "output": "",
+      "error": "Command failed: npx playwright test \"testing/playwright/delete-study-validation.spec.js\" --reporter=html --output-dir=testing/reports/delete-study-validation\nerror: unknown option '--output-dir=testing/reports/delete-study-validation'\n"
+    },
+    {
+      "suite": "Admin Dashboard Comprehensive",
+      "status": "FAILED",
+      "duration": 1424,
+      "output": "",
+      "error": "Command failed: npx playwright test \"testing/playwright/admin-dashboard-comprehensive.spec.js\" --reporter=html --output-dir=testing/reports/admin-dashboard-comprehensive\nerror: unknown option '--output-dir=testing/reports/admin-dashboard-comprehensive'\n"
+    },
+    {
+      "suite": "Multi-Role Workflow",
+      "status": "FAILED",
+      "duration": 1608,
+      "output": "",
+      "error": "Command failed: npx playwright test \"testing/playwright/comprehensive-multi-role-test.spec.js\" --reporter=html --output-dir=testing/reports/multi-role-workflow\nerror: unknown option '--output-dir=testing/reports/multi-role-workflow'\n"
+    }
+  ]
+}

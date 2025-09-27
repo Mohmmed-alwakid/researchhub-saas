@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Delete Study Browser Test - Live Demo</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 1200px; margin: 0 auto; padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .test-section { 
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; margin: 15px 0; border-radius: 10px; 
+            border-left: 4px solid #00ff88;
+        }
+        .success { border-left-color: #00ff88; background: rgba(0,255,136,0.1); }
+        .error { border-left-color: #ff4757; background: rgba(255,71,87,0.1); }
+        .warning { border-left-color: #ffa502; background: rgba(255,165,2,0.1); }
+        .info { border-left-color: #3742fa; background: rgba(55,66,250,0.1); }
+        
+        .step-progress {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .step.pending { background: rgba(255,255,255,0.1); color: #ccc; }
+        .step.active { background: #3742fa; color: white; transform: scale(1.05); }
+        .step.complete { background: #00ff88; color: #333; }
+        .step.failed { background: #ff4757; color: white; }
+        
+        button { 
+            background: linear-gradient(45deg, #00ff88, #00c6ff);
+            color: white; padding: 15px 30px; border: none; border-radius: 25px; 
+            cursor: pointer; margin: 10px; font-size: 16px; font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,255,136,0.3);
+            transition: all 0.3s ease;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(0,255,136,0.4); }
+        button:disabled { 
+            background: #6c757d; cursor: not-allowed; transform: none; 
+            box-shadow: none; 
+        }
+        
+        .api-call {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff88;
+        }
+        
+        pre { 
+            background: rgba(0,0,0,0.5); 
+            padding: 15px; border-radius: 8px; 
+            overflow-x: auto; max-height: 300px;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .highlight { 
+            background: rgba(255,255,0,0.2); 
+            padding: 2px 6px; 
+            border-radius: 4px;
+            color: #ffff00;
+            font-weight: bold;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .fix-summary {
+            background: rgba(0,255,136,0.1);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .before { border-left-color: #ff4757; }
+        .after { border-left-color: #00ff88; }
+        
+        @media (max-width: 768px) {
+            .step-progress { flex-direction: column; }
+            .before-after { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-header">
+            <h1>🔥 Delete Study Fix - Live Browser Test</h1>
+            <p>Testing the fix for: <em>"I tried to delete draft study but it shows Request failed with status code 404"</em></p>
+        </div>
+
+        <div class="fix-summary">
+            <h3>🎯 What We Fixed</h3>
+            <div class="before-after">
+                <div class="test-section before">
+                    <h4>❌ BEFORE (404 Error)</h4>
+                    <div class="api-call">
+                        <strong>Frontend:</strong><br>
+                        <code>apiService.delete('research-consolidated?action=delete-study', { data: { id: studyId } })</code>
+                    </div>
+                    <p><strong>Issue:</strong> ID wrapped in 'data' object, backend couldn't find it</p>
+                </div>
+                <div class="test-section after">
+                    <h4>✅ AFTER (Working)</h4>
+                    <div class="api-call">
+                        <strong>Frontend:</strong><br>
+                        <code>apiService.delete('research-consolidated?action=delete-study&id=' + studyId)</code>
+                    </div>
+                    <p><strong>Solution:</strong> ID in query string, matches other DELETE endpoints</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-progress">
+            <div class="step pending" id="step1">🔐 Auth</div>
+            <div class="step pending" id="step2">📝 Create</div>
+            <div class="step pending" id="step3">🗑️ Delete</div>
+            <div class="step pending" id="step4">✅ Verify</div>
+        </div>
+
+        <div class="test-section">
+            <button id="startTest" onclick="runCompleteTest()">🚀 Run Live Browser Test</button>
+            <button onclick="location.reload()">🔄 Reset Test</button>
+            <button onclick="testProduction()">🌐 Test Production Site</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3003/api';
+        const PRODUCTION_URL = 'https://researchhub-saas.vercel.app/api';
+        const TEST_ACCOUNTS = {
+            researcher: { email: 'abwanwr77+Researcher@gmail.com', password: 'Testtest123' }
+        };
+
+        let authToken = null;
+        let testStudyId = null;
+        let currentEnvironment = 'local';
+
+        function updateStep(stepId, status) {
+            const step = document.getElementById(stepId);
+            step.className = `step ${status}`;
+        }
+
+        function log(message, type = 'info', highlight = false) {
+            const resultsDiv = document.getElementById('results');
+            const logDiv = document.createElement('div');
+            logDiv.className = `test-section ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const content = highlight ? 
+                `<span class="highlight">[${timestamp}] ${message}</span>` : 
+                `<strong>[${timestamp}]</strong> ${message}`;
+            
+            logDiv.innerHTML = content;
+            resultsDiv.appendChild(logDiv);
+            console.log(`[${timestamp}] ${message}`);
+            
+            // Auto scroll to bottom
+            logDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function logApiCall(method, url, body = null, response = null) {
+            let apiHtml = `<div class="api-call">
+                <strong>${method}</strong> ${url}`;
+            
+            if (body) {
+                apiHtml += `<br><strong>Body:</strong> <pre>${JSON.stringify(body, null, 2)}</pre>`;
+            }
+            
+            if (response) {
+                const statusColor = response.ok ? '#00ff88' : '#ff4757';
+                apiHtml += `<br><strong style="color: ${statusColor}">Response (${response.status}):</strong>`;
+            }
+            
+            apiHtml += `</div>`;
+            log(apiHtml, response && response.ok ? 'success' : 'error');
+        }
+
+        async function testProduction() {
+            currentEnvironment = 'production';
+            log('🌐 Switching to PRODUCTION environment testing', 'warning', true);
+            log('Testing on: https://researchhub-saas.vercel.app', 'info');
+            await runCompleteTest();
+        }
+
+        async function runCompleteTest() {
+            const baseUrl = currentEnvironment === 'production' ? PRODUCTION_URL : BASE_URL;
+            
+            document.getElementById('startTest').disabled = true;
+            
+            // Reset steps
+            ['step1', 'step2', 'step3', 'step4'].forEach(id => updateStep(id, 'pending'));
+            
+            try {
+                log(`🚀 Starting comprehensive delete study test on ${currentEnvironment.toUpperCase()} environment`, 'info', true);
+                
+                // Step 1: Authentication
+                updateStep('step1', 'active');
+                log('🔐 Step 1: Authenticating as researcher...', 'info');
+                
+                const loginResponse = await fetch(`${baseUrl}/auth-consolidated?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(TEST_ACCOUNTS.researcher)
+                });
+                
+                logApiCall('POST', 'auth-consolidated?action=login', TEST_ACCOUNTS.researcher, loginResponse);
+                
+                const loginData = await loginResponse.json();
+                if (!loginData.success) {
+                    throw new Error(`Authentication failed: ${loginData.error}`);
+                }
+                
+                authToken = loginData.user?.access_token;
+                if (!authToken) {
+                    throw new Error('No access token received');
+                }
+                
+                updateStep('step1', 'complete');
+                log('✅ Authentication successful!', 'success');
+                
+                // Step 2: Create test study
+                updateStep('step2', 'active');
+                log('📝 Step 2: Creating a test study for deletion...', 'info');
+                
+                const studyData = {
+                    title: `Browser Test Study ${new Date().getTime()}`,
+                    description: 'This study will be deleted to demonstrate the fix working',
+                    type: 'unmoderated_study',
+                    targetParticipants: 3,
+                    duration: 10,
+                    compensation: 15,
+                    requirements: ['18+ years old'],
+                    tasks: [],
+                    settings: {
+                        recordScreen: false,
+                        recordAudio: false,
+                        recordWebcam: false,
+                        trackClicks: true,
+                        trackHovers: false,
+                        trackScrolls: true
+                    }
+                };
+                
+                const createResponse = await fetch(`${baseUrl}/research-consolidated?action=create-study`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(studyData)
+                });
+                
+                logApiCall('POST', 'research-consolidated?action=create-study', studyData, createResponse);
+                
+                const createData = await createResponse.json();
+                if (!createData.success) {
+                    throw new Error(`Study creation failed: ${createData.error}`);
+                }
+                
+                testStudyId = createData.study?.id;
+                if (!testStudyId) {
+                    throw new Error('No study ID received from creation');
+                }
+                
+                updateStep('step2', 'complete');
+                log(`✅ Test study created: <span class="highlight">${createData.study.title}</span>`, 'success');
+                log(`Study ID: <span class="highlight">${testStudyId}</span>`, 'info');
+                
+                // Step 3: Delete study (THE MAIN TEST)
+                updateStep('step3', 'active');
+                log('🗑️ Step 3: Testing delete study with the FIX...', 'warning', true);
+                log('Using FIXED API call format: ?action=delete-study&id=${studyId}', 'info');
+                
+                const deleteUrl = `${baseUrl}/research-consolidated?action=delete-study&id=${testStudyId}`;
+                const deleteResponse = await fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                logApiCall('DELETE', deleteUrl, null, deleteResponse);
+                
+                const deleteData = await deleteResponse.json();
+                
+                if (deleteResponse.status === 404) {
+                    updateStep('step3', 'failed');
+                    throw new Error('❌ Still getting 404! The fix may not be deployed correctly.');
+                }
+                
+                if (!deleteResponse.ok || !deleteData.success) {
+                    updateStep('step3', 'failed');
+                    throw new Error(`Delete failed: Status ${deleteResponse.status}, ${deleteData.error || 'Unknown error'}`);
+                }
+                
+                updateStep('step3', 'complete');
+                log('🎉 DELETE SUCCESS! No more 404 errors!', 'success', true);
+                log(JSON.stringify(deleteData, null, 2), 'success');
+                
+                // Step 4: Verify deletion
+                updateStep('step4', 'active');
+                log('✅ Step 4: Verifying study was actually deleted...', 'info');
+                
+                const verifyResponse = await fetch(`${baseUrl}/research-consolidated?action=get-studies`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyData.success && verifyData.studies) {
+                    const deletedStudy = verifyData.studies.find(study => study.id === testStudyId);
+                    
+                    if (deletedStudy) {
+                        updateStep('step4', 'failed');
+                        throw new Error('❌ Study still exists after deletion!');
+                    }
+                    
+                    updateStep('step4', 'complete');
+                    log('✅ Perfect! Study completely removed from database', 'success');
+                    log(`Remaining studies count: ${verifyData.studies.length}`, 'info');
+                } else {
+                    throw new Error('Could not verify deletion');
+                }
+                
+                // Final success message
+                log('', 'success'); // Empty line
+                log('🏆 ALL TESTS PASSED! The delete study fix is working perfectly!', 'success', true);
+                log(`Environment: ${currentEnvironment.toUpperCase()}`, 'success');
+                log('The user can now delete draft studies without 404 errors! ✨', 'success');
+                
+            } catch (error) {
+                log(`💥 Test failed: ${error.message}`, 'error', true);
+                console.error('Full error:', error);
+                
+                // Update failed step
+                const activeStep = document.querySelector('.step.active');
+                if (activeStep) {
+                    activeStep.className = 'step failed';
+                }
+            } finally {
+                document.getElementById('startTest').disabled = false;
+            }
+        }
+
+        // Auto-load message
+        log('🔥 Delete Study Fix Browser Test Ready!', 'info', true);
+        log('Click "Run Live Browser Test" to validate the fix works correctly', 'info');
+    </script>
+</body>
+</html>

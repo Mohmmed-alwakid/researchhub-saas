@@ -10,7 +10,9 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 1
+    },
     "preserveOutput": "always",
     "reporter": [
       [
@@ -42,7 +44,9 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "chromium",
         "name": "chromium",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -56,7 +60,9 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "firefox",
         "name": "firefox",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -70,7 +76,9 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "webkit",
         "name": "webkit",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -84,7 +92,9 @@
         "outputDir": "D:/MAMP/AfakarM/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "mobile-chrome",
         "name": "mobile-chrome",
         "testDir": "D:/MAMP/AfakarM/testing/playwright-mcp",
@@ -99,20 +109,469 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.54.2",
-    "workers": 8,
+    "workers": 1,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
-      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+      "title": "delete-study-streamlined.spec.ts",
+      "file": "delete-study-streamlined.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Delete Study Validation",
+          "file": "delete-study-streamlined.spec.ts",
+          "line": 21,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Delete Study API Endpoint Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6179,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🗑️ Testing delete study functionality\n"
+                        },
+                        {
+                          "text": "\n🔐 Logging in as researcher...\n"
+                        },
+                        {
+                          "text": "✅ Successfully logged in\n"
+                        },
+                        {
+                          "text": "\n🔧 Testing delete study API...\n"
+                        },
+                        {
+                          "text": "📊 Delete API Test Result: {\n  success: \u001b[33mfalse\u001b[39m,\n  status: \u001b[33m400\u001b[39m,\n  data: { success: \u001b[33mfalse\u001b[39m, error: \u001b[32m'Study ID is required'\u001b[39m },\n  error: \u001b[32m'Study ID is required'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "⚠️ Delete API returned: 400 - Study ID is required\n"
+                        },
+                        {
+                          "text": "📊 API calls made: 3\n"
+                        },
+                        {
+                          "text": "📊 Authentication errors: 0\n"
+                        },
+                        {
+                          "text": "✅ Delete study validation completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:45:37.386Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-88f8df20831ccbb7d81b",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "Delete Study Frontend Integration Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3289,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🖥️ Testing delete study frontend integration\n"
+                        },
+                        {
+                          "text": "ℹ️ Studies section not immediately visible - checking dashboard\n"
+                        },
+                        {
+                          "text": "ℹ️ Study creation button not immediately visible\n"
+                        },
+                        {
+                          "text": "✅ Frontend integration test completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:45:43.817Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-6f88382b6e3bdd93fd12",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 137,
+              "column": 3
+            },
+            {
+              "title": "Delete Study API Endpoint Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6899,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🗑️ Testing delete study functionality\n"
+                        },
+                        {
+                          "text": "\n🔐 Logging in as researcher...\n"
+                        },
+                        {
+                          "text": "✅ Successfully logged in\n"
+                        },
+                        {
+                          "text": "\n🔧 Testing delete study API...\n"
+                        },
+                        {
+                          "text": "📊 Delete API Test Result: {\n  success: \u001b[33mfalse\u001b[39m,\n  status: \u001b[33m400\u001b[39m,\n  data: { success: \u001b[33mfalse\u001b[39m, error: \u001b[32m'Study ID is required'\u001b[39m },\n  error: \u001b[32m'Study ID is required'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "⚠️ Delete API returned: 400 - Study ID is required\n"
+                        },
+                        {
+                          "text": "📊 API calls made: 3\n"
+                        },
+                        {
+                          "text": "📊 Authentication errors: 0\n"
+                        },
+                        {
+                          "text": "✅ Delete study validation completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:45:48.143Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-7bc1580c023ada6a5955",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "Delete Study Frontend Integration Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2803,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🖥️ Testing delete study frontend integration\n"
+                        },
+                        {
+                          "text": "ℹ️ Studies section not immediately visible - checking dashboard\n"
+                        },
+                        {
+                          "text": "ℹ️ Study creation button not immediately visible\n"
+                        },
+                        {
+                          "text": "✅ Frontend integration test completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:45:55.635Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-f023aafec7304ed8bafa",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 137,
+              "column": 3
+            },
+            {
+              "title": "Delete Study API Endpoint Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4547,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🗑️ Testing delete study functionality\n"
+                        },
+                        {
+                          "text": "\n🔐 Logging in as researcher...\n"
+                        },
+                        {
+                          "text": "✅ Successfully logged in\n"
+                        },
+                        {
+                          "text": "\n🔧 Testing delete study API...\n"
+                        },
+                        {
+                          "text": "📊 Delete API Test Result: {\n  success: \u001b[33mfalse\u001b[39m,\n  status: \u001b[33m400\u001b[39m,\n  data: { success: \u001b[33mfalse\u001b[39m, error: \u001b[32m'Study ID is required'\u001b[39m },\n  error: \u001b[32m'Study ID is required'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "⚠️ Delete API returned: 400 - Study ID is required\n"
+                        },
+                        {
+                          "text": "📊 API calls made: 3\n"
+                        },
+                        {
+                          "text": "📊 Authentication errors: 0\n"
+                        },
+                        {
+                          "text": "✅ Delete study validation completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:45:59.877Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-551efa383ac2238602cf",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "Delete Study Frontend Integration Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3016,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🖥️ Testing delete study frontend integration\n"
+                        },
+                        {
+                          "text": "ℹ️ Studies section not immediately visible - checking dashboard\n"
+                        },
+                        {
+                          "text": "ℹ️ Study creation button not immediately visible\n"
+                        },
+                        {
+                          "text": "✅ Frontend integration test completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:46:04.493Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-439d73e5f3807be09dee",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 137,
+              "column": 3
+            },
+            {
+              "title": "Delete Study API Endpoint Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4718,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🗑️ Testing delete study functionality\n"
+                        },
+                        {
+                          "text": "\n🔐 Logging in as researcher...\n"
+                        },
+                        {
+                          "text": "✅ Successfully logged in\n"
+                        },
+                        {
+                          "text": "\n🔧 Testing delete study API...\n"
+                        },
+                        {
+                          "text": "📊 Delete API Test Result: {\n  success: \u001b[33mfalse\u001b[39m,\n  status: \u001b[33m400\u001b[39m,\n  data: { success: \u001b[33mfalse\u001b[39m, error: \u001b[32m'Study ID is required'\u001b[39m },\n  error: \u001b[32m'Study ID is required'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "⚠️ Delete API returned: 400 - Study ID is required\n"
+                        },
+                        {
+                          "text": "📊 API calls made: 3\n"
+                        },
+                        {
+                          "text": "📊 Authentication errors: 0\n"
+                        },
+                        {
+                          "text": "✅ Delete study validation completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:46:08.348Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-265a548712908b306c01",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "Delete Study Frontend Integration Test",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3926,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🖥️ Testing delete study frontend integration\n"
+                        },
+                        {
+                          "text": "ℹ️ Studies section not immediately visible - checking dashboard\n"
+                        },
+                        {
+                          "text": "ℹ️ Study creation button not immediately visible\n"
+                        },
+                        {
+                          "text": "✅ Frontend integration test completed\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-27T18:46:13.304Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d20ce2aa8366d66ae40-6122e22202eaaa73cd2d",
+              "file": "delete-study-streamlined.spec.ts",
+              "line": 137,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2025-09-20T17:40:59.167Z",
-    "duration": 23.2349999999999,
-    "expected": 0,
+    "startTime": "2025-09-27T18:45:36.349Z",
+    "duration": 41146.195,
+    "expected": 8,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
