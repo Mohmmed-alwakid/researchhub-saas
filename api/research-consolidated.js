@@ -527,7 +527,7 @@ async function deleteStudy(req, res) {
         .from('studies')
         .select('*')
         .eq('uuid', id)
-        .eq('created_by', user.id)
+        .eq('researcher_id', user.id)  // Fixed: Use researcher_id, not created_by
         .single();
 
       if (findError || !studyData) {
@@ -549,7 +549,7 @@ async function deleteStudy(req, res) {
         .from('studies')
         .select('*')
         .eq('id', id)
-        .eq('created_by', user.id)
+        .eq('researcher_id', user.id)  // Fixed: Use researcher_id, not created_by
         .single();
 
       if (findError || !studyData) {
@@ -575,7 +575,7 @@ async function deleteStudy(req, res) {
       .from('studies')
       .delete()
       .eq(deleteQuery.field, deleteQuery.value)
-      .eq('created_by', user.id)
+      .eq('researcher_id', user.id)  // Fixed: Use researcher_id, not created_by
       .select();
 
     if (deleteError) {
