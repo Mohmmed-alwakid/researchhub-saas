@@ -296,7 +296,7 @@ async function getStudies(req, res) {
     }
     
     // Optimized database query with limits
-    let query = supabase
+    let query = supabaseAdmin
       .from('studies')
       .select('*')
       .limit(50); // Limit results to prevent large queries
@@ -491,13 +491,23 @@ async function updateStudy(req, res) {
  */
 async function deleteStudy(req, res) {
   try {
+    console.log('\n🔍 === DELETE STUDY DEBUG ===');
+    console.log(`Method: ${req.method}`);
+    console.log(`Query:`, req.query);
+    console.log(`Body:`, req.body);
+
     // Authenticate user
     const authResult = await authenticateUser(req);
     if (!authResult.success) {
+      console.log(`❌ Auth failed: ${authResult.error}`);
       return res.status(authResult.status).json({ success: false, error: authResult.error });
     }
 
+    console.log(`✅ User authenticated: ${authResult.user.id}`);
+
     const studyId = req.query.id || req.body.id;
+    console.log(`📋 Study ID: ${studyId} (type: ${typeof studyId})`);
+    
     if (!studyId) {
       return res.status(400).json({
         success: false,
@@ -505,20 +515,73 @@ async function deleteStudy(req, res) {
       });
     }
 
-    // First check if study exists and user owns it
-    const { data: existingStudy, error: fetchError } = await supabase
+    console.log('\n📊 DEBUGGING: Getting sample studies to understand data structure...');
+    const { data: sampleStudies, error: sampleError } = await supabaseAdmin
       .from('studies')
       .select('id, title, status, researcher_id')
-      .eq('id', studyId)
-      .eq('researcher_id', authResult.user.id)
-      .single();
+      .limit(3);
 
-    if (fetchError || !existingStudy) {
-      return res.status(404).json({
-        success: false,
-        error: 'Study not found or access denied'
+    if (sampleError) {
+      console.log(`❌ Sample query error: ${sampleError.message}`);
+    } else {
+      console.log(`✅ Sample studies retrieved: ${sampleStudies?.length || 0}`);
+      sampleStudies?.forEach((study, i) => {
+        console.log(`   ${i+1}. ${study.title} (ID: ${study.id} [${typeof study.id}], User: ${study.researcher_id})`);
       });
     }
+
+    console.log(`\n🎯 DEBUGGING: Searching for study ID ${studyId}...`);
+    
+    // Test different query approaches
+    const queryTests = [
+      { name: 'Original Query', id: studyId },
+      { name: 'String Conversion', id: String(studyId) },
+      { name: 'Number Conversion', id: Number(studyId) }
+    ];
+
+    let foundStudy = null;
+    let workingQuery = null;
+
+    for (const test of queryTests) {
+      console.log(`\n   Testing ${test.name}: ${test.id} (${typeof test.id})`);
+      
+      const { data: existingStudy, error: fetchError } = await supabaseAdmin
+        .from('studies')
+        .select('id, title, status, researcher_id')
+        .eq('id', test.id)
+        .eq('researcher_id', authResult.user.id);
+
+      if (fetchError) {
+        console.log(`   ❌ Query error: ${fetchError.message}`);
+      } else {
+        console.log(`   ✅ Query success: ${existingStudy?.length || 0} records found`);
+        if (existingStudy && existingStudy.length > 0) {
+          foundStudy = existingStudy[0];
+          workingQuery = test;
+          console.log(`   📋 Found study: "${foundStudy.title}"`);
+          console.log(`   📋 Status: ${foundStudy.status}`);
+          break;
+        }
+      }
+    }
+
+    if (!foundStudy) {
+      console.log(`❌ Study not found with any query method`);
+      console.log(`   Searched ID: ${studyId}`);
+      console.log(`   User ID: ${authResult.user.id}`);
+      
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found or access denied',
+        debug: {
+          searchedId: studyId,
+          userId: authResult.user.id,
+          queriesAttempted: queryTests.length
+        }
+      });
+    }
+
+    console.log(`\n✅ Study found with ${workingQuery.name}!`);
 
     // Optional: Only allow deletion of draft studies (uncomment if needed)
     // if (existingStudy.status !== 'draft') {
@@ -528,26 +591,37 @@ async function deleteStudy(req, res) {
     //   });
     // }
 
-    // Delete the study
-    const { error: deleteError } = await supabase
+    // Delete the study using the working query format
+    console.log('\n🗑️ DEBUGGING: Attempting delete...');
+    const { data: deleteResult, error: deleteError } = await supabaseAdmin
       .from('studies')
       .delete()
-      .eq('id', studyId)
-      .eq('researcher_id', authResult.user.id);
+      .eq('id', workingQuery.id)
+      .eq('researcher_id', authResult.user.id)
+      .select();
 
     if (deleteError) {
-      console.error('Database error deleting study:', deleteError);
+      console.error('❌ Database error deleting study:', deleteError);
       return res.status(500).json({
         success: false,
-        error: 'Failed to delete study from database'
+        error: 'Failed to delete study from database',
+        debug: {
+          deleteError: deleteError.message
+        }
       });
     }
 
-    console.log(`✅ Study deleted: ${existingStudy.title} (UUID: ${studyId})`);
+    console.log(`✅ Study deleted successfully: ${foundStudy.title}`);
+    console.log(`   Deleted records: ${deleteResult?.length || 0}`);
     
     return res.status(200).json({
       success: true,
-      message: 'Study deleted successfully'
+      message: 'Study deleted successfully',
+      debug: {
+        deletedStudy: foundStudy.title,
+        workingQueryType: workingQuery.name,
+        deletedRecords: deleteResult?.length || 0
+      }
     });
 
   } catch (error) {
