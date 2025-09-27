@@ -534,7 +534,15 @@ async function deleteStudy(req, res) {
         console.log(`❌ Study not found by UUID: ${findError?.message}`);
         return res.status(404).json({
           success: false,
-          error: 'Study not found or access denied'
+          error: 'Study not found or access denied',
+          debug: {
+            searchType: 'UUID',
+            searchValue: id,
+            userId: user.id,
+            findError: findError?.message,
+            hasStudyData: !!studyData,
+            timestamp: new Date().toISOString()
+          }
         });
       }
 
@@ -556,7 +564,15 @@ async function deleteStudy(req, res) {
         console.log(`❌ Study not found by numeric ID: ${findError?.message}`);
         return res.status(404).json({
           success: false,
-          error: 'Study not found or access denied'
+          error: 'Study not found or access denied',
+          debug: {
+            searchType: 'Numeric',
+            searchValue: id,
+            userId: user.id,
+            findError: findError?.message,
+            hasStudyData: !!studyData,
+            timestamp: new Date().toISOString()
+          }
         });
       }
 
