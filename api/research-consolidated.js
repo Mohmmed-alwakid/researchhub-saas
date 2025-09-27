@@ -531,8 +531,9 @@ async function deleteStudy(req, res) {
     }
 
     console.log(`\n🎯 DEBUGGING: Searching for study ID ${studyId}...`);
+    console.log(`   User ID from auth: ${authResult.user.id}`);
     
-    // Test different query approaches
+    // Test different query approaches with debugging
     const queryTests = [
       { name: 'Original Query', id: studyId },
       { name: 'String Conversion', id: String(studyId) },
@@ -545,22 +546,31 @@ async function deleteStudy(req, res) {
     for (const test of queryTests) {
       console.log(`\n   Testing ${test.name}: ${test.id} (${typeof test.id})`);
       
-      const { data: existingStudy, error: fetchError } = await supabaseAdmin
+      // First test without researcher filter to see if study exists at all
+      const { data: anyStudy, error: anyError } = await supabaseAdmin
         .from('studies')
         .select('id, title, status, researcher_id')
-        .eq('id', test.id)
-        .eq('researcher_id', authResult.user.id);
+        .eq('id', test.id);
 
-      if (fetchError) {
-        console.log(`   ❌ Query error: ${fetchError.message}`);
+      if (anyError) {
+        console.log(`   ❌ Any-study query error: ${anyError.message}`);
       } else {
-        console.log(`   ✅ Query success: ${existingStudy?.length || 0} records found`);
-        if (existingStudy && existingStudy.length > 0) {
-          foundStudy = existingStudy[0];
-          workingQuery = test;
-          console.log(`   📋 Found study: "${foundStudy.title}"`);
-          console.log(`   📋 Status: ${foundStudy.status}`);
-          break;
+        console.log(`   📊 Study exists check: ${anyStudy?.length || 0} records found`);
+        if (anyStudy && anyStudy.length > 0) {
+          const study = anyStudy[0];
+          console.log(`   📋 Found study: "${study.title}"`);
+          console.log(`   📋 Owner: ${study.researcher_id}`);
+          console.log(`   📋 Auth User: ${authResult.user.id}`);
+          console.log(`   📋 Ownership match: ${study.researcher_id === authResult.user.id ? 'YES' : 'NO'}`);
+          
+          if (study.researcher_id === authResult.user.id) {
+            foundStudy = study;
+            workingQuery = test;
+            console.log(`   ✅ FOUND OWNED STUDY!`);
+            break;
+          } else {
+            console.log(`   ⚠️ Study found but not owned by current user`);
+          }
         }
       }
     }
