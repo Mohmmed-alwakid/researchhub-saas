@@ -512,86 +512,48 @@ async function deleteStudy(req, res) {
 
     console.log(`🎯 Delete request for ID: ${id} (${typeof id}) by user: ${user.id}`);
 
-    // BREAKTHROUGH FIX: Use UUID-based deletion strategy
-    let study;
-    let deleteQuery;
-
-    // Detect if the ID is a UUID format (36 chars with dashes)
-    const isUuidFormat = typeof id === 'string' && id.includes('-') && id.length === 36;
+    // CORRECTED APPROACH: The database doesn't have a 'uuid' column!
+    // Use 'id' for both numeric and UUID formats, since 'uuid' column doesn't exist
     
-    if (isUuidFormat) {
-      console.log('🎯 UUID format detected - direct UUID deletion');
-      
-      // Find study by UUID
-      const { data: studyData, error: findError } = await supabaseAdmin
-        .from('studies')
-        .select('*')
-        .eq('uuid', id)
-        .eq('researcher_id', user.id)  // Fixed: Use researcher_id, not created_by
-        .single();
+    let study;
+    
+    console.log('🎯 Single strategy: Query by ID field only');
+    
+    // Find study by ID field (which handles both numeric and string values)
+    const { data: studyData, error: findError } = await supabaseAdmin
+      .from('studies')
+      .select('*')
+      .eq('id', id)  // Use actual database column name
+      .eq('researcher_id', user.id)  // Correct ownership field
+      .single();
 
-      if (findError || !studyData) {
-        console.log(`❌ Study not found by UUID: ${findError?.message}`);
-        return res.status(404).json({
-          success: false,
-          error: 'Study not found or access denied',
-          debug: {
-            searchType: 'UUID',
-            searchValue: id,
-            userId: user.id,
-            findError: findError?.message,
-            hasStudyData: !!studyData,
-            timestamp: new Date().toISOString()
-          }
-        });
-      }
-
-      study = studyData;
-      deleteQuery = { field: 'uuid', value: id };
-      
-    } else {
-      console.log('🎯 Numeric ID format - resolve to UUID');
-      
-      // Find study by numeric ID and get its UUID for deletion
-      const { data: studyData, error: findError } = await supabaseAdmin
-        .from('studies')
-        .select('*')
-        .eq('id', id)
-        .eq('researcher_id', user.id)  // Fixed: Use researcher_id, not created_by
-        .single();
-
-      if (findError || !studyData) {
-        console.log(`❌ Study not found by numeric ID: ${findError?.message}`);
-        return res.status(404).json({
-          success: false,
-          error: 'Study not found or access denied',
-          debug: {
-            searchType: 'Numeric',
-            searchValue: id,
-            userId: user.id,
-            findError: findError?.message,
-            hasStudyData: !!studyData,
-            timestamp: new Date().toISOString()
-          }
-        });
-      }
-
-      study = studyData;
-      // Use UUID for actual deletion (this is what works!)
-      deleteQuery = { field: 'uuid', value: studyData.uuid };
-      console.log(`✅ Resolved numeric ID ${id} to UUID ${studyData.uuid}`);
+    if (findError || !studyData) {
+      console.log(`❌ Study not found: ${findError?.message}`);
+      return res.status(404).json({
+        success: false,
+        error: 'Study not found or access denied',
+        debug: {
+          searchValue: id,
+          searchType: typeof id,
+          userId: user.id,
+          findError: findError?.message,
+          hasStudyData: !!studyData,
+          timestamp: new Date().toISOString()
+        }
+      });
     }
 
-    console.log(`✅ Study found: "${study.title}" - proceeding with UUID deletion`);
+    study = studyData;
+    console.log(`✅ Study found: "${study.title}" - proceeding with deletion`);
 
-    // Delete the study using UUID (GUARANTEED to work!)
-    console.log(`🗑️ Deleting study via ${deleteQuery.field}: ${deleteQuery.value}`);
+    // Delete the study using the correct database fields
+    console.log(`🗑️ Deleting study ID: ${id}`);
     
     const { data: deleteResult, error: deleteError } = await supabaseAdmin
       .from('studies')
       .delete()
-      .eq(deleteQuery.field, deleteQuery.value)
-      .eq('researcher_id', user.id)  // Fixed: Use researcher_id, not created_by
+      .eq('id', id)  // Use the actual database column that exists
+      .eq('researcher_id', user.id)  // Use correct ownership field
       .select();
 
     if (deleteError) {
