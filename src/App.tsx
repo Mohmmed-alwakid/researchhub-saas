@@ -48,6 +48,7 @@ const AdminDashboard = lazy(() => import('./client/pages/admin/AdminDashboard'))
 const ManualPaymentPage = lazy(() => import('./client/pages/payments/ManualPaymentPage.tsx'));
 const CreativeJourneyPage = lazy(() => import('./client/pages/journey/CreativeJourneyPage.tsx'));
 const StudyBuilderPage = lazy(() => import('./client/pages/study-builder/StudyBuilderPage'));
+const DocumentationPage = lazy(() => import('./client/pages/documentation/DocumentationPage'));
 const ParticipantStudyExecutionPage = lazy(() => import('./client/pages/participant/ParticipantStudyExecutionPage'));
 const OrganizationDashboard = lazy(() => import('./client/pages/organization/OrganizationDashboard'));
 const NotFoundPage = lazy(() => import('./client/pages/NotFoundPage'));
@@ -240,6 +241,10 @@ function App() {
                   <AnalyticsPage />
                 </ProtectedRoute>
               } />
+              
+              {/* Documentation & Help */}
+              <Route path="help" element={<DocumentationPage />} />
+              <Route path="documentation" element={<DocumentationPage />} />
               
               {/* Organization Routes - Admin Only */}
               <Route path="organizations" element={

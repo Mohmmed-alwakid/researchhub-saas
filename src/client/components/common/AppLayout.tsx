@@ -98,6 +98,7 @@ const AppLayout = () => {
       return [
         { name: 'My Applications', href: '/app/participant-dashboard', icon: BookOpen },
         { name: 'Discover Studies', href: '/app/discover', icon: Compass },
+        { name: 'Help', href: '/app/help', icon: HelpCircle },
         { name: 'Settings', href: '/app/settings', icon: Settings },
       ];
     }
@@ -109,6 +110,7 @@ const AppLayout = () => {
         { name: 'Studies', href: '/app/studies', icon: FileText },
         { name: 'Templates', href: '/app/templates', icon: Layout },
         { name: 'Participants', href: '/app/participants', icon: Users },
+        { name: 'Help', href: '/app/help', icon: HelpCircle },
         { name: 'Settings', href: '/app/settings', icon: Settings },
       ];
     }
@@ -120,7 +122,7 @@ const AppLayout = () => {
         { name: 'Dashboard', href: '/app/dashboard', icon: Home },
         { name: 'User Management', href: '/app/admin/users', icon: Users },
         { name: 'Studies', href: '/app/studies', icon: FileText },
-        { name: 'Analytics', href: '/app/admin/analytics', icon: BarChart3 },
+        { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
         { name: 'Templates', href: '/app/templates', icon: Layout },
         { name: 'Plan Management', href: '/app/admin/subscriptions', icon: CreditCard },
         { name: 'Billing & Payments', href: '/app/admin/payments', icon: DollarSign },
@@ -132,6 +134,7 @@ const AppLayout = () => {
         { name: 'Database Admin', href: '/app/admin/database', icon: Database },
         { name: 'API Management', href: '/app/admin/api', icon: Globe },
         { name: 'Support Center', href: '/app/admin/support', icon: HeadphonesIcon },
+        { name: 'Help', href: '/app/help', icon: HelpCircle },
         { name: 'System Settings', href: '/app/admin/settings', icon: Settings },
       ];
     }
