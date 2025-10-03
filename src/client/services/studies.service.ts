@@ -136,7 +136,7 @@ export const studiesService = {
    * Delete study
    */
   async deleteStudy(studyId: string): Promise<{ success: boolean; message: string }> {
-    return apiService.delete(`research-consolidated?action=delete-study&id=${studyId}`);
+    return apiService.post(`research-consolidated?action=delete-study`, { id: studyId });
   },
   /**
    * Duplicate study

@@ -501,7 +501,7 @@ async function deleteStudy(req, res) {
     }
 
     const user = authResult.user;
-    const id = req.query.id || req.body.id;
+    const { id } = req.body;
     
     if (!id) {
       return res.status(400).json({
